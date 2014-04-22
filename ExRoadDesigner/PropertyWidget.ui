@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui version="4.0">
+  <class>PropertyWidget</class>
+  <widget class="QDockWidget" name="PropertyWidget">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>192</width>
+        <height>831</height>
+      </rect>
+    </property>
+    <property name="minimumSize">
+      <size>
+        <width>192</width>
+        <height>240</height>
+      </size>
+    </property>
+    <property name="styleSheet">
+      <string notr="true">background-color: rgb(181, 181, 181);</string>
+    </property>
+    <widget class="QWidget" name="dockWidgetContents">
+      <widget class="QGroupBox" name="groupBox">
+        <property name="geometry">
+          <rect>
+            <x>10</x>
+            <y>440</y>
+            <width>171</width>
+            <height>171</height>
+          </rect>
+        </property>
+        <property name="title">
+          <string>Edge</string>
+        </property>
+        <widget class="QLabel" name="label">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>20</y>
+              <width>31</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Type</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditEdgeType">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>20</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_2">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>40</y>
+              <width>51</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Lanes</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditEdgeLanes">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>40</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_3">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>60</y>
+              <width>51</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>One Way</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditEdgeOneWay">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>60</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditEdgeLink">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>80</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_9">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>80</y>
+              <width>51</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Link</string>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_10">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>100</y>
+              <width>61</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Roundabout</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditEdgeRoundabout">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>100</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_17">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>120</y>
+              <width>51</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Group</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditEdgeGroupId">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>120</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_18">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>140</y>
+              <width>51</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Example?</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditEdgeGenerationType">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>140</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_5">
+        <property name="geometry">
+          <rect>
+            <x>10</x>
+            <y>10</y>
+            <width>171</width>
+            <height>421</height>
+          </rect>
+        </property>
+        <property name="title">
+          <string>Vertex</string>
+        </property>
+        <widget class="QLabel" name="label_6">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>60</y>
+              <width>31</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>ID</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditVertexDesc">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>60</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_7">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>80</y>
+              <width>51</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Location</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditVertexPos">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>80</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_8">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>230</y>
+              <width>51</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Neighbors</string>
+          </property>
+        </widget>
+        <widget class="QTextEdit" name="textEditVertexNeighbors">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>230</y>
+              <width>81</width>
+              <height>61</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_11">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>320</y>
+              <width>51</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Example?</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditVertexGenerationType">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>320</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_12">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>100</y>
+              <width>51</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Parent</string>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_13">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>160</y>
+              <width>51</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Uncles</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditVertexParent">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>100</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QTextEdit" name="textEditVertexUncles">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>160</y>
+              <width>81</width>
+              <height>61</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_14">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>120</y>
+              <width>71</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>On boundary?</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditVertexOnBoundary">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>120</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_15">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>300</y>
+              <width>51</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Group</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditVertexGroupId">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>300</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_16">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>340</y>
+              <width>61</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Example Id</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditVertexExampleDesc">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>340</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_19">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>380</y>
+              <width>61</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Deadend</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditVertexDeadend">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>380</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditVertexSearch">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>20</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+        <widget class="QPushButton" name="pushButtonVertexSearch">
+          <property name="geometry">
+            <rect>
+              <x>100</x>
+              <y>20</y>
+              <width>61</width>
+              <height>23</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Search</string>
+          </property>
+        </widget>
+        <widget class="QLabel" name="label_20">
+          <property name="geometry">
+            <rect>
+              <x>10</x>
+              <y>360</y>
+              <width>61</width>
+              <height>16</height>
+            </rect>
+          </property>
+          <property name="text">
+            <string>Local Ex Id</string>
+          </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEditVertexExampleStreetDesc">
+          <property name="geometry">
+            <rect>
+              <x>80</x>
+              <y>360</y>
+              <width>81</width>
+              <height>20</height>
+            </rect>
+          </property>
+        </widget>
+      </widget>
+    </widget>
+  </widget>
+  <resources/>
+  <connections/>
+</ui>

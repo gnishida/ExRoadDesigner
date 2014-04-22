@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="MainWindow">
+      <file>Resources/Undo_24x24.png</file>
+      <file>Resources/Save_24x24.png</file>
+      <file>Resources/Paste_24x24.png</file>
+      <file>Resources/Open_24x24.png</file>
+      <file>Resources/Delete_24x24.png</file>
+      <file>Resources/Cut_24x24.png</file>
+      <file>Resources/Copy_24x24.png</file>
+      <file>Resources/New_24x24.png</file>
+      <file>Resources/Select_24x24.png</file>
+      <file>Resources/Create_24x24.png</file>
+      <file>Resources/Sketch_24x24.png</file>
+      <file>Resources/SketchH_24x24.png</file>
+      <file>Resources/SketchB_24x24.png</file>
+      <file>Resources/3DView_24x24.png</file>
+      <file>Resources/Terrain_32x32.png</file>
+      <file>Resources/Debug_24x24.png</file>
+      <file>Resources/Line_24x24.png</file>
+    </qresource>
+</RCC>
