@@ -30,5 +30,7 @@ public slots:
 	void clear();
 	void mergeRoads();
 	void connectRoads();
+	void update3D();
+	//void camera3D();
 };
 

@@ -12,7 +12,7 @@
 #include <qvariant.h>
 
 #include <QTextStream>
-#include "polygon3D.h"
+#include "Polygon3D.h"
 #include "global.h"
 
 #include <boost/geometry/geometries/ring.hpp>
@@ -59,8 +59,7 @@ public:
 
 
 	//bounding rectangle
-	//Loop3D boundingRectangle;
-	Polyline3D boundingRectangle;
+	Loop3D boundingRectangle;
 	boost::geometry::ring_type<Polygon3D>::type bg_boudingRectangle;
 
 	void updateBoundingRectangle(void);

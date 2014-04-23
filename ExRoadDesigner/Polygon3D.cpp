@@ -1,212 +1,526 @@
-﻿#include <QMatrix4x4>
 #include "Polygon3D.h"
-#include "Polyline3D.h"
-#include "Util.h"
+#include <QVector2D>
+#include <QMatrix4x4>
 
-const QVector3D & Polygon3D::last() const {
-	return at(size() - 1);
+
+//**** Polygon3D
+void Polygon3D::renderContour(void)
+{	
+	glBegin(GL_LINE_LOOP);
+	for(size_t i=0; i<contour.size(); ++i){
+		glVertex3f(contour[i].x(),
+			contour[i].y(),
+			contour[i].z());
+	}
+	glEnd();	
+
+
 }
 
-QVector3D & Polygon3D::last() {
-	return at(size() - 1);
+
+void Polygon3D::render(void)
+{		
+	glBegin(GL_POLYGON);
+	for(size_t i=0; i<contour.size(); ++i){
+		glVertex3f(contour[i].x(),
+			contour[i].y(),
+			contour[i].z());
+	}
+	glEnd();			
 }
 
-void Polygon3D::correct() {
-	boost::geometry::correct(*this);
-}
-
-float Polygon3D::area() const {
-	return fabs(boost::geometry::area(*this));
-}
-
-QVector2D Polygon3D::centroid() const {
-	QVector2D ret;
-	boost::geometry::centroid(*this, ret);
-
-	return ret;
-}
-
-bool Polygon3D::contains(const QVector3D &pt) const {
-	return boost::geometry::within(pt, *this);
-}
-
-bool Polygon3D::contains(const QVector3D &pt) {
-	return boost::geometry::within(pt, *this);
-}
-
-bool Polygon3D::contains(const Polygon3D &polygon) const {
-	for (int i = 0; i < polygon.size(); ++i) {
-		if (!contains(polygon[i])) return false;
+void Polygon3D::renderNonConvex(bool reComputeNormal,
+	float nx, float ny, float nz)
+{
+	QVector3D myNormal;
+	if(reComputeNormal)
+	{
+		myNormal = this->getNormalVector();
+	} else {
+		myNormal.setX(nx);
+		myNormal.setY(ny);
+		myNormal.setZ(nz);
 	}
 
+	//Render inside fill			
+	if(contour.size() == 3){
+		glBegin(GL_TRIANGLES);	
+		for(size_t i=0; i<contour.size(); i++){	
+			glNormal3f(myNormal.x(), myNormal.y(), myNormal.z());
+			glVertex3f(contour[i].x(), contour[i].y(), contour[i].z());			
+		}
+		glEnd();
+	} else if(contour.size() == 4){
+		glBegin(GL_QUADS);	
+		for(int i=0; i<contour.size(); i++){	
+			glNormal3f(myNormal.x(), myNormal.y(), myNormal.z());
+			glVertex3f(contour[i].x(), contour[i].y(), contour[i].z());			
+		}
+		glEnd();
+	} else {
+
+		// create tessellator
+		GLUtesselator *tess = gluNewTess();
+
+		double *vtxData = new double[3*contour.size()];
+		for(size_t i=0; i<contour.size(); i++){
+			vtxData[3*i]=contour[i].x();
+			vtxData[3*i+1]=contour[i].y();
+			vtxData[3*i+2]=contour[i].z();
+		}
+
+		// register callback functions
+		gluTessCallback(tess, GLU_TESS_BEGIN, 
+			(void (__stdcall *)(void))glBegin);
+		gluTessCallback(tess, GLU_TESS_VERTEX,
+			(void (__stdcall *)(void))glVertex3dv);
+		gluTessCallback(tess, GLU_TESS_END, glEnd);
+
+		// describe non-convex polygon
+		gluTessBeginPolygon(tess, NULL);
+
+
+		// contour
+		gluTessBeginContour(tess);
+
+		for(size_t i=0; i<contour.size(); i++){
+			//HACK
+			glNormal3f(myNormal.x(), myNormal.y(), fabs(myNormal.z()));
+			gluTessVertex(tess, &vtxData[3*i], &vtxData[3*i]);
+		}
+		gluTessEndContour(tess);
+
+		gluTessEndPolygon(tess);
+
+		// delete tessellator after processing
+		gluDeleteTess(tess);
+
+		delete [] vtxData;
+	}
+
+	//Render contour wire
+	/*glColor3f(0.5f, 0.5f, 1.0f);			
+	glBegin(GL_LINES);
+	for(int i=0; i<contour.size()-1; ++i){
+	if(i==contour.size()-2)//last
+	glColor3f(0.5f, 1.0f, 1.0f);
+	else
+	glColor3f(0.5f, 0.5f, 1.0f);
+	if(ClientGlobalVariable::gV()->render_adaptGeometry==false){
+	glVertex3f(contour[i].x(),contour[i].y(),contour[i].z());
+	glVertex3f(contour[i+1].x(),contour[i+1].y(),contour[i+1].z());
+	}
+	else{
+	glVertex3f(contour[i].x(),contour[i].y(),0);
+	glVertex3f(contour[i+1].x(),contour[i+1].y(),0);
+	}
+	}*/
+
+	/*
+	glColor3f(0.5f, 0.5f, 1.0f);
+	glBegin(GL_LINE_LOOP);
+	for(size_t i=0; i<contour.size(); ++i){
+
+	if(ClientGlobalVariable::gV()->render_adaptGeometry==false)
+	glVertex3f(contour[i].x(),contour[i].y(),0.0f);
+	else
+	glVertex3f(contour[i].x(),contour[i].y(),contour[i].z());
+	}
+	glEnd();
+	*/
+}
+
+double angleBetweenVectors(QVector3D &vec1, QVector3D &vec2)
+{	
+	return acos( 0.999*(QVector3D::dotProduct(vec1, vec2)) / ( vec1.length() * vec2.length() ) );
+}
+
+/**
+* Given three non colinear points p0, p1, p2, this function computes
+* the intersection between the lines A and B. Line A is the line parallel to the segment p0-p1
+* and at a distance d01 from that segment. Line B is the line parallel to the segment
+* p1-p2 at a distance d12 from that segment.
+* Returns true if point is successfully computed
+**/
+
+bool getIrregularBisector(QVector3D &p0,
+	QVector3D &p1, QVector3D &p2, float d01, float d12,
+	QVector3D &intPt)
+{
+	double alpha;
+	double theta;
+	double L;
+
+	QVector3D p1_p0;
+	QVector3D p1_p2;
+	QVector3D p1_p2_perp;
+	QVector3D crossP;
+
+	p1_p0 = p0 - p1;
+	p1_p0.setZ(0.0f);
+
+	p1_p2 = p2 - p1;
+	p1_p2.setZ(0.0f);
+
+	p1_p2_perp.setX( -p1_p2.y() );
+	p1_p2_perp.setY(  p1_p2.x() );
+	p1_p2_perp.setZ( 0.0f );
+
+	alpha = angleBetweenVectors(p1_p0, p1_p2);				
+
+	if( !(alpha == alpha) ){
+		return false;
+	}				
+
+	theta = atan2( sin(alpha), (d01 / d12) + cos(alpha) );				
+	L = d12 / sin(theta);
+
+	//This is done to handle convex vs. concave angles in polygon
+	crossP = QVector3D::crossProduct(p1_p2, p1_p0);
+
+	if(crossP.z() > 0){
+		//CCW polygon (A + B + C)
+		//CW  polygon (A - B - C)
+		intPt = p1 + (p1_p2.normalized())*L*cos(theta) +
+			(p1_p2_perp.normalized())*d12;
+	}
+	else {
+		//CCW polygon (A - B + C)
+		//CW  polygon (A + B - C)
+		intPt = p1 - (p1_p2.normalized())*L*cos(theta) +
+			(p1_p2_perp.normalized())*d12;
+	}
 	return true;
 }
 
-BBox Polygon3D::envelope() const {
-	BBox bbox;
-	boost::geometry::envelope(*this, bbox);
-	return bbox;
+/**
+* Checks if contour A is within contour B
+**/
+bool is2DRingWithin2DRing( boost::geometry::ring_type<Polygon3D>::type &contourA, boost::geometry::ring_type<Polygon3D>::type &contourB)
+{
+	for(int i=0; i<contourA.size(); ++i){
+		if( !boost::geometry::within( contourA[i], contourB) ){
+			return false;
+		}
+	}
+	return true;
 }
 
-/**
- * 当該ポリゴンを移動する。
- */
-void Polygon3D::translate(float x, float y) {
-	Polygon3D temp = *this;
-	this->clear();
+float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea)
+{
+	Loop3D cleanPgon; 
+	double tol = 0.01f;
 
-	boost::geometry::strategy::transform::translate_transformer<QVector3D, QVector3D> translate(x, y);
-    boost::geometry::transform(temp, *this, translate);
-}
+	cleanPgon = this->contour;
 
-/**
- * 移動したポリゴンを返却する。
- *
- * @param x			X軸方向の移動距離
- * @param y			Y軸方向の移動距離
- * @ret				移動したポリゴン
- */
-void Polygon3D::translate(float x, float y, Polygon3D &ret) const {
-	boost::geometry::strategy::transform::translate_transformer<QVector3D, QVector3D> translate(x, y);
-    boost::geometry::transform(*this, ret, translate);
-}
+	int prev, next;
+	int cSz = cleanPgon.size();
 
-/**
- * 原点を中心に、指定した角度だけ時計回りに回転する。
- *
- * @param angle		時計回りの回転角度[degree]
- */
-void Polygon3D::rotate(float angle) {
-	Polygon3D temp = *this;
-	this->clear();
-
-	boost::geometry::strategy::transform::rotate_transformer<QVector3D, QVector3D, boost::geometry::degree> rotate(angle);
-    boost::geometry::transform(temp, *this, rotate);
-}
-
-/**
- * 原点を中心に、指定した角度だけ時計回りに回転したポリゴンを返却する。
- *
- * @param angle		時計回りの回転角度[degree]
- * @ret				回転したポリゴン
- */
-void Polygon3D::rotate(float angle, Polygon3D &ret) const {
-	boost::geometry::strategy::transform::rotate_transformer<QVector3D, QVector3D, boost::geometry::degree> rotate(angle);
-    boost::geometry::transform(*this, ret, rotate);
-}
-
-/**
- * 指定された点を中心に、指定された角度だけ時計回りに回転したポリゴンを返却する。
- *
- * @param angle		時計回りの回転角度[degree]
- * @param orig		回転中心
- */
-void Polygon3D::rotate(float angle, const QVector2D &orig) {
-	translate(-orig.x(), -orig.y());
-	rotate(angle);
-	translate(orig.x(), orig.y());
-}
-
-/**
- * このポリゴンを三角形または凸四角形の集合に分割する。
- * 2Dでのtessellationを行い、得られる図形のZ座標は全て0となる。
- * また、tessellateされた各図形の頂点はclosedで、CCWオーダである。
- */
-std::vector<Polygon3D> Polygon3D::tessellate() const {
-	std::vector<Polygon3D> trapezoids;
-
-	if (size() < 3) return trapezoids;
-
-	typedef boost::polygon::point_data<double> point;
-	typedef boost::polygon::polygon_set_data<double> polygon_set;
-	typedef boost::polygon::polygon_with_holes_data<double> bpolygon;
-
-	std::vector<point> pts;
-	for (int i = size() - 1; i >= 0; i--) {
-		pts.push_back(point(at(i).x(), at(i).y()));
+	if(cSz < 3){
+		return 0.0f;
 	}
 
-	bpolygon ply;
-	boost::polygon::set_points( ply, pts.begin(), pts.end() );
+	if(reorientFace(cleanPgon)){				
+		std::reverse(offsetDistances.begin(), offsetDistances.end() - 1);
+	}
 
-	std::vector<bpolygon> ots;
-	polygon_set plys;
-	plys.insert(ply);
-	plys.get_trapezoids(ots);
-
-	for (int i = 0; i < ots.size(); ++i) {
-		Polygon3D trapezoid;
-
-		for (boost::polygon::polygon_with_holes_data<double>::iterator_type it = ots[i].begin(); it != ots[i].end(); ++it) {
-			float z;
-
-			// 直近の頂点を探してZ座標を決定する
-			/*
-			float min_dist = std::numeric_limits<float>::max();
-			for (int j = 0; j < size(); ++j) {
-				float dist = SQR(at(j).x() - (*it).x()) + SQR(at(j).y() - (*it).y());
-				if (dist < min_dist) {
-					min_dist = dist;
-					z = at(j).z();
-				}
-			}*/
-
-			bool done = false;
-
-			for (int j = 0; j < size(); j++) {
-				if (at(j).x() == (*it).x() && at(j).y() == (*it).y()) {
-					z = at(j).z();
-					done = true;
-					break;
-				}
-			}
-			if (!done) {
-				int v1, v2;
-				float s;
-				findEdge((*it).x(), (*it).y(), v1, v2, s);
-				z = at(v1).z() + (at(v2).z() - at(v1).z()) * s;
-			}
-
-			trapezoid.push_back(QVector3D((*it).x(), (*it).y(), z));
-		}
-
-		if (trapezoid.size() >= 4) {
-			// closedのポリゴンなので、最初の頂点を削除する
-			trapezoid.erase(trapezoid.begin());
-
-			// CWオーダなので、CCWオーダにする
-			std::reverse(trapezoid.begin(), trapezoid.end());
-
-			trapezoids.push_back(trapezoid);
+	//if offsets are zero, add a small epsilon just to avoid division by zero
+	for(size_t i=0; i<offsetDistances.size(); ++i){
+		if(fabs(offsetDistances[i]) < tol){
+			offsetDistances[i] = tol;
 		}
 	}
 
-	return trapezoids;
-}
+	pgonInset.resize(cSz);
 
-void Polygon3D::findEdge(float x, float y, int& v1, int& v2, float& s) const {
-	float minDist = (std::numeric_limits<float>::max)();
+	QVector3D intPt;
 
-	for (int i = 0; i < size(); i++) {
-		int next = (i + 1) % size();
 
-		float dist = Util::pointSegmentDistanceXY(at(i), at(next), QVector3D(x, y, 0));
-		if (dist < minDist) {
-			minDist = dist;
-			v1 = i;
-			v2 = next;
-			if (fabs(at(next).x() - at(i).x()) > fabs(at(next).y() - at(i).y())) {
-				s = (x - at(i).x()) / (at(next).x() - at(i).x());
+	for(int cur=0; cur<cSz; ++cur){
+		//Some geometry and trigonometry
+
+		//point p1 is the point with index cur
+		prev = (cur-1+cSz)%cSz; //point p0
+		next = (cur+1)%cSz;	  //point p2
+
+		getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next],
+			offsetDistances[prev], offsetDistances[cur], intPt);
+
+		pgonInset[cur] = intPt;
+	}
+
+	//temp
+	//pgonInset = cleanPgon;
+
+	//Compute inset area
+	if(computeArea){
+
+		boost::geometry::ring_type<Polygon3D>::type bg_contour;
+		boost::geometry::ring_type<Polygon3D>::type bg_contour_inset;
+		float contArea;
+		float contInsetArea;
+
+		if(pgonInset.size()>0){
+			boost::geometry::assign(bg_contour_inset, pgonInset);
+			boost::geometry::correct(bg_contour_inset);
+
+			if(boost::geometry::intersects(bg_contour_inset)){
+				pgonInset.clear();
+				return 0.0f;
 			} else {
-				if (at(next).y() - at(i).y() != 0.0f) {
-					s = (y - at(i).y()) / (at(next).y() - at(i).y());                                
+
+				boost::geometry::assign(bg_contour, cleanPgon);
+				boost::geometry::correct(bg_contour);
+				//if inset is not within polygon
+				if( !is2DRingWithin2DRing(bg_contour_inset, bg_contour) ){
+					pgonInset.clear();
+					return 0.0f;
 				} else {
-					s = 0.0f;
+					contArea = fabs(boost::geometry::area(bg_contour));
+					contInsetArea = fabs(boost::geometry::area(bg_contour_inset));
+
+					if(contInsetArea < contArea){
+						//return boost::geometry::area(bg_contour_inset);
+						return contInsetArea;
+					} else {
+						pgonInset.clear();
+						return 0.0f;
+					}
 				}
+			}
+		} else {
+			pgonInset.clear();
+			return 0.0f;
+		}
+	}
+	return 0.0f;
+
+}
+
+QVector3D calculateNormal(QVector3D& p0,QVector3D& p1,QVector3D& p2)
+{
+	return (QVector3D::normal((p1-p0),(p2-p1)));
+}
+
+QVector3D Polygon3D::getLoopNormalVector(Loop3D &pin)
+{
+	if(pin.size() >= 3){
+		return (calculateNormal(pin[0], pin[1], pin[2]));
+	}
+	return ( QVector3D(0, 0, 0) );
+}
+
+QVector3D Polygon3D::getNormalVector()
+{	
+	if(this->normalVec.isNull())
+	{
+		normalVec = getLoopNormalVector(this->contour);
+	}
+	return normalVec;
+}
+
+const float MTC_FLOAT_TOL = 1e-6f;
+
+/**
+* Computes the intersection between two line segments on the XY plane
+* Segments must intersect within their extents for the intersection to be valid
+* z coordinate is ignored
+**/
+bool Polygon3D::segmentSegmentIntersectXY(QVector2D &a, QVector2D &b, QVector2D &c, QVector2D &d,
+	float *tab, float *tcd, bool segmentOnly, QVector2D &intPoint)
+{
+	QVector2D u = b - a;
+	QVector2D v = d - c;
+
+	if( u.lengthSquared() < MTC_FLOAT_TOL  ||  v.lengthSquared() < MTC_FLOAT_TOL )
+	{
+		return false;
+	}
+
+	float numer = v.x()*(c.y()-a.y()) + v.y()*(a.x()-c.x());
+	float denom = u.y()*v.x() - u.x()*v.y();
+
+	if (denom == 0.0f)  {
+		// they are parallel
+		*tab = 0.0f;
+		*tcd = 0.0f;
+		return false;
+	}
+
+	float t0 = numer / denom;
+
+	QVector2D ipt = a + t0*u;
+	QVector2D tmp = ipt - c;
+	float t1;
+	if (QVector2D::dotProduct(tmp, v) > 0.0f){
+		t1 = tmp.length() / v.length();
+	}
+	else {
+		t1 = -1.0f * tmp.length() / v.length();
+	}
+
+	//Check if intersection is within segments
+	if( !( (t0 >= MTC_FLOAT_TOL) && (t0 <= 1.0f-MTC_FLOAT_TOL) && (t1 >= MTC_FLOAT_TOL) && (t1 <= 1.0f-MTC_FLOAT_TOL) ) ){
+		return false;
+	}
+
+	*tab = t0;
+	*tcd = t1;
+	QVector2D dirVec = b-a;
+
+	intPoint = a+(*tab)*dirVec;
+	return true;
+}
+
+void Polygon3D::transformLoop(Loop3D &pin, Loop3D &pout, QMatrix4x4 &transformMat)
+{
+	pout = pin;
+	for(int i=0; i<pin.size(); ++i){
+		pout.at(i) = transformMat*pin.at(i);
+	}
+}
+
+//Only works for polygons with no holes in them
+bool Polygon3D::splitMeWithPolyline(std::vector<QVector3D> &pline, Loop3D &pgon1, Loop3D &pgon2)
+{
+	bool polylineIntersectsPolygon = false;
+
+	int plineSz = pline.size();
+	int contourSz = this->contour.size();
+
+	if(plineSz < 2 || contourSz < 3){
+		//std::cout << "ERROR: Cannot split if polygon has fewer than three vertices of if polyline has fewer than two points\n.";
+		return false;
+	}
+
+	QVector2D tmpIntPt;
+	QVector2D firstIntPt;
+	QVector2D secondIntPt;
+	float tPline, tPgon;
+	int firstIntPlineIdx    = -1;
+	int secondIntPlineIdx   = -1;
+	int firstIntContourIdx  = -1;
+	int secondIntContourIdx = -1;
+	int intCount = 0;
+
+
+	//iterate along polyline
+	for(int i=0; i<plineSz-1; ++i){
+		int iNext = i+1;
+
+		for(int j=0; j<contourSz; ++j){
+			int jNext = (j+1)%contourSz;
+
+			if (segmentSegmentIntersectXY( QVector2D(pline[i]), QVector2D(pline[iNext]),
+				QVector2D(contour[j]), QVector2D(contour[jNext]),
+				&tPline, &tPgon, true, tmpIntPt) ) 
+			{
+				polylineIntersectsPolygon = true;
+
+				//first intersection
+				if(intCount == 0){
+					firstIntPlineIdx = i;
+					firstIntContourIdx = j;
+					firstIntPt = tmpIntPt;
+				} else if(intCount == 1) {
+					secondIntPlineIdx = i;
+					secondIntContourIdx = j;
+					secondIntPt = tmpIntPt;
+				} else {
+					//std::cout << "Cannot split - Polyline intersects polygon at more than two points.\n";
+					return false;
+				}
+				intCount++;
 			}
 		}
 	}
+
+	if(intCount != 2){
+		//std::cout << "Cannot split - Polyline intersects polygon at " << intCount <<" points\n";
+		return false;
+	}
+
+	//Once we have intersection points and indexes, we reconstruct the two polygons
+	pgon1.clear();
+	pgon2.clear();
+	int pgonVtxIte;
+	int plineVtxIte;
+
+	//If first polygon segment intersected has an index greater
+	//	than second segment, modify indexes for correct reconstruction
+	if(firstIntContourIdx > secondIntContourIdx){
+		secondIntContourIdx += contourSz;
+	}
+
+	//==== Reconstruct first polygon
+	//-- append polygon contour
+	pgon1.push_back(firstIntPt);
+	pgonVtxIte = firstIntContourIdx;
+	while( pgonVtxIte < secondIntContourIdx){
+		pgon1.push_back(contour[(pgonVtxIte+1)%contourSz]);
+		pgonVtxIte++;
+	}
+	pgon1.push_back(secondIntPt);
+	//-- append polyline points
+	plineVtxIte = secondIntPlineIdx;
+	while(plineVtxIte > firstIntPlineIdx){
+		pgon1.push_back(pline[(plineVtxIte)]);
+		plineVtxIte--;
+	}
+
+	//==== Reconstruct second polygon
+	//-- append polygon contour
+	pgon2.push_back(secondIntPt);
+	pgonVtxIte = secondIntContourIdx;
+	while( pgonVtxIte < firstIntContourIdx + contourSz){
+		pgon2.push_back(contour[(pgonVtxIte+1)%contourSz]);
+		pgonVtxIte++;
+	}
+	pgon2.push_back(firstIntPt);
+	//-- append polyline points
+	plineVtxIte = firstIntPlineIdx;
+	while(plineVtxIte < secondIntPlineIdx){
+		pgon2.push_back(pline[(plineVtxIte + 1)]);
+		plineVtxIte++;
+	}
+
+
+	//verify that two polygons are created after the split. If not, return false
+	/////
+	if(pgon1.size() < 3 || pgon2.size() < 3){
+		//std::cout << "Invalid split - Resulting polygons have fewer than three vertices.\n";
+		return false;
+	}
+
+	return polylineIntersectsPolygon;
 }
+
+/**
+* @brief: Reorient polygon faces so that they are CCW
+* @in: If only check is true, the polygon is not modified
+* @out: True if polygon had to be reoriented
+**/
+bool Polygon3D::reorientFace(Loop3D &pface, bool onlyCheck)
+{
+	int pfaceSz = pface.size();
+	int next;
+	float tmpSum = 0.0f;
+
+	for(int i=0; i<pfaceSz; ++i){
+		next = (i+1)%pfaceSz;
+		tmpSum = tmpSum + ( pface[next].x() - pface[i].x() )*( pface[next].y() + pface[i].y() );
+	}			
+
+	if(tmpSum > 0.0f)
+	{				
+		if(!onlyCheck){
+			std::reverse(pface.begin(), pface.end());
+		}
+		return true;
+	}
+	return false;
+}
+
 
 /**
 * @brief: Given a polygon, this function computes the polygon's inwards offset. The offset distance
@@ -218,196 +532,93 @@ void Polygon3D::findEdge(float x, float y, int& v1, int& v2, float& s) const {
 * @param[out] pgonInset: The vertices of the polygon inset
 * @return insetArea: Returns the area of the polygon inset		
 **/
-void Polygon3D::computeInset(float offsetDistance, Polygon3D &pgonInset) {
-	if (size() < 3) return;
-	std::vector<float> offsetDistances(size(), offsetDistance);
+float Polygon3D::computeInset(float offsetDistance, Loop3D &pgonInset, bool computeArea)
+{
+	if(contour.size() < 3) return 0.0f;				
+	std::vector<float> offsetDistances(contour.size(), offsetDistance);
 
-	computeInset(offsetDistances, pgonInset);
+	return computeInset(offsetDistances, pgonInset, computeArea);
 }
 
-void Polygon3D::computeInset(std::vector<float> offsetDistances, Polygon3D &pgonInset) {
-	Polygon3D cleanPgon = *this;
-	double tol = 0.01f;
+//Distance from segment ab to point c
+float pointSegmentDistanceXY(QVector3D &a, QVector3D &b, QVector3D &c, QVector3D &closestPtInAB)
+{
+	float dist;		
 
-	int prev, next;
-	int cSz = cleanPgon.size();
+	float r_numerator = (c.x()-a.x())*(b.x()-a.x()) + (c.y()-a.y())*(b.y()-a.y());
+	float r_denomenator = (b.x()-a.x())*(b.x()-a.x()) + (b.y()-a.y())*(b.y()-a.y());
+	float r = r_numerator / r_denomenator;
+	//
+	float px = a.x() + r*(b.x()-a.x());
+	float py = a.y() + r*(b.y()-a.y());
+	//    
+	float s =  ((a.y()-c.y())*(b.x()-a.x())-(a.x()-c.x())*(b.y()-a.y()) ) / r_denomenator;
 
-	if (cSz < 3) return;
+	float distanceLine = fabs(s)*sqrt(r_denomenator);
 
-	//if offsets are zero, add a small epsilon just to avoid division by zero
-	for (size_t i=0; i<offsetDistances.size(); ++i){
-		if(fabs(offsetDistances[i]) < tol){
-			offsetDistances[i] = tol;
+	//
+	// (xx,yy) is the point on the lineSegment closest to (cx,cy)
+	//
+	closestPtInAB.setX(px);
+	closestPtInAB.setY(py);
+	closestPtInAB.setZ(0.0f);
+
+	if ( (r >= 0) && (r <= 1) )
+	{
+		dist = distanceLine;
+	}
+	else
+	{
+		float dist1 = (c.x()-a.x())*(c.x()-a.x()) + (c.y()-a.y())*(c.y()-a.y());
+		float dist2 = (c.x()-b.x())*(c.x()-b.x()) + (c.y()-b.y())*(c.y()-b.y());
+		if (dist1 < dist2)
+		{	
+			dist = sqrt(dist1);
+		}
+		else
+		{
+			dist = sqrt(dist2);
 		}
 	}
 
-	//pgonInset.resize(cSz);
-	QVector3D intPt;
-
-	for (int cur = 0; cur < cSz; ++cur) {
-		//point p1 is the point with index cur
-		prev = (cur-1+cSz)%cSz; //point p0
-		next = (cur+1)%cSz;	  //point p2
-
-		// Deanend対策
-		if (Util::diffAngle(cleanPgon[prev] - cleanPgon[cur], cleanPgon[next] - cleanPgon[cur]) < 0.1f) {
-			QVector3D vec = cleanPgon[cur] - cleanPgon[prev];
-			QVector3D vec2(-vec.y(), vec.x(), 0);
-			/*
-			vec2 = vec2.normalized() * offsetDistances[cur];
-			intPt = cleanPgon[cur] + vec2;
-			pgonInset.push_back(intPt);
-			*/
-
-			float angle = atan2f(vec2.y(), vec2.x());
-			for (int i = 0; i <= 10; ++i) {
-				float a = angle - (float)i * M_PI / 10.0f;
-				intPt = QVector3D(cleanPgon[cur].x() + cosf(a) * offsetDistances[cur], cleanPgon[cur].y() + sinf(a) * offsetDistances[cur], cleanPgon[cur].z());
-				pgonInset.push_back(intPt);
-			}
-
-			/*
-			vec = vec.normalized() * offsetDistances[cur];
-			intPt = cleanPgon[cur] + vec;
-			pgonInset.push_back(intPt);
-
-			intPt = cleanPgon[cur] - vec2;
-			pgonInset.push_back(intPt);
-			*/
-		} else {
-			Util::getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next], offsetDistances[prev], offsetDistances[cur], intPt);
-			//pgonInset[cur] = intPt;
-
-			// 鋭角対策
-			if (pgonInset.size() >= 2) {
-				if (Util::diffAngle(pgonInset[pgonInset.size() - 2] - pgonInset[pgonInset.size() - 1], intPt - pgonInset[pgonInset.size() - 1]) < 0.1f) {
-					pgonInset.erase(pgonInset.begin() + pgonInset.size() - 1);
-				}
-			}
-
-			pgonInset.push_back(intPt);
-		}
-	}
+	return abs(dist);
 }
 
-/**
- * Only works for polygons with no holes in them
- */
-bool Polygon3D::splitMeWithPolyline(const Polyline3D& pline, Polygon3D &pgon1, Polygon3D &pgon2) {
-	bool polylineIntersectsPolygon = false;
+float pointSegmentDistanceXY(QVector3D &a, QVector3D &b, QVector3D &c)
+{
+	QVector3D closestPt;
+	return pointSegmentDistanceXY(a, b, c, closestPt);
 
-	size_t plineSz = pline.size();
-	size_t contourSz = this->size();
-
-	if(plineSz < 2 || contourSz < 3){
-		//std::cout << "ERROR: Cannot split if polygon has fewer than three vertices of if polyline has fewer than two points\n.";
-		return false;
-	}
-
-	QVector2D tmpIntPt;
-	QVector3D firstIntPt;
-	QVector3D secondIntPt;
-	float tPline, tPgon;
-	int firstIntPlineIdx    = -1;
-	int secondIntPlineIdx   = -1;
-	int firstIntContourIdx  = -1;
-	int secondIntContourIdx = -1;
-	int intCount = 0;
-
-	//iterate along polyline
-	for (int i = 0; i < plineSz - 1; ++i) {
-		int iNext = i+1;
-
-		for (int j = 0; j < contourSz; ++j) {
-			int jNext = (j+1)%contourSz;
-
-			if (Util::segmentSegmentIntersectXY(QVector2D(pline[i]), QVector2D(pline[iNext]), QVector2D(at(j)), QVector2D(at(jNext)), &tPline, &tPgon, true, tmpIntPt)) {
-				polylineIntersectsPolygon = true;
-				float z = at(j).z() + (at(jNext).z() - at(j).z()) * tPgon;
-
-				//first intersection
-				if (intCount == 0) {
-					firstIntPlineIdx = i;
-					firstIntContourIdx = j;
-					firstIntPt = QVector3D(tmpIntPt.x(), tmpIntPt.y(), z);
-				} else if (intCount == 1) {
-					secondIntPlineIdx = i;
-					secondIntContourIdx = j;
-					secondIntPt = QVector3D(tmpIntPt.x(), tmpIntPt.y(), z);
-				} else {
-					return false;
-				}
-				intCount++;
-			}
-		}
-	}
-
-	if (intCount != 2) return false;
-
-	//Once we have intersection points and indexes, we reconstruct the two polygons
-	pgon1.clear();
-	pgon2.clear();
-	int pgonVtxIte;
-	int plineVtxIte;
-
-	//If first polygon segment intersected has an index greater
-	//	than second segment, modify indexes for correct reconstruction
-	if (firstIntContourIdx > secondIntContourIdx) {
-		secondIntContourIdx += contourSz;
-	}
-
-	//==== Reconstruct first polygon
-	//-- append polygon contour
-	pgon1.push_back(firstIntPt);
-	pgonVtxIte = firstIntContourIdx;
-	while (pgonVtxIte < secondIntContourIdx) {
-		pgon1.push_back(at((pgonVtxIte+1)%contourSz));
-		pgonVtxIte++;
-	}
-	pgon1.push_back(secondIntPt);
-	//-- append polyline points
-	plineVtxIte = secondIntPlineIdx;
-	while (plineVtxIte > firstIntPlineIdx) {
-		pgon1.push_back(pline[(plineVtxIte)]);
-		plineVtxIte--;
-	}
-
-	//==== Reconstruct second polygon
-	//-- append polygon contour
-	pgon2.push_back(secondIntPt);
-	pgonVtxIte = secondIntContourIdx;
-	while (pgonVtxIte < firstIntContourIdx + contourSz) {
-		pgon2.push_back(at((pgonVtxIte+1) % contourSz));
-		pgonVtxIte++;
-	}
-	pgon2.push_back(firstIntPt);
-	//-- append polyline points
-	plineVtxIte = firstIntPlineIdx;
-	while (plineVtxIte < secondIntPlineIdx) {
-		pgon2.push_back(pline[(plineVtxIte + 1)]);
-		plineVtxIte++;
-	}
-
-	//verify that two polygons are created after the split. If not, return false
-	if (pgon1.size() < 3 || pgon2.size() < 3) {
-		return false;
-	}
-
-	return polylineIntersectsPolygon;
 }
 
-/**
- * this function measures the minimum distance from the vertices of a contour A
- * to the edges of a contour B, i.e., it measures the distances from each vertex of A
- * to all the edges in B, and returns the minimum of such distances
- */
-float Polygon3D::distanceXYfromContourAVerticesToContourB(const Polygon3D& pB) {
+//Shortest distance from a point to a polygon
+float Polygon3D::distanceXYToPoint(Loop3D &pin, QVector3D &pt)
+{
+	float minDist = FLT_MAX;
+	float dist;
+	int idxNext;
+
+	for(size_t i=0; i<pin.size(); ++i){
+		idxNext = (i+1)%(pin.size());
+		dist = pointSegmentDistanceXY(pin.at(i), pin.at(idxNext), pt);
+		if(dist < minDist){
+			minDist = dist;
+		}
+	}
+	return minDist;
+}
+
+//this function measures the minimum distance from the vertices of a contour A
+//	to the edges of a contour B, i.e., it measures the distances from each vertex of A
+//  to all the edges in B, and returns the minimum of such distances
+float Polygon3D::distanceXYfromContourAVerticesToContourB(Loop3D &pA, Loop3D &pB)
+{
 	float minDist = FLT_MAX;
 	float dist;
 
-	for (size_t i = 0; i < size(); ++i) {
-		dist = boost::geometry::distance(pB, this->at(i));
-		if (dist < minDist) {
+	for(size_t i=0; i<pA.size(); ++i){
+		dist = Polygon3D::distanceXYToPoint(pB, pA.at(i));
+		if(dist < minDist){
 			minDist = dist;
 		}
 	}
@@ -415,14 +626,72 @@ float Polygon3D::distanceXYfromContourAVerticesToContourB(const Polygon3D& pB) {
 }
 
 /**
+* @brief: Merge consecutive vertices that are within a distance threshold to each other
+**/
+int Polygon3D::cleanLoop(Loop3D &pin, Loop3D &pout, float threshold=1.0f)
+{	
+	float thresholdSq = threshold*threshold;
+
+	if(pin.size()<3){
+		return 1;
+	}
+
+	boost::geometry::ring_type<Polygon3D>::type bg_pin;
+	boost::geometry::ring_type<Polygon3D>::type bg_pout;
+	boost::geometry::assign(bg_pin, pin);
+	boost::geometry::correct(bg_pin);
+	boost::geometry::simplify(bg_pin, bg_pout, threshold);
+
+	//strategy::simplify::douglas_peucker
+
+	//copy points back
+	QVector3D tmpPt;
+	for(size_t i=0; i< bg_pout.size(); ++i){						
+		tmpPt.setX( bg_pout[i].x() );
+		tmpPt.setY( bg_pout[i].y() );
+		pout.push_back(tmpPt);						
+	}
+
+	//remove last point
+	if( (pout[0] - pout[pout.size()-1]).lengthSquared() < thresholdSq ){
+		pout.pop_back();				
+	}
+
+	//clean angles
+	int next, prev;
+	QVector3D cur_prev, cur_next;
+	float ang;
+	float angleThreshold = 0.01f;
+	for(size_t i=0; i<pout.size(); ++i){
+		next = (i+1)%pout.size();
+		prev = (i-1+pout.size())%pout.size();
+		cur_prev = pout[prev]-pout[i];
+		cur_next = pout[next]-pout[i];
+
+		ang = angleBetweenVectors(cur_prev, cur_next);
+		if( (fabs(ang) < angleThreshold) 
+			|| (fabs(ang - 3.14159265f ) < angleThreshold)
+			|| (!(ang==ang) ) )
+		{
+			//std::cout << ang << " ";
+			pout.erase(pout.begin() + i);
+			--i;
+		}
+	}
+
+
+	return 0;
+}//
+
+/**
 * Get polygon oriented bounding box
 **/
-void Polygon3D::getLoopOBB(const Polygon3D& pin, QVector3D& size, QMatrix4x4& xformMat) {
+void Polygon3D::getLoopOBB(Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat){
 	float alpha = 0.0f;			
-	float deltaAlpha = 0.05 * M_PI;
+	float deltaAlpha = 0.05*3.14159265359f;
 	float bestAlpha;
 
-	Polygon3D rotLoop;
+	Loop3D rotLoop;
 	QMatrix4x4 rotMat;
 	QVector3D minPt, maxPt;
 	QVector3D origMidPt;
@@ -432,41 +701,80 @@ void Polygon3D::getLoopOBB(const Polygon3D& pin, QVector3D& size, QMatrix4x4& xf
 	float minArea = FLT_MAX;
 
 	rotLoop = pin;
-	//Polygon3D::getLoopAABB(rotLoop, minPt, maxPt);
-	//origMidPt = 0.5f*(minPt + maxPt);
-	origMidPt = rotLoop.envelope().midPt();
+	Polygon3D::getLoopAABB(rotLoop, minPt, maxPt);
+	origMidPt = 0.5f*(minPt + maxPt);
 
+	//while(alpha < 0.5f*_PI){
 	int cSz = pin.size();
 	QVector3D difVec;
-	for (int i=0; i<pin.size(); ++i) {
-		difVec = (pin.at((i+1) % cSz) - pin.at(i)).normalized();
+	for(int i=0; i<pin.size(); ++i){
+		difVec = (pin.at((i+1)%cSz) - pin.at(i)).normalized();
 		alpha = atan2(difVec.x(), difVec.y());
 		rotMat.setToIdentity();				
-		rotMat.rotate(Util::rad2deg(alpha), 0.0f, 0.0f, 1.0f);				
+		rotMat.rotate(57.2957795f*(alpha), 0.0f, 0.0f, 1.0f);//57.2957795 rad2degree				
 
 		transformLoop(pin, rotLoop, rotMat);
-		//boxSz = Polygon3D::getLoopAABB(rotLoop, minPt, maxPt);
-		BBox boxSz = rotLoop.envelope();
-		curArea = boxSz.dx() * boxSz.dy();
-		if (curArea < minArea) {
+		boxSz = Polygon3D::getLoopAABB(rotLoop, minPt, maxPt);
+		curArea = boxSz.x() * boxSz.y();
+		if(curArea < minArea){
 			minArea = curArea;
 			bestAlpha = alpha;
-			//bestBoxSz = boxSz;
-			bestBoxSz.setX(boxSz.dx());
-			bestBoxSz.setY(boxSz.dy());
+			bestBoxSz = boxSz;
 		}
 		//alpha += deltaAlpha;
 	}
 
 	xformMat.setToIdentity();											
-	xformMat.rotate(Util::rad2deg(bestAlpha), 0.0f, 0.0f, 1.0f);
+	xformMat.rotate(57.2957795f*(bestAlpha), 0.0f, 0.0f, 1.0f);//57.2957795 rad2degree
 	xformMat.setRow(3, QVector4D(origMidPt.x(), origMidPt.y(), origMidPt.z(), 1.0f));			
 	size = bestBoxSz;
-}
+}//
 
-void Polygon3D::transformLoop(const Polygon3D& pin, Polygon3D& pout, QMatrix4x4& transformMat) {
-	pout = pin;
-	for (int i=0; i<pin.size(); ++i) {
-		pout.at(i) = transformMat * pin.at(i);
+void Polygon3D::getMyOBB(QVector3D &size, QMatrix4x4 &xformMat){
+	Polygon3D::getLoopOBB(this->contour, size, xformMat);
+}//
+
+/**
+* @brief: Get polygon axis aligned bounding box
+* @return: The dimensions of the AABB 
+**/
+QVector3D Polygon3D::getLoopAABB(Loop3D &pin, QVector3D &minCorner, QVector3D &maxCorner)
+{
+	maxCorner = QVector3D(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+	minCorner = QVector3D( FLT_MAX,  FLT_MAX,  FLT_MAX);
+
+	QVector3D curPt;
+
+	for(int i=0; i<pin.size(); ++i){
+		curPt = pin.at(i);
+		if( curPt.x() > maxCorner.x() ){
+			maxCorner.setX(curPt.x());
+		}
+		if( curPt.y() > maxCorner.y() ){
+			maxCorner.setY(curPt.y());
+		}
+		if( curPt.z() > maxCorner.z() ){
+			maxCorner.setZ(curPt.z());
+		}
+		//------------
+		if( curPt.x() < minCorner.x() ){
+			minCorner.setX(curPt.x());
+		}
+		if( curPt.y() < minCorner.y() ){
+			minCorner.setY(curPt.y());
+		}
+		if( curPt.z() < minCorner.z() ){
+			minCorner.setZ(curPt.z());
+		}
 	}
-}
+	return QVector3D(maxCorner - minCorner);
+}//
+
+bool Polygon3D::isSelfIntersecting(void){
+	boost::geometry::ring_type<Polygon3D>::type bg_pgon;
+	boost::geometry::assign(bg_pgon, this->contour);
+	boost::geometry::correct(bg_pgon);
+	return boost::geometry::intersects(bg_pgon);
+}//
+
+

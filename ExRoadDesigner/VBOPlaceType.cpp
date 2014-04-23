@@ -226,8 +226,7 @@ void PlaceType::updateBoundingRectangle(void)
 {
 	this->boundingRectangle.clear();
 
-	//Loop3D tmpLoop;
-	Polyline3D tmpLoop;
+	Loop3D tmpLoop;
 
 	QMatrix4x4 xformMat;
 	xformMat.setToIdentity();				

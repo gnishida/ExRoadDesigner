@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Tue Apr 22 18:09:22 2014
+** Created: Wed Apr 23 15:05:18 2014
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -57,6 +57,7 @@ public:
     QPushButton *pushButtonGenerateSmoothWarp;
     QPushButton *pushButtonGenerateVerySmoothWarp;
     QPushButton *pushButtonClear;
+    QPushButton *pushButtonGenerate3D;
 
     void setupUi(QDockWidget *ControlWidget)
     {
@@ -156,6 +157,9 @@ public:
         pushButtonClear = new QPushButton(dockWidgetContents);
         pushButtonClear->setObjectName(QString::fromUtf8("pushButtonClear"));
         pushButtonClear->setGeometry(QRect(30, 640, 131, 31));
+        pushButtonGenerate3D = new QPushButton(dockWidgetContents);
+        pushButtonGenerate3D->setObjectName(QString::fromUtf8("pushButtonGenerate3D"));
+        pushButtonGenerate3D->setGeometry(QRect(30, 800, 131, 31));
         ControlWidget->setWidget(dockWidgetContents);
 
         retranslateUi(ControlWidget);
@@ -189,6 +193,7 @@ public:
         pushButtonGenerateSmoothWarp->setText(QApplication::translate("ControlWidget", "Smooth Warp", 0, QApplication::UnicodeUTF8));
         pushButtonGenerateVerySmoothWarp->setText(QApplication::translate("ControlWidget", "Very Smooth Warp", 0, QApplication::UnicodeUTF8));
         pushButtonClear->setText(QApplication::translate("ControlWidget", "Clear", 0, QApplication::UnicodeUTF8));
+        pushButtonGenerate3D->setText(QApplication::translate("ControlWidget", "Generate 3D", 0, QApplication::UnicodeUTF8));
         Q_UNUSED(ControlWidget);
     } // retranslateUi
 

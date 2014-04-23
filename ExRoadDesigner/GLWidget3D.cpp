@@ -25,6 +25,8 @@ This file is part of QtUrban.
 #include "MainWindow.h"
 #include <gl/GLU.h>
 #include "RendererHelper.h"
+#include "VBORoadGraph.h"
+#include "VBOPm.h"
 
 GLWidget3D::GLWidget3D(MainWindow* mainWin) : QGLWidget(QGLFormat(QGL::SampleBuffers), (QWidget*)mainWin) {
 	this->mainWin = mainWin;
@@ -32,6 +34,7 @@ GLWidget3D::GLWidget3D(MainWindow* mainWin) : QGLWidget(QGLFormat(QGL::SampleBuf
 	camera2D.resetCamera();
 	camera3D.resetCamera();
 	camera = &camera2D;
+	//G::global()["rend_mode"]=0;//2D	setRender2D_3D();
 
 	spaceRadius=30000.0;
 	farPlaneToSpaceRadiusFactor=5.0f;//N 5.0f
@@ -373,20 +376,51 @@ float waterMove=0;
 bool waterDir=true;
 
 void GLWidget3D::drawScene() {
-	mainWin->urbanGeometry->render(vboRenderManager);
+	///////////////////////////////////
+	// 2D MODE
+	//if(G::global()["rend_mode"]==0){
+		mainWin->urbanGeometry->render(vboRenderManager);
 
-	// draw the selected vertex and edge
-	if (vertexSelected) {
-		RendererHelper::renderPoint(vboRenderManager, "selected_vertex", selectedVertex->pt, QColor(0, 0, 255), selectedVertex->pt3D.z() + 2.0f);
+		vboRenderManager.renderStaticGeometry(QString("3d_sidewalk"));
+		vboRenderManager.renderStaticGeometry(QString("3d_building"));
+		vboRenderManager.renderStaticGeometry(QString("3d_building_fac"));
+
+		vboRenderManager.renderStaticGeometry(QString("3d_trees"));
+	
+
+		// draw the selected vertex and edge
+		if (vertexSelected) {
+			RendererHelper::renderPoint(vboRenderManager, "selected_vertex", selectedVertex->pt, QColor(0, 0, 255), selectedVertex->pt3D.z() + 2.0f);
+		}
+		if (edgeSelected) {
+			Polyline3D polyline(selectedEdge->polyline3D);
+			for (int i = 0; i < polyline.size(); ++i) polyline[i].setZ(polyline[i].z() + 10.0f);
+			RendererHelper::renderPolyline(vboRenderManager, "selected_edge_lines", "selected_edge_points", polyline, QColor(0, 0, 255));
+		}
+	//}
+
+	///////////////////////////////////
+	// 3D MODE
+	/*
+	if(G::global()["rend_mode"]==1){
+
+		glUniform1f(glGetUniformLocation(vboRenderManager.program, "waterMove"),waterMove);
+
+		//waterDir=qrand()%2;
+		if(waterDir)waterMove+=0.05;
+		if(!waterDir)waterMove-=0.05;
+		if(waterMove>1){waterMove=0;waterDir=!waterDir;}
+		if(waterMove<0){waterMove=0;waterDir=!waterDir;}
+		printf("wM %f\n",waterMove);
+		vboRenderManager.renderStaticGeometry(QString("3d_roads"));
+		vboRenderManager.renderStaticGeometry(QString("3d_sidewalk"));
+		vboRenderManager.renderStaticGeometry(QString("3d_building"));
+		vboRenderManager.renderStaticGeometry(QString("3d_building_fac"));
+
+		vboRenderManager.renderStaticGeometry(QString("3d_trees"));
+	
 	}
-	if (edgeSelected) {
-		Polyline3D polyline(selectedEdge->polyline3D);
-		for (int i = 0; i < polyline.size(); ++i) polyline[i].setZ(polyline[i].z() + 10.0f);
-		RendererHelper::renderPolyline(vboRenderManager, "selected_edge_lines", "selected_edge_points", polyline, QColor(0, 0, 255));
-	}
-
-	glUniform1f(glGetUniformLocation(vboRenderManager.program, "waterMove"),waterMove);
-
+	*/
 
 	/*
 	//Sky
@@ -570,4 +604,14 @@ void GLWidget3D::updateCamera(){
 	// light poss
 	QVector3D light_position=-camera3D.light_dir.toVector3D();
 	glUniform3f(glGetUniformLocation(vboRenderManager.program, "lightPosition"),light_position.x(),light_position.y(),light_position.z());
+}//
+
+void GLWidget3D::generate3DGeometry(){
+	printf("generate3DGeometry\n");
+	//1. update roadgraph
+	//VBORoadGraph::updateRoadGraph(vboRenderManager, mainWin->urbanGeometry->roads);
+	//2. generate parcels and buildings
+	VBOPm::generateGeometry(vboRenderManager, mainWin->urbanGeometry->roads);
+
+	printf("<<generate3DGeometry\n");
 }//

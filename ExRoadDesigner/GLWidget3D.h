@@ -35,7 +35,7 @@ This file is part of QtUrban.
 class MainWindow;
 
 class GLWidget3D : public QGLWidget {
-protected:
+public:
 	MainWindow* mainWin;
 	Camera camera2D;
 	Camera3D camera3D;
@@ -85,6 +85,10 @@ public:
 	void selectVertex(RoadGraph &roads, RoadVertexDesc v_desc);
 	void selectEdge(RoadGraph &roads, RoadEdgeDesc e_desc);
 
+	void updateCamera();
+	void generate3DGeometry();
+
+
 protected:
 	void initializeGL();
 
@@ -96,6 +100,7 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *e);
 	void mouseDoubleClickEvent(QMouseEvent *e);
 
-	void updateCamera();
+
+
 };
 

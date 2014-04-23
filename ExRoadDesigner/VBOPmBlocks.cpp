@@ -4,7 +4,7 @@
  ************************************************************************************************/
 
 #include "VBOPmBlocks.h"
-#include "polygon_3D.h"
+#include "polygon3D.h"
 
 #include <qdir.h>
 #include <QStringList>
@@ -90,7 +90,7 @@ struct vertex_output_visitor : public output_visitor
 			//initialize block random seed from first street node random seed
 			if(isFirstVertexVisited){
 				isFirstVertexVisited = false;
-				curRandSeed = ( (roadGraphPtr->graph)[v]->randSeed*4096 + 150889) % 714025;
+				//curRandSeed = ( (roadGraphPtr->graph)[v]->randSeed*4096 + 150889) % 714025;
 			}
 		}
 	}

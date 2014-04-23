@@ -4,7 +4,7 @@
  ************************************************************************************************/
 
 #include "VBOPm.h"
-#include "polygon_3D.h"
+#include "Polygon3D.h"
 
 #include <qdir.h>
 #include <QStringList>

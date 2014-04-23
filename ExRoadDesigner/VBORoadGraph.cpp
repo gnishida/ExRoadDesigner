@@ -8,7 +8,7 @@
 #include "VBORoadGraph.h"
 
 #include "VBORenderManager.h"
-#include "polygon_3D.h"
+#include "polygon3D.h"
 #include "global.h"
 
 
@@ -45,10 +45,10 @@ void VBORoadGraph::updateRoadGraph(VBORenderManager& rendManager,RoadGraph &road
 			col=QVector3D(0.9f, 0.9f, 0.9f);//white	
 		}*/
 
-		RoadEdge* edge = roadGraph.graph[*ei];
+		RoadEdgePtr edge = roadGraph.graph[*ei];
 		
-		p0 = edge->polyLine.front();//roadGraph.graph[boost::source(*ei, roadGraph.graph)].pt;
-		p1 = edge->polyLine.back();//roadGraph.graph[boost::target(*ei, roadGraph.graph)].pt;
+		p0 = edge->polyline.front();//roadGraph.graph[boost::source(*ei, roadGraph.graph)].pt;
+		p1 = edge->polyline.back();//roadGraph.graph[boost::target(*ei, roadGraph.graph)].pt;
 		p0.setZ(1.0f);
 		p1.setZ(1.0f);
 

@@ -5,7 +5,7 @@
 #pragma once
 
 #include <QSettings>
-#include "polygon3D.h"
+#include "Polygon3D.h"
 
 const int BLDG_NO_BLDG=0;// 0 NO BLDG
 const int BLDG_WITH_BLDG=1;	// 1 BLDG

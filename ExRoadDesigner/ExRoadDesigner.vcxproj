@@ -150,7 +150,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ControlWidget.cpp" />
+    <ClCompile Include="GeneratedFiles\Release\moc_ControlWidget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_MainWindow.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -189,6 +192,7 @@
     <ClCompile Include="VBOPmBuildings.cpp" />
     <ClCompile Include="VBOPmParcels.cpp" />
     <ClCompile Include="VBORenderManager.cpp" />
+    <ClCompile Include="VBORoadGraph.cpp" />
     <ClCompile Include="VBOShader.cpp" />
     <ClCompile Include="VBOUtil.cpp" />
   </ItemGroup>
@@ -237,6 +241,7 @@
     <ClInclude Include="BBox.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Camera3D.h" />
+    <ClInclude Include="common.h" />
     <ClInclude Include="ExFeature.h" />
     <ClInclude Include="GeneratedFiles\ui_ControlWidget.h" />
     <ClInclude Include="GeneratedFiles\ui_PropertyWidget.h" />
@@ -264,6 +269,7 @@
     <ClInclude Include="VBOPmBuildings.h" />
     <ClInclude Include="VBOPmParcels.h" />
     <ClInclude Include="VBORenderManager.h" />
+    <ClInclude Include="VBORoadGraph.h" />
     <ClInclude Include="VBOShader.h" />
     <ClInclude Include="VBOUtil.h" />
     <CustomBuild Include="PropertyWidget.h">

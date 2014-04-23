@@ -10,7 +10,7 @@
 
 #include "VBOParcel.h"
 #include <QVector3D>
-#include "polygon_3D.h"
+#include "Polygon3D.h"
 
 /**
 * Block.
