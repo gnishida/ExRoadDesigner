@@ -29,8 +29,6 @@ This file is part of QtUrban.
 #include <render/Terrain.h>
 */
 #include "GraphUtil.h"
-/*
-#include "UShapeRoadGenerator.h"
 #include "MultiExRoadGenerator.h"
 #include "MultiIntExRoadGenerator.h"
 #include "IntRoadGenerator.h"
@@ -38,7 +36,6 @@ This file is part of QtUrban.
 #include "SmoothWarpRoadGenerator.h"
 #include "VerySmoothWarpRoadGenerator.h"
 #include "RoadGeneratorHelper.h"
-*/
 #include "MainWindow.h"
 /*
 #include "BlockGenerator.h"
@@ -82,84 +79,60 @@ void UrbanGeometry::generateRoadsMultiEx(std::vector<ExFeature> &features) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
-	/*
-	MultiExRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, features);
+	MultiExRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, features);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
-	areas.selectedArea()->roads.adaptToTerrain(terrain);
-	*/
+	areas.selectedArea()->roads.adaptToTerrain();//terrain);
 }
 
 void UrbanGeometry::generateRoadsMultiIntEx(std::vector<ExFeature> &features) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
-	/*
-	MultiIntExRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, features);
+	MultiIntExRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, features);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
-	areas.selectedArea()->roads.adaptToTerrain(terrain);
-	*/
+	areas.selectedArea()->roads.adaptToTerrain();//terrain);
 }
 
 void UrbanGeometry::generateRoadsInterpolation(ExFeature &feature) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
-	/*
-	IntRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
+	IntRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, feature);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
-	areas.selectedArea()->roads.adaptToTerrain(terrain);
-	*/
+	areas.selectedArea()->roads.adaptToTerrain();//terrain);
 }
 
 void UrbanGeometry::generateRoadsWarp(ExFeature &feature) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
-	/*
-	WarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
+	WarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, feature);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
-	areas.selectedArea()->roads.adaptToTerrain(terrain);
-	*/
+	areas.selectedArea()->roads.adaptToTerrain();//terrain);
 }
 
 void UrbanGeometry::generateRoadsSmoothWarp(ExFeature &feature) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
-	/*
-	SmoothWarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
+	SmoothWarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, feature);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
-	areas.selectedArea()->roads.adaptToTerrain(terrain);
-	*/
+	areas.selectedArea()->roads.adaptToTerrain();//terrain);
 }
 
 void UrbanGeometry::generateRoadsVerySmoothWarp(ExFeature &feature) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
-	/*
-	VerySmoothWarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
+	VerySmoothWarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, feature);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
-	areas.selectedArea()->roads.adaptToTerrain(terrain);
-	*/
-}
-
-void UrbanGeometry::generateRoadsUShape(ExFeature &feature) {
-	if (areas.selectedIndex == -1) return;
-	if (areas.selectedArea()->hintLine.size() == 0) return;
-
-	/*
-	UShapeRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
-	generator.generateRoadNetwork(G::getBool("animation"));
-
-	areas.selectedArea()->roads.adaptToTerrain(terrain);
-	*/
+	areas.selectedArea()->roads.adaptToTerrain();//terrain);
 }
 
 void UrbanGeometry::generateBlocks() {
@@ -305,14 +278,14 @@ void UrbanGeometry::mergeRoads() {
 	areas.clear();
 }
 
-/*
 void UrbanGeometry::connectRoads() {
 	RoadGeneratorHelper::connectRoads(roads, 200.0f, 0.15f);
 	GraphUtil::removeDeadEnd(roads);
 
-	roads.adaptToTerrain(terrain);
+	roads.adaptToTerrain();//terrain);
 }
 
+/*
 void UrbanGeometry::newTerrain(int width, int depth, int cellLength) {
 	clear();
 
@@ -416,14 +389,6 @@ void UrbanGeometry::clearRoads() {
 	blocks.clear();
 	*/
 }
-
-/*
-void UrbanGeometry::perturbRoads(float perturbationFactor) {
-	GraphUtil::perturb(areas.selectedArea()->roads, areas.selectedArea()->area, perturbationFactor);
-
-	areas.selectedArea()->roads.adaptToTerrain(terrain);
-}
-*/
 
 void UrbanGeometry::loadAreas(const QString &filename) {
 	areas.load(filename);

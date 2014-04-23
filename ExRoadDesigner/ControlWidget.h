@@ -23,7 +23,6 @@ public slots:
 	void generateRoadsMultiEx();
 	void generateRoadsMultiIntEx();
 	void generateRoadsInterpolation();
-	void generateRoadsUShape();
 	void generateRoadsWarp();
 	void generateRoadsSmoothWarp();
 	void generateRoadsVerySmoothWarp();

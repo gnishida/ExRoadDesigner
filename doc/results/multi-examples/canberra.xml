@@ -1,0 +1,13 @@
+<feature>
+    <area>
+        <point x="-1273.203125" y="748.123046875"/>
+        <point x="130.1083679199219" y="748.123046875"/>
+        <point x="1291.7900390625" y="320.6241455078125"/>
+        <point x="1263.90966796875" y="-720.24267578125"/>
+        <point x="-1291.7900390625" y="-748.123046875"/>
+        <point x="-1273.203125" y="748.123046875"/>
+    </area>
+    <hintLine/>
+    <avenues filename="canberra.xml.avenues.gsm"/>
+    <streets filename="canberra.xml.streets.gsm"/>
+</feature>

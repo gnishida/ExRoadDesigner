@@ -73,7 +73,6 @@ public:
 	void generateRoadsMultiEx(std::vector<ExFeature> &features);
 	void generateRoadsMultiIntEx(std::vector<ExFeature> &features);
 	void generateRoadsInterpolation(ExFeature &feature);
-	void generateRoadsUShape(ExFeature &feature);
 	void generateRoadsWarp(ExFeature &feature);
 	void generateRoadsSmoothWarp(ExFeature &feature);
 	void generateRoadsVerySmoothWarp(ExFeature &feature);
@@ -85,9 +84,9 @@ public:
 
 	void addRoad(int roadType, const Polyline2D &polyline, int lanes);
 	void mergeRoads();
-	/*
 	void connectRoads();
 
+	/*
 	void newTerrain(int width, int depth, int cellLength);
 	void loadTerrain(const QString &filename);
 	void saveTerrain(const QString &filename);
@@ -95,10 +94,6 @@ public:
 	void loadRoads(const QString &filename);
 	void saveRoads(const QString &filename);
 	void clearRoads();
-
-	/*
-	void perturbRoads(float perturbationFactor);
-	*/
 
 	void loadAreas(const QString &filename);
 	void saveAreas(const QString &filename);

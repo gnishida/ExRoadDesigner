@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Wed Apr 23 15:05:18 2014
+** Created: Wed Apr 23 15:39:16 2014
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -53,7 +53,6 @@ public:
     QPushButton *pushButtonGenerateInterpolation;
     QGroupBox *groupBox_3;
     QPushButton *pushButtonGenerateWarp;
-    QPushButton *pushButtonGenerateUShape;
     QPushButton *pushButtonGenerateSmoothWarp;
     QPushButton *pushButtonGenerateVerySmoothWarp;
     QPushButton *pushButtonClear;
@@ -114,7 +113,7 @@ public:
         checkBoxCleanStreets->setGeometry(QRect(10, 100, 131, 17));
         groupBox_5 = new QGroupBox(dockWidgetContents);
         groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
-        groupBox_5->setGeometry(QRect(10, 680, 171, 101));
+        groupBox_5->setGeometry(QRect(10, 640, 171, 101));
         pushButtonConnect = new QPushButton(groupBox_5);
         pushButtonConnect->setObjectName(QString::fromUtf8("pushButtonConnect"));
         pushButtonConnect->setGeometry(QRect(20, 60, 131, 31));
@@ -141,25 +140,22 @@ public:
         pushButtonGenerateInterpolation->setGeometry(QRect(20, 60, 131, 31));
         groupBox_3 = new QGroupBox(dockWidgetContents);
         groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
-        groupBox_3->setGeometry(QRect(10, 450, 171, 181));
+        groupBox_3->setGeometry(QRect(10, 450, 171, 141));
         pushButtonGenerateWarp = new QPushButton(groupBox_3);
         pushButtonGenerateWarp->setObjectName(QString::fromUtf8("pushButtonGenerateWarp"));
-        pushButtonGenerateWarp->setGeometry(QRect(20, 60, 131, 31));
-        pushButtonGenerateUShape = new QPushButton(groupBox_3);
-        pushButtonGenerateUShape->setObjectName(QString::fromUtf8("pushButtonGenerateUShape"));
-        pushButtonGenerateUShape->setGeometry(QRect(20, 20, 131, 31));
+        pushButtonGenerateWarp->setGeometry(QRect(20, 20, 131, 31));
         pushButtonGenerateSmoothWarp = new QPushButton(groupBox_3);
         pushButtonGenerateSmoothWarp->setObjectName(QString::fromUtf8("pushButtonGenerateSmoothWarp"));
-        pushButtonGenerateSmoothWarp->setGeometry(QRect(20, 100, 131, 31));
+        pushButtonGenerateSmoothWarp->setGeometry(QRect(20, 60, 131, 31));
         pushButtonGenerateVerySmoothWarp = new QPushButton(groupBox_3);
         pushButtonGenerateVerySmoothWarp->setObjectName(QString::fromUtf8("pushButtonGenerateVerySmoothWarp"));
-        pushButtonGenerateVerySmoothWarp->setGeometry(QRect(20, 140, 131, 31));
+        pushButtonGenerateVerySmoothWarp->setGeometry(QRect(20, 100, 131, 31));
         pushButtonClear = new QPushButton(dockWidgetContents);
         pushButtonClear->setObjectName(QString::fromUtf8("pushButtonClear"));
-        pushButtonClear->setGeometry(QRect(30, 640, 131, 31));
+        pushButtonClear->setGeometry(QRect(30, 600, 131, 31));
         pushButtonGenerate3D = new QPushButton(dockWidgetContents);
         pushButtonGenerate3D->setObjectName(QString::fromUtf8("pushButtonGenerate3D"));
-        pushButtonGenerate3D->setGeometry(QRect(30, 800, 131, 31));
+        pushButtonGenerate3D->setGeometry(QRect(30, 760, 131, 31));
         ControlWidget->setWidget(dockWidgetContents);
 
         retranslateUi(ControlWidget);
@@ -189,7 +185,6 @@ public:
         pushButtonGenerateInterpolation->setText(QApplication::translate("ControlWidget", "Interpolation", 0, QApplication::UnicodeUTF8));
         groupBox_3->setTitle(QApplication::translate("ControlWidget", "Warp", 0, QApplication::UnicodeUTF8));
         pushButtonGenerateWarp->setText(QApplication::translate("ControlWidget", "Warp", 0, QApplication::UnicodeUTF8));
-        pushButtonGenerateUShape->setText(QApplication::translate("ControlWidget", "Weird Shape Fitting", 0, QApplication::UnicodeUTF8));
         pushButtonGenerateSmoothWarp->setText(QApplication::translate("ControlWidget", "Smooth Warp", 0, QApplication::UnicodeUTF8));
         pushButtonGenerateVerySmoothWarp->setText(QApplication::translate("ControlWidget", "Very Smooth Warp", 0, QApplication::UnicodeUTF8));
         pushButtonClear->setText(QApplication::translate("ControlWidget", "Clear", 0, QApplication::UnicodeUTF8));

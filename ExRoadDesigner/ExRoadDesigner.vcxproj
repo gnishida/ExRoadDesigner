@@ -121,7 +121,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;..\opencv\lib\;..\glew\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="BBox.cpp" />
     <ClCompile Include="ControlWidget.cpp" />
+    <ClCompile Include="ConvexHull.cpp" />
     <ClCompile Include="ExFeature.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_MainWindow.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -166,8 +167,11 @@
     <ClCompile Include="GLWidget3D.cpp" />
     <ClCompile Include="GraphUtil.cpp" />
     <ClCompile Include="Histogram.cpp" />
+    <ClCompile Include="IntRoadGenerator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="MultiExRoadGenerator.cpp" />
+    <ClCompile Include="MultiIntExRoadGenerator.cpp" />
     <ClCompile Include="Polygon2D.cpp" />
     <ClCompile Include="Polygon3D.cpp" />
     <ClCompile Include="PolygonBuilder.cpp" />
@@ -179,8 +183,12 @@
     <ClCompile Include="RoadArea.cpp" />
     <ClCompile Include="RoadAreaSet.cpp" />
     <ClCompile Include="RoadEdge.cpp" />
+    <ClCompile Include="RoadGeneratorHelper.cpp" />
     <ClCompile Include="RoadGraph.cpp" />
     <ClCompile Include="RoadVertex.cpp" />
+    <ClCompile Include="SmoothWarpRoadGenerator.cpp" />
+    <ClCompile Include="TensorField.cpp" />
+    <ClCompile Include="TopNSearch.cpp" />
     <ClCompile Include="UrbanGeometry.cpp" />
     <ClCompile Include="Util.cpp" />
     <ClCompile Include="VBOBlock.cpp" />
@@ -195,6 +203,8 @@
     <ClCompile Include="VBORoadGraph.cpp" />
     <ClCompile Include="VBOShader.cpp" />
     <ClCompile Include="VBOUtil.cpp" />
+    <ClCompile Include="VerySmoothWarpRoadGenerator.cpp" />
+    <ClCompile Include="WarpRoadGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.h">
@@ -242,6 +252,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Camera3D.h" />
     <ClInclude Include="common.h" />
+    <ClInclude Include="ConvexHull.h" />
     <ClInclude Include="ExFeature.h" />
     <ClInclude Include="GeneratedFiles\ui_ControlWidget.h" />
     <ClInclude Include="GeneratedFiles\ui_PropertyWidget.h" />
@@ -249,6 +260,9 @@
     <ClInclude Include="GLWidget3D.h" />
     <ClInclude Include="GraphUtil.h" />
     <ClInclude Include="Histogram.h" />
+    <ClInclude Include="IntRoadGenerator.h" />
+    <ClInclude Include="MultiExRoadGenerator.h" />
+    <ClInclude Include="MultiIntExRoadGenerator.h" />
     <ClInclude Include="Polygon2D.h" />
     <ClInclude Include="Polygon3D.h" />
     <ClInclude Include="PolygonBuilder.h" />
@@ -258,6 +272,10 @@
     <ClInclude Include="RendererHelper.h" />
     <ClInclude Include="RoadArea.h" />
     <ClInclude Include="RoadAreaSet.h" />
+    <ClInclude Include="RoadGeneratorHelper.h" />
+    <ClInclude Include="SmoothWarpRoadGenerator.h" />
+    <ClInclude Include="TensorField.h" />
+    <ClInclude Include="TopNSearch.h" />
     <ClInclude Include="UrbanGeometry.h" />
     <ClInclude Include="VBOBlock.h" />
     <ClInclude Include="VBOBuilding.h" />
@@ -272,6 +290,8 @@
     <ClInclude Include="VBORoadGraph.h" />
     <ClInclude Include="VBOShader.h" />
     <ClInclude Include="VBOUtil.h" />
+    <ClInclude Include="VerySmoothWarpRoadGenerator.h" />
+    <ClInclude Include="WarpRoadGenerator.h" />
     <CustomBuild Include="PropertyWidget.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing PropertyWidget.h...</Message>

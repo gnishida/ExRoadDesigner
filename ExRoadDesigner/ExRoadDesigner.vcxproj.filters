@@ -41,6 +41,9 @@
     <Filter Include="render PM\PM">
       <UniqueIdentifier>{4fd204ed-0ee3-4c73-b1cb-e1223cf600d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="road generator">
+      <UniqueIdentifier>{d6c9abeb-58e0-4010-88d5-12dc283827de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -115,9 +118,6 @@
     <ClCompile Include="UrbanGeometry.cpp">
       <Filter>Files</Filter>
     </ClCompile>
-    <ClCompile Include="ExFeature.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
     <ClCompile Include="Histogram.cpp">
       <Filter>Files</Filter>
     </ClCompile>
@@ -168,6 +168,39 @@
     </ClCompile>
     <ClCompile Include="VBORoadGraph.cpp">
       <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="ExFeature.cpp">
+      <Filter>road generator</Filter>
+    </ClCompile>
+    <ClCompile Include="IntRoadGenerator.cpp">
+      <Filter>road generator</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiExRoadGenerator.cpp">
+      <Filter>road generator</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiIntExRoadGenerator.cpp">
+      <Filter>road generator</Filter>
+    </ClCompile>
+    <ClCompile Include="SmoothWarpRoadGenerator.cpp">
+      <Filter>road generator</Filter>
+    </ClCompile>
+    <ClCompile Include="VerySmoothWarpRoadGenerator.cpp">
+      <Filter>road generator</Filter>
+    </ClCompile>
+    <ClCompile Include="WarpRoadGenerator.cpp">
+      <Filter>road generator</Filter>
+    </ClCompile>
+    <ClCompile Include="ConvexHull.cpp">
+      <Filter>Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TopNSearch.cpp">
+      <Filter>Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TensorField.cpp">
+      <Filter>Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RoadGeneratorHelper.cpp">
+      <Filter>road generator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -251,9 +284,6 @@
     <ClInclude Include="UrbanGeometry.h">
       <Filter>Files</Filter>
     </ClInclude>
-    <ClInclude Include="ExFeature.h">
-      <Filter>Files</Filter>
-    </ClInclude>
     <ClInclude Include="Histogram.h">
       <Filter>Files</Filter>
     </ClInclude>
@@ -310,6 +340,39 @@
     </ClInclude>
     <ClInclude Include="VBORoadGraph.h">
       <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="ExFeature.h">
+      <Filter>road generator</Filter>
+    </ClInclude>
+    <ClInclude Include="IntRoadGenerator.h">
+      <Filter>road generator</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiExRoadGenerator.h">
+      <Filter>road generator</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiIntExRoadGenerator.h">
+      <Filter>road generator</Filter>
+    </ClInclude>
+    <ClInclude Include="SmoothWarpRoadGenerator.h">
+      <Filter>road generator</Filter>
+    </ClInclude>
+    <ClInclude Include="VerySmoothWarpRoadGenerator.h">
+      <Filter>road generator</Filter>
+    </ClInclude>
+    <ClInclude Include="WarpRoadGenerator.h">
+      <Filter>road generator</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexHull.h">
+      <Filter>Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TopNSearch.h">
+      <Filter>Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TensorField.h">
+      <Filter>Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RoadGeneratorHelper.h">
+      <Filter>road generator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
