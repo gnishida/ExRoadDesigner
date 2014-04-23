@@ -35,6 +35,12 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;cxx;c;def</Extensions>
     </Filter>
+    <Filter Include="render PM\Geometry">
+      <UniqueIdentifier>{f1f7f165-33a1-47b1-944a-ebc875e7b8c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="render PM\PM">
+      <UniqueIdentifier>{4fd204ed-0ee3-4c73-b1cb-e1223cf600d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -117,6 +123,48 @@
     </ClCompile>
     <ClCompile Include="Polyline3D.cpp">
       <Filter>Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RoadArea.cpp">
+      <Filter>Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RoadAreaSet.cpp">
+      <Filter>Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PolygonBuilder.cpp">
+      <Filter>Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PolylineBuilder.cpp">
+      <Filter>Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Polygon3D.cpp">
+      <Filter>Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererHelper.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="VBOGeoBuilding.cpp">
+      <Filter>render PM</Filter>
+    </ClCompile>
+    <ClCompile Include="VBOPlaceType.cpp">
+      <Filter>render PM</Filter>
+    </ClCompile>
+    <ClCompile Include="VBOBlock.cpp">
+      <Filter>render PM\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="VBOParcel.cpp">
+      <Filter>render PM\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="VBOPm.cpp">
+      <Filter>render PM\PM</Filter>
+    </ClCompile>
+    <ClCompile Include="VBOPmBlocks.cpp">
+      <Filter>render PM\PM</Filter>
+    </ClCompile>
+    <ClCompile Include="VBOPmBuildings.cpp">
+      <Filter>render PM\PM</Filter>
+    </ClCompile>
+    <ClCompile Include="VBOPmParcels.cpp">
+      <Filter>render PM\PM</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -209,5 +257,58 @@
     <ClInclude Include="Polyline3D.h">
       <Filter>Files</Filter>
     </ClInclude>
+    <ClInclude Include="RoadArea.h">
+      <Filter>Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RoadAreaSet.h">
+      <Filter>Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PolygonBuilder.h">
+      <Filter>Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PolylineBuilder.h">
+      <Filter>Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Polygon3D.h">
+      <Filter>Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererHelper.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="VBOGeoBuilding.h">
+      <Filter>render PM</Filter>
+    </ClInclude>
+    <ClInclude Include="VBOPlaceType.h">
+      <Filter>render PM</Filter>
+    </ClInclude>
+    <ClInclude Include="VBOBlock.h">
+      <Filter>render PM\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="VBOBuilding.h">
+      <Filter>render PM\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="VBOParcel.h">
+      <Filter>render PM\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="VBOPm.h">
+      <Filter>render PM\PM</Filter>
+    </ClInclude>
+    <ClInclude Include="VBOPmBlocks.h">
+      <Filter>render PM\PM</Filter>
+    </ClInclude>
+    <ClInclude Include="VBOPmBuildings.h">
+      <Filter>render PM\PM</Filter>
+    </ClInclude>
+    <ClInclude Include="VBOPmParcels.h">
+      <Filter>render PM\PM</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\data\shaders\lc_fragment_sk.glsl">
+      <Filter>render</Filter>
+    </None>
+    <None Include="..\data\shaders\lc_vertex_sk.glsl">
+      <Filter>render</Filter>
+    </None>
   </ItemGroup>
 </Project>

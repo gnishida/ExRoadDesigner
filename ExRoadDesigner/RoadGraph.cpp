@@ -15,8 +15,8 @@ RoadGraph::RoadGraph() {
 	showAvenues = true;
 	showLocalStreets = true;
 
-	//renderMode = RENDER_DEFAULT;
-	renderMode = RENDER_GROUPBY;
+	renderMode = RENDER_DEFAULT;
+	//renderMode = RENDER_GROUPBY;
 }
 
 RoadGraph::~RoadGraph() {
@@ -27,7 +27,11 @@ void RoadGraph::generateMesh(VBORenderManager& renderManger,QString meshName) {
 
 	renderManger.removeStaticGeometry(meshName);
 
-	_generateMeshVerticesGroupBy(renderManger, meshName);
+	if (renderMode == RENDER_DEFAULT) {
+		_generateMeshVerticesDefault(renderManger, meshName);
+	} else if (renderMode == RENDER_GROUPBY) {
+		_generateMeshVerticesGroupBy(renderManger, meshName);
+	}
 
 	modified = false;
 }
@@ -175,11 +179,9 @@ void RoadGraph::_generateMeshVerticesTexture(mylib::TextureManager* textureManag
 	renderables.push_back(mylib::RenderablePtr(renderable3));
 	renderables.push_back(mylib::RenderablePtr(renderable4));
 }
+*/
 
-void RoadGraph::_generateMeshVerticesDefault(mylib::TextureManager* textureManager) {
-	mylib::RenderableQuadList* renderable1 = new mylib::RenderableQuadList();
-	mylib::RenderableCircleList* renderable2 = new mylib::RenderableCircleList();
-
+void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManger,QString meshName) {
 	// エッジを描画
 	{
 		RoadEdgeIter ei, eend;
@@ -191,6 +193,9 @@ void RoadGraph::_generateMeshVerticesDefault(mylib::TextureManager* textureManag
 
 			float halfWidth = graph[*ei]->getWidth() / 2.0f;
 			float halfWidthBg = halfWidth * 1.2f;
+
+			std::vector<Vertex> vert(4*(num - 1));
+			QColor color = graph[*ei]->color;
 
 			QVector3D p0, p1, p2, p3;
 			QVector3D p0Bg, p1Bg, p2Bg, p3Bg;
@@ -224,31 +229,49 @@ void RoadGraph::_generateMeshVerticesDefault(mylib::TextureManager* textureManag
 					Util::getIrregularBisector(pt1, pt2, pt3, -halfWidthBg, -halfWidthBg, p2Bg);
 				}
 
+				float heightOffset = 0.0f;
+				bool render = false;
+
 				switch (graph[*ei]->type) {
 				case RoadEdge::TYPE_HIGHWAY:
 					if (showHighways) {
-						renderable1->addQuad(p0, p1, p2, p3, QVector3D(0, 0, 1), graph[*ei]->color, 0.7f);
-						renderable1->addQuad(p0Bg, p1Bg, p2Bg, p3Bg, QVector3D(0, 0, 1), graph[*ei]->bgColor);
+						render = true;
+						heightOffset = 0.7f;
+						//renderable1->addQuad(p0, p1, p2, p3, QVector3D(0, 0, 1), graph[*ei]->color, 0.7f);
+						//renderable1->addQuad(p0Bg, p1Bg, p2Bg, p3Bg, QVector3D(0, 0, 1), graph[*ei]->bgColor);
 					}
 					break;
 				case RoadEdge::TYPE_BOULEVARD:
 					if (showBoulevards) {
-						renderable1->addQuad(p0, p1, p2, p3, QVector3D(0, 0, 1), graph[*ei]->color, 0.5f);
-						renderable1->addQuad(p0Bg, p1Bg, p2Bg, p3Bg, QVector3D(0, 0, 1), graph[*ei]->bgColor);
+						render = true;
+						heightOffset = 0.5f;
+						//renderable1->addQuad(p0, p1, p2, p3, QVector3D(0, 0, 1), graph[*ei]->color, 0.5f);
+						//renderable1->addQuad(p0Bg, p1Bg, p2Bg, p3Bg, QVector3D(0, 0, 1), graph[*ei]->bgColor);
 					}
 					break;
 				case RoadEdge::TYPE_AVENUE:
 					if (showAvenues) {
-						renderable1->addQuad(p0, p1, p2, p3, QVector3D(0, 0, 1), graph[*ei]->color, 0.5f);
-						renderable1->addQuad(p0Bg, p1Bg, p2Bg, p3Bg, QVector3D(0, 0, 1), graph[*ei]->bgColor);
+						render = true;
+						heightOffset = 0.5f;
+						//renderable1->addQuad(p0, p1, p2, p3, QVector3D(0, 0, 1), graph[*ei]->color, 0.5f);
+						//renderable1->addQuad(p0Bg, p1Bg, p2Bg, p3Bg, QVector3D(0, 0, 1), graph[*ei]->bgColor);
 					}
 					break;
 				case RoadEdge::TYPE_STREET:
 					if (showLocalStreets) {
-						renderable1->addQuad(p0, p1, p2, p3, QVector3D(0, 0, 1), graph[*ei]->color, 0.3f);
-						renderable1->addQuad(p0Bg, p1Bg, p2Bg, p3Bg, QVector3D(0, 0, 1), graph[*ei]->bgColor);
+						render = true;
+						heightOffset = 0.3f;
+						//renderable1->addQuad(p0, p1, p2, p3, QVector3D(0, 0, 1), graph[*ei]->color, 0.3f);
+						//renderable1->addQuad(p0Bg, p1Bg, p2Bg, p3Bg, QVector3D(0, 0, 1), graph[*ei]->bgColor);
 					}
 					break;
+				}
+
+				if (render) {
+					vert[i*4+0]=Vertex(p0.x(),p0.y(),p0.z()+heightOffset,color.redF(),color.greenF(),color.blueF(),0,0,1.0f,0,0,0);// pos color normal texture
+					vert[i*4+1]=Vertex(p1.x(),p1.y(),p1.z()+heightOffset,color.redF(),color.greenF(),color.blueF(),0,0,1.0f,0,0,0);// pos color normal texture
+					vert[i*4+2]=Vertex(p2.x(),p2.y(),p2.z()+heightOffset,color.redF(),color.greenF(),color.blueF(),0,0,1.0f,0,0,0);// pos color normal texture
+					vert[i*4+3]=Vertex(p3.x(),p3.y(),p3.z()+heightOffset,color.redF(),color.greenF(),color.blueF(),0,0,1.0f,0,0,0);// pos color normal texture
 				}
 
 				p0 = p3;
@@ -256,11 +279,14 @@ void RoadGraph::_generateMeshVerticesDefault(mylib::TextureManager* textureManag
 				p0Bg = p3Bg;
 				p1Bg = p2Bg;
 			}
+
+			renderManger.addStaticGeometry(meshName,vert,"",GL_QUADS,1);//MODE=1 color
 		}
 	}
 
 	// draw intersections
 	{
+		/*
 		RoadVertexIter vi, vend;
 		for (boost::tie(vi, vend) = boost::vertices(graph); vi != vend; ++vi) {
 			if (!graph[*vi]->valid) continue;
@@ -295,12 +321,9 @@ void RoadGraph::_generateMeshVerticesDefault(mylib::TextureManager* textureManag
 			renderable2->addCircle(graph[*vi]->pt3D, max_width * 0.5f, 20, color, offset);
 			renderable2->addCircle(graph[*vi]->pt3D, max_widthBg * 0.5f, 20, bgColor);
 		}
+		*/
 	}
-
-	renderables.push_back(mylib::RenderablePtr(renderable1));
-	renderables.push_back(mylib::RenderablePtr(renderable2));
 }
-*/
 
 void RoadGraph::_generateMeshVerticesGroupBy(VBORenderManager& renderManger,QString meshName) {
 	// エッジを描画

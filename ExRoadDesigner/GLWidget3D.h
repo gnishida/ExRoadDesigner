@@ -24,6 +24,8 @@ This file is part of QtUrban.
 #include <QKeyEvent>
 #include "Camera.h"
 #include "Camera3D.h"
+#include "RoadGraph.h"
+
 /*
 #include <render/TextureManager.h>
 #include <render/SimpleSkyBox.h>
@@ -35,8 +37,10 @@ class MainWindow;
 class GLWidget3D : public QGLWidget {
 protected:
 	MainWindow* mainWin;
-	//Camera camera;
-	Camera3D camera;
+	Camera camera2D;
+	Camera3D camera3D;
+	Camera* camera;
+
 	/*
 	mylib::TextureManager* textureManager;
 	mylib::SimpleSkyBox* skyBox;
@@ -51,12 +55,10 @@ protected:
 	float rotationSensitivity;
 	float zoomSensitivity;
 
-	/*
 	RoadVertexDesc selectedVertexDesc;
 	RoadVertexPtr selectedVertex;
 	RoadEdgeDesc selectedEdgeDesc;
 	RoadEdgePtr selectedEdge;
-	*/
 	bool vertexSelected;
 	bool edgeSelected;
 
@@ -80,8 +82,8 @@ public:
 	void mouseTo2D(int x, int y, QVector2D &result);
 
 	void drawScene();
-	//void selectVertex(RoadGraph &roads, RoadVertexDesc v_desc);
-	//void selectEdge(RoadGraph &roads, RoadEdgeDesc e_desc);
+	void selectVertex(RoadGraph &roads, RoadVertexDesc v_desc);
+	void selectEdge(RoadGraph &roads, RoadEdgeDesc e_desc);
 
 protected:
 	void initializeGL();

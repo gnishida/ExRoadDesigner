@@ -18,16 +18,18 @@ This file is part of QtUrban.
 
 #include "glew.h"
 
-/*#include <util/PolygonBuilder.h>
-#include <util/PolylineBuilder.h>
+#include "PolygonBuilder.h"
+#include "PolylineBuilder.h"
+/*
 #include <render/TextureManager.h>
 #include <render/WaterRenderer.h>
 #include <render/Terrain.h>
 #include <render/Renderer.h>
-#include <render/RendererHelper.h>
+#include "RendererHelper.h"
 #include <render/Renderer.h>
-#include <road/RoadAreaSet.h>
 */
+#include "RoadGraph.h"
+#include "RoadAreaSet.h"
 #include "ExFeature.h"
 //#include <pm/Block.h>
 
@@ -46,13 +48,13 @@ public:
 	mylib::Renderer renderer;
 
 	mylib::WaterRenderer* waterRenderer;
-
+	*/
 	PolygonBuilder areaBuilder;
 	PolylineBuilder hintLineBuilder;
 	PolylineBuilder avenueBuilder;
 
 	RoadAreaSet areas;
-	*/
+	
 	int selectedAreaIndex;
 	//RendererHelper rendererHelper;
 
@@ -81,9 +83,9 @@ public:
 	void render(VBORenderManager &vboRenderManager);
 	void adaptToTerrain();
 
-	/*
 	void addRoad(int roadType, const Polyline2D &polyline, int lanes);
 	void mergeRoads();
+	/*
 	void connectRoads();
 
 	void newTerrain(int width, int depth, int cellLength);
@@ -91,14 +93,15 @@ public:
 	void saveTerrain(const QString &filename);
 	*/
 	void loadRoads(const QString &filename);
-	/*
 	void saveRoads(const QString &filename);
 	void clearRoads();
+
+	/*
 	void perturbRoads(float perturbationFactor);
+	*/
 
 	void loadAreas(const QString &filename);
 	void saveAreas(const QString &filename);
-	*/
 
 private:
 };

@@ -20,6 +20,7 @@ This file is part of QtUrban.
 #include <QFile>
 #include "common.h"
 #include "global.h"
+#include "RendererHelper.h"
 /*
 #include <render/WaterRenderer.h>
 #include <render/TextureManager.h>
@@ -78,10 +79,10 @@ void UrbanGeometry::clearGeometry() {
 }
 
 void UrbanGeometry::generateRoadsMultiEx(std::vector<ExFeature> &features) {
-	/*
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
+	/*
 	MultiExRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, features);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
@@ -90,10 +91,10 @@ void UrbanGeometry::generateRoadsMultiEx(std::vector<ExFeature> &features) {
 }
 
 void UrbanGeometry::generateRoadsMultiIntEx(std::vector<ExFeature> &features) {
-	/*
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
+	/*
 	MultiIntExRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, features);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
@@ -102,10 +103,10 @@ void UrbanGeometry::generateRoadsMultiIntEx(std::vector<ExFeature> &features) {
 }
 
 void UrbanGeometry::generateRoadsInterpolation(ExFeature &feature) {
-	/*
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
+	/*
 	IntRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
@@ -114,10 +115,10 @@ void UrbanGeometry::generateRoadsInterpolation(ExFeature &feature) {
 }
 
 void UrbanGeometry::generateRoadsWarp(ExFeature &feature) {
-	/*
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
+	/*
 	WarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
@@ -126,10 +127,10 @@ void UrbanGeometry::generateRoadsWarp(ExFeature &feature) {
 }
 
 void UrbanGeometry::generateRoadsSmoothWarp(ExFeature &feature) {
-	/*
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
+	/*
 	SmoothWarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
@@ -138,10 +139,10 @@ void UrbanGeometry::generateRoadsSmoothWarp(ExFeature &feature) {
 }
 
 void UrbanGeometry::generateRoadsVerySmoothWarp(ExFeature &feature) {
-	/*
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
+	/*
 	VerySmoothWarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
@@ -150,10 +151,10 @@ void UrbanGeometry::generateRoadsVerySmoothWarp(ExFeature &feature) {
 }
 
 void UrbanGeometry::generateRoadsUShape(ExFeature &feature) {
-	/*
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
+	/*
 	UShapeRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
@@ -196,9 +197,6 @@ void UrbanGeometry::render(VBORenderManager &vboRenderManager) {
 	// draw a terrain
 	renderer.render(terrain, textureManager);
 
-	// draw a road network
-	renderer.render(&roads, textureManager);
-
 	// draw blocks and parcels
 	for (int i = 0; i < blocks.size(); ++i) {
 		renderer.render(blocks[i], textureManager);
@@ -208,54 +206,65 @@ void UrbanGeometry::render(VBORenderManager &vboRenderManager) {
 			renderer.render(blocks[i]->parcels[*vi], textureManager);
 		}
 	}
+	*/
 
 	// draw the area which is now being defined
 	if (areaBuilder.selecting()) {
-		areaBuilder.adaptToTerrain(terrain);
-		rendererHelper.renderPolyline(areaBuilder.polyline3D(), QColor(0, 0, 255), GL_LINE_STIPPLE);
+		areaBuilder.adaptToTerrain();//terrain);
+		RendererHelper::renderPolyline(vboRenderManager, "area_builder_lines", "area_builder_points", areaBuilder.polyline3D(), QColor(0, 0, 255));
 	}
 
 	// draw a hint polyline
 	if (hintLineBuilder.selecting()) {
-		hintLineBuilder.adaptToTerrain(terrain);
-		rendererHelper.renderPolyline(hintLineBuilder.polyline3D(), QColor(255, 0, 0), GL_LINE_STIPPLE);
+		hintLineBuilder.adaptToTerrain();//terrain);
+		RendererHelper::renderPolyline(vboRenderManager, "hintline_builder_lines", "hintline_builder_points", hintLineBuilder.polyline3D(), QColor(255, 0, 0));
 	}
 
 	// draw a avenue sketch polyline
+	/*
 	if (avenueBuilder.selecting()) {
 		avenueBuilder.adaptToTerrain(terrain);
 		rendererHelper.renderPolyline(avenueBuilder.polyline3D(), QColor(255, 255, 0), GL_LINE_STIPPLE);
 	}
+	*/
 
 	// draw the areas
 	for (int i = 0; i < areas.size(); ++i) {
-		if (i == areas.selectedIndex) {
-			rendererHelper.renderPolyline(areas[i]->area3D, QColor(0, 0, 255), GL_LINE_STIPPLE);
-			rendererHelper.renderPolyline(areas[i]->hintLine3D, QColor(255, 0, 0), GL_LINE_STIPPLE);
-		} else {
-			rendererHelper.renderPolyline(areas[i]->area3D, QColor(196, 196, 255), GL_LINE_STIPPLE);
+		QString strLinesN = QString("area_lines%1").arg(i + 1);
+		QString strPointsN = QString("area_points%1").arg(i + 1);
+
+		QString strHintLinesN = QString("hint_lines%1").arg(i + 1);
+		QString strHintPointsN = QString("hint_points%1").arg(i + 1);
+
+		QColor colorArea(0, 0, 255);
+		QColor colorHintLine(255, 0, 0);
+		if (i != areas.selectedIndex) {
+			colorArea = QColor(196, 196, 255);
+			colorHintLine = QColor(255, 196, 196);
 		}
 
-		// draw the road graph
-		areas[i]->roads.adaptToTerrain(terrain);
-		renderer.render(&areas[i]->roads, textureManager);
-	}
+		// draw the area and the hint line
+		RendererHelper::renderPolyline(vboRenderManager, strLinesN, strPointsN, areas[i]->area3D, colorArea);
+		RendererHelper::renderPolyline(vboRenderManager, strHintLinesN, strHintPointsN, areas[i]->hintLine3D, colorHintLine);
 
-	glDisable(GL_LIGHTING);
-	*/
+		// draw the road graph
+		//areas[i]->roads.adaptToTerrain(terrain);
+		QString str = QString("roadGraph%1").arg(i + 1);
+		areas[i]->roads.generateMesh(vboRenderManager,str);
+		vboRenderManager.renderStaticGeometry(str);
+	}
 }
 
 /**
  * Adapt all geometry objects to terrain.
  */
 void UrbanGeometry::adaptToTerrain() {
-	//roads.adaptToTerrain(terrain);
+	roads.adaptToTerrain();//terrain);
 }
 
 /**
  * 指定された道路を追加する。
  */
-/*
 void UrbanGeometry::addRoad(int roadType, const Polyline2D &polyline, int lanes) {
 	RoadVertexDesc v1_desc;
 	if (!GraphUtil::getVertex(roads, polyline[0], 10.0f, v1_desc)) {
@@ -276,7 +285,7 @@ void UrbanGeometry::addRoad(int roadType, const Polyline2D &polyline, int lanes)
 
 	GraphUtil::planarify(roads);
 
-	roads.adaptToTerrain(terrain);
+	roads.adaptToTerrain();//terrain);
 }
 
 void UrbanGeometry::mergeRoads() {
@@ -296,6 +305,7 @@ void UrbanGeometry::mergeRoads() {
 	areas.clear();
 }
 
+/*
 void UrbanGeometry::connectRoads() {
 	RoadGeneratorHelper::connectRoads(roads, 200.0f, 0.15f);
 	GraphUtil::removeDeadEnd(roads);
@@ -387,7 +397,6 @@ void UrbanGeometry::loadRoads(const QString &filename) {
 	roads.adaptToTerrain();
 }
 
-/*
 void UrbanGeometry::saveRoads(const QString &filename) {
 	QFile file(filename);
 	if (!file.open(QIODevice::WriteOnly)) {
@@ -400,27 +409,30 @@ void UrbanGeometry::saveRoads(const QString &filename) {
 
 void UrbanGeometry::clearRoads() {
 	roads.clear();
+	/*
 	for (int i = 0; i < blocks.size(); ++i) {
 		delete blocks[i];
 	}
 	blocks.clear();
+	*/
 }
 
+/*
 void UrbanGeometry::perturbRoads(float perturbationFactor) {
 	GraphUtil::perturb(areas.selectedArea()->roads, areas.selectedArea()->area, perturbationFactor);
 
 	areas.selectedArea()->roads.adaptToTerrain(terrain);
 }
+*/
 
 void UrbanGeometry::loadAreas(const QString &filename) {
 	areas.load(filename);
 
 	for (int i = 0; i < areas.size(); ++i) {
-		areas[i]->adaptToTerrain(terrain);
+		areas[i]->adaptToTerrain();//terrain);
 	}
 }
 
 void UrbanGeometry::saveAreas(const QString &filename) {
 	areas.save(filename);
 }
-*/

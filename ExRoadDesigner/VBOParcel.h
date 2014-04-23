@@ -7,7 +7,7 @@
 #include <QSettings>
 #include "VBOBuilding.h"
 #include <QTextStream>
-#include "polygon_3D.h"
+#include "polygon3D.h"
 
 const int PAR_PARK=0;
 const int PAR_WITH_BLDG=1;

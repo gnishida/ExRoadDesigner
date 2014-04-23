@@ -71,11 +71,9 @@ public:
 	void add2DMeshOfVertex(mylib::RenderablePtr renderable, RoadVertexPtr vertex, QColor color, float height);
 	*/
 private:
-	/*
-	void _generateMeshVertices(mylib::TextureManager* textureManager);
-	void _generateMeshVerticesDefault(mylib::TextureManager* textureManager);
-	void _generateMeshVerticesTexture(mylib::TextureManager* textureManager);
-	*/
+	//void _generateMeshVertices(mylib::TextureManager* textureManager);
+	void _generateMeshVerticesDefault(VBORenderManager& renderManger,QString meshName);
+	//void _generateMeshVerticesTexture(mylib::TextureManager* textureManager);
 	void _generateMeshVerticesGroupBy(VBORenderManager& renderManger,QString meshName);
 	/*
 	void _generateMeshVerticesGenerationType(mylib::TextureManager* textureManager);

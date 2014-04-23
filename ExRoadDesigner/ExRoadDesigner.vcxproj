@@ -166,14 +166,28 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Polygon2D.cpp" />
+    <ClCompile Include="Polygon3D.cpp" />
+    <ClCompile Include="PolygonBuilder.cpp" />
     <ClCompile Include="Polyline2D.cpp" />
     <ClCompile Include="Polyline3D.cpp" />
+    <ClCompile Include="PolylineBuilder.cpp" />
     <ClCompile Include="PropertyWidget.cpp" />
+    <ClCompile Include="RendererHelper.cpp" />
+    <ClCompile Include="RoadArea.cpp" />
+    <ClCompile Include="RoadAreaSet.cpp" />
     <ClCompile Include="RoadEdge.cpp" />
     <ClCompile Include="RoadGraph.cpp" />
     <ClCompile Include="RoadVertex.cpp" />
     <ClCompile Include="UrbanGeometry.cpp" />
     <ClCompile Include="Util.cpp" />
+    <ClCompile Include="VBOBlock.cpp" />
+    <ClCompile Include="VBOGeoBuilding.cpp" />
+    <ClCompile Include="VBOParcel.cpp" />
+    <ClCompile Include="VBOPlaceType.cpp" />
+    <ClCompile Include="VBOPm.cpp" />
+    <ClCompile Include="VBOPmBlocks.cpp" />
+    <ClCompile Include="VBOPmBuildings.cpp" />
+    <ClCompile Include="VBOPmParcels.cpp" />
     <ClCompile Include="VBORenderManager.cpp" />
     <ClCompile Include="VBOShader.cpp" />
     <ClCompile Include="VBOUtil.cpp" />
@@ -231,9 +245,24 @@
     <ClInclude Include="GraphUtil.h" />
     <ClInclude Include="Histogram.h" />
     <ClInclude Include="Polygon2D.h" />
+    <ClInclude Include="Polygon3D.h" />
+    <ClInclude Include="PolygonBuilder.h" />
     <ClInclude Include="Polyline2D.h" />
     <ClInclude Include="Polyline3D.h" />
+    <ClInclude Include="PolylineBuilder.h" />
+    <ClInclude Include="RendererHelper.h" />
+    <ClInclude Include="RoadArea.h" />
+    <ClInclude Include="RoadAreaSet.h" />
     <ClInclude Include="UrbanGeometry.h" />
+    <ClInclude Include="VBOBlock.h" />
+    <ClInclude Include="VBOBuilding.h" />
+    <ClInclude Include="VBOGeoBuilding.h" />
+    <ClInclude Include="VBOParcel.h" />
+    <ClInclude Include="VBOPlaceType.h" />
+    <ClInclude Include="VBOPm.h" />
+    <ClInclude Include="VBOPmBlocks.h" />
+    <ClInclude Include="VBOPmBuildings.h" />
+    <ClInclude Include="VBOPmParcels.h" />
     <ClInclude Include="VBORenderManager.h" />
     <ClInclude Include="VBOShader.h" />
     <ClInclude Include="VBOUtil.h" />
@@ -341,6 +370,10 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\data\shaders\lc_fragment_sk.glsl" />
+    <None Include="..\data\shaders\lc_vertex_sk.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

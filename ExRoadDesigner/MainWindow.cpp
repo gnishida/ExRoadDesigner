@@ -64,11 +64,11 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* e) {
-	//glWidget->keyPressEvent(e);
+	glWidget->keyPressEvent(e);
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent* e) {
-	//glWidget->keyReleaseEvent(e);
+	glWidget->keyReleaseEvent(e);
 }
 
 void MainWindow::onNewTerrain() {
@@ -120,7 +120,6 @@ void MainWindow::onLoadRoads() {
 }
 
 void MainWindow::onSaveRoads() {
-	/*
 	QString filename = QFileDialog::getSaveFileName(this, tr("Save Street Map file..."), "", tr("StreetMap Files (*.gsm)"));
 
 	if (filename.isEmpty()) {
@@ -133,18 +132,14 @@ void MainWindow::onSaveRoads() {
 	urbanGeometry->saveRoads(filename);
 
 	QApplication::restoreOverrideCursor();
-	*/
 }
 
 void MainWindow::onClearRoads() {
-	/*
 	urbanGeometry->clearRoads();
 	glWidget->updateGL();
-	*/
 }
 
 void MainWindow::onLoadAreas() {
-	/*
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open Area file..."), "", tr("Area Files (*.area)"));
 
 	if (filename.isEmpty()) {
@@ -154,11 +149,9 @@ void MainWindow::onLoadAreas() {
 	urbanGeometry->loadAreas(filename);
 
 	glWidget->updateGL();
-	*/
 }
 
 void MainWindow::onSaveAreas() {
-	/*
 	QString filename = QFileDialog::getSaveFileName(this, tr("Save Area Map file..."), "", tr("Area Files (*.area)"));
 
 	if (filename.isEmpty()) {
@@ -171,7 +164,6 @@ void MainWindow::onSaveAreas() {
 	urbanGeometry->saveAreas(filename);
 
 	QApplication::restoreOverrideCursor();
-	*/
 }
 
 void MainWindow::onSaveImage() {
@@ -189,72 +181,58 @@ void MainWindow::onSaveImage() {
 }
 
 void MainWindow::onAreaMenu() {
-	/*
 	ui.actionAreaSelect->setChecked(mode == MODE_AREA_SELECT);
 	ui.actionAreaCreate->setChecked(mode == MODE_AREA_CREATE);
 	ui.actionHintLine->setChecked(mode == MODE_HINT_LINE);
 	ui.actionAvenueSketch->setChecked(mode == MODE_AVENUE_SKETCH);
 	ui.actionDebug->setChecked(mode == MODE_DEBUG);
-	*/
 }
 
 void MainWindow::onAreaSelect() {
-	/*
 	mode = MODE_AREA_SELECT;
 	ui.actionAreaCreate->setChecked(false);
 	ui.actionHintLine->setChecked(false);
 	ui.actionAvenueSketch->setChecked(false);
 	ui.actionDebug->setChecked(false);
-	*/
 }
 
 void MainWindow::onAreaCreate() {
-	/*
 	mode = MODE_AREA_CREATE;
 	ui.actionAreaSelect->setChecked(false);
 	ui.actionHintLine->setChecked(false);
 	ui.actionAvenueSketch->setChecked(false);
 	ui.actionDebug->setChecked(false);
-	*/
 }
 
 void MainWindow::onAreaDelete() {
-	/*
 	urbanGeometry->areas.deleteArea();
 
 	glWidget->updateGL();
-	*/
 }
 
 void MainWindow::onHintLine() {
-	/*
 	mode = MODE_HINT_LINE;
 	ui.actionAreaCreate->setChecked(false);
 	ui.actionAreaSelect->setChecked(false);
 	ui.actionHighwaySketch->setChecked(false);
 	ui.actionAvenueSketch->setChecked(false);
 	ui.actionDebug->setChecked(false);
-	*/
 }
 
 void MainWindow::onAvenueSketch() {
-	/*
 	mode = MODE_AVENUE_SKETCH;
 	ui.actionAreaCreate->setChecked(false);
 	ui.actionAreaSelect->setChecked(false);
 	ui.actionHighwaySketch->setChecked(false);
 	ui.actionDebug->setChecked(false);
-	*/
 }
 
 void MainWindow::onDebug() {
-	/*
 	mode = MODE_DEBUG;
 	ui.actionAreaSelect->setChecked(false);
 	ui.actionAreaCreate->setChecked(false);
 	ui.actionHintLine->setChecked(false);
 	ui.actionAvenueSketch->setChecked(false);
-	*/
 }
 
 void MainWindow::onGenerateBlocks() {
@@ -274,7 +252,6 @@ void MainWindow::onGenerateParcels() {
 }
 
 void MainWindow::onDisplayRoads() {
-	/*
 	urbanGeometry->roads.showHighways = ui.actionDisplayHighway->isChecked();
 	urbanGeometry->roads.showBoulevards = ui.actionDisplayBoulevard->isChecked();
 	urbanGeometry->roads.showAvenues = ui.actionDisplayAvenue->isChecked();
@@ -282,7 +259,6 @@ void MainWindow::onDisplayRoads() {
 	urbanGeometry->roads.setModified();
 
 	glWidget->updateGL();
-	*/
 }
 
 void MainWindow::onRenderingDefault() {
@@ -290,12 +266,10 @@ void MainWindow::onRenderingDefault() {
 	ui.actionRenderingGroupBy->setChecked(false);
 	ui.actionRenderingGenerationType->setChecked(false);
 
-	/*
 	urbanGeometry->roads.renderMode = RoadGraph::RENDER_DEFAULT;
 	urbanGeometry->roads.setModified();
 
 	glWidget->updateGL();
-	*/
 }
 
 void MainWindow::onRenderingTexture() {
@@ -303,12 +277,10 @@ void MainWindow::onRenderingTexture() {
 	ui.actionRenderingGroupBy->setChecked(false);
 	ui.actionRenderingGenerationType->setChecked(false);
 
-	/*
 	urbanGeometry->roads.renderMode = RoadGraph::RENDER_TEXTURE;
 	urbanGeometry->roads.setModified();
 
 	glWidget->updateGL();
-	*/
 }
 
 void MainWindow::onRenderingGroupBy() {
@@ -316,12 +288,10 @@ void MainWindow::onRenderingGroupBy() {
 	ui.actionRenderingTexture->setChecked(false);
 	ui.actionRenderingGenerationType->setChecked(false);
 
-	/*
 	urbanGeometry->roads.renderMode = RoadGraph::RENDER_GROUPBY;
 	urbanGeometry->roads.setModified();
 
 	glWidget->updateGL();
-	*/
 }
 
 void MainWindow::onRenderingGenerationType() {
@@ -329,12 +299,10 @@ void MainWindow::onRenderingGenerationType() {
 	ui.actionRenderingTexture->setChecked(false);
 	ui.actionRenderingGroupBy->setChecked(false);
 
-	/*
 	urbanGeometry->roads.renderMode = RoadGraph::RENDER_GENERATION_TYPE;
 	urbanGeometry->roads.setModified();
 
 	glWidget->updateGL();
-	*/
 }
 
 void MainWindow::onShowControlWidget() {
