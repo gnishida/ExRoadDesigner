@@ -1,7 +1,7 @@
 #include "Polygon3D.h"
 #include <QVector2D>
 #include <QMatrix4x4>
-
+#include "Util.h"
 
 //**** Polygon3D
 void Polygon3D::renderContour(void)
@@ -231,7 +231,7 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 		}
 	}
 
-	pgonInset.resize(cSz);
+	//pgonInset.resize(cSz);
 
 	QVector3D intPt;
 
@@ -243,10 +243,29 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 		prev = (cur-1+cSz)%cSz; //point p0
 		next = (cur+1)%cSz;	  //point p2
 
-		getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next],
-			offsetDistances[prev], offsetDistances[cur], intPt);
+		if (Util::diffAngle(cleanPgon[prev] - cleanPgon[cur], cleanPgon[next] - cleanPgon[cur]) < 0.1f) {
+			// For deanend edge
+			QVector3D vec = cleanPgon[cur] - cleanPgon[prev];
+			QVector3D vec2(-vec.y(), vec.x(), 0);
 
-		pgonInset[cur] = intPt;
+			float angle = atan2f(vec2.y(), vec2.x());
+			for (int i = 0; i <= 10; ++i) {
+				float a = angle - (float)i * M_PI / 10.0f;
+				intPt = QVector3D(cleanPgon[cur].x() + cosf(a) * offsetDistances[cur], cleanPgon[cur].y() + sinf(a) * offsetDistances[cur], cleanPgon[cur].z());
+				pgonInset.push_back(intPt);
+			}
+		} else {
+			Util::getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next], offsetDistances[prev], offsetDistances[cur], intPt);
+			
+			// For acute angle
+			if (pgonInset.size() >= 2) {
+				if (Util::diffAngle(pgonInset[pgonInset.size() - 2] - pgonInset[pgonInset.size() - 1], intPt - pgonInset[pgonInset.size() - 1]) < 0.1f) {
+					pgonInset.erase(pgonInset.begin() + pgonInset.size() - 1);
+				}
+			}
+
+			pgonInset.push_back(intPt);
+		}
 	}
 
 	//temp

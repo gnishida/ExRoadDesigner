@@ -4,7 +4,7 @@
  ************************************************************************************************/
 
 #include "VBOPmBlocks.h"
-#include "polygon3D.h"
+#include "Polygon3D.h"
 
 #include <qdir.h>
 #include <QStringList>
@@ -45,7 +45,12 @@ void VBOPmBlocks::init(){
 ///////////////////////////////////////////////////////////////
 RoadGraph * roadGraphPtr;
 std::vector< Block > * blocksPtr;
-Loop3D blockContourTmp;
+//Loop3D blockContourTmp;
+
+Polygon3D blockContourTmp;
+Polygon3D blockContourPoints;
+std::vector<Polyline3D> blockContourLines;
+
 std::vector< float > blockContourWidths;
 bool isFirstVertexVisited;
 
@@ -59,20 +64,56 @@ struct output_visitor : public boost::planar_face_traversal_visitor
 {
 	void begin_face()
 	{
+		/*
 		blockContourTmp.clear();
 		blockContourWidths.clear();
 		isFirstVertexVisited = true;
 		curRandSeed = 0;
+		*/
+		blockContourTmp.clear();
+		blockContourWidths.clear();
+
+		blockContourPoints.clear();
+		blockContourLines.clear();
 	}
 
 	void end_face()
 	{
+		/*
 		if(blockContourTmp.size() > 2){
 			Block newBlock;
 			newBlock.blockContour.contour = blockContourTmp;		
 			newBlock.blockContourRoadsWidths = blockContourWidths;
 			newBlock.randSeed = curRandSeed;	
 			blocksPtr->push_back(newBlock);//!!!! UPDATEE
+		}
+		*/
+		blockContourTmp.clear();
+			
+		for (int i = 0; i < blockContourPoints.contour.size(); ++i) {
+			blockContourTmp.push_back(blockContourPoints[i]);
+
+			if ((blockContourLines[i][0] - blockContourPoints[i]).lengthSquared() < (blockContourLines[i].last() - blockContourPoints[i]).lengthSquared()) {
+				for (int j = 1; j < blockContourLines[i].size() - 1; ++j) {
+					blockContourTmp.push_back(blockContourLines[i][j]);
+				}
+			} else {
+				for (int j = blockContourLines[i].size() - 2; j > 0; --j) {
+					blockContourTmp.push_back(blockContourLines[i][j]);
+				}
+			}
+		}
+
+		//if (blockContourTmp.area() > 100.0f) {
+		if (blockContourTmp.contour.size() >= 3 && blockContourWidths.size() >= 3) {
+			Block newBlock;
+			newBlock.blockContour = blockContourTmp;
+			newBlock.blockContourRoadsWidths = blockContourWidths;
+			while (newBlock.blockContour.contour.size() > newBlock.blockContourRoadsWidths.size()) {
+				newBlock.blockContourRoadsWidths.push_back(newBlock.blockContourRoadsWidths.back());
+			}
+	
+			blocksPtr->push_back(newBlock);
 		}
 	}
 };
@@ -84,20 +125,23 @@ struct vertex_output_visitor : public output_visitor
 	void next_vertex(Vertex v) 
 	{ 	
 		//std::cout << v << " 
+		/*
 		if(  v >= 0 && v < boost::num_vertices(roadGraphPtr->graph) ){
 			blockContourTmp.push_back( (roadGraphPtr->graph)[v]->pt );
 
 			//initialize block random seed from first street node random seed
 			if(isFirstVertexVisited){
 				isFirstVertexVisited = false;
-				//curRandSeed = ( (roadGraphPtr->graph)[v]->randSeed*4096 + 150889) % 714025;
+				curRandSeed = ( (roadGraphPtr->graph)[v]->randSeed*4096 + 150889) % 714025;
 			}
-		}
+		}*/
+		blockContourPoints.push_back(roadGraphPtr->graph[v]->pt);
 	}
 
 	template <typename Edge> 
 	void next_edge(Edge e) 
 	{ 
+		/*
 		int sIdx, tIdx;
 		sIdx = boost::source(e, roadGraphPtr->graph);
 		tIdx = boost::target(e, roadGraphPtr->graph);
@@ -107,6 +151,13 @@ struct vertex_output_visitor : public output_visitor
 
 				blockContourWidths.push_back( 0.5f*7.0f);///!!!!! UPDATEE //roadGraphPtr->graph)[e]->wid);	//half of the width	
 		}
+		*/
+		blockContourLines.push_back(roadGraphPtr->graph[e]->polyline3D);
+
+		for (int i = 0; i < roadGraphPtr->graph[e]->polyline3D.size() - 1; ++i) {
+			blockContourWidths.push_back(0.5f * roadGraphPtr->graph[e]->getWidth());
+		}
+
 	}
 };
 
@@ -216,6 +267,9 @@ bool VBOPmBlocks::generateBlocks(
 		return false;
 	}
 
+	// build embedding manually
+	buildEmbedding(roadGraph, embedding);
+
 	//Create edge index property map?	
 	typedef std::map<RoadEdgeDesc, size_t> EdgeIndexMap;
 	EdgeIndexMap mapEdgeIdx;
@@ -250,10 +304,11 @@ bool VBOPmBlocks::generateBlocks(
 				blocks[i].blockContourRoadsWidths.end() - 1);
 			//std::cout << "reorient\n";
 		}
+
+		/*
 		//fix block geometry before calling function...
 		Loop3D cleanPgon;
-		Polygon3D::cleanLoop(blocks[i].blockContour.contour,
-			cleanPgon, 5.0f);		
+		Polygon3D::cleanLoop(blocks[i].blockContour.contour, cleanPgon, 5.0f);		
 
 		//update widths			
 		if(blocks[i].blockContour.contour.size() != cleanPgon.size()){
@@ -277,7 +332,7 @@ bool VBOPmBlocks::generateBlocks(
 			//std::cout << cleanPgon.size() << " " << cleanWidths.size() << "\n";
 			blocks[i].myColor = QVector3D(0.5f, 0.7f, 0.8f);		
 		}
-
+		*/
 
 		if( blocks[i].blockContour.contour.size() != blocks[i].blockContourRoadsWidths.size() ){
 			std::cout << "Error: " << blocks[i].blockContour.contour.size() << " " << blocks[i].blockContourRoadsWidths.size() << "\n";
@@ -347,4 +402,28 @@ bool VBOPmBlocks::generateBlocks(
 	}
 	return true;
 }//
+
+void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding) {
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		std::map<float, RoadEdgeDesc> edges;
+
+		RoadOutEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::out_edges(*vi, roads.graph); ei != eend; ++ei) {
+			if ((roads.graph[*ei]->polyline[0] - roads.graph[*vi]->pt).lengthSquared() > (roads.graph[*ei]->polyline.last() - roads.graph[*vi]->pt).lengthSquared()) {
+				std::reverse(roads.graph[*ei]->polyline.begin(), roads.graph[*ei]->polyline.end());
+			}
+
+			QVector2D vec = roads.graph[*ei]->polyline[1] - roads.graph[*ei]->polyline[0];
+			edges[-atan2f(vec.y(), vec.x())] = *ei;
+		}
+
+		std::vector<RoadEdgeDesc> edge_descs;
+		for (std::map<float, RoadEdgeDesc>::iterator it = edges.begin(); it != edges.end(); ++it) {
+			edge_descs.push_back(it->second);
+		}
+
+		embedding.push_back(edge_descs);
+	}
+}
 

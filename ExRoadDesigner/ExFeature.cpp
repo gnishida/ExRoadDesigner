@@ -13,49 +13,6 @@ void ExFeature::setHintLine(const Polyline2D &polyline) {
 	hintLine = polyline;
 }
 
-/*
-void ExFeature::addItem(int roadType, const ExFeatureItem &item) {
-	switch (roadType) {
-	case RoadEdge::TYPE_AVENUE:
-		_avenueItems.push_back(item);
-		break;
-	case RoadEdge::TYPE_STREET:
-		_streetItems.push_back(item);
-		break;
-	}
-}
-
-size_t ExFeature::numItems(int roadType) const {
-	if (roadType == RoadEdge::TYPE_AVENUE) {
-		return _avenueItems.size();
-	} else {
-		return _streetItems.size();
-	}
-}
-
-const std::vector<ExFeatureItem>& ExFeature::items(int roadType) const {
-	switch (roadType) {
-	case RoadEdge::TYPE_AVENUE:
-		return _avenueItems;
-	case RoadEdge::TYPE_STREET:
-		return _streetItems;
-	default:
-		return _streetItems;
-	}
-}
-
-std::vector<ExFeatureItem>& ExFeature::items(int roadType) {
-	switch (roadType) {
-	case RoadEdge::TYPE_AVENUE:
-		return _avenueItems;
-	case RoadEdge::TYPE_STREET:
-		return _streetItems;
-	default:
-		return _streetItems;
-	}
-}
-*/
-
 RoadGraph& ExFeature::roads(int roadType) {
 	if (roadType == RoadEdge::TYPE_AVENUE) {
 		return avenues;

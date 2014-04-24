@@ -708,10 +708,7 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager,Building& bu
 		float blackWidth=1.0f;
 		Polygon3D roofRed;
 		footprint.computeInset(blackWidth,roofRed.contour,false);
-		//rendManager.addStaticGeometry2("3d_building",footprint.contour,height,false,"",GL_QUADS,1,QVector3D(1,1,1));
-		rendManager.addStaticGeometry2("3d_building",roofRed.contour,height+sideWalkEl,false,"",GL_QUADS,1,QVector3D(1,1,1),colorW);
-		//rendManager.addStaticGeometry2("3d_building",footprint.contour,height-blackWidth/2.0f+sideWalkEl,false,"",GL_QUADS,1,colorB);
-		// blackWidth/2.0f -->-0.2 to push a bit down
+		//rendManager.addStaticGeometry2("3d_building",roofRed.contour,height+sideWalkEl,false,"",GL_QUADS,1,QVector3D(1,1,1),colorW);
 		rendManager.addStaticGeometry2("3d_building",footprint.contour,height-0.2+sideWalkEl,false,"hatching_array",GL_QUADS,10|mode_TexArray,QVector3D(1,1,1),QVector3D(0.1f,0.1f,0.1f));
 	}
 

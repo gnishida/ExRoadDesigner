@@ -45,11 +45,11 @@ This file is part of QtUrban.
 UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
 
-	//terrain = NULL;
+	terrain = NULL;
 
 	//waterRenderer = new mylib::WaterRenderer(3000, 3000, -2.0f);
 
-	//loadTerrain("data/default.trn");
+	loadTerrain("../data/default.trn");
 
 	selectedAreaIndex = -1;
 }
@@ -62,7 +62,7 @@ void UrbanGeometry::clear() {
 }
 
 void UrbanGeometry::clearGeometry() {
-	//if (terrain != NULL) delete terrain;
+	if (terrain != NULL) delete terrain;
 
 	roads.clear();
 
@@ -79,60 +79,60 @@ void UrbanGeometry::generateRoadsMultiEx(std::vector<ExFeature> &features) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
-	MultiExRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, features);
+	MultiExRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, features);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
-	areas.selectedArea()->roads.adaptToTerrain();//terrain);
+	areas.selectedArea()->roads.adaptToTerrain(terrain);
 }
 
 void UrbanGeometry::generateRoadsMultiIntEx(std::vector<ExFeature> &features) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
-	MultiIntExRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, features);
+	MultiIntExRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, features);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
-	areas.selectedArea()->roads.adaptToTerrain();//terrain);
+	areas.selectedArea()->roads.adaptToTerrain(terrain);
 }
 
 void UrbanGeometry::generateRoadsInterpolation(ExFeature &feature) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
-	IntRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, feature);
+	IntRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
-	areas.selectedArea()->roads.adaptToTerrain();//terrain);
+	areas.selectedArea()->roads.adaptToTerrain(terrain);
 }
 
 void UrbanGeometry::generateRoadsWarp(ExFeature &feature) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
-	WarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, feature);
+	WarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
-	areas.selectedArea()->roads.adaptToTerrain();//terrain);
+	areas.selectedArea()->roads.adaptToTerrain(terrain);
 }
 
 void UrbanGeometry::generateRoadsSmoothWarp(ExFeature &feature) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
-	SmoothWarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, feature);
+	SmoothWarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
-	areas.selectedArea()->roads.adaptToTerrain();//terrain);
+	areas.selectedArea()->roads.adaptToTerrain(terrain);
 }
 
 void UrbanGeometry::generateRoadsVerySmoothWarp(ExFeature &feature) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
-	VerySmoothWarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, feature);
+	VerySmoothWarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, terrain, feature);
 	generator.generateRoadNetwork(G::getBool("animation"));
 
-	areas.selectedArea()->roads.adaptToTerrain();//terrain);
+	areas.selectedArea()->roads.adaptToTerrain(terrain);
 }
 
 void UrbanGeometry::generateBlocks() {
@@ -159,17 +159,22 @@ void UrbanGeometry::generateParcels() {
 
 void UrbanGeometry::render(VBORenderManager &vboRenderManager) {
 	// draw the road graph
-	roads.generateMesh(vboRenderManager,"roadGraph");
-	vboRenderManager.renderStaticGeometry("roadGraph");
+	roads.generateMesh(vboRenderManager, "roads_lines", "roads_points");
+	vboRenderManager.renderStaticGeometry("roads_lines");
+	vboRenderManager.renderStaticGeometry("roads_points");
 
 	/*
 	if (waterRenderer != NULL) {
 		waterRenderer->renderMe(textureManager);
 	}
+	*/
 	
 	// draw a terrain
-	renderer.render(terrain, textureManager);
+	//renderer.render(terrain, textureManager);
+	terrain->generateMesh(vboRenderManager, "terrain");
+	vboRenderManager.renderStaticGeometry("terrain");
 
+	/*
 	// draw blocks and parcels
 	for (int i = 0; i < blocks.size(); ++i) {
 		renderer.render(blocks[i], textureManager);
@@ -183,13 +188,13 @@ void UrbanGeometry::render(VBORenderManager &vboRenderManager) {
 
 	// draw the area which is now being defined
 	if (areaBuilder.selecting()) {
-		areaBuilder.adaptToTerrain();//terrain);
+		areaBuilder.adaptToTerrain(terrain);
 		RendererHelper::renderPolyline(vboRenderManager, "area_builder_lines", "area_builder_points", areaBuilder.polyline3D(), QColor(0, 0, 255));
 	}
 
 	// draw a hint polyline
 	if (hintLineBuilder.selecting()) {
-		hintLineBuilder.adaptToTerrain();//terrain);
+		hintLineBuilder.adaptToTerrain(terrain);
 		RendererHelper::renderPolyline(vboRenderManager, "hintline_builder_lines", "hintline_builder_points", hintLineBuilder.polyline3D(), QColor(255, 0, 0));
 	}
 
@@ -222,9 +227,11 @@ void UrbanGeometry::render(VBORenderManager &vboRenderManager) {
 
 		// draw the road graph
 		//areas[i]->roads.adaptToTerrain(terrain);
-		QString str = QString("roadGraph%1").arg(i + 1);
-		areas[i]->roads.generateMesh(vboRenderManager,str);
-		vboRenderManager.renderStaticGeometry(str);
+		QString str1 = QString("roads_lines").arg(i + 1);
+		QString str2 = QString("roads_points").arg(i + 1);
+		areas[i]->roads.generateMesh(vboRenderManager, str1, str2);
+		vboRenderManager.renderStaticGeometry(str1);
+		vboRenderManager.renderStaticGeometry(str2);
 	}
 }
 
@@ -232,7 +239,7 @@ void UrbanGeometry::render(VBORenderManager &vboRenderManager) {
  * Adapt all geometry objects to terrain.
  */
 void UrbanGeometry::adaptToTerrain() {
-	roads.adaptToTerrain();//terrain);
+	roads.adaptToTerrain(terrain);
 }
 
 /**
@@ -258,7 +265,7 @@ void UrbanGeometry::addRoad(int roadType, const Polyline2D &polyline, int lanes)
 
 	GraphUtil::planarify(roads);
 
-	roads.adaptToTerrain();//terrain);
+	roads.adaptToTerrain(terrain);
 }
 
 void UrbanGeometry::mergeRoads() {
@@ -282,19 +289,20 @@ void UrbanGeometry::connectRoads() {
 	RoadGeneratorHelper::connectRoads(roads, 200.0f, 0.15f);
 	GraphUtil::removeDeadEnd(roads);
 
-	roads.adaptToTerrain();//terrain);
+	roads.adaptToTerrain(terrain);
 }
 
-/*
 void UrbanGeometry::newTerrain(int width, int depth, int cellLength) {
 	clear();
 
-	terrain = new mylib::Terrain(width, depth, cellLength);
+	terrain = new Terrain(width, depth, cellLength);
 
+	/*
 	if (waterRenderer != NULL) {
 		waterRenderer->setWidth(width);
 		waterRenderer->setDepth(depth);
 	}
+	*/
 }
 
 void UrbanGeometry::loadTerrain(const QString &filename) {
@@ -312,7 +320,7 @@ void UrbanGeometry::loadTerrain(const QString &filename) {
 	this->depth = line.split(" ")[1].toInt();
 	int cellLength = line.split(" ")[2].toInt();
 
-	terrain = new mylib::Terrain(width, depth, cellLength);
+	terrain = new Terrain(width, depth, cellLength);
 
 	for (int i = 0; i < terrain->getNumRows() * terrain->getNumCols(); ++i) {
 		line = in.readLine();
@@ -327,10 +335,12 @@ void UrbanGeometry::loadTerrain(const QString &filename) {
 		terrain->setValue(x, y, line.toFloat());
 	}
 
+	/*
 	if (waterRenderer != NULL) {
 		waterRenderer->setWidth(width);// * 1.2f);
 		waterRenderer->setDepth(depth);// * 1.2f);
 	}
+	*/
 }
 
 void UrbanGeometry::saveTerrain(const QString &filename) {
@@ -355,7 +365,6 @@ void UrbanGeometry::saveTerrain(const QString &filename) {
 		}
 	}
 }
-*/
 
 void UrbanGeometry::loadRoads(const QString &filename) {
 	QFile file(filename);
@@ -367,7 +376,7 @@ void UrbanGeometry::loadRoads(const QString &filename) {
 	roads.clear();
 	GraphUtil::loadRoads(roads, filename);
 
-	roads.adaptToTerrain();
+	roads.adaptToTerrain(terrain);
 }
 
 void UrbanGeometry::saveRoads(const QString &filename) {
@@ -394,7 +403,7 @@ void UrbanGeometry::loadAreas(const QString &filename) {
 	areas.load(filename);
 
 	for (int i = 0; i < areas.size(); ++i) {
-		areas[i]->adaptToTerrain();//terrain);
+		areas[i]->adaptToTerrain(terrain);
 	}
 }
 

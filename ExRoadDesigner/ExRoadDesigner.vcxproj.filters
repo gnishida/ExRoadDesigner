@@ -31,10 +31,6 @@
     <Filter Include="render PM">
       <UniqueIdentifier>{0c679474-b313-45cf-8352-882a78a96147}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;cxx;c;def</Extensions>
-    </Filter>
     <Filter Include="render PM\Geometry">
       <UniqueIdentifier>{f1f7f165-33a1-47b1-944a-ebc875e7b8c7}</UniqueIdentifier>
     </Filter>
@@ -44,13 +40,20 @@
     <Filter Include="road generator">
       <UniqueIdentifier>{d6c9abeb-58e0-4010-88d5-12dc283827de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Main Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{fb349a01-a1fa-43e3-8d24-f3a2615eeefd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="MainWindow.cpp">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_MainWindow.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -62,34 +65,22 @@
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="ControlWidget.cpp">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="GraphUtil.cpp">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="RoadEdge.cpp">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="RoadGraph.cpp">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="RoadVertex.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BBox.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Util.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Polygon2D.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Polyline2D.cpp">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="PropertyWidget.cpp">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_PropertyWidget.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -98,10 +89,7 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GLWidget3D.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
-    <ClCompile Include="global.cpp">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="VBORenderManager.cpp">
       <Filter>render</Filter>
@@ -116,28 +104,13 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="UrbanGeometry.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Histogram.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Polyline3D.cpp">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="RoadArea.cpp">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="RoadAreaSet.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PolygonBuilder.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PolylineBuilder.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Polygon3D.cpp">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClCompile>
     <ClCompile Include="RendererHelper.cpp">
       <Filter>render</Filter>
@@ -190,17 +163,71 @@
     <ClCompile Include="WarpRoadGenerator.cpp">
       <Filter>road generator</Filter>
     </ClCompile>
-    <ClCompile Include="ConvexHull.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TopNSearch.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TensorField.cpp">
-      <Filter>Files</Filter>
-    </ClCompile>
     <ClCompile Include="RoadGeneratorHelper.cpp">
       <Filter>road generator</Filter>
+    </ClCompile>
+    <ClCompile Include="BBox.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="global.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="Histogram.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="Polygon2D.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="Polygon3D.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="Polyline2D.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="Polyline3D.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="TensorField.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="TopNSearch.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="ConvexHull.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="PolygonBuilder.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="PolylineBuilder.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ControlWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Main Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainCell.cpp">
+      <Filter>Main Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ColorTable.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="ElevationColorTable.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainSizeInputDialog.cpp">
+      <Filter>Main Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TerrainSizeInputDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TerrainSizeInputDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -210,20 +237,26 @@
     <CustomBuild Include="MainWindow.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="ControlWidget.ui">
-      <Filter>Form Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="ControlWidget.h">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </CustomBuild>
     <CustomBuild Include="MainWindow.h">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </CustomBuild>
     <CustomBuild Include="PropertyWidget.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="PropertyWidget.h">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="TerrainSizeInputDialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="TerrainSizeInputDialog.h">
+      <Filter>Main Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ControlWidget.ui">
+      <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -231,43 +264,22 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="GraphUtil.h">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClInclude>
     <ClInclude Include="RoadEdge.h">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClInclude>
     <ClInclude Include="RoadGraph.h">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClInclude>
     <ClInclude Include="RoadVertex.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BBox.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Util.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Polygon2D.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Polyline2D.h">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_PropertyWidget.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="GLWidget3D.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera3D.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="global.h">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClInclude>
     <ClInclude Include="VBOUtil.h">
       <Filter>render</Filter>
@@ -278,32 +290,14 @@
     <ClInclude Include="VBOShader.h">
       <Filter>render</Filter>
     </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_ControlWidget.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="UrbanGeometry.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Histogram.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Polyline3D.h">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClInclude>
     <ClInclude Include="RoadArea.h">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClInclude>
     <ClInclude Include="RoadAreaSet.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PolygonBuilder.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PolylineBuilder.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Polygon3D.h">
-      <Filter>Files</Filter>
+      <Filter>Main Files</Filter>
     </ClInclude>
     <ClInclude Include="RendererHelper.h">
       <Filter>render</Filter>
@@ -335,9 +329,6 @@
     <ClInclude Include="VBOPmParcels.h">
       <Filter>render PM\PM</Filter>
     </ClInclude>
-    <ClInclude Include="common.h">
-      <Filter>Files</Filter>
-    </ClInclude>
     <ClInclude Include="VBORoadGraph.h">
       <Filter>render</Filter>
     </ClInclude>
@@ -362,17 +353,74 @@
     <ClInclude Include="WarpRoadGenerator.h">
       <Filter>road generator</Filter>
     </ClInclude>
-    <ClInclude Include="ConvexHull.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TopNSearch.h">
-      <Filter>Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TensorField.h">
-      <Filter>Files</Filter>
-    </ClInclude>
     <ClInclude Include="RoadGeneratorHelper.h">
       <Filter>road generator</Filter>
+    </ClInclude>
+    <ClInclude Include="BBox.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="global.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="Histogram.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="Polygon2D.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="Polygon3D.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="Polyline2D.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="Polyline3D.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="TensorField.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="TopNSearch.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="Util.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvexHull.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="PolylineBuilder.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="PolygonBuilder.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera3D.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Main Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainCell.h">
+      <Filter>Main Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorTable.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="ElevationColorTable.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_TerrainSizeInputDialog.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ControlWidget.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

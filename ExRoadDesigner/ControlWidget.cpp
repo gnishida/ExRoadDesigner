@@ -35,7 +35,6 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	connect(ui.pushButtonClear, SIGNAL(clicked()), this, SLOT(clear()));
 	connect(ui.pushButtonConnect, SIGNAL(clicked()), this, SLOT(connectRoads()));
 	connect(ui.pushButtonMerge, SIGNAL(clicked()), this, SLOT(mergeRoads()));
-	connect(ui.pushButtonGenerate3D, SIGNAL(clicked()), this, SLOT(update3D()));
 	//connect(ui.pushButtonCamera3D, SIGNAL(clicked()), this, SLOT(camera3D()));
 
 	hide();
@@ -221,12 +220,6 @@ void ControlWidget::mergeRoads() {
  */
 void ControlWidget::connectRoads() {
 	mainWin->urbanGeometry->connectRoads();
-
-	mainWin->glWidget->updateGL();
-}
-
-void ControlWidget::update3D() {
-	mainWin->glWidget->generate3DGeometry();
 
 	mainWin->glWidget->updateGL();
 }

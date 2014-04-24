@@ -198,8 +198,8 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 			if (event->buttons() & Qt::RightButton) {
 				change = -change;
 			}
-			//mainWin->urbanGeometry->terrain->addValue(pos.x(), pos.y(), change);
-			//mainWin->urbanGeometry->adaptToTerrain();
+			mainWin->urbanGeometry->terrain->addValue(pos.x(), pos.y(), change);
+			mainWin->urbanGeometry->adaptToTerrain();
 		} else if (event->buttons() & Qt::LeftButton) {	// Rotate
 			camera->changeXRotation(rotationSensitivity * dy);
 			camera->changeZRotation(-rotationSensitivity * dx);    
@@ -244,7 +244,7 @@ void GLWidget3D::mouseDoubleClickEvent(QMouseEvent *e) {
 		mainWin->urbanGeometry->areaBuilder.end();
 		mainWin->urbanGeometry->areas.add(RoadAreaPtr(new RoadArea(mainWin->urbanGeometry->areaBuilder.polygon())));
 		mainWin->urbanGeometry->areas.selectLastArea();
-		mainWin->urbanGeometry->areas.selectedArea()->adaptToTerrain();//mainWin->urbanGeometry->terrain);
+		mainWin->urbanGeometry->areas.selectedArea()->adaptToTerrain(mainWin->urbanGeometry->terrain);
 
 		mainWin->mode = MainWindow::MODE_AREA_SELECT;
 		mainWin->ui.actionAreaSelect->setChecked(true);
@@ -256,7 +256,7 @@ void GLWidget3D::mouseDoubleClickEvent(QMouseEvent *e) {
 		mainWin->urbanGeometry->hintLineBuilder.end();
 		mainWin->urbanGeometry->areas.selectedArea()->hintLine = mainWin->urbanGeometry->hintLineBuilder.polyline();
 
-		mainWin->urbanGeometry->areas.selectedArea()->adaptToTerrain();//mainWin->urbanGeometry->terrain);
+		mainWin->urbanGeometry->areas.selectedArea()->adaptToTerrain(mainWin->urbanGeometry->terrain);
 
 		mainWin->mode = MainWindow::MODE_AREA_SELECT;
 		mainWin->ui.actionAreaSelect->setChecked(true);

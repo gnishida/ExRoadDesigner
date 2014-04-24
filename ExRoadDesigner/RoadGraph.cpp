@@ -22,15 +22,16 @@ RoadGraph::RoadGraph() {
 RoadGraph::~RoadGraph() {
 }
 
-void RoadGraph::generateMesh(VBORenderManager& renderManger,QString meshName) {
+void RoadGraph::generateMesh(VBORenderManager& renderManager, const QString &linesN, const QString &pointsN) {
 	if (!modified) return;
 
-	renderManger.removeStaticGeometry(meshName);
+	renderManager.removeStaticGeometry(linesN);
+	renderManager.removeStaticGeometry(pointsN);
 
 	if (renderMode == RENDER_DEFAULT) {
-		_generateMeshVerticesDefault(renderManger, meshName);
+		_generateMeshVerticesDefault(renderManager, linesN, pointsN);
 	} else if (renderMode == RENDER_GROUPBY) {
-		_generateMeshVerticesGroupBy(renderManger, meshName);
+		_generateMeshVerticesGroupBy(renderManager, linesN, pointsN);
 	}
 
 	modified = false;
@@ -181,7 +182,7 @@ void RoadGraph::_generateMeshVerticesTexture(mylib::TextureManager* textureManag
 }
 */
 
-void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManger,QString meshName) {
+void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, const QString &linesN, const QString &pointsN) {
 	// エッジを描画
 	{
 		RoadEdgeIter ei, eend;
@@ -221,8 +222,7 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManger,QStr
 
 				if (i < num - 2) {
 					QVector3D pt3 = graph[*ei]->polyline3D[i + 2];
-
-
+					
 					Util::getIrregularBisector(pt1, pt2, pt3, halfWidth, halfWidth, p3);
 					Util::getIrregularBisector(pt1, pt2, pt3, -halfWidth, -halfWidth, p2);
 					Util::getIrregularBisector(pt1, pt2, pt3, halfWidthBg, halfWidthBg, p3Bg);
@@ -237,32 +237,24 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManger,QStr
 					if (showHighways) {
 						render = true;
 						heightOffset = 0.7f;
-						//renderable1->addQuad(p0, p1, p2, p3, QVector3D(0, 0, 1), graph[*ei]->color, 0.7f);
-						//renderable1->addQuad(p0Bg, p1Bg, p2Bg, p3Bg, QVector3D(0, 0, 1), graph[*ei]->bgColor);
 					}
 					break;
 				case RoadEdge::TYPE_BOULEVARD:
 					if (showBoulevards) {
 						render = true;
 						heightOffset = 0.5f;
-						//renderable1->addQuad(p0, p1, p2, p3, QVector3D(0, 0, 1), graph[*ei]->color, 0.5f);
-						//renderable1->addQuad(p0Bg, p1Bg, p2Bg, p3Bg, QVector3D(0, 0, 1), graph[*ei]->bgColor);
 					}
 					break;
 				case RoadEdge::TYPE_AVENUE:
 					if (showAvenues) {
 						render = true;
 						heightOffset = 0.5f;
-						//renderable1->addQuad(p0, p1, p2, p3, QVector3D(0, 0, 1), graph[*ei]->color, 0.5f);
-						//renderable1->addQuad(p0Bg, p1Bg, p2Bg, p3Bg, QVector3D(0, 0, 1), graph[*ei]->bgColor);
 					}
 					break;
 				case RoadEdge::TYPE_STREET:
 					if (showLocalStreets) {
 						render = true;
 						heightOffset = 0.3f;
-						//renderable1->addQuad(p0, p1, p2, p3, QVector3D(0, 0, 1), graph[*ei]->color, 0.3f);
-						//renderable1->addQuad(p0Bg, p1Bg, p2Bg, p3Bg, QVector3D(0, 0, 1), graph[*ei]->bgColor);
 					}
 					break;
 				}
@@ -280,13 +272,12 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManger,QStr
 				p1Bg = p2Bg;
 			}
 
-			renderManger.addStaticGeometry(meshName,vert,"",GL_QUADS,1);//MODE=1 color
+			renderManager.addStaticGeometry(linesN, vert, "", GL_QUADS, 1);//MODE=1 color
 		}
 	}
 
 	// draw intersections
 	{
-		/*
 		RoadVertexIter vi, vend;
 		for (boost::tie(vi, vend) = boost::vertices(graph); vi != vend; ++vi) {
 			if (!graph[*vi]->valid) continue;
@@ -318,14 +309,30 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManger,QStr
 				offset = 0.5f;
 			}
 
-			renderable2->addCircle(graph[*vi]->pt3D, max_width * 0.5f, 20, color, offset);
-			renderable2->addCircle(graph[*vi]->pt3D, max_widthBg * 0.5f, 20, bgColor);
+			std::vector<Vertex> vert(3*20);
+
+			for (int i = 0; i < 20; ++i) {
+				float angle1 = 2.0 * M_PI * i / 20.0f;
+				float angle2 = 2.0 * M_PI * (i + 1) / 20.0f;
+
+				vert[i*3+0]=Vertex(graph[*vi]->pt3D.x(), graph[*vi]->pt3D.y(), graph[*vi]->pt3D.z(), color.redF(), color.greenF(), color.blueF(), 0, 0, 1.0f, 0, 0, 0);
+				vert[i*3+0]=Vertex(graph[*vi]->pt3D.x() + max_width * cosf(angle1), graph[*vi]->pt3D.y() + max_width * sinf(angle1), graph[*vi]->pt3D.z(), color.redF(), color.greenF(), color.blueF(), 0, 0, 1.0f, 0, 0, 0);
+				vert[i*3+0]=Vertex(graph[*vi]->pt3D.x() + max_width * cosf(angle2), graph[*vi]->pt3D.y() + max_width * sinf(angle2), graph[*vi]->pt3D.z(), color.redF(), color.greenF(), color.blueF(), 0, 0, 1.0f, 0, 0, 0);
+				/*
+				generateMeshVertex(o.x(), o.y(), o.z(), 0, 0, 1, color);
+				generateMeshVertex(o.x() + r * cos(angle1), o.y() + r * sin(angle1), o.z(), 0, 0, 1, color);
+				generateMeshVertex(o.x() + r * cos(angle2), o.y() + r * sin(angle2), o.z(), 0, 0, 1, color);
+				*/
+			}
+
+			renderManager.addStaticGeometry(pointsN, vert, "", GL_TRIANGLES, 1);//MODE=1 color
+			//renderable2->addCircle(graph[*vi]->pt3D, max_width * 0.5f, 20, color, offset);
+			//renderable2->addCircle(graph[*vi]->pt3D, max_widthBg * 0.5f, 20, bgColor);
 		}
-		*/
 	}
 }
 
-void RoadGraph::_generateMeshVerticesGroupBy(VBORenderManager& renderManger,QString meshName) {
+void RoadGraph::_generateMeshVerticesGroupBy(VBORenderManager& renderManger, const QString &linesN, const QString &pointsN) {
 	// エッジを描画
 	{
 		RoadEdgeIter ei, eend;
@@ -469,7 +476,7 @@ void RoadGraph::_generateMeshVerticesGroupBy(VBORenderManager& renderManger,QStr
 				p1Bg = p2Bg;
 			}
 
-			renderManger.addStaticGeometry(meshName,vert,"",GL_QUADS,1);//MODE=1 color
+			renderManger.addStaticGeometry(linesN, vert, "", GL_QUADS, 1);//MODE=1 color
 		}
 	}
 
@@ -935,11 +942,10 @@ void RoadGraph::setZ(float z) {
 /**
  * 道路網のGeometryを更新した場合は、必ずこの関数を実行して、3D Geometryを更新すること。
  */
-void RoadGraph::adaptToTerrain() {
+void RoadGraph::adaptToTerrain(Terrain* terrain) {
 	RoadVertexIter vi, vend;
 	for (boost::tie(vi, vend) = boost::vertices(graph); vi != vend; ++vi) {
-		//float z = terrain->getValue(graph[*vi]->pt.x(), graph[*vi]->pt.y());
-		float z = 0.0f;
+		float z = terrain->getValue(graph[*vi]->pt.x(), graph[*vi]->pt.y());
 		if (z < 0.0f) {
 			graph[*vi]->properties["bridgeHeight"] = -z + 2.0f;
 			z = 0.0f;
@@ -957,8 +963,7 @@ void RoadGraph::adaptToTerrain() {
 			// 仕方がないので、同じポイントならスキップするようにした。
 			if (i > 0 && (graph[*ei]->polyline[i] - graph[*ei]->polyline[i - 1]).lengthSquared() < 1.0f) continue;
 
-			//float z = terrain->getValue(graph[*ei]->polyline[i].x(), graph[*ei]->polyline[i].y());
-			float z = 0.0f;
+			float z = terrain->getValue(graph[*ei]->polyline[i].x(), graph[*ei]->polyline[i].y());
 			if (z < 0.0f) {
 				if (-z + 2.0f > bridgeHeight) {
 					bridgeHeight = -z + 2.0f;

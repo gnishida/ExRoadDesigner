@@ -19,10 +19,6 @@ public:
 	RoadGraph streets;
 	Polyline2D hintLine;
 
-	/*
-	std::vector<ExFeatureItem> _avenueItems;
-	std::vector<ExFeatureItem> _streetItems;
-	*/
 	float avgAvenueLength;
 	float varAvenueLength;
 	float avgStreetLength;
@@ -38,10 +34,6 @@ public:
 
 	void setArea(const Polygon2D &area);
 	void setHintLine(const Polyline2D &polyline);
-	//void addItem(int roadType, const ExFeatureItem &item);
-	//size_t numItems(int roadType) const;
-	//const std::vector<ExFeatureItem>& items(int roadType) const;
-	//std::vector<ExFeatureItem>& items(int roadType);
 	RoadGraph& roads(int roadType);
 	RoadGraph& reducedRoads(int roadType);
 

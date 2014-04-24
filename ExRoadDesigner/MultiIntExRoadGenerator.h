@@ -5,6 +5,7 @@
 #include "RoadAreaSet.h"
 #include "ExFeature.h"
 #include "MainWindow.h"
+#include "Terrain.h"
 
 class MultiIntExRoadGenerator {
 private:
@@ -12,12 +13,12 @@ private:
 	RoadGraph &roads;
 	Polygon2D targetArea;
 	Polyline2D hintLine;
-	//mylib::Terrain *terrain;
+	Terrain *terrain;
 	std::vector<ExFeature> &features;
 	bool animation;
 
 public:
-	MultiIntExRoadGenerator(MainWindow *mainWin, RoadGraph &roads, const Polygon2D &targetArea, const Polyline2D &hintLine, std::vector<ExFeature> &features) : mainWin(mainWin), roads(roads), targetArea(targetArea), hintLine(hintLine), features(features) {}
+	MultiIntExRoadGenerator(MainWindow *mainWin, RoadGraph &roads, const Polygon2D &targetArea, const Polyline2D &hintLine, Terrain *terrain, std::vector<ExFeature> &features) : mainWin(mainWin), roads(roads), targetArea(targetArea), hintLine(hintLine), terrain(terrain), features(features) {}
 	~MultiIntExRoadGenerator() {}
 
 	void generateRoadNetwork(bool animation = false);

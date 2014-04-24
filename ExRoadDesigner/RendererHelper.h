@@ -5,13 +5,9 @@
 #include "Polygon3D.h"
 #include "Polyline2D.h"
 #include "Polyline3D.h"
-//#include "Renderable.h"
 
 class RendererHelper {
 public:
-	//static void render(std::vector<mylib::RenderablePtr> renderables);
-	//static void renderOne(mylib::RenderablePtr renderable);
-
 	/*static void renderArea(const Polygon3D& area, const QColor& color, GLenum lineType);
 	static void renderArea(const Polygon2D& area, const QColor& color, GLenum lineType, float height);
 	*/

@@ -5,12 +5,7 @@
 #include <stdio.h>
 #include "RoadVertex.h"
 #include "RoadEdge.h"
-/*
-#include "../render/Renderable.h"
-#include "../render/GeometryObject.h"
-#include "../render/RenderableQuadList.h"
-*/
-//#include "../render/Terrain.h"
+#include "Terrain.h"
 #include "VBORenderManager.h"
 
 using namespace boost;
@@ -56,13 +51,13 @@ public:
 
 	void setModified() { modified = true; }
 
-	void generateMesh(VBORenderManager& renderManger,QString meshName);
+	void generateMesh(VBORenderManager& renderManger, const QString &linesN, const QString &pointsN);
 	//void addMeshFromEdge(RenderablePtr renderable, RoadEdgePtr edge, float widthBase, QColor color, float height);
 	//void addMeshFromVertex(RenderablePtr renderable, RoadVertexPtr vertex, QColor color, float height);
 
 	void clear();
 	void setZ(float z);
-	void adaptToTerrain();
+	void adaptToTerrain(Terrain* terrain);
 	//void add3DMeshOfEdge(mylib::RenderableQuadList* renderable, RoadEdgePtr edge, float width, QColor color, float heightOffset = 0.0f);
 
 	/*
@@ -72,9 +67,9 @@ public:
 	*/
 private:
 	//void _generateMeshVertices(mylib::TextureManager* textureManager);
-	void _generateMeshVerticesDefault(VBORenderManager& renderManger,QString meshName);
+	void _generateMeshVerticesDefault(VBORenderManager& renderManger, const QString &linesN, const QString &pointsN);
 	//void _generateMeshVerticesTexture(mylib::TextureManager* textureManager);
-	void _generateMeshVerticesGroupBy(VBORenderManager& renderManger,QString meshName);
+	void _generateMeshVerticesGroupBy(VBORenderManager& renderManger, const QString &linesN, const QString &pointsN);
 	/*
 	void _generateMeshVerticesGenerationType(mylib::TextureManager* textureManager);
 	*/

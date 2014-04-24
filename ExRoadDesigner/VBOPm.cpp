@@ -87,7 +87,6 @@ bool VBOPm::generateGeometry(VBORenderManager& rendManager,RoadGraph &roadGraph)
 		printf("ERROR: generateBlocks\n");
 		//return false;
 	}
-	
 	printf(">>Num Blocks %d\n",blocks.size());
 	
 	//////////////////////////////////////////////
@@ -169,12 +168,15 @@ bool VBOPm::generateGeometry(VBORenderManager& rendManager,RoadGraph &roadGraph)
 		printf("ERROR: generateParcels\n");
 		//return false;
 	}
+	printf(">>Parcels were generated.\n");
+
 	//////////////////////////////////////////////
 	// 4. BUILDINGS
 	if(VBOPmBuildings::generateBuildings(placeTypes,blocks)==false){
 		printf("ERROR: generateBuildings\n");
 		//return false;
 	}
+	printf(">>Buildings contours were generated.\n");
 	
 	//////////////////////////////////////////////
 	// 5. BUILDINGS Geometry
@@ -186,9 +188,7 @@ bool VBOPm::generateGeometry(VBORenderManager& rendManager,RoadGraph &roadGraph)
 	Block::parcelGraphVertexIter vi, viEnd;
 	for(int bN=0;bN<blocks.size();bN++){
 		//blocks[bN]
-		for(boost::tie(vi, viEnd) = boost::vertices(blocks[bN].myParcels);
-			vi != viEnd; ++vi)
-		{
+		for(boost::tie(vi, viEnd) = boost::vertices(blocks[bN].myParcels); vi != viEnd; ++vi) {
 			//blocks[bN].myParcels[*vi].parcelContour
 			VBOGeoBuilding::generateBuilding(rendManager,blocks[bN].myParcels[*vi].myBuilding);//.buildingFootprint,blocks[bN].myParcels[*vi].parcelBuildingAttributes.att_stories);
 		}

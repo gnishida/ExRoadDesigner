@@ -69,6 +69,8 @@ public:
 		centroid = ref.centroid;
 	}
 
+	void clear() { contour.clear(); }
+
 	/**
 	* Assignment operator.
 	**/

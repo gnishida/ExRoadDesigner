@@ -800,8 +800,7 @@ bool RoadGeneratorHelper::growRoadOneStep(RoadGraph& roads, RoadVertexDesc srcDe
  * 急激な標高の変化がある場合に、エッジをその境界でカットする
  * polylineのlast()が、カットされる側にあることを前提とする
  */
-void RoadGeneratorHelper::cutEdgeBySteepElevationChange(Polyline2D &polyline) {//, mylib::Terrain *terrain) {
-	/*
+void RoadGeneratorHelper::cutEdgeBySteepElevationChange(Polyline2D &polyline, Terrain *terrain) {
 	// 点が2つ未満の場合は、処理不能
 	if (polyline.size() < 2) return;
 
@@ -816,7 +815,6 @@ void RoadGeneratorHelper::cutEdgeBySteepElevationChange(Polyline2D &polyline) {/
 	}
 
 	polyline[polyline.size() - 1] = pt;
-	*/
 }
 
 /**

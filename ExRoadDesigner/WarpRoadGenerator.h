@@ -5,6 +5,7 @@
 #include "RoadAreaSet.h"
 #include "ExFeature.h"
 #include "MainWindow.h"
+#include "Terrain.h"
 
 class WarpRoadGenerator {
 private:
@@ -12,12 +13,12 @@ private:
 	RoadGraph &roads;
 	Polygon2D targetArea;
 	Polyline2D hintLine;
-	//mylib::Terrain *terrain;
+	Terrain *terrain;
 	ExFeature &feature;
 	bool animation;
 
 public:
-	WarpRoadGenerator(MainWindow *mainWin, RoadGraph &roads, const Polygon2D &targetArea, const Polyline2D &hintLine, ExFeature &feature) : mainWin(mainWin), roads(roads), targetArea(targetArea), hintLine(hintLine), feature(feature) {}
+	WarpRoadGenerator(MainWindow *mainWin, RoadGraph &roads, const Polygon2D &targetArea, const Polyline2D &hintLine, Terrain *terrain, ExFeature &feature) : mainWin(mainWin), roads(roads), targetArea(targetArea), hintLine(hintLine), terrain(terrain), feature(feature) {}
 	~WarpRoadGenerator() {}
 
 	void generateRoadNetwork(bool animation = false);

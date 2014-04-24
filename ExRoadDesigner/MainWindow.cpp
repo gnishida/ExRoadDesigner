@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include <QFileDialog>
+#include "TerrainSizeInputDialog.h"
 
 MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags) {
 	ui.setupUi(this);
@@ -37,8 +38,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 	connect(ui.actionHintLine, SIGNAL(triggered()), this, SLOT(onHintLine()));
 	connect(ui.actionAvenueSketch, SIGNAL(triggered()), this, SLOT(onAvenueSketch()));
 	connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(onDebug()));
-	connect(ui.actionGenerateBlocks, SIGNAL(triggered()), this, SLOT(onGenerateBlocks()));
-	connect(ui.actionGenerateParcels, SIGNAL(triggered()), this, SLOT(onGenerateParcels()));
+	connect(ui.actionGenerate3D, SIGNAL(triggered()), this, SLOT(onGenerate3D()));
 	connect(ui.actionDisplayHighway, SIGNAL(triggered()), this, SLOT(onDisplayRoads()));
 	connect(ui.actionDisplayBoulevard, SIGNAL(triggered()), this, SLOT(onDisplayRoads()));
 	connect(ui.actionRenderingDefault, SIGNAL(triggered()), this, SLOT(onRenderingDefault()));
@@ -72,17 +72,14 @@ void MainWindow::keyReleaseEvent(QKeyEvent* e) {
 }
 
 void MainWindow::onNewTerrain() {
-	/*
 	TerrainSizeInputDialog dlg(this);
 	if (dlg.exec() == QDialog::Accepted) {
 		urbanGeometry->newTerrain(dlg.width, dlg.depth, dlg.cellLength);
 		glWidget->updateGL();
 	}
-	*/
 }
 
 void MainWindow::onLoadTerrain() {
-	/*
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open Terrain file..."), "", tr("Terrain Files (*.trn)"));
 
 	if (filename.isEmpty()) {
@@ -92,11 +89,9 @@ void MainWindow::onLoadTerrain() {
 	urbanGeometry->loadTerrain(filename);
 
 	glWidget->updateGL();
-	*/
 }
 
 void MainWindow::onSaveTerrain() {
-	/*
 	QString filename = QFileDialog::getSaveFileName(this, tr("Save Terrain file..."), "", tr("Terrain Files (*.trn)"));
 
 	if (filename.isEmpty()) {
@@ -104,7 +99,6 @@ void MainWindow::onSaveTerrain() {
 	}
 
 	urbanGeometry->saveTerrain(filename);
-	*/
 }
 
 void MainWindow::onLoadRoads() {
@@ -235,20 +229,9 @@ void MainWindow::onDebug() {
 	ui.actionAvenueSketch->setChecked(false);
 }
 
-void MainWindow::onGenerateBlocks() {
-	/*
-	urbanGeometry->generateBlocks();
-
+void MainWindow::onGenerate3D() {
+	glWidget->generate3DGeometry();
 	glWidget->updateGL();
-	*/
-}
-
-void MainWindow::onGenerateParcels() {
-	/*
-	urbanGeometry->generateParcels();
-
-	glWidget->updateGL();
-	*/
 }
 
 void MainWindow::onDisplayRoads() {

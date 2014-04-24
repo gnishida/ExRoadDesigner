@@ -1,42 +1,5 @@
 ﻿#include "RendererHelper.h"
 
-/*void RendererHelper::render(std::vector<mylib::RenderablePtr> renderables) {
-	for (int i = 0; i < renderables.size(); i++) {
-		renderOne(renderables[i]);
-	}
-}
-
-void RendererHelper::renderOne(mylib::RenderablePtr renderable) {
-	if (renderable->glBeginMode == GL_LINE_STIPPLE) {
-		glEnable(GL_LINE_STIPPLE);
-		glLineStipple(1 , 0xF0F0);
-		glLineWidth(renderable->size);
-	} else {
-		glDisable(GL_LINE_STIPPLE);
-	}
-
-	if (renderable->glBeginMode == GL_LINES || renderable->glBeginMode == GL_LINE_STRIP) {
-		glLineWidth(renderable->size);
-	}
-
-	if (renderable->glBeginMode == GL_POINTS) {
-		glPointSize(renderable->size);
-	}
-
-	if (renderable->glBeginMode != GL_LINE_STIPPLE) {
-		glBegin(renderable->glBeginMode);
-	} else {
-		glBegin(GL_LINE_STRIP);
-	}
-	for (int j = 0; j < renderable->vertices.size(); ++j) {
-		glColor3f(renderable->vertices[j].color[0], renderable->vertices[j].color[1], renderable->vertices[j].color[2]);
-		glNormal3f(renderable->vertices[j].normal[0], renderable->vertices[j].normal[1], renderable->vertices[j].normal[2]);
-		glVertex3f(renderable->vertices[j].location[0], renderable->vertices[j].location[1], renderable->vertices[j].location[2]);
-	}
-	glEnd();
-}
-*/
-
 /**
  * 与えられたポリゴンに基づいて、閉じた領域を描画する。
  * ただし、ポリゴンデータ自体は、閉じていなくて良い。

@@ -33,6 +33,7 @@ public:
 		RoadGraph &roadGraph,
 		std::vector< Block > &blocks);
 
+	static void buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding);
 };
 
 

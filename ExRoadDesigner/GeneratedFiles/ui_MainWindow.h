@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Wed Apr 23 13:16:44 2014
+** Created: Thu Apr 24 10:16:27 2014
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -82,6 +82,7 @@ public:
     QAction *actionColorByGroup;
     QAction *actionColorDefault;
     QAction *actionRenderingGenerationType;
+    QAction *actionGenerate3D;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -278,6 +279,8 @@ public:
         actionColorDefault->setObjectName(QString::fromUtf8("actionColorDefault"));
         actionRenderingGenerationType = new QAction(MainWindow);
         actionRenderingGenerationType->setObjectName(QString::fromUtf8("actionRenderingGenerationType"));
+        actionGenerate3D = new QAction(MainWindow);
+        actionGenerate3D->setObjectName(QString::fromUtf8("actionGenerate3D"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -340,9 +343,7 @@ public:
         menuArea->addAction(actionAvenueSketch);
         menuArea->addSeparator();
         menuArea->addAction(actionDebug);
-        menuPM->addAction(actionGenerateBlocks);
-        menuPM->addAction(actionGenerateParcels);
-        menuPM->addAction(actionGenerateBuildings);
+        menuPM->addAction(actionGenerate3D);
         menuDisplay->addAction(menuRoads->menuAction());
         menuRoads->addAction(actionDisplayHighway);
         menuRoads->addAction(actionDisplayBoulevard);
@@ -428,6 +429,7 @@ public:
         actionColorByGroup->setText(QApplication::translate("MainWindow", "By Group", 0, QApplication::UnicodeUTF8));
         actionColorDefault->setText(QApplication::translate("MainWindow", "Default", 0, QApplication::UnicodeUTF8));
         actionRenderingGenerationType->setText(QApplication::translate("MainWindow", "Generation Type", 0, QApplication::UnicodeUTF8));
+        actionGenerate3D->setText(QApplication::translate("MainWindow", "Generate 3D", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuWindow->setTitle(QApplication::translate("MainWindow", "Window", 0, QApplication::UnicodeUTF8));
         menuArea->setTitle(QApplication::translate("MainWindow", "Area", 0, QApplication::UnicodeUTF8));

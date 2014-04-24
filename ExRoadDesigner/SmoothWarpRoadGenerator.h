@@ -6,6 +6,7 @@
 #include "RoadAreaSet.h"
 #include "ExFeature.h"
 #include "MainWindow.h"
+#include "Terrain.h"
 
 class SmoothWarpRoadGenerator {
 private:
@@ -13,16 +14,14 @@ private:
 	RoadGraph &roads;
 	Polygon2D targetArea;
 	Polyline2D hintLine;
-	//mylib::Terrain *terrain;
+	Terrain *terrain;
 	ExFeature &feature;
 	bool animation;
 
-	//std::vector<float> rotationAngles;
-	//cv::Mat tensorField;
 	TensorField tensorField;
 
 public:
-	SmoothWarpRoadGenerator(MainWindow *mainWin, RoadGraph &roads, const Polygon2D &targetArea, const Polyline2D &hintLine, ExFeature &feature) : mainWin(mainWin), roads(roads), targetArea(targetArea), hintLine(hintLine), feature(feature) {}
+	SmoothWarpRoadGenerator(MainWindow *mainWin, RoadGraph &roads, const Polygon2D &targetArea, const Polyline2D &hintLine, Terrain *terrain, ExFeature &feature) : mainWin(mainWin), roads(roads), targetArea(targetArea), hintLine(hintLine), terrain(terrain), feature(feature) {}
 	~SmoothWarpRoadGenerator() {}
 
 	void generateRoadNetwork(bool animation = false);

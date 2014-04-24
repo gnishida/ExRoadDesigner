@@ -26,12 +26,6 @@ This file is part of QtUrban.
 #include "Camera3D.h"
 #include "RoadGraph.h"
 
-/*
-#include <render/TextureManager.h>
-#include <render/SimpleSkyBox.h>
-#include <road/RoadAreaSet.h>
-*/
-
 class MainWindow;
 
 class GLWidget3D : public QGLWidget {

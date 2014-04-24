@@ -50,8 +50,7 @@ public slots:
 	void onHintLine();
 	void onAvenueSketch();
 	void onDebug();
-	void onGenerateBlocks();
-	void onGenerateParcels();
+	void onGenerate3D();
 	void onDisplayRoads();
 	void onRenderingDefault();
 	void onRenderingTexture();

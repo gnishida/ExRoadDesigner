@@ -80,19 +80,17 @@ void RoadArea::save(QDomDocument& doc, QDomNode& parent) {
 	}
 }
 
-void RoadArea::adaptToTerrain() {//mylib::Terrain* terrain) {
+void RoadArea::adaptToTerrain(Terrain* terrain) {
 	area3D.clear();
 	hintLine3D.clear();
 
 	for (int i = 0; i < area.size(); ++i) {
-		//float z = terrain->getValue(area[i].x(), area[i].y());
-		float z = 0.0f;
+		float z = terrain->getValue(area[i].x(), area[i].y());
 		area3D.push_back(QVector3D(area[i].x(), area[i].y(), z + 30));
 	}
 
 	for (int i = 0; i < hintLine.size(); ++i) {
-		//float z = terrain->getValue(hintLine[i].x(), hintLine[i].y());
-		float z = 0.0f;
+		float z = terrain->getValue(hintLine[i].x(), hintLine[i].y());
 		hintLine3D.push_back(QVector3D(hintLine[i].x(), hintLine[i].y(), z + 30));
 	}
 }
