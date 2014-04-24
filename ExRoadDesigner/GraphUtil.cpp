@@ -2684,17 +2684,11 @@ void GraphUtil::singlify(RoadGraph& roads) {
  * Convert the road graph to a planar graph.
  */
 void GraphUtil::planarify(RoadGraph& roads) {
-	clock_t start, end;
-	start = clock();
-
 	bool split = true;
 
 	while (split) {
 		split = planarifyOne(roads);
 	}
-
-	end = clock();
-	std::cout << "planarify: " << (double)(end-start)/CLOCKS_PER_SEC << std::endl;
 }
 
 /**

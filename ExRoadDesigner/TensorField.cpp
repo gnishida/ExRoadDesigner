@@ -53,9 +53,7 @@ void TensorField::init(const Polygon2D &area, const Polyline2D &hintLine, const 
 		for (int j = 0; j < mat.cols; ++j) {
 			int x = bbox.minPt.x() + j;
 			int y = bbox.minPt.y() + i;
-			if (x == 1375 && y == 2267) {
-				int k = 0;
-			}
+
 			//if (!area.contains(QVector2D(x, y))) continue;
 
 			TopNSearch<int> tns;

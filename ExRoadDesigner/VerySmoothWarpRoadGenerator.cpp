@@ -578,8 +578,6 @@ bool VerySmoothWarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc s
 						roads.graph[tgtDesc]->properties["example_street_desc"] = next_ex_v_desc;
 					}
 					roads.graph[tgtDesc]->properties["angle"] = tensorField.get(roads.graph[tgtDesc]->pt);
-					float angle = roads.graph[tgtDesc]->properties["angle"].toFloat();
-					std::cout << angle << std::endl;
 				}
 			} else {
 				seeds.push_back(tgtDesc);

@@ -35,10 +35,6 @@ public:
 	Camera3D camera3D;
 	Camera* camera;
 
-	/*
-	mylib::TextureManager* textureManager;
-	mylib::SimpleSkyBox* skyBox;
-	*/
 	bool shiftPressed;
 	bool controlPressed;
 	bool altPressed;

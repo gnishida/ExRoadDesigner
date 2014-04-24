@@ -1071,6 +1071,7 @@ void RoadGeneratorHelper::saveSnappingImage(RoadGraph &roads, const Polygon2D &a
  * 道路オブジェクトの整合性をチェック
  */
 void RoadGeneratorHelper::check(RoadGraph &roads) {
+	/*
 	// 全ての頂点、エッジに、group_id、generation_typeが設定されていること
 	{
 		std::cout << "*** Vertex Check ***" << std::endl;
@@ -1111,17 +1112,7 @@ void RoadGeneratorHelper::check(RoadGraph &roads) {
 			} else if (roads.graph[*ei]->properties["generation_type"] != "example" && roads.graph[*ei]->properties["generation_type"] != "pm") {
 				std::cout << "ERROR: generation_type is unknown [" << roads.graph[*ei]->properties["generation_type"].toString().toUtf8().data() << "]" << std::endl;
 			}
-
-			/*
-			if (roads.graph[*ei]->properties["generation_type"] == "example") {
-				RoadVertexDesc src = boost::source(*ei, roads.graph);
-				RoadVertexDesc tgt = boost::target(*ei, roads.graph);
-
-				if (roads.graph[src]->properties["generation_type"] != "example" && roads.graph[tgt]->properties["generation_type"] != "example") {
-					std::cout << "ERROR: both vertices are not example." << std::endl;
-				}
-			}
-			*/
 		}
 	}
+	*/
 }

@@ -16,7 +16,6 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 	ui.areaToolBar->addAction(ui.actionAreaCreate);
 	ui.areaToolBar->addAction(ui.actionHintLine);
 	ui.areaToolBar->addAction(ui.actionAvenueSketch);
-	ui.areaToolBar->addAction(ui.actionDebug);
 
 	ui.actionAreaSelect->setChecked(true);
 
@@ -37,7 +36,6 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 	connect(ui.actionAreaDelete, SIGNAL(triggered()), this, SLOT(onAreaDelete()));
 	connect(ui.actionHintLine, SIGNAL(triggered()), this, SLOT(onHintLine()));
 	connect(ui.actionAvenueSketch, SIGNAL(triggered()), this, SLOT(onAvenueSketch()));
-	connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(onDebug()));
 	connect(ui.actionGenerate3D, SIGNAL(triggered()), this, SLOT(onGenerate3D()));
 	connect(ui.actionDisplayHighway, SIGNAL(triggered()), this, SLOT(onDisplayRoads()));
 	connect(ui.actionDisplayBoulevard, SIGNAL(triggered()), this, SLOT(onDisplayRoads()));
@@ -179,7 +177,6 @@ void MainWindow::onAreaMenu() {
 	ui.actionAreaCreate->setChecked(mode == MODE_AREA_CREATE);
 	ui.actionHintLine->setChecked(mode == MODE_HINT_LINE);
 	ui.actionAvenueSketch->setChecked(mode == MODE_AVENUE_SKETCH);
-	ui.actionDebug->setChecked(mode == MODE_DEBUG);
 }
 
 void MainWindow::onAreaSelect() {
@@ -187,7 +184,6 @@ void MainWindow::onAreaSelect() {
 	ui.actionAreaCreate->setChecked(false);
 	ui.actionHintLine->setChecked(false);
 	ui.actionAvenueSketch->setChecked(false);
-	ui.actionDebug->setChecked(false);
 }
 
 void MainWindow::onAreaCreate() {
@@ -195,7 +191,6 @@ void MainWindow::onAreaCreate() {
 	ui.actionAreaSelect->setChecked(false);
 	ui.actionHintLine->setChecked(false);
 	ui.actionAvenueSketch->setChecked(false);
-	ui.actionDebug->setChecked(false);
 }
 
 void MainWindow::onAreaDelete() {
@@ -210,7 +205,6 @@ void MainWindow::onHintLine() {
 	ui.actionAreaSelect->setChecked(false);
 	ui.actionHighwaySketch->setChecked(false);
 	ui.actionAvenueSketch->setChecked(false);
-	ui.actionDebug->setChecked(false);
 }
 
 void MainWindow::onAvenueSketch() {
@@ -218,15 +212,6 @@ void MainWindow::onAvenueSketch() {
 	ui.actionAreaCreate->setChecked(false);
 	ui.actionAreaSelect->setChecked(false);
 	ui.actionHighwaySketch->setChecked(false);
-	ui.actionDebug->setChecked(false);
-}
-
-void MainWindow::onDebug() {
-	mode = MODE_DEBUG;
-	ui.actionAreaSelect->setChecked(false);
-	ui.actionAreaCreate->setChecked(false);
-	ui.actionHintLine->setChecked(false);
-	ui.actionAvenueSketch->setChecked(false);
 }
 
 void MainWindow::onGenerate3D() {

@@ -123,13 +123,11 @@ void ExFeature::computePMParameters() {
 	}
 	*/
 
+	// extract avenues feature
 	GraphUtil::computeStatistics(reducedAvenues, avgAvenueLength, varAvenueLength, avgAvenueCurvature, varAvenueCurvature);
-	std::cout << "avgAvenueCurvature: " << avgAvenueCurvature << std::endl;
-	std::cout << "varAvenueCurvature: " << varAvenueCurvature << std::endl;
 
+	// extract local streets feature
 	GraphUtil::computeStatistics(streets, avgStreetLength, varStreetLength, avgStreetCurvature, varStreetCurvature);
-	std::cout << "avgAvenueCurvature: " << avgAvenueCurvature << std::endl;
-	std::cout << "varAvenueCurvature: " << varAvenueCurvature << std::endl;
 }
 
 void ExFeature::load(QString filepath, bool reduce) {

@@ -66,8 +66,6 @@
     <addaction name="separator"/>
     <addaction name="actionHighwaySketch"/>
     <addaction name="actionAvenueSketch"/>
-    <addaction name="separator"/>
-    <addaction name="actionDebug"/>
    </widget>
    <widget class="QMenu" name="menuPM">
     <property name="title">

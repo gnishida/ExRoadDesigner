@@ -16,11 +16,6 @@ This file is part of QtUrban.
 
 #include "GLWidget3D.h"
 #include "Util.h"
-/*
-#include <render/Terrain.h>
-#include <render/SimpleSkyBox.h>
-#include <render/RendererHelper.h>
-*/
 #include "GraphUtil.h"
 #include "MainWindow.h"
 #include <gl/GLU.h>
@@ -82,7 +77,7 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 					change = -change;
 				}
 
-				//mainWin->urbanGeometry->terrain->addValue(pos.x(), pos.y(), change);
+				mainWin->urbanGeometry->terrain->addValue(pos.x(), pos.y(), change);
 
 				updateGL();
 			} else {
@@ -155,21 +150,6 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 				mainWin->urbanGeometry->avenueBuilder.addPoint(pos);
 			}
 			
-			break;
-		case MainWindow::MODE_DEBUG:
-			/*
-			if (GraphUtil::getVertex(mainWin->urbanGeometry->roads, pos, 10, selectedVertexDesc)) {
-				selectedVertex = mainWin->urbanGeometry->roads.graph[selectedVertexDesc];
-				mainWin->propertyWidget->setRoadVertex(mainWin->urbanGeometry->roads, selectedVertexDesc, selectedVertex);
-				mainWin->propertyWidget->resetRoadEdge();
-			} else {
-				if (GraphUtil::getEdge(mainWin->urbanGeometry->roads, pos, 10, selectedEdgeDesc)) {
-					selectedEdge = mainWin->urbanGeometry->roads.graph[selectedEdgeDesc];
-					mainWin->propertyWidget->resetRoadVertex();
-					mainWin->propertyWidget->setRoadEdge(selectedEdge);
-				}
-			}
-			*/
 			break;
 		}
 	}
@@ -371,9 +351,6 @@ void GLWidget3D::paintGL() {
 
 	drawScene();		
 }
-
-float waterMove=0;
-bool waterDir=true;
 
 void GLWidget3D::drawScene() {
 	///////////////////////////////////
