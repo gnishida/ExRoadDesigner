@@ -43,7 +43,7 @@ GLWidget3D::GLWidget3D(MainWindow* mainWin) : QGLWidget(QGLFormat(QGL::SampleBuf
 	keyMPressed=false;
 
 	camera->setRotation(0, 0, 0);
-	camera->setTranslation(0, 0, 8000);
+	camera->setTranslation(0, 0, 6000);
 
 	vertexSelected = false;
 	edgeSelected = false;

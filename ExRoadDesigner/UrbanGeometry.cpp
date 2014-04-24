@@ -170,7 +170,6 @@ void UrbanGeometry::render(VBORenderManager &vboRenderManager) {
 	*/
 	
 	// draw a terrain
-	//renderer.render(terrain, textureManager);
 	terrain->generateMesh(vboRenderManager, "terrain");
 	vboRenderManager.renderStaticGeometry("terrain");
 

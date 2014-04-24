@@ -283,7 +283,7 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 			if (!graph[*vi]->valid) continue;
 
 			// get the largest width of the outing edges
-			float max_width = 0;
+			float max_r = 0;
 			int max_roadType = 0;
 			QColor color, bgColor;
 			float offset = 0.3f;
@@ -291,9 +291,9 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 			for (boost::tie(oei, oeend) = boost::out_edges(*vi, graph); oei != oeend; ++oei) {
 				if (!graph[*oei]->valid) continue;
 
-				float width = graph[*oei]->getWidth();
-				if (width > max_width) {
-					max_width = width;
+				float r = graph[*oei]->getWidth() * 0.5f;
+				if (r > max_r) {
+					max_r = r;
 				}
 
 				if (graph[*oei]->type > max_roadType) {
@@ -303,7 +303,7 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 				}
 			}
 
-			float max_widthBg = max_width * 1.2f;
+			float max_rBg = max_r * 1.2f;
 
 			if (max_roadType == RoadEdge::TYPE_AVENUE) {
 				offset = 0.5f;
@@ -315,9 +315,9 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 				float angle1 = 2.0 * M_PI * i / 20.0f;
 				float angle2 = 2.0 * M_PI * (i + 1) / 20.0f;
 
-				vert[i*3+0]=Vertex(graph[*vi]->pt3D.x(), graph[*vi]->pt3D.y(), graph[*vi]->pt3D.z(), color.redF(), color.greenF(), color.blueF(), 0, 0, 1.0f, 0, 0, 0);
-				vert[i*3+0]=Vertex(graph[*vi]->pt3D.x() + max_width * cosf(angle1), graph[*vi]->pt3D.y() + max_width * sinf(angle1), graph[*vi]->pt3D.z(), color.redF(), color.greenF(), color.blueF(), 0, 0, 1.0f, 0, 0, 0);
-				vert[i*3+0]=Vertex(graph[*vi]->pt3D.x() + max_width * cosf(angle2), graph[*vi]->pt3D.y() + max_width * sinf(angle2), graph[*vi]->pt3D.z(), color.redF(), color.greenF(), color.blueF(), 0, 0, 1.0f, 0, 0, 0);
+				vert[i*3+0]=Vertex(graph[*vi]->pt3D.x(), graph[*vi]->pt3D.y(), graph[*vi]->pt3D.z() + offset, color.redF(), color.greenF(), color.blueF(), 0, 0, 1.0f, 0, 0, 0);
+				vert[i*3+1]=Vertex(graph[*vi]->pt3D.x() + max_r * cosf(angle1), graph[*vi]->pt3D.y() + max_r * sinf(angle1), graph[*vi]->pt3D.z() + offset, color.redF(), color.greenF(), color.blueF(), 0, 0, 1.0f, 0, 0, 0);
+				vert[i*3+2]=Vertex(graph[*vi]->pt3D.x() + max_r * cosf(angle2), graph[*vi]->pt3D.y() + max_r * sinf(angle2), graph[*vi]->pt3D.z() + offset, color.redF(), color.greenF(), color.blueF(), 0, 0, 1.0f, 0, 0, 0);
 				/*
 				generateMeshVertex(o.x(), o.y(), o.z(), 0, 0, 1, color);
 				generateMeshVertex(o.x() + r * cos(angle1), o.y() + r * sin(angle1), o.z(), 0, 0, 1, color);
@@ -332,7 +332,7 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 	}
 }
 
-void RoadGraph::_generateMeshVerticesGroupBy(VBORenderManager& renderManger, const QString &linesN, const QString &pointsN) {
+void RoadGraph::_generateMeshVerticesGroupBy(VBORenderManager& renderManager, const QString &linesN, const QString &pointsN) {
 	// エッジを描画
 	{
 		RoadEdgeIter ei, eend;
@@ -476,19 +476,18 @@ void RoadGraph::_generateMeshVerticesGroupBy(VBORenderManager& renderManger, con
 				p1Bg = p2Bg;
 			}
 
-			renderManger.addStaticGeometry(linesN, vert, "", GL_QUADS, 1);//MODE=1 color
+			renderManager.addStaticGeometry(linesN, vert, "", GL_QUADS, 1);//MODE=1 color
 		}
 	}
 
 	// draw intersections
 	{
-		/*
 		RoadVertexIter vi, vend;
 		for (boost::tie(vi, vend) = boost::vertices(graph); vi != vend; ++vi) {
 			if (!graph[*vi]->valid) continue;
 
 			// get the largest width of the outing edges
-			float max_width = 0;
+			float max_r = 0;
 			int max_roadType = 0;
 			float offset = 0.3f;
 			int group_id = -1;
@@ -496,9 +495,9 @@ void RoadGraph::_generateMeshVerticesGroupBy(VBORenderManager& renderManger, con
 			for (boost::tie(oei, oeend) = boost::out_edges(*vi, graph); oei != oeend; ++oei) {
 				if (!graph[*oei]->valid) continue;
 
-				float width = graph[*oei]->getWidth();
-				if (width > max_width) {
-					max_width = width;
+				float r = graph[*oei]->getWidth();
+				if (r > max_r) {
+					max_r = r;
 				}
 
 				if (graph[*oei]->type > max_roadType) {
@@ -510,7 +509,7 @@ void RoadGraph::_generateMeshVerticesGroupBy(VBORenderManager& renderManger, con
 				}
 			}
 
-			float max_widthBg = max_width * 1.2f;
+			float max_rBg = max_r * 1.2f;
 
 			if (max_roadType == RoadEdge::TYPE_AVENUE) {
 				offset = 0.5f;
@@ -537,10 +536,26 @@ void RoadGraph::_generateMeshVerticesGroupBy(VBORenderManager& renderManger, con
 				bgColor = QColor(128, 128, 128);
 			}
 
-			renderable2->addCircle(graph[*vi]->pt3D, max_width * 0.5f, 20, color, offset);
-			renderable2->addCircle(graph[*vi]->pt3D, max_widthBg * 0.5f, 20, bgColor);
+			std::vector<Vertex> vert(3*20);
+
+			for (int i = 0; i < 20; ++i) {
+				float angle1 = 2.0 * M_PI * i / 20.0f;
+				float angle2 = 2.0 * M_PI * (i + 1) / 20.0f;
+
+				vert[i*3+1]=Vertex(graph[*vi]->pt3D.x(), graph[*vi]->pt3D.y(), graph[*vi]->pt3D.z() + offset, color.redF(), color.greenF(), color.blueF(), 0, 0, 1.0f, 0, 0, 0);
+				vert[i*3+2]=Vertex(graph[*vi]->pt3D.x() + max_r * cosf(angle1), graph[*vi]->pt3D.y() + max_r * sinf(angle1), graph[*vi]->pt3D.z() + offset, color.redF(), color.greenF(), color.blueF(), 0, 0, 1.0f, 0, 0, 0);
+				vert[i*3+3]=Vertex(graph[*vi]->pt3D.x() + max_r * cosf(angle2), graph[*vi]->pt3D.y() + max_r * sinf(angle2), graph[*vi]->pt3D.z() + offset, color.redF(), color.greenF(), color.blueF(), 0, 0, 1.0f, 0, 0, 0);
+				/*
+				generateMeshVertex(o.x(), o.y(), o.z(), 0, 0, 1, color);
+				generateMeshVertex(o.x() + r * cos(angle1), o.y() + r * sin(angle1), o.z(), 0, 0, 1, color);
+				generateMeshVertex(o.x() + r * cos(angle2), o.y() + r * sin(angle2), o.z(), 0, 0, 1, color);
+				*/
+			}
+
+			renderManager.addStaticGeometry(pointsN, vert, "", GL_TRIANGLES, 1);//MODE=1 color
+			//renderable2->addCircle(graph[*vi]->pt3D, max_width * 0.5f, 20, color, offset);
+			//renderable2->addCircle(graph[*vi]->pt3D, max_widthBg * 0.5f, 20, bgColor);
 		}
-		*/
 	}
 }
 
