@@ -20,7 +20,7 @@ typedef graph_traits<BGLGraph>::in_edge_iterator RoadInEdgeIter;
 
 class Terrain;
 
-class RoadGraph {//: public mylib::GeometryObject {
+class RoadGraph {
 public:
 	static enum { RENDER_DEFAULT = 0, RENDER_TEXTURE, RENDER_GROUPBY, RENDER_GENERATION_TYPE };
 
@@ -52,27 +52,16 @@ public:
 	void setModified() { modified = true; }
 
 	void generateMesh(VBORenderManager& renderManger, const QString &linesN, const QString &pointsN);
-	//void addMeshFromEdge(RenderablePtr renderable, RoadEdgePtr edge, float widthBase, QColor color, float height);
-	//void addMeshFromVertex(RenderablePtr renderable, RoadVertexPtr vertex, QColor color, float height);
 
 	void clear();
-	void setZ(float z);
+	//void setZ(float z);
 	void adaptToTerrain(Terrain* terrain);
-	//void add3DMeshOfEdge(mylib::RenderableQuadList* renderable, RoadEdgePtr edge, float width, QColor color, float heightOffset = 0.0f);
 
-	/*
-	void generate2DMesh();
-	void add2DMeshOfEdge(mylib::RenderablePtr renderable, RoadEdgePtr edge, float widthBase, QColor color, float height);
-	void add2DMeshOfVertex(mylib::RenderablePtr renderable, RoadVertexPtr vertex, QColor color, float height);
-	*/
 private:
-	//void _generateMeshVertices(mylib::TextureManager* textureManager);
-	void _generateMeshVerticesDefault(VBORenderManager& renderManger, const QString &linesN, const QString &pointsN);
-	//void _generateMeshVerticesTexture(mylib::TextureManager* textureManager);
-	void _generateMeshVerticesGroupBy(VBORenderManager& renderManger, const QString &linesN, const QString &pointsN);
-	/*
-	void _generateMeshVerticesGenerationType(mylib::TextureManager* textureManager);
-	*/
+	void _generateMeshVerticesDefault(VBORenderManager& renderManager, const QString &linesN, const QString &pointsN);
+	void _generateMeshVerticesTexture(VBORenderManager& renderManager, const QString &linesN, const QString &pointsN);
+	void _generateMeshVerticesGroupBy(VBORenderManager& renderManager, const QString &linesN, const QString &pointsN);
+	void _generateMeshVerticesGenerationType(VBORenderManager& renderManager, const QString &linesN, const QString &pointsN);
 };
 
 typedef boost::shared_ptr<RoadGraph> RoadGraphPtr;

@@ -89,13 +89,6 @@ void RoadAreaSet::deleteArea() {
 	selectedIndex = -1;
 }
 
-void RoadAreaSet::setZ(float z) {
-	roads.setZ(z);
-	for (int i = 0; i < areas.size(); ++i) {
-		areas[i]->roads.setZ(z);
-	}
-}
-
 void RoadAreaSet::addRoads(int roadType, int lanes, bool oneWay, const Polyline2D &polyline) {
 	GraphUtil::addEdge(roads, polyline, roadType, lanes, oneWay);
 	GraphUtil::planarify(roads);

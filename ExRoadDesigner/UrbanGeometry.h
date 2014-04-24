@@ -53,8 +53,6 @@ public:
 	void generateRoadsWarp(ExFeature &feature);
 	void generateRoadsSmoothWarp(ExFeature &feature);
 	void generateRoadsVerySmoothWarp(ExFeature &feature);
-	void generateBlocks();
-	void generateParcels();
 
 	void render(VBORenderManager &vboRenderManager);
 	void adaptToTerrain();

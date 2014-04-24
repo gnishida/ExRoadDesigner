@@ -135,28 +135,6 @@ void UrbanGeometry::generateRoadsVerySmoothWarp(ExFeature &feature) {
 	areas.selectedArea()->roads.adaptToTerrain(terrain);
 }
 
-void UrbanGeometry::generateBlocks() {
-	/*
-	BlockGenerator generator(mainWin);
-	generator.run();
-
-	for (int i = 0; i < blocks.size(); ++i) {
-		blocks[i]->adaptToTerrain(terrain);
-	}
-	*/
-}
-
-void UrbanGeometry::generateParcels() {
-	/*
-	ParcelGenerator generator(mainWin);
-	generator.run();
-
-	for (int i = 0; i < blocks.size(); ++i) {
-		blocks[i]->adaptToTerrain(terrain);
-	}
-	*/
-}
-
 void UrbanGeometry::render(VBORenderManager &vboRenderManager) {
 	// draw the road graph
 	roads.generateMesh(vboRenderManager, "roads_lines", "roads_points");

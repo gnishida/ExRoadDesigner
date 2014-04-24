@@ -27,8 +27,6 @@ public:
 	RoadAreaPtr selectedArea();
 	void deleteArea();
 
-	void setZ(float z);
-
 	void addRoads(int roadType, int lanes, bool oneWay, const Polyline2D &polyline);
 	void mergeRoads();
 
