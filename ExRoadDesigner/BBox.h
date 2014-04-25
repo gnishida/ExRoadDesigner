@@ -21,7 +21,7 @@ public:
 };
 
 /**
- * BBoxをBoostのboxの代替として使用
+ * use BBox as boost box
  */
 BOOST_GEOMETRY_REGISTER_BOX(BBox, QVector2D, minPt, maxPt)
 

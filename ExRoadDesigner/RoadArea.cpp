@@ -12,7 +12,7 @@ void RoadArea::clear() {
 }
 
 /**
- * 与えられたfeatureノード配下のXML情報に基づいて、グリッド特徴量を設定する。
+ * load an area from XML
  */
 void RoadArea::load(QDomNode& node) {
 	roads.clear();

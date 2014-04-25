@@ -21,13 +21,6 @@ This file is part of QtUrban.
 #include "common.h"
 #include "global.h"
 #include "RendererHelper.h"
-/*
-#include <render/WaterRenderer.h>
-#include <render/TextureManager.h>
-#include <render/Texture.h>
-#include <render/GeometryObject.h>
-#include <render/Terrain.h>
-*/
 #include "GraphUtil.h"
 #include "MultiExRoadGenerator.h"
 #include "MultiIntExRoadGenerator.h"
@@ -37,10 +30,6 @@ This file is part of QtUrban.
 #include "VerySmoothWarpRoadGenerator.h"
 #include "RoadGeneratorHelper.h"
 #include "MainWindow.h"
-/*
-#include "BlockGenerator.h"
-#include "ParcelGenerator.h"
-*/
 
 UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
@@ -220,7 +209,7 @@ void UrbanGeometry::adaptToTerrain() {
 }
 
 /**
- * 指定された道路を追加する。
+ * add a road edge
  */
 void UrbanGeometry::addRoad(int roadType, const Polyline2D &polyline, int lanes) {
 	RoadVertexDesc v1_desc;

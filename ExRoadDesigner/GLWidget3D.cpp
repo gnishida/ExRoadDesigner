@@ -83,7 +83,7 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 			} else {
 				mainWin->urbanGeometry->areas.selectArea(pos);
 
-				// 各エリアについて、マウスポインタの近くに頂点またはエッジがあるかチェックし、あれば、それを選択する
+				// select a vertex or an edge
 				bool found = false;
 				
 				for (int i = 0; i < mainWin->urbanGeometry->areas.size(); ++i) {
@@ -98,7 +98,7 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 					}
 				}
 
-				// どのエリアにも、近くに頂点またはエッジがなければ、roadsをチェック
+				// select a vertex or an edge
 				if (!found) {
 					if (GraphUtil::getVertex(mainWin->urbanGeometry->roads, pos, 10, selectedVertexDesc)) {
 						selectVertex(mainWin->urbanGeometry->roads, selectedVertexDesc);
@@ -125,7 +125,7 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 			
 			break;
 		case MainWindow::MODE_HINT_LINE:
-			// まだエリアが選択されていない場合は、現在のマウス位置を使ってエリアを選択する
+			// select an area
 			if (mainWin->urbanGeometry->areas.selectedIndex == -1) {
 				mainWin->urbanGeometry->areas.selectArea(pos);
 			}
@@ -412,7 +412,7 @@ void GLWidget3D::drawScene() {
 }
 
 /**
- * 頂点を選択する
+ * select a vertex
  */
 void GLWidget3D::selectVertex(RoadGraph &roads, RoadVertexDesc v_desc) {
 	selectedVertex = roads.graph[v_desc];

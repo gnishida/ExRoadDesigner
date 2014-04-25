@@ -23,6 +23,6 @@ public:
 };
 
 /**
- * Linestringを定義
+ * use Polyline2D as boost Linestring
  */
 BOOST_GEOMETRY_REGISTER_LINESTRING(Polyline2D)

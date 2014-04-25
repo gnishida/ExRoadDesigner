@@ -21,11 +21,6 @@ public:
 	//std::vector<Block*> blocks;
 	Terrain* terrain;
 
-	/*
-	mylib::Renderer renderer;
-
-	mylib::WaterRenderer* waterRenderer;
-	*/
 	PolygonBuilder areaBuilder;
 	PolylineBuilder hintLineBuilder;
 	PolylineBuilder avenueBuilder;
@@ -33,7 +28,6 @@ public:
 	RoadAreaSet areas;
 	
 	int selectedAreaIndex;
-	//RendererHelper rendererHelper;
 
 public:
 	UrbanGeometry(MainWindow* mainWin);

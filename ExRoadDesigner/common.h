@@ -34,12 +34,12 @@
 
 
 /**
- * QVector2DをBoostのpointの代替として使用
+ * use QVector2D as Boost point
  */
 BOOST_GEOMETRY_REGISTER_POINT_2D_GET_SET(QVector2D, float, boost::geometry::cs::cartesian, x, y, setX, setY)
 
 /**
- * QVector3DをBoostのpointの代替として使用
+ * use QVector3D as Boost point
  */
 BOOST_GEOMETRY_REGISTER_POINT_2D_GET_SET(QVector3D, float, boost::geometry::cs::cartesian, x, y, setX, setY)
 

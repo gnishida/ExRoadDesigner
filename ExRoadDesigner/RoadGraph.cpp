@@ -762,7 +762,7 @@ void RoadGraph::setZ(float z) {
 */
 
 /**
- * 道路網のGeometryを更新した場合は、必ずこの関数を実行して、3D Geometryを更新すること。
+ * adapt this road graph to the terrain.
  */
 void RoadGraph::adaptToTerrain(Terrain* terrain) {
 	RoadVertexIter vi, vend;
@@ -781,8 +781,8 @@ void RoadGraph::adaptToTerrain(Terrain* terrain) {
 
 		float bridgeHeight = 0.0f;
 		for (int i = 0; i < graph[*ei]->polyline.size(); ++i) {
-			// たまに、同じポイントが重複していることがあり、そのせいで道路表示がねじれてしまう。
-			// 仕方がないので、同じポイントならスキップするようにした。
+			// some hacks to avoid the roads get twisted when they are rendered
+			// by removing some points which are too close to each other.
 			if (i > 0 && (graph[*ei]->polyline[i] - graph[*ei]->polyline[i - 1]).lengthSquared() < 1.0f) continue;
 
 			float z = terrain->getValue(graph[*ei]->polyline[i].x(), graph[*ei]->polyline[i].y());

@@ -24,7 +24,7 @@ public:
 	static bool leftTurn(const QVector2D& a, const QVector2D& b, const QVector2D& c);
 	static bool leftTurn(const QVector2D& v1, const QVector2D& v2);
 
-	// 角度関係
+	// angle computatiopn
 	static float deg2rad(float deg);
 	static float rad2deg(float rad);
 	static float normalizeAngle(float angle);
@@ -35,13 +35,13 @@ public:
 	static QVector2D rotate(const QVector2D &pt, float rad);
 	static QVector2D rotate(const QVector2D &pt, float rad, const QVector2D &orig);
 
-	// 座標系関係
+	// coordinate conversion
 	static void cartesian2polar(const QVector2D &pt, float &radius, float &theta);
 
-	// 曲率
+	// curvature
 	static float curvature(const Polyline2D &polyline);
 
-	// 乱数関係
+	// random
 	static float genRand();
 	static float genRand(float a, float b);
 	static float genRandNormal(float mean, float variance);
@@ -49,7 +49,7 @@ public:
 	// Barycentric interpolation
 	static float barycentricInterpolation(const QVector3D& p0, const QVector3D& p1, const QVector3D& p2, const QVector2D& p);
 
-	// 3Dポイントを2Dポイント(XY平面)に射影する
+	// projection
 	static QVector2D projectTo2D(const QVector3D &pt);
 
 	static bool getIrregularBisector(const QVector3D& p0, const QVector3D& p1, const QVector3D& p2, float d01, float d12, QVector3D& intPt);

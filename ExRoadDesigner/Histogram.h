@@ -9,7 +9,6 @@ public:
 	int end;
 	int step;
 	std::vector<int> bins;
-	//std::map<std::pair<int, int>, int> bins;
 
 public:
 	Histogram(int start, int end, int step);

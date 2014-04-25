@@ -10,7 +10,7 @@ void TensorField::init(const Polygon2D &area, const Polyline2D &hintLine, const 
 
 	std::vector<float> rotationAngles;
 
-	// B-splineの位置を計算
+	// compute the knots of B-spline
 	Polyline2D bsplineHintLine;
 	bsplineHintLine.push_back(hintLine[0]);
 	for (int i = 1; i < hintLine.size() - 1; ++i) {
@@ -20,7 +20,7 @@ void TensorField::init(const Polygon2D &area, const Polyline2D &hintLine, const 
 	}
 	bsplineHintLine.push_back(hintLine.last());
 
-	// hintLine上の各点における、回転角度を計算
+	// compute the rotation angle at each hintLine points
 	for (int i = 0; i < hintLine.size(); ++i) {
 		float angle;
 

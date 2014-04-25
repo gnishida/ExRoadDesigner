@@ -103,7 +103,7 @@ void RoadAreaSet::mergeRoads() {
 }
 
 /**
- * 与えられたfeatureノード配下のXML情報に基づいて、グリッド特徴量を設定する。
+ * load all the areas from XML.
  */
 void RoadAreaSet::load(QString filename) {
 	QFile file(filename);

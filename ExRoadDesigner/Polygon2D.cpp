@@ -50,12 +50,12 @@ BBox Polygon2D::envelope() const {
 }
 
 /**
- * このポリゴンと、与えられた線分との交点を求める。交点があれば、trueを返却する。
+ * compute the intersection of this polygon with the given line segment. If they intersect each other, then return true. Otherwise return false.
  *
- * @param a		線分を定義する頂点の１つ
- * @param b		線分を定義する頂点の１つ
- * @param intPt	求められた交点
- * @return		交点があればtrueを返却する
+ * @param a		One point of the given line segment
+ * @param b		Another point of the given line segment
+ * @param intPt	The intersection
+ * @return		true if they intersect each other. false otherwise.
  */ 
 bool Polygon2D::intersects(const QVector2D& a, const QVector2D& b, QVector2D& intPt) const {
 	Polyline2D polyline;
@@ -73,7 +73,7 @@ bool Polygon2D::intersects(const QVector2D& a, const QVector2D& b, QVector2D& in
 }
 
 /**
- * 当該ポリゴンを移動する。
+ * translate this polygon.
  */
 void Polygon2D::translate(float x, float y) {
 	Polygon2D temp = *this;
@@ -84,11 +84,11 @@ void Polygon2D::translate(float x, float y) {
 }
 
 /**
- * 移動したポリゴンを返却する。
+ * translate this polygon.
  *
- * @param x			X軸方向の移動距離
- * @param y			Y軸方向の移動距離
- * @ret				移動したポリゴン
+ * @param x			x coordinate of the translation
+ * @param y			y coordinate of the translation
+ * @ret				the translated polygon
  */
 void Polygon2D::translate(float x, float y, Polygon2D &ret) const {
 	boost::geometry::strategy::transform::translate_transformer<QVector2D, QVector2D> translate(x, y);
@@ -96,9 +96,9 @@ void Polygon2D::translate(float x, float y, Polygon2D &ret) const {
 }
 
 /**
- * 原点を中心に、指定した角度だけ時計回りに回転する。
+ * rotate this polygon clockwise around the origin.
  *
- * @param angle		時計回りの回転角度[degree]
+ * @param angle		angle [degree]
  */
 void Polygon2D::rotate(float angle) {
 	Polygon2D temp = *this;
@@ -109,10 +109,10 @@ void Polygon2D::rotate(float angle) {
 }
 
 /**
- * 原点を中心に、指定した角度だけ時計回りに回転したポリゴンを返却する。
+ * rotate this polygon clockwise around the origin.
  *
- * @param angle		時計回りの回転角度[degree]
- * @ret				回転したポリゴン
+ * @param angle		angle [degree]
+ * @ret				the rotated polygon
  */
 void Polygon2D::rotate(float angle, Polygon2D &ret) const {
 	boost::geometry::strategy::transform::rotate_transformer<QVector2D, QVector2D, boost::geometry::degree> rotate(angle);
@@ -120,10 +120,10 @@ void Polygon2D::rotate(float angle, Polygon2D &ret) const {
 }
 
 /**
- * 指定された点を中心に、指定された角度だけ時計回りに回転したポリゴンを返却する。
+ * rotate this polygon clockwise around the given point.
  *
- * @param angle		時計回りの回転角度[degree]
- * @param orig		回転中心
+ * @param angle		angle [degree]
+ * @param orig		the point around which this polygon rotates
  */
 void Polygon2D::rotate(float angle, const QVector2D &orig) {
 	translate(-orig.x(), -orig.y());
@@ -132,8 +132,8 @@ void Polygon2D::rotate(float angle, const QVector2D &orig) {
 }
 
 /**
- * このポリゴンを三角形または凸四角形の集合に分割する。
- * 各図形の頂点は、openでCCWオーダである。
+ * tessellate this polygon.
+ * assume that the polygon is open and the vertices are in CCW order.
  */
 std::vector<Polygon2D> Polygon2D::tessellate() {
 	std::vector<Polygon2D> trapezoids;

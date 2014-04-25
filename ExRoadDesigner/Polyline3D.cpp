@@ -10,7 +10,7 @@ QVector3D & Polyline3D::last() {
 }
 
 /**
- * 当該ポリラインを移動する。
+ * translate this polyline
  */
 void Polyline3D::translate(const QVector2D &offset) {
 	for (int i = 0; i < size(); ++i) {
@@ -19,10 +19,10 @@ void Polyline3D::translate(const QVector2D &offset) {
 }
 
 /**
- * 指定された点を中心に、指定された角度だけ時計回りに回転したポリゴンを返却する。
+ * rotate this polygon clockwise around the given point.
  *
- * @param angle		時計回りの回転角度[degree]
- * @param orig		回転中心
+ * @param angle		angle [degree]
+ * @param orig		rotation center
  */
 void Polyline3D::rotate(float angle, const QVector2D &orig) {
 	for (int i = 0; i < size(); ++i) {
@@ -33,7 +33,7 @@ void Polyline3D::rotate(float angle, const QVector2D &orig) {
 }
 
 /**
- * スケールする
+ * scale
  */
 void Polyline3D::scale(float factor) {
 	for (int i = 0; i < size(); ++i) {

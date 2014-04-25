@@ -18,7 +18,7 @@ QVector2D& Polyline2D::nextLast() {
 }
 
 /**
- * 当該ポリラインを移動する。
+ * translate this polyline.
  */
 void Polyline2D::translate(const QVector2D &offset) {
 	for (int i = 0; i < size(); ++i) {
@@ -37,9 +37,9 @@ void Polyline2D::translate(float x, float y, Polyline2D &ret) const {
 }
 
 /**
- * 原点を中心に、指定された角度だけ時計回りに回転したポリゴンを返却する。
+ * rotate this polygon clockwise around the origin.
  *
- * @param angle		時計回りの回転角度[degree]
+ * @param angle		angle [degree]
  */
 void Polyline2D::rotate(float degree) {
 	for (int i = 0; i < size(); ++i) {
@@ -48,10 +48,10 @@ void Polyline2D::rotate(float degree) {
 }
 
 /**
- * 指定された点を中心に、指定された角度だけ時計回りに回転したポリゴンを返却する。
+ * rotate this polygon clockwise around the given point.
  *
- * @param angle		時計回りの回転角度[degree]
- * @param orig		回転中心
+ * @param angle		angle [degree]
+ * @param orig		rotation center
  */
 void Polyline2D::rotate(float degree, const QVector2D &orig) {
 	for (int i = 0; i < size(); ++i) {
@@ -60,7 +60,7 @@ void Polyline2D::rotate(float degree, const QVector2D &orig) {
 }
 
 /**
- * スケールする
+ * scale this polyline.
  */
 void Polyline2D::scale(float factor) {
 	for (int i = 0; i < size(); ++i) {
@@ -69,14 +69,14 @@ void Polyline2D::scale(float factor) {
 }
 
 /**
- * 全長の長さを計算して返却する。
+ * return the length of this polyline
  */
 float Polyline2D::length() const {
 	return length(size() - 1);
 }
 
 /**
- * 指定したindexの点までの長さを計算して返却する。
+ * return the length of this polyline
  */
 float Polyline2D::length(int index) const {
 	float length = 0.0f;
