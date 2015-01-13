@@ -2,6 +2,11 @@
 #include "Polyline2D.h"
 #include "Polygon2D.h"
 
+BBox::BBox() {
+	minPt = QVector2D(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+	maxPt = QVector2D(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
+}
+
 void BBox::addPoint(const QVector2D& pt) {
 	boost::geometry::expand(*this, pt);
 }

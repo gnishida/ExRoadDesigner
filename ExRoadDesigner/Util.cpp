@@ -247,6 +247,26 @@ float Util::diffAngle(const QVector3D& dir1, const QVector3D& dir2, bool absolut
 	}
 }
 
+bool Util::withinAngle(float angle, float angle1, float angle2) {
+	if (diffAngle(angle1, angle2) > 3.14159f) return true;
+
+	if (diffAngle(angle1, angle2, false) >= 0) {
+		if (diffAngle(angle, angle1, false) >= 0) {
+			return false;
+		} else {
+			if (diffAngle(angle, angle1) < diffAngle(angle1, angle2)) return true;
+			else return false;
+		}
+	} else {
+		if (diffAngle(angle, angle2, false) >= 0) {
+			return false;
+		} else {
+			if (diffAngle(angle, angle2) < diffAngle(angle1, angle2)) return true;
+			else return false;
+		}
+	}
+}
+
 /**
  * Compute the difference in angle that is normalized in the range of [0, PI].
  */

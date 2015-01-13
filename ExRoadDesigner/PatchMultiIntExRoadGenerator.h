@@ -35,6 +35,7 @@ private:
 	bool isValidRule(RoadVertexDesc srcDesc, RoadGraph &replacementGraph);
 
 	void attemptExpansion2(int roadType, RoadVertexDesc srcDesc, ExFeature& f, std::vector<RoadEdgeDescs> &circles, std::list<RoadVertexDesc> &seeds);
+	void attemptExpansion3(int roadType, RoadVertexDesc srcDesc, ExFeature& f, RoadGraph &exRoads, std::vector<RoadEdgeDescs> &circles, std::list<RoadVertexDesc> &seeds);
 	bool growRoadSegment(int roadType, RoadVertexDesc srcDesc, ExFeature& f, const Polyline2D &polyline, int lanes, RoadVertexDesc next_ex_v_desc, bool byExample, float snapFactor, float angleTolerance, std::list<RoadVertexDesc> &seeds);
 
 	std::pair<int, RoadVertexDesc> synthesizeItem(int roadType, RoadVertexDesc v_desc, std::vector<RoadEdgeDescs> &shapes, std::vector<RoadEdgePtr> &edges, float &rotation_angle);

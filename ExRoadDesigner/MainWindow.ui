@@ -141,9 +141,6 @@
     <addaction name="actionTerrainGeneration"/>
     <addaction name="actionUpdateMountain"/>
     <addaction name="actionTerrainSegmentation"/>
-    <addaction name="separator"/>
-    <addaction name="actionStatistics"/>
-    <addaction name="actionDetailedStatistics"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuArea"/>
@@ -746,16 +743,6 @@
   <action name="actionAreaDeleteAll">
    <property name="text">
     <string>Delete All</string>
-   </property>
-  </action>
-  <action name="actionStatistics">
-   <property name="text">
-    <string>Statistics</string>
-   </property>
-  </action>
-  <action name="actionDetailedStatistics">
-   <property name="text">
-    <string>DetailedStatistics</string>
    </property>
   </action>
  </widget>

@@ -693,29 +693,6 @@ bool RoadGeneratorHelper::isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_des
 }
 
 /**
- * 指定された頂点について、指定されたエッジに似たエッジが既に登録済みかどうかチェックする。
- * polylineには、各点の、頂点からのオフセット座標が入る。
- * 登録済みのエッジに対しては、エッジの端点への方向ベクトルとpolylineの端点の方向ベクトルのなす角度が30度未満なら、trueを返却する。
- */
-bool RoadGeneratorHelper::isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_desc, RoadVertexDesc tgt_desc, float angleTolerance) {
-	QVector2D vec = roads.graph[tgt_desc]->pt - roads.graph[v_desc]->pt;
-
-	RoadOutEdgeIter ei, eend;
-	for (boost::tie(ei, eend) = out_edges(v_desc, roads.graph); ei != eend; ++ei) {
-		if (!roads.graph[*ei]->valid) continue;
-
-		if (roads.graph[*ei]->polyline.size() == 0) continue;
-
-		RoadVertexDesc tgt = boost::target(*ei, roads.graph);
-
-		Polyline2D polyline = GraphUtil::orderPolyLine(roads, *ei, v_desc);
-		if (Util::diffAngle(polyline[1] - polyline[0], vec) < angleTolerance) return true;
-	}
-
-	return false;
-}
-
-/**
  * Example領域を使って、指定された位置のモジュラ位置（Example座標系）を返却する。
  * モジュラ位置は、Example領域のBBoxの中に入る座標となる。
  * ※ 現状の実装では、Axis Aligned BBoxを使用し、Oriented BBoxなどをサポートしていない。
@@ -2147,6 +2124,119 @@ bool RoadGeneratorHelper::isShape(RoadGraph &roads, RoadVertexDesc desc, std::ve
 	return false;
 }
 
+// パッチオブジェクトに変換する
+std::vector<Patch> RoadGeneratorHelper::convertToPatch(int roadType, RoadGraph& roads, RoadGraph& avenues, std::vector<RoadEdgeDescs> &shapes) {
+	std::vector<Patch> patches;
+	for (int i = 0; i < shapes.size(); ++i) {
+		Patch patch;
+
+		QMap<RoadVertexDesc, RoadVertexDesc> conv;
+		for (int j = 0; j < shapes[i].size(); ++j) {
+			RoadVertexDesc src = boost::source(shapes[i][j], roads.graph);
+			RoadVertexDesc tgt = boost::target(shapes[i][j], roads.graph);
+
+			if (!conv.contains(src)) {
+				RoadVertexPtr v = RoadVertexPtr(new RoadVertex(*roads.graph[src]));
+				RoadVertexDesc v_desc = GraphUtil::addVertex(patch.roads, v);
+				if (roadType == RoadEdge::TYPE_AVENUE) {
+					patch.roads.graph[v_desc]->properties["example_desc"] = src;
+				} else {
+					//patch.roads.graph[v_desc]->properties["example_street_desc"] = src;
+
+					// どうやら、local streetの場合も、example_descで良いと思う。
+					patch.roads.graph[v_desc]->properties["example_desc"] = src;
+				}
+				if (GraphUtil::getDegree(roads, src) == 1 && !roads.graph[src]->onBoundary) {
+					if (roadType == RoadEdge::TYPE_AVENUE) {
+						patch.roads.graph[v_desc]->deadend = true;
+					} else {
+						// local streetの場合、avenueとの交点はdeadendと見なさない
+						RoadVertexDesc nearest_desc;
+						if (!GraphUtil::getVertex(avenues, roads.graph[src]->pt, 0.1f, nearest_desc)) {
+							patch.roads.graph[v_desc]->deadend = true;
+						}
+					}
+				}
+				patch.roads.graph[v_desc]->patchId = i;
+				patch.roads.graph[v_desc]->type = roadType;
+				conv[src] = v_desc;
+			}
+			if (!conv.contains(tgt)) {
+				RoadVertexPtr v = RoadVertexPtr(new RoadVertex(*roads.graph[tgt]));
+				RoadVertexDesc v_desc = GraphUtil::addVertex(patch.roads, v);
+				if (roadType == RoadEdge::TYPE_AVENUE) {
+					patch.roads.graph[v_desc]->properties["example_desc"] = tgt;
+				} else {
+					//patch.roads.graph[v_desc]->properties["example_street_desc"] = tgt;
+
+					// どうやら、local streetの場合も、example_descで良いと思う。
+					patch.roads.graph[v_desc]->properties["example_desc"] = tgt;
+				}
+				if (GraphUtil::getDegree(roads, tgt) == 1 && !roads.graph[tgt]->onBoundary) {
+					if (roadType == RoadEdge::TYPE_AVENUE) {
+						patch.roads.graph[v_desc]->deadend = true;
+					} else {
+						// local streetの場合、avenueとの交点はdeadendと見なさない
+						RoadVertexDesc nearest_desc;
+						if (!GraphUtil::getVertex(avenues, roads.graph[tgt]->pt, 0.1f, nearest_desc)) {
+							patch.roads.graph[v_desc]->deadend = true;
+						}
+					}
+				}
+				patch.roads.graph[v_desc]->patchId = i;
+				patch.roads.graph[v_desc]->type = roadType;
+				conv[tgt] = v_desc;
+			}
+
+			RoadEdgePtr e = RoadEdgePtr(new RoadEdge(*roads.graph[shapes[i][j]]));
+			GraphUtil::addEdge(patch.roads, conv[src], conv[tgt], e);
+		}
+
+		// 各パッチのコネクタを設定
+		RoadVertexIter vi, vend;
+		for (boost::tie(vi, vend) = boost::vertices(patch.roads.graph); vi != vend; ++vi) {
+			if (GraphUtil::getDegree(patch.roads, *vi) == 1) {
+				patch.connectors.push_back(*vi);
+
+				// この頂点からエッジを辿りながら、各エッジにconnectorフラグをマークする
+				markConnectorToEdge(patch.roads, *vi);
+			}
+		}
+
+		patches.push_back(patch);
+	}
+
+	return patches;
+}
+
+void RoadGeneratorHelper::markConnectorToEdge(RoadGraph &roads, RoadVertexDesc srcDesc) {
+	QMap<RoadVertexDesc, bool> visited;
+	std::list<RoadVertexDesc> queue;
+
+	queue.push_back(srcDesc);
+
+	while (!queue.empty()) {
+		RoadVertexDesc v = queue.front();
+		queue.pop_front();
+
+		if (visited[v]) continue;
+		visited[v] = true;
+
+		RoadOutEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::out_edges(v, roads.graph); ei != eend; ++ei) {
+			if (!roads.graph[*ei]->valid) continue;
+
+			roads.graph[*ei]->connector = true;
+
+			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+
+			if (GraphUtil::getDegree(roads, tgt) == 2) {
+				queue.push_back(tgt);
+			}
+		}
+	}
+}
+
 RoadVertexDesc RoadGeneratorHelper::createEdgesByExample(RoadGraph &roads, float angle, std::vector<RoadEdgeDescs> &shapes, std::vector<RoadEdgePtr> &edges, float &rotation_angle) {
 	QMap<int, RoadVertexDesc> conv;
 
@@ -2277,4 +2367,59 @@ RoadVertexDesc RoadGeneratorHelper::createEdgesByExample2(RoadGraph &roads, floa
 	}
 
 	return v_desc;
+}
+
+/**
+ * 道路網を画像として保存する。
+ */
+void RoadGeneratorHelper::saveRoadImage(RoadGraph& roads, std::list<RoadVertexDesc>& seeds, const char* filename) {
+	BBox bbox = GraphUtil::getAABoundingBox(roads);
+	cv::Mat img(bbox.dy() + 1, bbox.dx() + 1, CV_8UC3, cv::Scalar(0, 0, 0));
+
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		cv::Scalar color(128, 128, 128);
+		if (roads.graph[*ei]->type == RoadEdge::TYPE_STREET) {
+			color = cv::Scalar(192, 192, 192);
+		}
+
+		for (int pl = 0; pl < roads.graph[*ei]->polyline.size() - 1; ++pl) {
+			int x1 = roads.graph[*ei]->polyline[pl].x() - bbox.minPt.x();
+			int y1 = img.rows - (roads.graph[*ei]->polyline[pl].y() - bbox.minPt.y());
+			int x2 = roads.graph[*ei]->polyline[pl + 1].x() - bbox.minPt.x();
+			int y2 = img.rows - (roads.graph[*ei]->polyline[pl + 1].y() - bbox.minPt.y());
+			cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), color, 3);
+		}
+	}
+
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		if (!roads.graph[*vi]->valid) continue;
+
+		int x = roads.graph[*vi]->pt.x() - bbox.minPt.x();
+		int y = img.rows - (roads.graph[*vi]->pt.y() - bbox.minPt.y());
+
+		// seedを描画
+		if (std::find(seeds.begin(), seeds.end(), *vi) != seeds.end()) {
+			cv::circle(img, cv::Point(x, y), 6, cv::Scalar(255, 0, 0), 3);
+		}
+
+		// onBoundaryを描画
+		if (roads.graph[*vi]->onBoundary) {
+			cv::circle(img, cv::Point(x, y), 10, cv::Scalar(0, 255, 255), 3);
+		}
+
+		// deadendを描画
+		if (roads.graph[*vi]->deadend) {
+			cv::circle(img, cv::Point(x, y), 10, cv::Scalar(0, 0, 255), 3);
+		}
+
+		// 頂点IDを描画
+		QString str = QString::number(*vi);
+		cv::putText(img, str.toUtf8().data(), cv::Point(x, y), cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1);
+	}
+
+	cv::imwrite(filename, img);
 }

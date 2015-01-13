@@ -7,8 +7,7 @@ public:
 	QVector2D minPt, maxPt;
 
 public:
-	BBox() {}
-	~BBox() {}
+	BBox();
 
 	void addPoint(const QVector2D& pt);
 	bool contains(const QVector2D& pt) const;

@@ -10,9 +10,11 @@
 #include "Polygon2D.h"
 #include "Histogram.h"
 #include "RoadGraph.h"
+#include "Patch.h"
 
 class ExFeature {
 public:
+	int ex_id;
 	Polygon2D area;
 	RoadGraph avenues;
 	RoadGraph reducedAvenues;
@@ -32,6 +34,8 @@ public:
 	bool streetShapesDetected;
 	std::vector<RoadEdgeDescs> avenueShapes;
 	std::vector<RoadEdgeDescs> streetShapes;
+	std::vector<Patch> avenuePatches;
+	std::vector<Patch> streetPatches;
 
 public:
 	ExFeature() {}
@@ -64,9 +68,12 @@ public:
 	void saveArea(QDomDocument &doc, QDomNode &parent);
 	void saveHintLine(QDomDocument &doc, QDomNode &parent);
 
+	static void savePatchImages(int roadType, int ex_id, RoadGraph& roads, std::vector<Patch> patches, float scale, bool label);
+
 	void init();
 
 	std::vector<RoadEdgeDescs> shapes(int roadType, float houghScale, float patchDistance);
+	std::vector<Patch> patches(int roadType, float houghScale, float patchDistance);
 	void detectAvenueShapes(float houghScale, float patchDistance);
 	void detectStreetShapes(float houghScale, float patchDistance);
 };

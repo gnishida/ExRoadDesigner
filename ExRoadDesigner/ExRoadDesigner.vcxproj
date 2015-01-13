@@ -129,6 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AliagaRoadGenerator.cpp" />
     <ClCompile Include="BBox.cpp" />
     <ClCompile Include="BlendingVideoSettingDialog.cpp" />
     <ClCompile Include="BSpline.cpp" />
@@ -199,8 +200,10 @@
     <ClCompile Include="nvModel\nvModel.cpp" />
     <ClCompile Include="nvModel\nvModelObj.cpp" />
     <ClCompile Include="nvModel\nvModelQuery.cpp" />
-    <ClCompile Include="PatchTensorRoadGenerator.cpp" />
+    <ClCompile Include="Patch.cpp" />
+    <ClCompile Include="PatchRoadGenerator.cpp" />
     <ClCompile Include="PatchWarp2RoadGenerator.cpp" />
+    <ClCompile Include="PatchWarpRoadGenerator.cpp" />
     <ClCompile Include="PMRoadGenerator.cpp" />
     <ClCompile Include="RotationVideoSettingDialog.cpp" />
     <ClCompile Include="ShapeDetector.cpp" />
@@ -262,7 +265,6 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MorphGrid.cpp" />
     <ClCompile Include="PatchMultiIntExRoadGenerator.cpp" />
-    <ClCompile Include="PatchWarpRoadGenerator.cpp" />
     <ClCompile Include="Polygon2D.cpp" />
     <ClCompile Include="Polygon3D.cpp" />
     <ClCompile Include="PolygonBuilder.cpp" />
@@ -304,6 +306,7 @@
     <ClCompile Include="VBOWater.cpp" />
     <ClCompile Include="VideoCaptureSettingDialog.cpp" />
     <ClCompile Include="VoronoiUtil.cpp" />
+    <ClCompile Include="WarpRoadGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.h">
@@ -347,7 +350,9 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AliagaRoadGenerator.h" />
     <ClInclude Include="BBox.h" />
+    <ClInclude Include="WarpRoadGenerator.h" />
     <CustomBuild Include="BlendingVideoSettingDialog.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing BlendingVideoSettingDialog.h...</Message>
@@ -468,6 +473,9 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe" -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED  -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_OPENGL_LIB "-I$(BOOST_ROOT)\." "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtXml" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtTest" "-I.\..\opencv\include" "-I.\..\glew\include\GL"</Command>
     </CustomBuild>
+    <ClInclude Include="Patch.h" />
+    <ClInclude Include="PatchRoadGenerator.h" />
+    <ClInclude Include="PatchWarpRoadGenerator.h" />
     <ClInclude Include="VoronoiUtil.h" />
     <CustomBuild Include="CircleDetectionScaleInputDialog.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
@@ -496,7 +504,6 @@
     <ClInclude Include="nvModel\nvModel.h" />
     <ClInclude Include="nvModel\nvQuaternion.h" />
     <ClInclude Include="nvModel\nvVector.h" />
-    <ClInclude Include="PatchTensorRoadGenerator.h" />
     <ClInclude Include="PatchWarp2RoadGenerator.h" />
     <ClInclude Include="PMRoadGenerator.h" />
     <ClInclude Include="ShapeDetector.h" />
@@ -517,7 +524,6 @@
     <ClInclude Include="LC_Layer.h" />
     <ClInclude Include="MorphGrid.h" />
     <ClInclude Include="PatchMultiIntExRoadGenerator.h" />
-    <ClInclude Include="PatchWarpRoadGenerator.h" />
     <ClInclude Include="Polygon2D.h" />
     <ClInclude Include="Polygon3D.h" />
     <ClInclude Include="PolygonBuilder.h" />

@@ -5,6 +5,7 @@
 #include "RoadEdge.h"
 #include <fstream>
 #include "ShapeDetector.h"
+#include "RoadGeneratorHelper.h"
 
 void ExFeature::setArea(const Polygon2D &area) {
 	this->area = area;
@@ -161,9 +162,9 @@ void ExFeature::load(QString filepath, bool reduce) {
 	}
 
 	GraphUtil::copyRoads(avenues, reducedAvenues);
-	if (reduce) {
+	//if (reduce) {
 		GraphUtil::reduce(reducedAvenues);
-	}
+	//}
 	GraphUtil::clean(reducedAvenues);
 
 	init();
@@ -291,6 +292,164 @@ void ExFeature::saveHintLine(QDomDocument &doc, QDomNode &parent) {
 }
 
 /**
+ * パッチを画像として保存する。
+ */
+void ExFeature::savePatchImages(int roadType, int ex_id, RoadGraph& roads, std::vector<Patch> patches, float scale, bool label) {
+	// 画像の大きさを決定
+	BBox bbox = GraphUtil::getAABoundingBox(roads, true);
+	bbox.minPt -= QVector2D(10.0f, 10.0f);
+	bbox.maxPt += QVector2D(10.0f, 10.0f);
+
+	int width = 3 * scale;
+
+	for (int i = 0; i < patches.size(); ++i) {
+		cv::Mat img((int)(bbox.dy() * scale), (int)(bbox.dx() * scale), CV_8UC3, cv::Scalar(255, 255, 255));
+
+		// 画像に、全パッチを描画する
+		for (int j2 = 0; j2 < patches.size(); ++j2) {
+			RoadEdgeIter ei, eend;
+			for (boost::tie(ei, eend) = boost::edges(patches[j2].roads.graph); ei != eend; ++ei) {
+				for (int pl = 0; pl < patches[j2].roads.graph[*ei]->polyline.size() - 1; ++pl) {
+					int x1 = (patches[j2].roads.graph[*ei]->polyline[pl].x() - bbox.minPt.x()) * scale;
+					int y1 = img.rows - (patches[j2].roads.graph[*ei]->polyline[pl].y() - bbox.minPt.y()) * scale;
+					int x2 = (patches[j2].roads.graph[*ei]->polyline[pl+1].x() - bbox.minPt.x()) * scale;
+					int y2 = img.rows - (patches[j2].roads.graph[*ei]->polyline[pl+1].y() - bbox.minPt.y()) * scale;
+
+					cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(248, 248, 248), width);
+				}
+			}
+		}
+
+		// 画像に、当該パッチを描画する
+		{
+			RoadEdgeIter ei, eend;
+			for (boost::tie(ei, eend) = boost::edges(patches[i].roads.graph); ei != eend; ++ei) {
+				for (int pl = 0; pl < patches[i].roads.graph[*ei]->polyline.size() - 1; ++pl) {
+					int x1 = (patches[i].roads.graph[*ei]->polyline[pl].x() - bbox.minPt.x()) * scale;
+					int y1 = img.rows - (patches[i].roads.graph[*ei]->polyline[pl].y() - bbox.minPt.y()) * scale;
+					int x2 = (patches[i].roads.graph[*ei]->polyline[pl+1].x() - bbox.minPt.x()) * scale;
+					int y2 = img.rows - (patches[i].roads.graph[*ei]->polyline[pl+1].y() - bbox.minPt.y()) * scale;
+
+					if (patches[i].roads.graph[*ei]->connector) {
+						cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(255, 128, 128), width);
+					} else {
+						cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(255, 0, 0), width);
+					}
+				}
+			}
+
+			// 頂点の描画
+			{
+				RoadVertexIter vi, vend;
+				for (boost::tie(vi, vend) = boost::vertices(patches[i].roads.graph); vi != vend; ++vi) {
+					int x = (patches[i].roads.graph[*vi]->pt.x() - bbox.minPt.x()) * scale;
+					int y = img.rows - (patches[i].roads.graph[*vi]->pt.y() - bbox.minPt.y()) * scale;
+
+					// 頂点の描画 (青色の円)
+					cv::circle(img, cv::Point(x, y), width * 1.5, cv::Scalar(255, 0, 0), -1);
+				}
+			}
+
+			if (label) {
+				// コネクタの描画 (灰色の×)
+				for (int ci = 0; ci < patches[i].connectors.size(); ++ci) {
+					int x = (patches[i].roads.graph[patches[i].connectors[ci]]->pt.x() - bbox.minPt.x()) * scale;
+					int y = img.rows - (patches[i].roads.graph[patches[i].connectors[ci]]->pt.y() - bbox.minPt.y()) *scale;
+					cv::line(img, cv::Point(x - 10, y - 10), cv::Point(x + 10, y + 10), cv::Scalar(128, 128, 128), 5);
+					cv::line(img, cv::Point(x + 10, y - 10), cv::Point(x - 10, y + 10), cv::Scalar(128, 128, 128), 5);
+				}
+
+				RoadVertexIter vi, vend;
+				for (boost::tie(vi, vend) = boost::vertices(patches[i].roads.graph); vi != vend; ++vi) {
+					int x = (patches[i].roads.graph[*vi]->pt.x() - bbox.minPt.x()) * scale;
+					int y = img.rows - (patches[i].roads.graph[*vi]->pt.y() - bbox.minPt.y()) * scale;
+
+					// onBoundaryの描画 (黄色の円)
+					if (patches[i].roads.graph[*vi]->onBoundary) {
+						cv::circle(img, cv::Point(x, y), 10, cv::Scalar(0, 255, 255), 5);
+					}
+
+					// deadendの描画 (赤色の円)
+					if (patches[i].roads.graph[*vi]->deadend) {
+						cv::circle(img, cv::Point(x, y), 10, cv::Scalar(0, 0, 255), 5);
+					}
+
+					// 頂点IDと、元のexampleの頂点IDを描画
+					QString str = QString::number(*vi) + "/" + QString::number(patches[i].roads.graph[*vi]->properties["example_desc"].toUInt());
+					cv::putText(img, str.toUtf8().data(), cv::Point(x, y), cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 0.5, cv::Scalar(0, 128, 0), 1);
+				}
+			}
+		}
+
+		char filename[255];
+		if (roadType == RoadEdge::TYPE_AVENUE) {
+			sprintf(filename, "patches/avenue%d_patch_%d.jpg", ex_id, i);
+		} else {
+			sprintf(filename, "patches/street%d_patch_%d.jpg", ex_id, i);
+		}
+		//cv::flip(img, img, 0);
+		cv::imwrite(filename, img);
+	}
+
+	// 元のExample道路も描画（各頂点について、属するパッチIDを表示）
+	{
+		cv::Mat img((int)(bbox.dy() * scale), (int)(bbox.dx() * scale), CV_8UC3, cv::Scalar(255, 255, 255));
+
+		RoadEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+			if (!roads.graph[*ei]->valid) continue;
+
+			for (int pl = 0; pl < roads.graph[*ei]->polyline.size() - 1; ++pl) {
+				int x1 = (roads.graph[*ei]->polyline[pl].x() - bbox.minPt.x()) * scale;
+				int y1 = img.rows - (roads.graph[*ei]->polyline[pl].y() - bbox.minPt.y()) * scale;
+				int x2 = (roads.graph[*ei]->polyline[pl+1].x() - bbox.minPt.x()) * scale;
+				int y2 = img.rows - (roads.graph[*ei]->polyline[pl+1].y() - bbox.minPt.y()) * scale;
+				cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(0, 0, 0), width);
+			}
+		}
+
+		// 頂点を描画
+		{
+			RoadVertexIter vi, vend;
+			for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+				if (!roads.graph[*vi]->valid) continue;
+
+				int x = (roads.graph[*vi]->pt.x() - bbox.minPt.x()) * scale;
+				int y = img.rows - (roads.graph[*vi]->pt.y() - bbox.minPt.y()) * scale;
+
+				// 頂点の描画 (黒色の円)
+				cv::circle(img, cv::Point(x, y), width * 1.5, cv::Scalar(0, 0, 0), -1);
+			}
+		}
+
+		if (label) {
+			RoadVertexIter vi, vend;
+			for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+				if (!roads.graph[*vi]->valid) continue;
+
+				int x = (roads.graph[*vi]->pt.x() - bbox.minPt.x()) * scale;
+				int y = img.rows - (roads.graph[*vi]->pt.y() - bbox.minPt.y()) * scale;
+
+				// 属するパッチIDを描画
+				if (roads.graph[*vi]->patchId < 0 && !roads.graph[*vi]->onBoundary) {
+					printf("ERROR!!!!!!!!!!!!!!  patchID should be >= 0.");
+				}
+				QString str = QString::number(roads.graph[*vi]->patchId);
+				cv::putText(img, str.toUtf8().data(), cv::Point(x, y), cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 1, cv::Scalar(0, 128, 0), 2);
+			}
+		}
+
+		char filename[255];
+		if (roadType == RoadEdge::TYPE_AVENUE) {
+			sprintf(filename, "patches/avenue%d_patch_ids.jpg", ex_id);
+		} else {
+			sprintf(filename, "patches/street%d_patch_ids.jpg", ex_id);
+		}
+		cv::imwrite(filename, img);
+	}
+}
+
+/**
  * 道路avenuesの各Vertexについて、ほぼ同じ座標のlocal streetのVertexがあれば、local streetのVertexの
  * propertyに"avenue_intersected" = trueを設定する。
  */
@@ -318,44 +477,25 @@ std::vector<RoadEdgeDescs> ExFeature::shapes(int roadType, float houghScale, flo
 	}
 }
 
+std::vector<Patch> ExFeature::patches(int roadType, float houghScale, float patchDistance) {
+	if (roadType == RoadEdge::TYPE_AVENUE) {
+		if (!avenueShapesDetected) detectAvenueShapes(houghScale, patchDistance);
+		return avenuePatches;
+	} else {
+		if (!streetShapesDetected) detectStreetShapes(houghScale, patchDistance);
+		return streetPatches;
+	}
+}
+
 void ExFeature::detectAvenueShapes(float houghScale, float patchDistance) {
 	if (avenueShapesDetected) return;
 	avenueShapesDetected = true;
 
-	avenueShapes = ShapeDetector::detect(reducedAvenues, houghScale, patchDistance);
+	avenueShapes = ShapeDetector::detect(avenues, houghScale, patchDistance);
+	avenuePatches = RoadGeneratorHelper::convertToPatch(RoadEdge::TYPE_AVENUE, avenues, avenues, avenueShapes);
 
-	for (int j = 0; j < avenueShapes.size(); ++j) {
-		//cv::Mat img(15000, 15000, CV_8UC3);
-
-		for (int k = 0 ; k < avenueShapes[j].size(); ++k) {
-			reducedAvenues.graph[avenueShapes[j][k]]->properties["shape_id"] = j;
-		}
-
-		// 画像に、パッチを描画する
-		/*
-		for (int j2 = 0; j2 < avenueShapes.size(); ++j2) {
-			for (int k = 0 ; k < avenueShapes[j2].size(); ++k) {
-				for (int pl = 0; pl < reducedAvenues.graph[avenueShapes[j2][k]]->polyline.size() - 1; ++pl) {
-					int x1 = (reducedAvenues.graph[avenueShapes[j2][k]]->polyline[pl].x() + 7500) * 1;
-					int y1 = (reducedAvenues.graph[avenueShapes[j2][k]]->polyline[pl].y() + 7500) * 1;
-					int x2 = (reducedAvenues.graph[avenueShapes[j2][k]]->polyline[pl+1].x() + 7500) * 1;
-					int y2 = (reducedAvenues.graph[avenueShapes[j2][k]]->polyline[pl+1].y() + 7500) * 1;
-
-					if (j2 == j) {
-						cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(255, 0, 0), 3);
-					} else {
-						cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(255, 255, 255), 3);
-					}
-				}
-			}
-		}
-
-		char filename[255];
-		sprintf(filename, "patches/avenue_patch_%d.jpg", j);
-		cv::flip(img, img, 0);
-		cv::imwrite(filename, img);
-		*/
-	}
+	// save patch images
+	//savePatchImages(RoadEdge::TYPE_AVENUE, ex_id, avenues, avenuePatches, 1.0f, true);
 }
 
 void ExFeature::detectStreetShapes(float houghScale, float patchDistance) {
@@ -363,11 +503,8 @@ void ExFeature::detectStreetShapes(float houghScale, float patchDistance) {
 	streetShapesDetected = true;
 
 	streetShapes = ShapeDetector::detect(streets, houghScale, patchDistance);
+	streetPatches = RoadGeneratorHelper::convertToPatch(RoadEdge::TYPE_STREET, streets, avenues, streetShapes);
 
-	for (int j = 0; j < streetShapes.size(); ++j) {
-		for (int k = 0 ; k < streetShapes[j].size(); ++k) {
-			streets.graph[streetShapes[j][k]]->properties["shape_id"] = j;
-		}
-	}
-
+	// save patch images
+	//savePatchImages(RoadEdge::TYPE_STREET, ex_id, streets, streetPatches, 1.0f, true);
 }

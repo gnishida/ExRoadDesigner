@@ -22,11 +22,13 @@ This file is part of QtUrban.
 #include "global.h"
 #include "RendererHelper.h"
 #include "GraphUtil.h"
+#include "PatchRoadGenerator.h"
+#include "WarpRoadGenerator.h"
 #include "PatchMultiIntExRoadGenerator.h"
 #include "PatchWarpRoadGenerator.h"
 #include "PatchWarp2RoadGenerator.h"
-#include "PatchTensorRoadGenerator.h"
 #include "PMRoadGenerator.h"
+#include "AliagaRoadGenerator.h"
 #include "RoadGeneratorHelper.h"
 #include "MainWindow.h"
 #include "Util.h"
@@ -63,6 +65,36 @@ void UrbanGeometry::clearGeometry() {
 	}
 	blocks.clear();
 	*/
+}
+
+void UrbanGeometry::generateRoadsTest(std::vector<ExFeature> &features) {
+	if (areas.selectedIndex == -1) return;
+	if (areas.selectedArea()->hintLine.size() == 0) return;
+
+	if (G::getBool("useLayer")) {
+		PatchRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
+		generator.generateRoadNetwork();
+		areas.selectedArea()->roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
+	} else {
+		PatchRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
+		generator.generateRoadNetwork();
+		roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
+	}
+}
+
+void UrbanGeometry::generateRoadsWarp(std::vector<ExFeature> &features) {
+	if (areas.selectedIndex == -1) return;
+	if (areas.selectedArea()->hintLine.size() == 0) return;
+
+	if (G::getBool("useLayer")) {
+		WarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
+		generator.generateRoadNetwork();
+		areas.selectedArea()->roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
+	} else {
+		WarpRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
+		generator.generateRoadNetwork();
+		roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
+	}
 }
 
 void UrbanGeometry::generateRoadsPatchMulti(std::vector<ExFeature> &features) {
@@ -110,21 +142,6 @@ void UrbanGeometry::generateRoadsPatchWarp2(std::vector<ExFeature> &features) {
 	}
 }
 
-void UrbanGeometry::generateRoadsVerySmoothWarp(std::vector<ExFeature> &features) {
-	if (areas.selectedIndex == -1) return;
-	if (areas.selectedArea()->hintLine.size() == 0) return;
-	
-	if (G::getBool("useLayer")) {
-		PatchTensorRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
-		generator.generateRoadNetwork();
-		areas.selectedArea()->roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
-	} else {
-		PatchTensorRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
-		generator.generateRoadNetwork();
-		roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
-	}
-}
-
 void UrbanGeometry::generateRoadsPM(std::vector<ExFeature> &features) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
@@ -135,6 +152,21 @@ void UrbanGeometry::generateRoadsPM(std::vector<ExFeature> &features) {
 		areas.selectedArea()->roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 	} else {
 		PMRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
+		generator.generateRoadNetwork();
+		roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
+	}
+}
+
+void UrbanGeometry::generateRoadsAliaga(std::vector<ExFeature> &features) {
+	if (areas.selectedIndex == -1) return;
+	if (areas.selectedArea()->hintLine.size() == 0) return;
+
+	if (G::getBool("useLayer")) {
+		AliagaRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
+		generator.generateRoadNetwork();
+		areas.selectedArea()->roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
+	} else {
+		AliagaRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
 		roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 	}

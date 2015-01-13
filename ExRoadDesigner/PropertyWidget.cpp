@@ -56,7 +56,7 @@ void PropertyWidget::setRoadVertex(RoadGraph &roads, RoadVertexDesc vertexDesc, 
 		exampleStreetDesc = selectedVertex->properties["example_street_desc"].toString();
 	}
 
-	QString deadend = selectedVertex->properties["deadend"].toBool() ? "Yes" : "No";
+	QString deadend = selectedVertex->deadend ? "Yes" : "No";
 	QString rotationAngle = QString("%1").arg(selectedVertex->properties["rotation_angle"].toFloat());
 
 	ui.lineEditVertexDesc->setText(desc);

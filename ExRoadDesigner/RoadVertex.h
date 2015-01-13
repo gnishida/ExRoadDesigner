@@ -12,11 +12,12 @@ public:
 	QVector2D pt;
 	QVector3D pt3D;
 	bool valid;
-	bool seed;
 	bool fixed;
 	int type;
-
+	int patchId;
+	bool deadend;
 	bool onBoundary;
+	float rotationAngle;
 
 	QHash<QString, QVariant> properties;
 

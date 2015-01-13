@@ -24,7 +24,7 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.checkBoxUseLayer->setChecked(true);
 	ui.checkBoxRemoveSmallBlocks->setChecked(false);
 	ui.lineEditMinBlockSize->setText("10000");
-	ui.lineEditHoughScale->setText("0.1");
+	ui.lineEditHoughScale->setText("500.0");
 	ui.lineEditPatchDistance1->setText("100");
 	ui.lineEditPatchDistance2->setText("20");
 	ui.lineEditInterpolateSigma1->setText("0.2");
@@ -37,11 +37,12 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.lineEditMaxBlockSizeForPark->setText("250000");
 
 	// register the event handlers
+	connect(ui.pushButtonGenerateTest, SIGNAL(clicked()), this, SLOT(generateRoadsTest()));
+	connect(ui.pushButtonGenerateTestWarp, SIGNAL(clicked()), this, SLOT(generateRoadsTestWarp()));
 	connect(ui.pushButtonGeneratePatch, SIGNAL(clicked()), this, SLOT(generateRoadsPatch()));
-	//connect(ui.pushButtonGeneratePatchWarp, SIGNAL(clicked()), this, SLOT(generateRoadsPatchWarp()));
 	connect(ui.pushButtonGeneratePatchWarp2, SIGNAL(clicked()), this, SLOT(generateRoadsPatchWarp2()));
-	//connect(ui.pushButtonGenerateVerySmoothWarp, SIGNAL(clicked()), this, SLOT(generateRoadsVerySmoothWarp()));
 	connect(ui.pushButtonGeneratePM, SIGNAL(clicked()), this, SLOT(generateRoadsPM()));
+	connect(ui.pushButtonGenerateAliaga, SIGNAL(clicked()), this, SLOT(generateRoadsAliaga()));
 	connect(ui.pushButtonClear, SIGNAL(clicked()), this, SLOT(clear()));
 	//connect(ui.pushButtonConnect, SIGNAL(clicked()), this, SLOT(connectRoads()));
 	connect(ui.pushButtonConnect2, SIGNAL(clicked()), this, SLOT(connectRoads2()));
@@ -85,6 +86,86 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Event handlers
 
+void ControlWidget::generateRoadsTest() {
+	if (mainWin->urbanGeometry->areas.selectedIndex == -1) return;
+
+	G::global()["numAvenueIterations"] = ui.lineEditNumAvenueIterations->text().toInt();
+	G::global()["numStreetIterations"] = ui.lineEditNumStreetIterations->text().toInt();
+	int numExamples = ui.lineEditNumExamples->text().toInt();
+	G::global()["cleanAvenues"] = ui.checkBoxCleanAvenues->isChecked();
+	G::global()["cleanStreets"] = ui.checkBoxCleanStreets->isChecked();
+	G::global()["generateLocalStreets"] = ui.checkBoxLocalStreets->isChecked();
+	G::global()["cropping"] = ui.checkBoxCropping->isChecked();
+	G::global()["useLayer"] = ui.checkBoxUseLayer->isChecked();
+	G::global()["removeSmallBlocks"] = ui.checkBoxRemoveSmallBlocks->isChecked();
+	G::global()["minBlockSize"] = ui.lineEditMinBlockSize->text().toFloat();
+
+	G::global()["houghScale"] = ui.lineEditHoughScale->text().toFloat();
+	G::global()["avenuePatchDistance"] = ui.lineEditPatchDistance1->text().toFloat();
+	G::global()["streetPatchDistance"] = ui.lineEditPatchDistance2->text().toFloat();
+	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
+	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
+	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
+	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
+	G::global()["roadSnapFactor"] = ui.lineEditRoadSnapFactor->text().toFloat();
+	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
+	G::global()["rotationForSteepSlope"] = ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
+
+	std::vector<ExFeature> features;
+	features.resize(numExamples);
+	for (int i = 0; i < numExamples; ++i) {
+		QString filename = QFileDialog::getOpenFileName(this, tr("Open Feature file..."), "", tr("StreetMap Files (*.xml)"));
+		if (filename.isEmpty()) return;
+	
+		features[i].load(filename, false);
+		features[i].ex_id = i;
+	}
+
+	mainWin->urbanGeometry->generateRoadsTest(features);
+	
+	mainWin->glWidget->updateGL();
+}
+
+void ControlWidget::generateRoadsTestWarp() {
+	if (mainWin->urbanGeometry->areas.selectedIndex == -1) return;
+
+	G::global()["numAvenueIterations"] = ui.lineEditNumAvenueIterations->text().toInt();
+	G::global()["numStreetIterations"] = ui.lineEditNumStreetIterations->text().toInt();
+	int numExamples = ui.lineEditNumExamples->text().toInt();
+	G::global()["cleanAvenues"] = ui.checkBoxCleanAvenues->isChecked();
+	G::global()["cleanStreets"] = ui.checkBoxCleanStreets->isChecked();
+	G::global()["generateLocalStreets"] = ui.checkBoxLocalStreets->isChecked();
+	G::global()["cropping"] = ui.checkBoxCropping->isChecked();
+	G::global()["useLayer"] = ui.checkBoxUseLayer->isChecked();
+	G::global()["removeSmallBlocks"] = ui.checkBoxRemoveSmallBlocks->isChecked();
+	G::global()["minBlockSize"] = ui.lineEditMinBlockSize->text().toFloat();
+
+	G::global()["houghScale"] = ui.lineEditHoughScale->text().toFloat();
+	G::global()["avenuePatchDistance"] = ui.lineEditPatchDistance1->text().toFloat();
+	G::global()["streetPatchDistance"] = ui.lineEditPatchDistance2->text().toFloat();
+	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
+	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
+	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
+	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
+	G::global()["roadSnapFactor"] = ui.lineEditRoadSnapFactor->text().toFloat();
+	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
+	G::global()["rotationForSteepSlope"] = ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
+
+	std::vector<ExFeature> features;
+	features.resize(numExamples);
+	for (int i = 0; i < numExamples; ++i) {
+		QString filename = QFileDialog::getOpenFileName(this, tr("Open Feature file..."), "", tr("StreetMap Files (*.xml)"));
+		if (filename.isEmpty()) return;
+	
+		features[i].load(filename, false);
+		features[i].ex_id = i;
+	}
+
+	mainWin->urbanGeometry->generateRoadsWarp(features);
+	
+	mainWin->glWidget->updateGL();
+}
+
 void ControlWidget::generateRoadsPatch() {
 	if (mainWin->urbanGeometry->areas.selectedIndex == -1) return;
 
@@ -121,45 +202,6 @@ void ControlWidget::generateRoadsPatch() {
 	}
 
 	mainWin->urbanGeometry->generateRoadsPatchMulti(features);
-	
-	mainWin->glWidget->updateGL();
-}
-
-void ControlWidget::generateRoadsPatchWarp() {
-	if (mainWin->urbanGeometry->areas.selectedIndex == -1) return;
-
-	G::global()["numAvenueIterations"] = ui.lineEditNumAvenueIterations->text().toInt();
-	G::global()["numStreetIterations"] = ui.lineEditNumStreetIterations->text().toInt();
-	int numExamples = ui.lineEditNumExamples->text().toInt();
-	G::global()["cleanAvenues"] = ui.checkBoxCleanAvenues->isChecked();
-	G::global()["cleanStreets"] = ui.checkBoxCleanStreets->isChecked();
-	G::global()["generateLocalStreets"] = ui.checkBoxLocalStreets->isChecked();
-	G::global()["cropping"] = ui.checkBoxCropping->isChecked();
-	G::global()["useLayer"] = ui.checkBoxUseLayer->isChecked();
-	G::global()["removeSmallBlocks"] = ui.checkBoxRemoveSmallBlocks->isChecked();
-	G::global()["minBlockSize"] = ui.lineEditMinBlockSize->text().toFloat();
-
-	G::global()["houghScale"] = ui.lineEditHoughScale->text().toFloat();
-	G::global()["avenuePatchDistance"] = ui.lineEditPatchDistance1->text().toFloat();
-	G::global()["streetPatchDistance"] = ui.lineEditPatchDistance2->text().toFloat();
-	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
-	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
-	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
-	G::global()["roadSnapFactor"] = ui.lineEditRoadSnapFactor->text().toFloat();
-	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
-	G::global()["rotationForSteepSlope"] = ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
-
-	std::vector<ExFeature> features;
-	features.resize(numExamples);
-	for (int i = 0; i < numExamples; ++i) {
-		QString filename = QFileDialog::getOpenFileName(this, tr("Open Feature file..."), "", tr("StreetMap Files (*.xml)"));
-		if (filename.isEmpty()) return;
-	
-		features[i].load(filename, false);
-		//features[i].detectShapes(ui.lineEditPatchDistance1->text().toFloat(), ui.lineEditPatchDistance2->text().toFloat());
-	}
-
-	mainWin->urbanGeometry->generateRoadsPatchWarp(features);
 	
 	mainWin->glWidget->updateGL();
 }
@@ -203,45 +245,6 @@ void ControlWidget::generateRoadsPatchWarp2() {
 	mainWin->glWidget->updateGL();
 }
 
-void ControlWidget::generateRoadsVerySmoothWarp() {
-	if (mainWin->urbanGeometry->areas.selectedIndex == -1) return;
-
-	G::global()["numAvenueIterations"] = ui.lineEditNumAvenueIterations->text().toInt();
-	G::global()["numStreetIterations"] = ui.lineEditNumStreetIterations->text().toInt();
-	int numExamples = ui.lineEditNumExamples->text().toInt();
-	G::global()["cleanAvenues"] = ui.checkBoxCleanAvenues->isChecked();
-	G::global()["cleanStreets"] = ui.checkBoxCleanStreets->isChecked();
-	G::global()["generateLocalStreets"] = ui.checkBoxLocalStreets->isChecked();
-	G::global()["cropping"] = ui.checkBoxCropping->isChecked();
-	G::global()["useLayer"] = ui.checkBoxUseLayer->isChecked();
-	G::global()["removeSmallBlocks"] = ui.checkBoxRemoveSmallBlocks->isChecked();
-	G::global()["minBlockSize"] = ui.lineEditMinBlockSize->text().toFloat();
-
-	G::global()["houghScale"] = ui.lineEditHoughScale->text().toFloat();
-	G::global()["avenuePatchDistance"] = ui.lineEditPatchDistance1->text().toFloat();
-	G::global()["streetPatchDistance"] = ui.lineEditPatchDistance2->text().toFloat();
-	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
-	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
-	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
-	G::global()["roadSnapFactor"] = ui.lineEditRoadSnapFactor->text().toFloat();
-	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
-	G::global()["rotationForSteepSlope"] = ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
-
-	std::vector<ExFeature> features;
-	features.resize(numExamples);
-	for (int i = 0; i < numExamples; ++i) {
-		QString filename = QFileDialog::getOpenFileName(this, tr("Open Feature file..."), "", tr("StreetMap Files (*.xml)"));
-		if (filename.isEmpty()) return;
-	
-		features[i].load(filename, false);
-		//features[i].detectShapes(ui.lineEditPatchDistance1->text().toFloat(), ui.lineEditPatchDistance2->text().toFloat());
-	}
-
-	mainWin->urbanGeometry->generateRoadsVerySmoothWarp(features);
-	
-	mainWin->glWidget->updateGL();
-}
-
 void ControlWidget::generateRoadsPM() {
 	if (mainWin->urbanGeometry->areas.selectedIndex == -1) return;
 
@@ -274,6 +277,42 @@ void ControlWidget::generateRoadsPM() {
 	}
 
 	mainWin->urbanGeometry->generateRoadsPM(features);
+	
+	mainWin->glWidget->updateGL();
+}
+
+void ControlWidget::generateRoadsAliaga() {
+	if (mainWin->urbanGeometry->areas.selectedIndex == -1) return;
+
+	G::global()["numAvenueIterations"] = ui.lineEditNumAvenueIterations->text().toInt();
+	G::global()["numStreetIterations"] = ui.lineEditNumStreetIterations->text().toInt();
+	int numExamples = ui.lineEditNumExamples->text().toInt();
+	G::global()["cleanAvenues"] = ui.checkBoxCleanAvenues->isChecked();
+	G::global()["cleanStreets"] = ui.checkBoxCleanStreets->isChecked();
+	G::global()["generateLocalStreets"] = ui.checkBoxLocalStreets->isChecked();
+	G::global()["cropping"] = ui.checkBoxCropping->isChecked();
+	G::global()["useLayer"] = ui.checkBoxUseLayer->isChecked();
+	G::global()["removeSmallBlocks"] = ui.checkBoxRemoveSmallBlocks->isChecked();
+	G::global()["minBlockSize"] = ui.lineEditMinBlockSize->text().toFloat();
+
+	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
+	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
+	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
+	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
+	G::global()["roadSnapFactor"] = ui.lineEditRoadSnapFactor->text().toFloat();
+	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
+	G::global()["rotationForSteepSlope"] = ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
+
+	std::vector<ExFeature> features;
+	features.resize(numExamples);
+	for (int i = 0; i < numExamples; ++i) {
+		QString filename = QFileDialog::getOpenFileName(this, tr("Open Feature file..."), "", tr("StreetMap Files (*.xml)"));
+		if (filename.isEmpty()) return;
+	
+		features[i].load(filename, true);
+	}
+
+	mainWin->urbanGeometry->generateRoadsAliaga(features);
 	
 	mainWin->glWidget->updateGL();
 }

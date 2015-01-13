@@ -3,18 +3,20 @@
 RoadVertex::RoadVertex() {
 	this->pt = QVector2D(0.0f, 0.0f);
 	this->valid = true;
-	this->seed = false;
 	this->onBoundary = false;
 	this->fixed = false;
+	this->patchId = -1;
+	this->deadend = false;
 }
 
 RoadVertex::RoadVertex(const QVector2D &pt) {
 	this->pt.setX(pt.x());
 	this->pt.setY(pt.y());
 	this->valid = true;
-	this->seed = false;
 	this->onBoundary = false;
 	this->fixed = false;
+	this->patchId = -1;
+	this->deadend = false;
 }
 
 const QVector2D& RoadVertex::getPt() const {

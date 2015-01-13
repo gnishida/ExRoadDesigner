@@ -7,6 +7,7 @@
 #include "ExFeature.h"
 //#include "Terrain.h"
 #include "VBORenderManager.h"
+#include "Patch.h"
 
 /**
  * 道路網生成のヘルパークラス。
@@ -37,7 +38,6 @@ public:
 
 	//static int getClosestItem(const KDEFeature &f, int roadType, const QVector2D &pt);
 	static bool isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_desc, const Polyline2D &polyline, float angleTolerance);
-	static bool isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_desc, RoadVertexDesc tgt_desc, float angleTolerance);
 
 	static QVector2D modulo(const Polygon2D &targetArea, const Polygon2D &exampleArea, const QVector2D &pt, BBox &bbox);
 	static bool containsInitialSeed(const Polygon2D &targetArea, const Polygon2D &exampleArea, const QVector2D &pt);
@@ -83,8 +83,12 @@ public:
 
 	static void elasticTransform(RoadGraph &srcRoads, const Polyline2D &srcLine, const Polyline2D &dstLine, RoadGraph &dstRoads);
 	static bool isShape(RoadGraph &roads, RoadVertexDesc desc, std::vector<RoadEdgeDescs> &shapes, int &shape_index);
+	static std::vector<Patch> convertToPatch(int roadType, RoadGraph& roads, RoadGraph& avenues, std::vector<RoadEdgeDescs> &shapes);
+	static void markConnectorToEdge(RoadGraph &roads, RoadVertexDesc srcDesc);
 
 	static RoadVertexDesc createEdgesByExample(RoadGraph &roads, float angle, std::vector<RoadEdgeDescs> &shapes, std::vector<RoadEdgePtr> &edges, float &rotation_angle);
 	static RoadVertexDesc createEdgesByExample2(RoadGraph &roads, float angle, std::vector<RoadEdgeDescs> &shapes, std::vector<RoadEdgePtr> &edges);
+
+	static void saveRoadImage(RoadGraph& roads, std::list<RoadVertexDesc>& seeds, const char* filename);
 };
 

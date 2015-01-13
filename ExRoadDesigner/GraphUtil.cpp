@@ -168,6 +168,73 @@ RoadVertexDesc GraphUtil::getVertex(RoadGraph& roads, const QVector2D& pt, float
 }
 
 /**
+ * 近隣頂点を探す。
+ * ただし、方向ベクトルがangle方向からしきい値を超えてる場合、その頂点はスキップする。
+ * また、距離がdistance_threshold未満であること。
+ */
+bool GraphUtil::getVertex(RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float angle, float angle_threshold, RoadVertexDesc& nearest_desc, bool onlyValidVertex) {
+	float min_dist = distance_threshold * distance_threshold;
+	bool found = false;;
+
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		if (onlyValidVertex && !roads.graph[*vi]->valid) continue;
+		if (*vi == srcDesc) continue;
+
+		QVector2D vec = roads.graph[*vi]->getPt() - roads.graph[srcDesc]->pt;
+		float angle2 = atan2f(vec.y(), vec.x());
+		if (Util::diffAngle(angle, angle2) > angle_threshold) continue;
+
+		float dist = vec.lengthSquared();
+		if (dist < min_dist) {
+			nearest_desc = *vi;
+			min_dist = dist;
+			found = true;
+		}
+	}
+
+	return found;
+}
+
+/**
+ * 近隣頂点を探す。ただし、deadendの頂点は対象外。
+ * また、方向ベクトルがangle方向からしきい値を超えてる場合、その頂点はスキップする。
+ * さらに、距離がdistance_threshold未満であること。
+ */
+bool GraphUtil::getVertexExceptDeadend(RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float angle, float angle_threshold, RoadVertexDesc& nearest_desc, bool onlyValidVertex) {
+	float distance_threshold2 = distance_threshold * distance_threshold;
+	float min_cost = std::numeric_limits<float>::max();
+	bool found = false;;
+
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		if (onlyValidVertex && !roads.graph[*vi]->valid) continue;
+		if (*vi == srcDesc) continue;
+
+		if (roads.graph[*vi]->deadend) continue;
+
+		QVector2D vec = roads.graph[*vi]->getPt() - roads.graph[srcDesc]->pt;
+		float angle2 = atan2f(vec.y(), vec.x());
+		if (Util::diffAngle(angle, angle2) > angle_threshold) continue;
+
+		float dist = vec.lengthSquared();
+		if (dist > distance_threshold2) continue;
+
+		// 適当なコスト関数で、最適な頂点を探す。
+		// 基本的には、距離が近く、角度の差が小さいやつ。でも、係数はむずかしい。。。
+		float cost = dist + Util::diffAngle(angle, angle2) * 1000.0;
+
+		if (cost < min_cost) {
+			min_cost = cost;
+			nearest_desc = *vi;
+			found = true;
+		}
+	}
+
+	return found;
+}
+
+/**
  * Find the closest vertex from the specified point. 
  * If the closet vertex is within the threshold, return true. Otherwise, return false.
  */
@@ -558,6 +625,43 @@ RoadEdgeDesc GraphUtil::getEdge(RoadGraph& roads, int index, bool onlyValidEdge)
 	}
 
 	throw "No edge found for the specified index.";
+}
+
+bool GraphUtil::getCloseEdge(RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float angle, float angle_threshold, RoadEdgeDesc& nearest_desc, QVector2D& nearestPt, bool onlyValidEdge) {
+	if (angle < 0) {
+		angle += 3.14159265 * 2.0f;
+	}
+
+	float min_dist = distance_threshold;
+	bool found = false;
+
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (onlyValidEdge && !roads.graph[*ei]) continue;
+
+		RoadVertexDesc src = boost::source(*ei, roads.graph);
+		RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+
+		if (src == srcDesc || tgt == srcDesc) continue;
+
+		QVector2D vec1 = roads.graph[src]->pt - roads.graph[srcDesc]->pt;
+		QVector2D vec2 = roads.graph[tgt]->pt - roads.graph[srcDesc]->pt;
+		float angle1 = atan2f(vec1.y(), vec1.x());
+		float angle2 = atan2f(vec2.y(), vec2.x());
+
+		if (Util::withinAngle(angle, angle1, angle2) || Util::diffAngle(angle, angle1) < angle_threshold || Util::diffAngle(angle, angle2) < angle_threshold) {
+			QVector2D pt;
+			float dist = GraphUtil::distance(roads, roads.graph[srcDesc]->pt, *ei, pt);
+			if (dist < min_dist) {
+				min_dist = dist;
+				found = true;
+				nearest_desc = *ei;
+				nearestPt = pt;
+			}
+		}
+	}
+
+	return found;
 }
 
 /**
@@ -1079,6 +1183,17 @@ bool GraphUtil::hasCloseEdge(RoadGraph* roads, RoadVertexDesc v1, RoadVertexDesc
 	return false;
 }
 
+bool GraphUtil::isIntersect(RoadGraph &smallRoads, RoadGraph &largeRoads) {
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(smallRoads.graph); ei != eend; ++ei) {
+		if (!smallRoads.graph[*ei]->valid) continue;
+
+		if (GraphUtil::isIntersect(largeRoads, smallRoads.graph[*ei]->polyline)) return true;
+	}
+
+	return false;
+}
+
 /**
  * Check if the poly line intersects with the existing road segments.
  */
@@ -1113,6 +1228,7 @@ bool GraphUtil::isIntersect(RoadGraph &roads, const Polyline2D &polyline, QVecto
 
 /**
  * Check if the poly line intersects with the existing road segments.
+ * ただし、頂点srcDescに最も近い交点をintPointにセットして返却する。
  */
 bool GraphUtil::isIntersect(RoadGraph &roads, const Polyline2D &polyline, RoadVertexDesc srcDesc, QVector2D &intPoint) {
 	if (polyline.size() < 2) return false;
@@ -1186,6 +1302,37 @@ bool GraphUtil::isIntersect(RoadGraph &roads, const Polyline2D &polyline1, const
 				return true;
 			}
 		}
+	}
+
+	return false;
+}
+
+/**
+ * Check if the poly line intersects with the existing road segments.
+ * ただし、頂点srcDescに最も近い交点をintPointにセットして返却する。
+ */
+bool GraphUtil::isIntersect(RoadGraph &roads, const Polyline2D &polyline, RoadVertexDesc srcDesc, RoadEdgeDesc &nearestEdgeDesc, QVector2D &intPoint) {
+	if (polyline.size() < 2) return false;
+
+	float min_dist = std::numeric_limits<float>::max();
+
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		QVector2D pt;
+		if (isIntersect(roads, roads.graph[*ei]->polyline, polyline, pt)) {
+			float dist = (roads.graph[srcDesc]->pt - pt).lengthSquared();
+			if (dist < min_dist) {
+				min_dist = dist;
+				nearestEdgeDesc = *ei;
+				intPoint = pt;
+			}
+		}
+	}
+
+	if (min_dist < std::numeric_limits<float>::max()) {
+		return true;
 	}
 
 	return false;
@@ -1462,6 +1609,88 @@ RoadVertexDesc GraphUtil::cutoffEdge(RoadGraph &roads, RoadEdgeDesc edge, RoadVe
 	}
 
 	return v;
+}
+
+/**
+ * 指定された頂点に接続されたエッジのpolylineを取得する。
+ * 隣接頂点のdegreeが2の場合は、その先のエッジも含めたpolylineを取得する。
+ */
+Polyline2D GraphUtil::getAdjoiningPolyline(RoadGraph& roads, RoadVertexDesc v_desc) {
+	Polyline2D polyline;
+	polyline.push_back(roads.graph[v_desc]->pt);
+
+	QMap<RoadVertexDesc, bool> visited;
+	std::list<RoadVertexDesc> queue;
+	queue.push_back(v_desc);
+	visited[v_desc] = true;
+
+	while (!queue.empty()) {
+		RoadVertexDesc v = queue.front();
+		queue.pop_front();
+
+		RoadOutEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::out_edges(v, roads.graph); ei != eend; ++ei) {
+			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+			if (visited[tgt]) continue;
+
+			visited[tgt] = true;
+
+			Polyline2D p = GraphUtil::orderPolyLine(roads, *ei, v);
+			polyline.insert(polyline.end(), p.begin() + 1, p.end());
+
+			if (GraphUtil::getDegree(roads, tgt) == 2) {
+				queue.push_back(tgt);
+			}
+
+			break;
+		}
+
+	}
+
+	return polyline;
+}
+
+/**
+ * 指定された頂点に接続されたエッジのpolylineを取得する。
+ * 隣接頂点のdegreeが2の場合は、その先のエッジも含めたpolylineを取得する。
+ */
+Polyline2D GraphUtil::getAdjoiningPolyline(RoadGraph& roads, RoadVertexDesc v_desc, RoadVertexDesc& root_desc) {
+	Polyline2D polyline;
+	polyline.push_back(roads.graph[v_desc]->pt);
+
+	QMap<RoadVertexDesc, bool> visited;
+	std::list<RoadVertexDesc> queue;
+	queue.push_back(v_desc);
+	visited[v_desc] = true;
+
+	while (!queue.empty()) {
+		RoadVertexDesc v = queue.front();
+		queue.pop_front();
+
+		RoadOutEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::out_edges(v, roads.graph); ei != eend; ++ei) {
+			if (!roads.graph[*ei]->valid) continue;
+
+			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+			if (visited[tgt]) continue;
+
+			visited[tgt] = true;
+
+			Polyline2D p = GraphUtil::orderPolyLine(roads, *ei, v);
+			polyline.insert(polyline.end(), p.begin() + 1, p.end());
+
+			if (GraphUtil::getDegree(roads, tgt) == 2) {
+				queue.push_back(tgt);
+			} else {
+				root_desc = tgt;
+			}
+
+			break;
+		}
+
+	}
+
+	return polyline;
 }
 
 /**
@@ -1778,14 +2007,25 @@ void GraphUtil::connectRoads(RoadGraph& roads1, RoadGraph& roads2, float connect
 /**
  * Return the axix aligned bounding box of the road graph.
  */
-BBox GraphUtil::getAABoundingBox(RoadGraph& roads) {
+BBox GraphUtil::getAABoundingBox(RoadGraph& roads, bool checkPolyline) {
 	BBox box;
 
-	RoadVertexIter vi, vend;
-	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
-		if (!roads.graph[*vi]->valid) continue;
+	if (checkPolyline) {
+		RoadEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+			if (!roads.graph[*ei]->valid) continue;
 
-		box.addPoint(roads.graph[*vi]->getPt());
+			for (int pl = 0; pl < roads.graph[*ei]->polyline.size(); ++pl) {
+				box.addPoint(roads.graph[*ei]->polyline[pl]);
+			}
+		}
+	} else {
+		RoadVertexIter vi, vend;
+		for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+			if (!roads.graph[*vi]->valid) continue;
+
+			box.addPoint(roads.graph[*vi]->getPt());
+		}
 	}
 
 	return box;

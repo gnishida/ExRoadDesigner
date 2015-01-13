@@ -24,6 +24,6 @@ public:
 	CircleHoughTransform() {}
 	~CircleHoughTransform() {}
 
-	static std::vector<RoadEdgeDescs> detect(RoadGraph &roads, float scale = 0.2f);
+	static std::vector<RoadEdgeDescs> detect(RoadGraph &roads, float maxRadius, float houghThreshold);
 };
 

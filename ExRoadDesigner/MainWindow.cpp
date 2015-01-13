@@ -14,6 +14,7 @@
 #include "InterpolationVideoSettingDialog.h"
 #include "RotationVideoSettingDialog.h"
 #include "StructureDetectionSettingDialog.h"
+#include "RoadGeneratorHelper.h"
 
 MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags) {
 	ui.setupUi(this);
@@ -82,8 +83,6 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 	connect(ui.actionTerrainGeneration, SIGNAL(triggered()), this, SLOT(onTerrainGeneration()));
 	connect(ui.actionUpdateMountain, SIGNAL(triggered()), this, SLOT(onUpdateMountain()));
 	connect(ui.actionTerrainSegmentation, SIGNAL(triggered()), this, SLOT(onTerrainSegmentation()));
-	connect(ui.actionStatistics, SIGNAL(triggered()), this, SLOT(onStatistics()));
-	connect(ui.actionDetailedStatistics, SIGNAL(triggered()), this, SLOT(onDetailedStatistics()));
 	connect(ui.actionControlWidget, SIGNAL(triggered()), this, SLOT(onShowControlWidget()));
 	connect(ui.actionPropertyWidget, SIGNAL(triggered()), this, SLOT(onShowPropertyWidget()));
 	connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(onDebug()));
@@ -340,7 +339,7 @@ void MainWindow::onDetectCircle() {
 	CircleDetectionScaleInputDialog dlg(this);
 	if (dlg.exec() == QDialog::Accepted) {
 		CircleHoughTransform ht;
-		urbanGeometry->shapes = ht.detect(urbanGeometry->roads, dlg.scale);
+		urbanGeometry->shapes = ht.detect(urbanGeometry->roads, dlg.scale, 50.0f);
 		glWidget->updateGL();
 	}
 }
@@ -349,6 +348,13 @@ void MainWindow::onDetectStructure() {
 	StructureDetectionSettingDialog dlg(this);
 	if (dlg.exec() == QDialog::Accepted) {
 		urbanGeometry->shapes = ShapeDetector::detect(urbanGeometry->roads, dlg.scale, dlg.distance);
+
+		std::vector<Patch> patches;
+		patches = RoadGeneratorHelper::convertToPatch(RoadEdge::TYPE_AVENUE, urbanGeometry->roads, urbanGeometry->roads, urbanGeometry->shapes);
+
+		// save patch images
+		ExFeature::savePatchImages(RoadEdge::TYPE_AVENUE, 0, urbanGeometry->roads, patches, 10.0f, false);
+
 		glWidget->updateGL();
 	}
 }
@@ -1219,333 +1225,6 @@ void MainWindow::onTerrainSegmentation() {
 
 	urbanGeometry->adaptToTerrain();
 	glWidget->updateGL();
-}
-
-void MainWindow::onStatistics() {
-	/*
-	// percentage of dead-end roads
-	{
-		int cnt_deadend = 0;
-		int total = 0;
-		RoadEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::edges(urbanGeometry->roads.graph); ei != eend; ++ei) {
-			if (!urbanGeometry->roads.graph[*ei]->valid) continue;
-
-			RoadVertexDesc src = boost::source(*ei, urbanGeometry->roads.graph);
-			RoadVertexDesc tgt = boost::target(*ei, urbanGeometry->roads.graph);
-			if ((GraphUtil::getDegree(urbanGeometry->roads, src) == 1 && !urbanGeometry->roads.graph[src]->onBoundary) || 
-				(GraphUtil::getDegree(urbanGeometry->roads, tgt) == 1 && !urbanGeometry->roads.graph[tgt]->onBoundary)) {
-				cnt_deadend++;
-			}
-			total++;
-		}
-		printf("percentage of dead-end roads: %lf [%%] (%d / %d)\n", (float)cnt_deadend / (float)total * 100.0f, cnt_deadend, total);
-	}
-
-	// density of the intersections
-	if (urbanGeometry->areas.size() > 0) {
-		float area = urbanGeometry->areas.areas[0]->area.area() * 0.001f * 0.001f;
-		int numIntersections = GraphUtil::getNumVertices(urbanGeometry->roads);
-		printf("density of intersections: %lf /km2 (%d / %lf)\n", (float)numIntersections / area, numIntersections, area);
-	}
-
-	// distance between intersections
-	{
-		float total_distance = 0.0f;
-		int num = 0;
-		RoadEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::edges(urbanGeometry->roads.graph); ei != eend; ++ei) {
-			if (!urbanGeometry->roads.graph[*ei]->valid) continue;
-
-			total_distance += urbanGeometry->roads.graph[*ei]->polyline.length();
-			num++;
-		}
-
-		printf("distance between intersections: %lf\n", total_distance / (float)num);
-	}
-
-	// curvature
-	{
-		float total_curvature = 0.0f;
-		int num = 0;
-		int histogram[30];
-		for (int i = 0; i < 30; ++i) histogram[i] = 0;
-		RoadEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::edges(urbanGeometry->roads.graph); ei != eend; ++ei) {
-			if (!urbanGeometry->roads.graph[*ei]->valid) continue;
-
-			float curvature = Util::curvature(urbanGeometry->roads.graph[*ei]->polyline);
-			total_curvature += curvature;
-			num++;
-
-			int bin = curvature * 100;
-			if (bin >= 30) bin = 30;
-			histogram[bin]++;
-		}
-
-		printf("curvature: %lf\n", total_curvature / (float)num);
-	}
-	*/
-
-	if (urbanGeometry->areas.size() > 0) {
-		computeStatistics(urbanGeometry->areas[0]->area);
-	}
-}
-
-void MainWindow::computeStatistics(const Polygon2D& area) {
-	// percentage of dead-end roads
-	{
-		int cnt_deadend = 0;
-		int total = 0;
-		RoadEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::edges(urbanGeometry->roads.graph); ei != eend; ++ei) {
-			if (!urbanGeometry->roads.graph[*ei]->valid) continue;
-
-			RoadVertexDesc src = boost::source(*ei, urbanGeometry->roads.graph);
-			RoadVertexDesc tgt = boost::target(*ei, urbanGeometry->roads.graph);
-			if (!area.contains(urbanGeometry->roads.graph[src]->pt) && !area.contains(urbanGeometry->roads.graph[tgt]->pt)) continue;
-
-			if ((GraphUtil::getDegree(urbanGeometry->roads, src) == 1 && !urbanGeometry->roads.graph[src]->onBoundary) || 
-				(GraphUtil::getDegree(urbanGeometry->roads, tgt) == 1 && !urbanGeometry->roads.graph[tgt]->onBoundary)) {
-				cnt_deadend++;
-			}
-			total++;
-		}
-		if (total > 0) {
-			printf("percentage of dead-end roads: %lf [%%] (%d / %d)\n", (float)cnt_deadend / (float)total * 100.0f, cnt_deadend, total);
-		} else {
-			printf("percentage of dead-end roads: N/A\n");
-		}
-	}
-
-	// density of the intersections
-	if (urbanGeometry->areas.size() > 0) {
-		float a = area.area() * 0.001f * 0.001f;
-		int numIntersections = 0;
-		RoadVertexIter vi, vend;
-		for (boost::tie(vi, vend) = boost::vertices(urbanGeometry->roads.graph); vi != vend; ++vi) {
-			if (!urbanGeometry->roads.graph[*vi]->valid) continue;
-			if (area.contains(urbanGeometry->roads.graph[*vi]->pt)) {
-				numIntersections++;
-			}
-		}
-		printf("density of intersections: %lf /km2 (%d / %lf)\n", (float)numIntersections / a, numIntersections, a);
-	}
-
-	// distance between intersections
-	{
-		FILE* fp = fopen("distance.txt", "w");
-
-		float total_distance = 0.0f;
-		int num = 0;
-		RoadEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::edges(urbanGeometry->roads.graph); ei != eend; ++ei) {
-			if (!urbanGeometry->roads.graph[*ei]->valid) continue;
-
-			RoadVertexDesc src = boost::source(*ei, urbanGeometry->roads.graph);
-			RoadVertexDesc tgt = boost::target(*ei, urbanGeometry->roads.graph);
-			if (!area.contains(urbanGeometry->roads.graph[src]->pt) && !area.contains(urbanGeometry->roads.graph[tgt]->pt)) continue;
-
-			total_distance += urbanGeometry->roads.graph[*ei]->polyline.length();
-			fprintf(fp, "%lf\n", urbanGeometry->roads.graph[*ei]->polyline.length());
-			num++;
-		}
-		fclose(fp);
-
-		if (num > 0) {
-			printf("distance between intersections: %lf\n", total_distance / (float)num);
-		} else {
-			printf("distance between intersections: N/A\n");
-		}
-	}
-
-	// curvature
-	{
-		FILE* fp = fopen("curvature.txt", "w");
-
-		float total_curvature = 0.0f;
-		int num = 0;
-		int histogram[30];
-		for (int i = 0; i < 30; ++i) histogram[i] = 0;
-		RoadEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::edges(urbanGeometry->roads.graph); ei != eend; ++ei) {
-			if (!urbanGeometry->roads.graph[*ei]->valid) continue;
-
-			RoadVertexDesc src = boost::source(*ei, urbanGeometry->roads.graph);
-			RoadVertexDesc tgt = boost::target(*ei, urbanGeometry->roads.graph);
-			if (!area.contains(urbanGeometry->roads.graph[src]->pt) && !area.contains(urbanGeometry->roads.graph[tgt]->pt)) continue;
-
-			float curvature = Util::curvature(urbanGeometry->roads.graph[*ei]->polyline);
-			fprintf(fp, "%lf\n", curvature * 1000.0f);
-			total_curvature += curvature;
-			num++;
-		}
-		fclose(fp);
-
-		if (num > 0) {
-			printf("curvature: %lf\n", total_curvature / (float)num);
-		} else {
-			printf("curvature: N/A\n");
-		}
-	}
-
-	// road segments direction
-	{
-		int num = 36;
-		float dangle = 360.0f / num;
-		int* bin = new int[num];
-		for (int i = 0; i < num; ++i) bin[i] = 0;
-
-		RoadEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::edges(urbanGeometry->roads.graph); ei != eend; ++ei) {
-			if (!urbanGeometry->roads.graph[*ei]->valid) continue;
-
-			RoadVertexDesc src = boost::source(*ei, urbanGeometry->roads.graph);
-			RoadVertexDesc tgt = boost::target(*ei, urbanGeometry->roads.graph);
-			if (!area.contains(urbanGeometry->roads.graph[src]->pt) && !area.contains(urbanGeometry->roads.graph[tgt]->pt)) continue;
-
-			for (int pl = 0; pl < urbanGeometry->roads.graph[*ei]->polyline.size() - 1; ++pl) {
-				float dx = urbanGeometry->roads.graph[*ei]->polyline[pl].x() - urbanGeometry->roads.graph[*ei]->polyline[pl + 1].x();
-				float dy = urbanGeometry->roads.graph[*ei]->polyline[pl].y() - urbanGeometry->roads.graph[*ei]->polyline[pl + 1].y();
-
-				float angle = atan2f(dy, dx) * 180.0f / 3.141592653;
-				if (angle < 0) angle += 360.0f;
-				int bin_id = angle / dangle;
-				if (bin_id >= num) bin_id = num - 1;
-				bin[bin_id]++;
-
-				angle = atan2f(-dy, -dx) * 180.0f / 3.141592653;
-				if (angle < 0) angle += 360.0f;
-				bin_id = angle / dangle;
-				if (bin_id >= num) bin_id = num - 1;
-				bin[bin_id]++;
-			}
-		}
-
-		printf("street segments direction:\n");
-		for (int i = 0; i < num; ++i) {
-			printf("%d, ", bin[i]);
-		}
-		printf("\n");
-
-		delete [] bin;
-	}
-}
-
-void MainWindow::computeStatistics(const BBox& bbox) {
-	// percentage of dead-end roads
-	{
-		int cnt_deadend = 0;
-		int total = 0;
-		RoadEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::edges(urbanGeometry->roads.graph); ei != eend; ++ei) {
-			if (!urbanGeometry->roads.graph[*ei]->valid) continue;
-
-			RoadVertexDesc src = boost::source(*ei, urbanGeometry->roads.graph);
-			RoadVertexDesc tgt = boost::target(*ei, urbanGeometry->roads.graph);
-			if (!bbox.contains(urbanGeometry->roads.graph[src]->pt) && !bbox.contains(urbanGeometry->roads.graph[tgt]->pt)) continue;
-
-			if ((GraphUtil::getDegree(urbanGeometry->roads, src) == 1 && !urbanGeometry->roads.graph[src]->onBoundary) || 
-				(GraphUtil::getDegree(urbanGeometry->roads, tgt) == 1 && !urbanGeometry->roads.graph[tgt]->onBoundary)) {
-				cnt_deadend++;
-			}
-			total++;
-		}
-		if (total > 0) {
-			printf("percentage of dead-end roads: %lf [%%] (%d / %d)\n", (float)cnt_deadend / (float)total * 100.0f, cnt_deadend, total);
-		} else {
-			printf("percentage of dead-end roads: N/A\n");
-		}
-	}
-
-	// density of the intersections
-	if (urbanGeometry->areas.size() > 0) {
-		float area = bbox.area() * 0.001f * 0.001f;
-		int numIntersections = 0;
-		RoadVertexIter vi, vend;
-		for (boost::tie(vi, vend) = boost::vertices(urbanGeometry->roads.graph); vi != vend; ++vi) {
-			if (!urbanGeometry->roads.graph[*vi]->valid) continue;
-			if (bbox.contains(urbanGeometry->roads.graph[*vi]->pt)) {
-				numIntersections++;
-			}
-		}
-		printf("density of intersections: %lf /km2 (%d / %lf)\n", (float)numIntersections / area, numIntersections, area);
-	}
-
-	// distance between intersections
-	{
-		float total_distance = 0.0f;
-		int num = 0;
-		RoadEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::edges(urbanGeometry->roads.graph); ei != eend; ++ei) {
-			if (!urbanGeometry->roads.graph[*ei]->valid) continue;
-
-			RoadVertexDesc src = boost::source(*ei, urbanGeometry->roads.graph);
-			RoadVertexDesc tgt = boost::target(*ei, urbanGeometry->roads.graph);
-			if (!bbox.contains(urbanGeometry->roads.graph[src]->pt) && !bbox.contains(urbanGeometry->roads.graph[tgt]->pt)) continue;
-
-			total_distance += urbanGeometry->roads.graph[*ei]->polyline.length();
-			num++;
-		}
-
-		if (num > 0) {
-			printf("distance between intersections: %lf\n", total_distance / (float)num);
-		} else {
-			printf("distance between intersections: N/A\n");
-		}
-	}
-
-	// curvature
-	{
-		float total_curvature = 0.0f;
-		int num = 0;
-		int histogram[30];
-		for (int i = 0; i < 30; ++i) histogram[i] = 0;
-		RoadEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::edges(urbanGeometry->roads.graph); ei != eend; ++ei) {
-			if (!urbanGeometry->roads.graph[*ei]->valid) continue;
-
-			RoadVertexDesc src = boost::source(*ei, urbanGeometry->roads.graph);
-			RoadVertexDesc tgt = boost::target(*ei, urbanGeometry->roads.graph);
-			if (!bbox.contains(urbanGeometry->roads.graph[src]->pt) && !bbox.contains(urbanGeometry->roads.graph[tgt]->pt)) continue;
-
-			float curvature = Util::curvature(urbanGeometry->roads.graph[*ei]->polyline);
-			total_curvature += curvature;
-			num++;
-
-			int bin = curvature * 100;
-			if (bin >= 30) bin = 30;
-			histogram[bin]++;
-		}
-
-		if (num > 0) {
-			printf("curvature: %lf\n", total_curvature / (float)num);
-		} else {
-			printf("curvature: N/A\n");
-		}
-
-		/*
-		for (int i = 0; i < 30; ++i) {
-			printf("curvature: %lf - %lf: %d\n", (float)i * 0.01, (float)(i+1) * 0.01, histogram[i]);
-		}
-		*/
-	}
-}
-
-void MainWindow::onDetailedStatistics() {
-	if (urbanGeometry->areas.size() > 0) {
-		BBox bbox = urbanGeometry->areas.areas[0]->area.envelope();
-		int num = 5;
-		float dx = bbox.dx() / (float)num;
-		for (int i = 0; i < num; ++i) {
-			BBox b;
-			b.minPt = QVector2D(bbox.minPt.x() + dx * i, bbox.minPt.y());
-			b.maxPt = QVector2D(bbox.minPt.x() + dx * i + dx, bbox.maxPt.y());
-			printf("************************************************\n");
-			printf("(%lf, %lf) - (%lf, %lf)\n", b.minPt.x(), b.minPt.y(), b.maxPt.x(), b.maxPt.y());
-			computeStatistics(b);
-		}
-	}
 }
 
 void MainWindow::onShowControlWidget() {

@@ -83,15 +83,9 @@ public slots:
 	void onTerrainGeneration();
 	void onUpdateMountain();
 	void onTerrainSegmentation();
-	void onStatistics();
-	void onDetailedStatistics();
 	void onShowControlWidget();
 	void onShowPropertyWidget();
 	void onDebug();
-
-public:
-	void computeStatistics(const Polygon2D& area);
-	void computeStatistics(const BBox& bbox);
 };
 
 #endif // MAINWINDOW_H

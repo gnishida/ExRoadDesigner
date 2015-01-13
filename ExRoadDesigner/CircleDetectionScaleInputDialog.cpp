@@ -7,7 +7,7 @@ CircleDetectionScaleInputDialog::CircleDetectionScaleInputDialog(MainWindow* mai
 
 	// set up the UI
 	ui.setupUi(this);
-	ui.lineEditScale->setText("0.1");
+	ui.lineEditScale->setText("500.0");
 
 	// register the event handlers
 	connect(ui.okButton, SIGNAL(clicked()), this, SLOT(onOK()));

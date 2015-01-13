@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Tue Jan 13 11:49:03 2015
+** Created: Tue Jan 13 14:53:36 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -108,8 +108,6 @@ public:
     QAction *actionMountainVideo;
     QAction *actionGenerate3DRoads;
     QAction *actionAreaDeleteAll;
-    QAction *actionStatistics;
-    QAction *actionDetailedStatistics;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -358,10 +356,6 @@ public:
         actionGenerate3DRoads->setObjectName(QString::fromUtf8("actionGenerate3DRoads"));
         actionAreaDeleteAll = new QAction(MainWindow);
         actionAreaDeleteAll->setObjectName(QString::fromUtf8("actionAreaDeleteAll"));
-        actionStatistics = new QAction(MainWindow);
-        actionStatistics->setObjectName(QString::fromUtf8("actionStatistics"));
-        actionDetailedStatistics = new QAction(MainWindow);
-        actionDetailedStatistics->setObjectName(QString::fromUtf8("actionDetailedStatistics"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -471,9 +465,6 @@ public:
         menuTool->addAction(actionTerrainGeneration);
         menuTool->addAction(actionUpdateMountain);
         menuTool->addAction(actionTerrainSegmentation);
-        menuTool->addSeparator();
-        menuTool->addAction(actionStatistics);
-        menuTool->addAction(actionDetailedStatistics);
 
         retranslateUi(MainWindow);
 
@@ -584,8 +575,6 @@ public:
         actionMountainVideo->setText(QApplication::translate("MainWindow", "Mountains Video", 0, QApplication::UnicodeUTF8));
         actionGenerate3DRoads->setText(QApplication::translate("MainWindow", "Generate 3D Roads", 0, QApplication::UnicodeUTF8));
         actionAreaDeleteAll->setText(QApplication::translate("MainWindow", "Delete All", 0, QApplication::UnicodeUTF8));
-        actionStatistics->setText(QApplication::translate("MainWindow", "Statistics", 0, QApplication::UnicodeUTF8));
-        actionDetailedStatistics->setText(QApplication::translate("MainWindow", "DetailedStatistics", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuWindow->setTitle(QApplication::translate("MainWindow", "Window", 0, QApplication::UnicodeUTF8));
         menuArea->setTitle(QApplication::translate("MainWindow", "Area", 0, QApplication::UnicodeUTF8));

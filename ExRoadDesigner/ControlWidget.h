@@ -20,11 +20,13 @@ public:
 	//void setRoadEdge(RoadEdgePtr selectedEdge);
 
 public slots:
+	void generateRoadsTest();
+	void generateRoadsTestWarp();
 	void generateRoadsPatch();
-	void generateRoadsPatchWarp();
+	//void generateRoadsPatchWarp();
 	void generateRoadsPatchWarp2();
-	void generateRoadsVerySmoothWarp();
 	void generateRoadsPM();
+	void generateRoadsAliaga();
 	void clear();
 	void mergeRoads();
 	void trimRoads();

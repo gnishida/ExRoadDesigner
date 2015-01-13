@@ -196,14 +196,8 @@
     <ClCompile Include="PatchMultiIntExRoadGenerator.cpp">
       <Filter>road generator</Filter>
     </ClCompile>
-    <ClCompile Include="PatchWarpRoadGenerator.cpp">
-      <Filter>road generator</Filter>
-    </ClCompile>
     <ClCompile Include="BSpline.cpp">
       <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="PatchTensorRoadGenerator.cpp">
-      <Filter>road generator</Filter>
     </ClCompile>
     <ClCompile Include="PMRoadGenerator.cpp">
       <Filter>road generator</Filter>
@@ -351,6 +345,21 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_RotationVideoSettingDialog.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Patch.cpp">
+      <Filter>road</Filter>
+    </ClCompile>
+    <ClCompile Include="PatchRoadGenerator.cpp">
+      <Filter>road generator</Filter>
+    </ClCompile>
+    <ClCompile Include="PatchWarpRoadGenerator.cpp">
+      <Filter>road generator</Filter>
+    </ClCompile>
+    <ClCompile Include="WarpRoadGenerator.cpp">
+      <Filter>road generator</Filter>
+    </ClCompile>
+    <ClCompile Include="AliagaRoadGenerator.cpp">
+      <Filter>road generator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -557,14 +566,8 @@
     <ClInclude Include="PatchMultiIntExRoadGenerator.h">
       <Filter>road generator</Filter>
     </ClInclude>
-    <ClInclude Include="PatchWarpRoadGenerator.h">
-      <Filter>road generator</Filter>
-    </ClInclude>
     <ClInclude Include="BSpline.h">
       <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="PatchTensorRoadGenerator.h">
-      <Filter>road generator</Filter>
     </ClInclude>
     <ClInclude Include="PMRoadGenerator.h">
       <Filter>road generator</Filter>
@@ -673,6 +676,21 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_RotationVideoSettingDialog.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Patch.h">
+      <Filter>road</Filter>
+    </ClInclude>
+    <ClInclude Include="PatchRoadGenerator.h">
+      <Filter>road generator</Filter>
+    </ClInclude>
+    <ClInclude Include="PatchWarpRoadGenerator.h">
+      <Filter>road generator</Filter>
+    </ClInclude>
+    <ClInclude Include="WarpRoadGenerator.h">
+      <Filter>road generator</Filter>
+    </ClInclude>
+    <ClInclude Include="AliagaRoadGenerator.h">
+      <Filter>road generator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

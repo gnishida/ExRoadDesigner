@@ -182,6 +182,12 @@ void PMRoadGenerator::generateStreetSeeds(std::list<RoadVertexDesc> &seeds) {
 		for (boost::tie(ei, eend) = edges(roads.graph); ei != eend && i < num; ++ei) {
 			if (!roads.graph[*ei]->valid) continue;
 
+			RoadVertexDesc src = boost::source(*ei, roads.graph);
+			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+
+			// 両端頂点がエリア外なら、スキップ
+			if (!targetArea.contains(roads.graph[src]->pt) && !targetArea.contains(roads.graph[tgt]->pt)) continue;
+
 			std::cout << "Initial seed generation for the local street (i: " << i << ")" << std::endl;
 			++i;
 
@@ -189,13 +195,8 @@ void PMRoadGenerator::generateStreetSeeds(std::list<RoadVertexDesc> &seeds) {
 			RoadEdgeDesc e = *ei;
 			RoadEdgeDesc e1, e2;
 
-			RoadVertexDesc src = boost::source(*ei, roads.graph);
-			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
-
-
 			// 両端の頂点から、group_idを特定
 			int group_id = roads.graph[src]->properties["group_id"].toInt();
-
 
 			int num = roads.graph[e]->polyline.length() / interpolated_length;
 			if (num == 0) continue;
@@ -232,7 +233,7 @@ void PMRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, std
 	synthesizeItem(roadType, srcDesc, edges);
 	
 	float roadSnapFactor = 0.6f;
-	float roadAngleTolerance = 0.7f;//0.52f;
+	float roadAngleTolerance = 0.52f;
 
 	for (int i = 0; i < edges.size(); ++i) {
 		if (RoadGeneratorHelper::isRedundantEdge(roads, srcDesc, edges[i]->polyline, roadAngleTolerance)) continue;
@@ -319,14 +320,6 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, cons
 	}
 	
 	if (!snapDone && GraphUtil::getVertex(roads, new_edge->polyline.last(), (new_edge->polyline.back() - new_edge->polyline[0]).length() * snapFactor, srcDesc, tgtDesc)) {
-		if (RoadGeneratorHelper::isRedundantEdge(roads, tgtDesc, srcDesc, angleTolerance)) {
-			return false;
-		}
-		if (GraphUtil::getDegree(roads, tgtDesc) >= 4) {
-			return false;
-		}
-
-
 		snapTried = true;
 
 		// 他の頂点にスナップ
@@ -388,10 +381,6 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, cons
 			roads.graph[tgtDesc]->properties["generation_type"] = "pm";
 			roads.graph[tgtDesc]->onBoundary = true;
 		}
-	}
-
-	if (tgtDesc == 341) {
-		int xxx = 0;
 	}
 
 	RoadEdgeDesc e_desc = GraphUtil::addEdge(roads, srcDesc, tgtDesc, new_edge);

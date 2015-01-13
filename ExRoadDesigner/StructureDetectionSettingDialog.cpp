@@ -7,7 +7,7 @@ StructureDetectionSettingDialog::StructureDetectionSettingDialog(MainWindow* mai
 
 	// set up the UI
 	ui.setupUi(this);
-	ui.lineEditScale->setText("0.1");
+	ui.lineEditScale->setText("500.0");
 	ui.lineEditDistance->setText("100");
 
 	// register the event handlers

@@ -35,6 +35,7 @@ public:
 	static float diffAngle(const QVector2D& dir1, const QVector2D& dir2, bool absolute = true);
 	static float diffAngle(const QVector3D& dir1, const QVector3D& dir2, bool absolute = true);
 	static float diffAngle(float angle1, float angle2, bool absolute = true);
+	static bool withinAngle(float angle, float angle1, float angle2);
 	static float angleThreePoints(const QVector3D& pa, const QVector3D& pb, const QVector3D& pc);
 	static QVector2D rotate(const QVector2D &pt, float rad);
 	static QVector2D rotate(const QVector2D &pt, float rad, const QVector2D &orig);

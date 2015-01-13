@@ -32,7 +32,7 @@ GLWidget3D::GLWidget3D(MainWindow* mainWin) : QGLWidget(QGLFormat(QGL::SampleBuf
 	flyCamera.resetCamera();
 	camera3D.resetCamera();
 	camera = &camera2D;
-	camera = &flyCamera;
+	//camera = &flyCamera;
 	//G::global()["rend_mode"]=0;//2D	setRender2D_3D();
 
 	spaceRadius=30000.0;
@@ -470,7 +470,7 @@ void GLWidget3D::initializeGL() {
 			printf("Ready for OpenGL 4.2\n");
 		else {
 			printf("OpenGL 4.2 not supported\n");
-			exit(1);
+			//exit(1);
 		}
 		const GLubyte* text=
 			glGetString(GL_VERSION);

@@ -22,6 +22,8 @@ public:
 	static RoadVertexDesc getVertex(RoadGraph& roads, const QVector2D& pt, bool onlyValidVertex = true);
 	static RoadVertexDesc getVertex(RoadGraph& roads, const QVector2D& pt, RoadVertexDesc ignore, bool onlyValidVertex = true);
 	static RoadVertexDesc getVertex(RoadGraph& roads, const QVector2D& pt, float angle, float angle_threshold, bool onlyValidVertex = true);
+	static bool getVertex(RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float angle, float angle_threshold, RoadVertexDesc& nearest_desc, bool onlyValidVertex = true);
+	static bool getVertexExceptDeadend(RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float angle, float angle_threshold, RoadVertexDesc& nearest_desc, bool onlyValidVertex = true);
 	static bool getVertex(RoadGraph& roads, const QVector2D& pos, float threshold, RoadVertexDesc& desc, bool onlyValidVertex = true);
 	static bool getVertex(RoadGraph& roads, RoadVertexDesc v, float threshold, RoadVertexDesc& desc, bool onlyValidVertex = true);
 	static bool getVertex(RoadGraph& roads, const QVector2D& pos, float threshold, RoadVertexDesc ignore, RoadVertexDesc& desc, bool onlyValidVertex = true);
@@ -41,6 +43,7 @@ public:
 
 	// Edge related functions
 	static RoadEdgeDesc getEdge(RoadGraph& roads, int index, bool onlyValidEdge = true);
+	static bool getCloseEdge(RoadGraph& roads, RoadVertexDesc src, float distance_threshold, float angle, float angle_threshold, RoadEdgeDesc& nearest_desc, QVector2D& nearestPt, bool onlyValidEdge = true);
 	static float getTotalEdgeLength(RoadGraph& roads, RoadVertexDesc v);
 	static int getNumEdges(RoadGraph& roads, bool onlyValidEdge = true);
 	static int getNumEdges(RoadGraph& roads, RoadVertexDesc v, bool onlyValidEdge = true);
@@ -62,12 +65,14 @@ public:
 	static RoadVertexDesc splitEdge(RoadGraph &roads, RoadEdgeDesc edge_desc, const QVector2D& pt);
 	static RoadVertexDesc splitEdge(RoadGraph &roads, RoadEdgeDesc edge_desc, const QVector2D& pt, RoadEdgeDesc &edge1, RoadEdgeDesc &edge2);
 	static bool hasCloseEdge(RoadGraph* roads, RoadVertexDesc v1, RoadVertexDesc v2, float angle_threshold = 0.3f);
+	static bool isIntersect(RoadGraph &smallRoads, RoadGraph &largeRoads);
 	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline);
 	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline, QVector2D &intPoint);
 	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline, RoadVertexDesc srcDesc, QVector2D &intPoint);
 	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline, RoadEdgeDesc ignoreEdge);
 	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline1, const Polyline2D &polyline2);
 	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline1, const Polyline2D &polyline2, QVector2D &intPoint);
+	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline, RoadVertexDesc srcDesc, RoadEdgeDesc &nearestEdgeDesc, QVector2D &intPoint);
 	static std::vector<QVector2D> simplifyPolyLine(std::vector<QVector2D>& polyline, float threshold);
 	static void removeShortEdges(RoadGraph& roads, float threshold);
 	static void removeLinkEdges(RoadGraph& roads);
@@ -80,6 +85,8 @@ public:
 	static bool isStraightEdge(RoadGraph &roads, RoadVertexDesc v, RoadEdgeDesc e);
 	static bool isPotentiallyStraightEdge(RoadGraph &roads, RoadVertexDesc v, RoadEdgeDesc e);
 	static RoadVertexDesc cutoffEdge(RoadGraph &roads, RoadEdgeDesc edge, RoadVertexDesc v_desc, const QVector2D &pt);
+	static Polyline2D getAdjoiningPolyline(RoadGraph& roads, RoadVertexDesc v_desc);
+	static Polyline2D getAdjoiningPolyline(RoadGraph& roads, RoadVertexDesc v_desc, RoadVertexDesc& root_desc);
 
 	// File I/O
 	static void loadRoads(RoadGraph& roads, const QString& filename, int roadType = 0);
@@ -89,7 +96,7 @@ public:
 	static void copyRoads(RoadGraph& srcRoads, RoadGraph& dstRoads);
 	static void mergeRoads(RoadGraph& roads1, RoadGraph& roads2);
 	static void connectRoads(RoadGraph& roads1, RoadGraph& roads2, float connect_threshold);
-	static BBox getAABoundingBox(RoadGraph& roads);
+	static BBox getAABoundingBox(RoadGraph& roads, bool checkPolyline = false);
 	static BBox getBoudingBox(RoadGraph& roads, float theta1, float theta2, float theta_step = 0.087f);
 	static void extractRoads(RoadGraph& roads, int roadType = 0);
 	static void extractRoads(RoadGraph& roads, Polygon2D& area, bool strict, int roadType = 0);
