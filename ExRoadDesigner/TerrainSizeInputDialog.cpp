@@ -7,9 +7,8 @@ TerrainSizeInputDialog::TerrainSizeInputDialog(MainWindow* mainWin) : QDialog((Q
 
 	// set up the UI
 	ui.setupUi(this);
-	ui.lineEditWidth->setText("6000");
-	ui.lineEditDepth->setText("6000");
-	ui.lineEditCellLength->setText("100");
+	ui.lineEditSide->setText("6000");
+	ui.lineEditCellResolution->setText("200");
 
 	// register the event handlers
 	connect(ui.okButton, SIGNAL(clicked()), this, SLOT(onOK()));
@@ -22,9 +21,8 @@ TerrainSizeInputDialog::TerrainSizeInputDialog(MainWindow* mainWin) : QDialog((Q
 // Event handlers
 
 void TerrainSizeInputDialog::onOK() {
-	width = ui.lineEditWidth->text().toInt();
-	depth = ui.lineEditDepth->text().toInt();
-	cellLength = ui.lineEditCellLength->text().toInt();
+	side = ui.lineEditSide->text().toInt();
+	cellResolution = ui.lineEditCellResolution->text().toInt();
 	accept();
 }
 

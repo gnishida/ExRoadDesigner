@@ -6,20 +6,23 @@ in vec3 outUV;
 in vec3 origVertex;// L
 
 in vec3 varyingNormal;
-in vec3 varyingLightDirection;
 in vec4 varyingLightVertexPosition;//position respect the camera view
 
 out vec4 outputF;
 
 uniform int mode;
+uniform int terrainMode;
 uniform sampler2D tex0;
 uniform sampler2DArray tex_3D;
 //uniform sampler3D tex_3D;
 
+uniform vec4 terrain_size;//remove if terrainMode=2 removed
+uniform sampler2D terrain_tex;
 
 uniform sampler2D shadowMap;
 uniform int shadowState;
  
+uniform vec3 lightDir;
 uniform mat4 light_mvpMatrix;
 uniform mat4 light_biasMatrix;	//transfrom to [0,1] tex coordinates
 
@@ -28,6 +31,14 @@ uniform float waterMove;
 const float ambientColor=0.1;
 const float diffuseColor=1.0;
 const float specularColor=1.0;
+
+vec3 terrainMode3Colors[] = vec3[5]( 
+   vec3( 0xf0/255.0, 0xed/255.0, 0xe5/255.0 ), // 7 mid river
+   vec3( 0xca/255.0 ,0xdf/255.0, 0xaa/255.0 ), // 8 green
+   vec3( 0xdf/255.0, 0xd9/255.0, 0xc3/255.0 ), // 9 coast
+   vec3( 0xe9/255.0, 0xe5/255.0, 0xdc/255.0 ), //10 flat
+   vec3( 0x50/255.0, 0x44/255.0, 0x43/255.0 ) //11 mountain 504443
+);
 
 vec2 poissonDisk4[4] = vec2[](
   vec2( -0.94201624, -0.39906216 ),
@@ -71,7 +82,7 @@ float shadowCoef(){
     float z = 0.5 * ProjCoords.z + 0.5;
 	
 	/// D
-	bool HDShadow=false;
+	bool HDShadow=true;
 	float visibility=1.0f;
 	if(HDShadow==true){
 		// HDShadow
@@ -153,47 +164,67 @@ void main(){
 	//////////////
 	// TERRAIN
 	if((mode&0xFF)==3){
-		/*float height=(origVertex.z)/100.0;
-		outputF = texture( tex_3D, vec3(outUV.rg,height) );*/
-		//outputF = texture( tex_3D, vec3(outUV.rg,3.0) );
-		//return;
-
-		vec4 terrainColor=vec4(0,0,0,1.0);
-		float factor;
-		//float height=(origVertex.z)/255.0;//0-1
-		float height=(origVertex.z)/255.0;//0-1
-		height=min(height,1.0);
-		height=max(height,0);
-		/*terrainColor+=height*texture( tex_3D, vec3(outUV.rg,1.0));
-		terrainColor+=(1-height)*texture( tex_3D, vec3(outUV.rg,2.0));//texture( tex_3D, vec3(outUV.rg,2.0));
-		outputF =terrainColor;
-		return;*/
-		if(height<=0.33){
-			//terrainColor=vec4(1.0,1.0,1.0,1.0);
-			factor=height/0.33;//0-1
-			//terrainColor+=(1-factor)*texture( tex_3D, vec3(outUV.rg,0.0));
-			//terrainColor+=factor*texture( tex_3D, vec3(outUV.rg,1.0));
-			terrainColor+=(1-factor)*texture( tex_3D, vec3(outUV.rg,0.0));
-			terrainColor+=factor*texture( tex_3D, vec3(outUV.rg+vec2(0.1,0.1),1.0));
-		}else{
-			if(height<=0.66){
-				//terrainColor=vec4(0,1.0,1.0,1.0);
-				factor=(height-0.33)/0.33f;//0-1
-				//terrainColor+=(1-factor)*texture( tex_3D, vec3(outUV.rg,1.0));
-				//terrainColor+=factor*texture( tex_3D, vec3(outUV.rg,2.0));
-				terrainColor+=(1-factor)*texture( tex_3D, vec3(outUV.rg+vec2(0.1,0.1),1.0));
-				terrainColor+=factor*texture( tex_3D, vec3(outUV.rg+vec2(0.45,0.45),2.0));
+		///////////////////////////
+		// 0 FLAT (Maps)
+		if(terrainMode==0){
+			float height=outColor.r;///COMPUTED IN VERTEX
+			if(height<=15){//water
+				if(height<=13){
+					outputF=vec4(0xa0/255.0,0xc3/255.0,0xff/255.0,1.0);//water blue
+				}else{
+					outputF=mix(
+						vec4(0x84/255.0,0xa9/255.0,0xe6/255.0,1.0),//water blue dark 92bbff (mine 84a9e6)
+						vec4(0xa0/255.0,0xc3/255.0,0xff/255.0,1.0),//water blue
+						(15.0f-height)*0.5f);
+				}
 			}else{
-				//terrainColor=vec4(0,0,1.0,1.0);
-				factor=(height-0.66)/0.33f;//0-1
-				//terrainColor+=(1-factor)*texture( tex_3D, vec3(outUV.rg,2.0));
-				//terrainColor+=factor*texture( tex_3D, vec3(outUV.rg,3.0));
-				terrainColor+=(1-factor)*texture( tex_3D, vec3(outUV.rg+vec2(0.45,0.45),2.0));
-				terrainColor+=factor*texture( tex_3D, vec3(outUV.rg+vec2(0.3,0.3),3.0));
-
+				//outputF=vec4(0xf0/255.0,0xed/255.0,0xe5/255.0,1.0);//grey brighter
+				outputF=vec4(0xe9/255.0,0xe5/255.0,0xdc/255.0,1.0);//gray dark
 			}
+			return;
 		}
-		outputF =terrainColor;
+		///////////////////////////
+		// 2 FLAT (Content Design)
+		if(terrainMode==2){
+			outputF=vec4(0,1,1,1);//0xe9/255.0,0xe5/255.0,0xdc/255.0,1.0);//gray dark
+			vec2 terrainTexCoord=vec2(
+				int(origVertex.x-terrain_size.x)/terrain_size.z,
+				int(origVertex.y-terrain_size.y)/terrain_size.w
+				);
+			float height=255.0f*texture(terrain_tex,terrainTexCoord.rg).r;
+
+			if(height<=6){//water
+				if(height<=0){
+					outputF=vec4(0x84/255.0,0xa9/255.0,0xe6/255.0,1.0);//water blue dark 92bbff (mine 84a9e6)
+				}else{
+					outputF=vec4(0xa0/255.0,0xc3/255.0,0xff/255.0,1.0);//water blue
+				}
+			}else{
+				outputF=vec4(0xe9/255.0,0xe5/255.0,0xdc/255.0,1.0);//gray dark
+				int heighStep=int(height-7);//index 0-4 (0 mid river, 1 green, 2 coast, 3 flat, 4 mountain)
+				if(heighStep<0)heighStep=0;
+				if(heighStep>4)heighStep=4;
+				outputF=vec4(terrainMode3Colors[heighStep],1.0);
+			}
+			return;
+		}
+		///////////////////////////
+		// 1 MOUNTAIN
+		if(terrainMode==1){
+			vec4 terrainColor=vec4(0,0,0,1.0);
+			float factor;
+			const float maxHeight=9.0;//7=255*7 1500m (change in vertex shader as well) HERE IS 9 TO ALLOW LESS HIGH MOUNTAINS
+			float height=100.0f*(origVertex.z/maxHeight)/255.0;//0-100
+			height=clamp(height,0.0,99.999999);//0-99.99
+
+			int texInd=int(height/25);
+			float interpTex=mod(height,25.0);
+			// texture
+			outputF=mix(
+				texture( tex_3D, vec3(outUV.rg,texInd) ),
+				texture( tex_3D, vec3(outUV.rg,texInd+1) ),
+				interpTex/25.0);
+		}
 	}
 
 	//////////////
@@ -231,31 +262,10 @@ void main(){
 		normalC = normalC*2.0-vec3(1.0);
 		normalC2 = normalC2*2.0-vec3(1.0);
 		normalC = normalize((normalC+normalC2)*0.5);
-		/*vec2 coord0=(coordFac+vec2(-waterMove,waterMove))*1.02;
-		vec2 coord1=(coordFac+vec2(waterMove*3))*0.33;
-		vec2 coord2=(coordFac+vec2(-waterMove*4))*0.25;
-		vec3 normalC=texture( tex_3D, vec3(coord0,6.0) ).xyz;//6 water normal
-		vec3 normalC2=texture( tex_3D, vec3(coord1,6.0) ).xyz;//6 water normal
-		vec3 normalC3=texture( tex_3D, vec3(coord2,6.0) ).xyz;//6 water normal
-
-		normalC = normalC*2.0-vec3(1.0);
-		normalC2 = normalC2*2.0-vec3(1.0);
-		normalC3 = normalC3*2.0-vec3(1.0);
-		normalC = normalize((normalC+normalC2+normalC3)*0.33);*/
-		/*int numWav=2;
-		vec3 normalC=vec3(0,0,0);
-		for(int i=3;i<3+numWav;i++){
-			float sig=i%2==0?-1.0:1.0;
-			vec2 coord=(coordFac+vec2(sig*waterMove*i))/i;
-			normalC+=texture( tex_3D, vec3(coord,6.0) ).xyz;//6 water normal
-		}
-		normalC=normalize((2.0*normalC-vec3(1.0))/numWav);*/
 	
 		float intensity=1.0f;
 
-		intensity=1-(0.95*max(0.0, dot(normalize(varyingLightDirection), normalize(normalC)))+0.05);
-		//intensity=clamp(intensity,0,1);
-		//intensity=(intensity)-0.1;
+		intensity=1-(0.95*max(0.0, dot(normalize(-lightDir), normalize(normalC)))+0.05);
 		int darknessInt=int(99.999*(1.0-intensity));
 		int texInd=darknessInt/25;
 		int interpTex=darknessInt%25;
@@ -278,25 +288,13 @@ void main(){
 		}
 		
 		if((mode&0x0200)==0x0200){
-			intensity=1-(0.95*max(0.0, dot(normalize(varyingLightDirection), normalize(varyingNormal)))+0.05);
+			intensity=1-(0.95*max(0.0, dot(normalize(-lightDir), normalize(varyingNormal)))+0.05);
 			intensity=clamp(intensity,0,1);
 		}
 		if((mode&0xFF)==9){
 			int windNumber=int(outColor.z);
 			intensity*=facade(coordFac,maxFac,windNumber);
-			/*//float dist=2.0;
-			if(coordFac.x<2.0||coordFac.y<2.0){
-				//dist=min(coordFac.x,coordFac.y);
-				intensity=0;
-			}
-			if(coordFac.x>maxFac.x-2.0||coordFac.y>maxFac.y-2.0){
-				//dist=min(dist,min(maxFac.x-coordFac.x,maxFac.y-coordFac.y));
-				intensity=0;
-			}*/
 		}
-		/*float t=smoothstep(1.5,2.0,dist);
-		intensity=clamp(intensity-t,0,1);*/
-
 
 		int darknessInt=int(99.999*(1.0-intensity));
 		int texInd=darknessInt/25;
@@ -313,49 +311,6 @@ void main(){
 				vec4(1,1,1,1),
 				perl*0.3*(4-texInd));
 		}
-
-		/*if(intensity<=0.2){
-			outputF =vec4(1.0,1.0,1.0,1.0);
-		}else{
-			if(intensity<=0.3){
-				outputF=mix(vec4(1.0,1.0,1.0,1.0),texture( tex_3D, vec3(coordFac.xy*0.1,0.0) ),(intensity-0.2)*10.0);
-			}else{
-				if(intensity<=0.4){
-					outputF=texture( tex_3D, vec3(coordFac.xy*0.1,0.0) );
-				}else{
-					if(intensity<=0.6){
-						outputF=mix(texture(tex_3D, vec3(coordFac.xy*0.1,0.0)),texture( tex_3D, vec3(coordFac.xy*0.1,1.0) ),(intensity-0.4)*10.0);
-					}else{
-						if(intensity<=0.7){
-							outputF=texture( tex_3D, vec3(coordFac.xy*0.1,1.0) );
-						}else{
-							if(intensity<=0.8){
-								outputF=mix(texture(tex_3D, vec3(coordFac.xy*0.1,1.0)),texture( tex_3D, vec3(coordFac.xy*0.1,2.0) ),(intensity-0.7)*10.0);
-							}else{
-								outputF=texture( tex_3D, vec3(coordFac.xy*0.1,2.0));
-
-							}
-
-						}
-
-					}
-
-				}
-			}
-		}*/
-		/*outputF =vec4(1.0,1.0,1.0,1.0);
-		vec2 coordFac=outColor.xy;
-		vec2 maxFac=outUV.xy;
-		float dist=2.0;
-		if(coordFac.x<2.0||coordFac.y<2.0){
-			dist=min(coordFac.x,coordFac.y);
-		}
-		if(coordFac.x>maxFac.x-2.0||coordFac.y>maxFac.y-2.0){
-			dist=min(dist,min(maxFac.x-coordFac.x,maxFac.y-coordFac.y));
-		}
-		float t=smoothstep(1.5,2.0,dist);
-		outputF =mix(texture( tex_3D, vec3(coordFac.xy*0.1,0.0) ),vec4(1,1,1,1),t);*/
-		
 		return;
 	}
 
@@ -363,12 +318,12 @@ void main(){
 	// LIGHTING
 	vec4 ambientIllumination=vec4(0.05,0.05,0.05,0.0);
 	vec4 diffuseIllumination=vec4(0.95,0.95,0.95,1.0);
-	if((mode&0x0200)==0x0200){
-		vec3 normal = normalize(varyingNormal);
-		//vec3 lightDirection = normalize(vec3(0.5,0.5,0.5));//normalize(varyingLightDirection);
-		vec3 lightDirection = normalize(varyingLightDirection);
+	if(((mode&0x0200)==0x0200)||((mode&0xFF)==0x03)){//terran also gets lighting
+		vec3 normal = varyingNormal;
+		if(((mode&0x0FF)==0x05)||((mode&0xFF)==0x06))//seems that it needs it
+			normal=normalize(normal);
 		ambientIllumination = ambientColor*vec4(1.0,1.0,1.0,1.0);
-		diffuseIllumination = (diffuseColor*vec4(1.0,1.0,1.0,1.0)) * max(0.0, dot(lightDirection, normal));
+		diffuseIllumination = (diffuseColor*vec4(1.0,1.0,1.0,1.0)) * max(0.0, dot(-lightDir, normal));
 		//outputF=(ambientIllumination+diffuseIllumination)*outputF;
 	}
 

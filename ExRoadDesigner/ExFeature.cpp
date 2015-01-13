@@ -4,6 +4,7 @@
 #include "GraphUtil.h"
 #include "RoadEdge.h"
 #include <fstream>
+#include "ShapeDetector.h"
 
 void ExFeature::setArea(const Polygon2D &area) {
 	this->area = area;
@@ -165,7 +166,12 @@ void ExFeature::load(QString filepath, bool reduce) {
 	}
 	GraphUtil::clean(reducedAvenues);
 
+	init();
+
 	computePMParameters();
+
+	avenueShapesDetected = false;
+	streetShapesDetected = false;
 }
 
 /**
@@ -282,4 +288,86 @@ void ExFeature::saveHintLine(QDomDocument &doc, QDomNode &parent) {
 
 		node_area.appendChild(node_point);
 	}
+}
+
+/**
+ * 道路avenuesの各Vertexについて、ほぼ同じ座標のlocal streetのVertexがあれば、local streetのVertexの
+ * propertyに"avenue_intersected" = trueを設定する。
+ */
+void ExFeature::init() {
+	// エリア境界上の頂点にたいして、onBoundaryフラグをセットする。
+
+
+	// local streetについて、avenueと交差しているかどうかのフラグをセットする
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(avenues.graph); vi != vend; ++vi) {
+		RoadVertexDesc desc;
+		if (GraphUtil::getVertex(streets, avenues.graph[*vi]->pt, 1.0f, desc)) {
+			streets.graph[desc]->properties["avenue_intersected"] = true;
+		}
+	}
+}
+
+std::vector<RoadEdgeDescs> ExFeature::shapes(int roadType, float houghScale, float patchDistance) {
+	if (roadType == RoadEdge::TYPE_AVENUE) {
+		if (!avenueShapesDetected) detectAvenueShapes(houghScale, patchDistance);
+		return avenueShapes;
+	} else {
+		if (!streetShapesDetected) detectStreetShapes(houghScale, patchDistance);
+		return streetShapes;
+	}
+}
+
+void ExFeature::detectAvenueShapes(float houghScale, float patchDistance) {
+	if (avenueShapesDetected) return;
+	avenueShapesDetected = true;
+
+	avenueShapes = ShapeDetector::detect(reducedAvenues, houghScale, patchDistance);
+
+	for (int j = 0; j < avenueShapes.size(); ++j) {
+		//cv::Mat img(15000, 15000, CV_8UC3);
+
+		for (int k = 0 ; k < avenueShapes[j].size(); ++k) {
+			reducedAvenues.graph[avenueShapes[j][k]]->properties["shape_id"] = j;
+		}
+
+		// 画像に、パッチを描画する
+		/*
+		for (int j2 = 0; j2 < avenueShapes.size(); ++j2) {
+			for (int k = 0 ; k < avenueShapes[j2].size(); ++k) {
+				for (int pl = 0; pl < reducedAvenues.graph[avenueShapes[j2][k]]->polyline.size() - 1; ++pl) {
+					int x1 = (reducedAvenues.graph[avenueShapes[j2][k]]->polyline[pl].x() + 7500) * 1;
+					int y1 = (reducedAvenues.graph[avenueShapes[j2][k]]->polyline[pl].y() + 7500) * 1;
+					int x2 = (reducedAvenues.graph[avenueShapes[j2][k]]->polyline[pl+1].x() + 7500) * 1;
+					int y2 = (reducedAvenues.graph[avenueShapes[j2][k]]->polyline[pl+1].y() + 7500) * 1;
+
+					if (j2 == j) {
+						cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(255, 0, 0), 3);
+					} else {
+						cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(255, 255, 255), 3);
+					}
+				}
+			}
+		}
+
+		char filename[255];
+		sprintf(filename, "patches/avenue_patch_%d.jpg", j);
+		cv::flip(img, img, 0);
+		cv::imwrite(filename, img);
+		*/
+	}
+}
+
+void ExFeature::detectStreetShapes(float houghScale, float patchDistance) {
+	if (streetShapesDetected) return;
+	streetShapesDetected = true;
+
+	streetShapes = ShapeDetector::detect(streets, houghScale, patchDistance);
+
+	for (int j = 0; j < streetShapes.size(); ++j) {
+		for (int k = 0 ; k < streetShapes[j].size(); ++k) {
+			streets.graph[streetShapes[j][k]]->properties["shape_id"] = j;
+		}
+	}
+
 }

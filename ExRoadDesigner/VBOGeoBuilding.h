@@ -11,7 +11,7 @@ class VBORenderManager;
 
 class VBOGeoBuilding {
 public:
-	static void generateBuilding(VBORenderManager& rendManager,Building& building);
+	static void generateBuilding(VBORenderManager& rendManager,Building& building,int type);
 	static bool bldgInitialized;
 	static void initBuildingsTex();
 };

@@ -3,6 +3,9 @@
 #include <QMatrix4x4>
 #include "Util.h"
 
+#include "clipper.hpp"
+//#include "clipper.cpp"
+
 //**** Polygon3D
 void Polygon3D::renderContour(void)
 {	
@@ -206,6 +209,8 @@ bool is2DRingWithin2DRing( boost::geometry::ring_type<Polygon3D>::type &contourA
 	return true;
 }
 
+using namespace ClipperLib;
+
 float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea)
 {
 	Loop3D cleanPgon; 
@@ -236,6 +241,8 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 	QVector3D intPt;
 
 
+	/*
+	// GEN CODE--> It leads to self-intersection very often with non-convex polygons
 	for(int cur=0; cur<cSz; ++cur){
 		//Some geometry and trigonometry
 
@@ -266,10 +273,27 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 
 			pgonInset.push_back(intPt);
 		}
+	}*/
+	
+	// Old Code
+	pgonInset.resize(cSz);
+	for(int cur=0; cur<cSz; ++cur){
+		//Some geometry and trigonometry
+
+		//point p1 is the point with index cur
+		prev = (cur-1+cSz)%cSz; //point p0
+		next = (cur+1)%cSz;	  //point p2
+
+		getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next],
+			offsetDistances[prev], offsetDistances[cur], intPt);
+
+		pgonInset[cur] = intPt;
 	}
 
+
+
 	//temp
-	//pgonInset = cleanPgon;
+	
 
 	//Compute inset area
 	if(computeArea){
@@ -284,8 +308,9 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 			boost::geometry::correct(bg_contour_inset);
 
 			if(boost::geometry::intersects(bg_contour_inset)){
+				//printf("INSET: intersects\n");
 				pgonInset.clear();
-				return 0.0f;
+				//return 0.0f;
 			} else {
 
 				boost::geometry::assign(bg_contour, cleanPgon);
@@ -293,24 +318,49 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 				//if inset is not within polygon
 				if( !is2DRingWithin2DRing(bg_contour_inset, bg_contour) ){
 					pgonInset.clear();
-					return 0.0f;
+					//printf("INSET: ringWithRing\n");
+					//return 0.0f;
 				} else {
 					contArea = fabs(boost::geometry::area(bg_contour));
 					contInsetArea = fabs(boost::geometry::area(bg_contour_inset));
 
-					if(contInsetArea < contArea){
+					if(contInsetArea < contArea){// OK EXIT
 						//return boost::geometry::area(bg_contour_inset);
 						return contInsetArea;
 					} else {
+						//printf("INSET: contInsetArea < contArea\n");
 						pgonInset.clear();
-						return 0.0f;
+						//return 0.0f;
 					}
 				}
 			}
 		} else {
+			//printf("INSET: sides <0\n");
 			pgonInset.clear();
-			return 0.0f;
+			//return 0.0f;
 		}
+		// IT FAILED TRY SECOND METHOD
+		{
+			Path subj;
+			Paths solution;
+			for(int cur=0; cur<cSz; ++cur){
+				subj << IntPoint(cleanPgon[cur].x()*1000,cleanPgon[cur].y()*1000);
+			}
+			/*subj << 
+				ClipperLib::IntPoint(348,257) << IntPoint(364,148) << IntPoint(362,148) << 
+				IntPoint(326,241) << IntPoint(295,219) << IntPoint(258,88) << 
+				IntPoint(440,129) << IntPoint(370,196) << IntPoint(372,275);*/
+			ClipperOffset co;
+			co.AddPath(subj, jtSquare, etClosedPolygon);
+			co.Execute(solution, -1000*7.5);
+			pgonInset.resize(solution[0].size());
+			for(int sN=0;sN<solution[0].size();sN++){
+				pgonInset[sN]=QVector3D(solution[0][sN].X/1000.0f,solution[0][sN].Y/1000.0f,0);
+			}
+			//printf("Solutions %d\n",solution.size());
+			return Area(solution[0]);
+		}
+
 	}
 	return 0.0f;
 

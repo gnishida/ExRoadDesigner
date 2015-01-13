@@ -1,0 +1,7 @@
+<cameras>
+  <camera xrot="304" yrot="0" zrot="287" dx="2541" dy="-603" dz="631" lookAtX="0" lookAtY="0" lookAtZ="0" />
+  <camera xrot="304" yrot="0" zrot="277" dx="1649" dy="-498" dz="631" lookAtX="0" lookAtY="0" lookAtZ="0" />
+  <camera xrot="304" yrot="0" zrot="267" dx="878" dy="-406" dz="631" lookAtX="0" lookAtY="0" lookAtZ="0" />
+  <camera xrot="303" yrot="0" zrot="257" dx="352" dy="-451" dz="631" lookAtX="0" lookAtY="0" lookAtZ="0" />
+  <camera xrot="305" yrot="0" zrot="250" dx="-785" dy="-1177" dz="631" lookAtX="0" lookAtY="0" lookAtZ="0" />
+</cameras>

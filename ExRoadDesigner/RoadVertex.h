@@ -14,6 +14,7 @@ public:
 	bool valid;
 	bool seed;
 	bool fixed;
+	int type;
 
 	bool onBoundary;
 

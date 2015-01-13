@@ -1,0 +1,16 @@
+<feature>
+    <area>
+        <point x="-1857.743530273438" y="865.6702270507813"/>
+        <point x="1857.743530273438" y="865.6702270507813"/>
+        <point x="1857.743530273438" y="-865.670166015625"/>
+        <point x="-1857.743530273438" y="-865.670166015625"/>
+        <point x="-1857.743530273438" y="865.6702270507813"/>
+    </area>
+    <hintLine>
+        <point x="-1214.236450195313" y="-229.823974609375"/>
+        <point x="-769.91015625" y="-229.823974609375"/>
+        <point x="-294.9407043457031" y="-222.1632080078125"/>
+    </hintLine>
+    <avenues filename="grid_for_session1b.xml.avenues.gsm"/>
+    <streets filename="grid_for_session1b.xml.streets.gsm"/>
+</feature>

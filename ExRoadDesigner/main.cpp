@@ -24,10 +24,17 @@ int main(int argc, char *argv[]) {
 	G::global()["maxHeightBaseAspectRatio"] = 1.0f;
 	G::global()["minBuildingArea"] = 10.0f;
 
-	G::global()["roadSnapFactor"] = 0.7f;
+	//G::global()["roadSnapFactor"] = 0.7f;
 	//G::global()["roadAngleTolerance"] = 1.2566f;
 	//G::global()["roadAngleTolerance"] = 1.0f;
-	G::global()["roadAngleTolerance"] = 0.8f;
+	//G::global()["roadAngleTolerance"] = 0.8f;
+	//G::global()["roadAngleTolerance"] = 0.52f;
+
+	G::global()["seaLevelForAvenue"] = 0.1f;
+	G::global()["seaLevelForStreet"] = 48.9f;
+
+	G::global()["MAX_Z"] = 4500.0f;
+	G::global()["shader2D"] = true;
 
 
 	QApplication a(argc, argv);

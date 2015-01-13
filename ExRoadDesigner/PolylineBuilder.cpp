@@ -27,7 +27,7 @@ void PolylineBuilder::moveLastPoint(const QVector2D& pt) {
 void PolylineBuilder::end() {
 	_selecting = false;
 
-	if (_polyline.size() >= 2 && (_polyline.nextLast() - _polyline.last()).lengthSquared() < 1.0f) {
+	if (_polyline.size() >= 2 && (_polyline.nextLast() - _polyline.last()).lengthSquared() < 900.0f) {
 		_polyline.pop_back();
 	}
 }
@@ -53,11 +53,11 @@ const Polyline3D& PolylineBuilder::polyline3D() const {
 	return _polyline3D;
 }
 
-void PolylineBuilder::adaptToTerrain(Terrain* terrain) {
+void PolylineBuilder::adaptToTerrain(VBORenderManager* vboRenderManager) {
 	_polyline3D.clear();
 
 	for (int i = 0; i < _polyline.size(); ++i) {
-		float z = terrain->getValue(_polyline[i].x(), _polyline[i].y());
+		float z = vboRenderManager->getTerrainHeight(_polyline[i].x(), _polyline[i].y());
 		_polyline3D.push_back(QVector3D(_polyline[i].x(), _polyline[i].y(), z + 30));
 	}
 }

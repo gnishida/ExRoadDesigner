@@ -38,6 +38,7 @@
     <addaction name="actionSaveTerrain"/>
     <addaction name="separator"/>
     <addaction name="actionLoadRoads"/>
+    <addaction name="actionAddRoads"/>
     <addaction name="actionSaveRoads"/>
     <addaction name="actionClearRoads"/>
     <addaction name="separator"/>
@@ -45,6 +46,11 @@
     <addaction name="actionSaveAreas"/>
     <addaction name="separator"/>
     <addaction name="actionSaveImage"/>
+    <addaction name="actionSaveImageHD"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoadCamera"/>
+    <addaction name="actionSaveCamera"/>
+    <addaction name="actionResetCamera"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -62,16 +68,23 @@
     <addaction name="actionAreaSelect"/>
     <addaction name="actionAreaCreate"/>
     <addaction name="actionAreaDelete"/>
+    <addaction name="actionAreaDeleteAll"/>
     <addaction name="actionHintLine"/>
+    <addaction name="actionCutRoads"/>
     <addaction name="separator"/>
     <addaction name="actionHighwaySketch"/>
     <addaction name="actionAvenueSketch"/>
+    <addaction name="actionStreetSketch"/>
+    <addaction name="separator"/>
+    <addaction name="actionControlPoints"/>
    </widget>
    <widget class="QMenu" name="menuPM">
     <property name="title">
      <string>PM</string>
     </property>
+    <addaction name="actionGenerate2D"/>
     <addaction name="actionGenerate3D"/>
+    <addaction name="actionGenerate3DRoads"/>
    </widget>
    <widget class="QMenu" name="menuDisplay">
     <property name="title">
@@ -97,12 +110,50 @@
     <addaction name="actionRenderingGroupBy"/>
     <addaction name="actionRenderingGenerationType"/>
    </widget>
+   <widget class="QMenu" name="menuDetect">
+    <property name="title">
+     <string>Detect</string>
+    </property>
+    <addaction name="actionDetectCircle"/>
+    <addaction name="actionDetectStructure"/>
+    <addaction name="actionConvert"/>
+   </widget>
+   <widget class="QMenu" name="menuDebug">
+    <property name="title">
+     <string>Debug</string>
+    </property>
+    <addaction name="actionDebug"/>
+   </widget>
+   <widget class="QMenu" name="menuTool">
+    <property name="title">
+     <string>Tool</string>
+    </property>
+    <addaction name="actionGenerateRegularGrid"/>
+    <addaction name="actionGenerateCurvyGrid"/>
+    <addaction name="separator"/>
+    <addaction name="actionRotationVideo"/>
+    <addaction name="actionInterpolationVideo"/>
+    <addaction name="actionBlendingVideo"/>
+    <addaction name="actionGrowingVideo"/>
+    <addaction name="action3DVideo"/>
+    <addaction name="actionMountainVideo"/>
+    <addaction name="separator"/>
+    <addaction name="actionTerrainGeneration"/>
+    <addaction name="actionUpdateMountain"/>
+    <addaction name="actionTerrainSegmentation"/>
+    <addaction name="separator"/>
+    <addaction name="actionStatistics"/>
+    <addaction name="actionDetailedStatistics"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuArea"/>
    <addaction name="menuPM"/>
+   <addaction name="menuDetect"/>
    <addaction name="menuDisplay"/>
    <addaction name="menuRendering"/>
+   <addaction name="menuTool"/>
    <addaction name="menuWindow"/>
+   <addaction name="menuDebug"/>
   </widget>
   <widget class="QToolBar" name="fileToolBar">
    <attribute name="toolBarArea">
@@ -130,7 +181,7 @@
     <string>New Terrain</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+N</string>
+    <string/>
    </property>
   </action>
   <action name="actionOpenTerrain">
@@ -142,7 +193,7 @@
     <string>Open Terrain</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+O</string>
+    <string/>
    </property>
   </action>
   <action name="actionExit">
@@ -176,7 +227,7 @@
     <string>Save Terrain</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+S</string>
+    <string/>
    </property>
   </action>
   <action name="actionUndo">
@@ -355,18 +406,6 @@
     <string>Property Widget</string>
    </property>
   </action>
-  <action name="actionDebug">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="MainWindow.qrc">
-     <normaloff>:/MainWindow/Resources/Debug_24x24.png</normaloff>:/MainWindow/Resources/Debug_24x24.png</iconset>
-   </property>
-   <property name="text">
-    <string>Debug</string>
-   </property>
-  </action>
   <action name="action3DView">
    <property name="checkable">
     <bool>true</bool>
@@ -395,10 +434,16 @@
    <property name="text">
     <string>Load Roads</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionLoadAreas">
    <property name="text">
     <string>Load Areas</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
   <action name="actionSaveAreas">
@@ -429,6 +474,9 @@
   <action name="actionClearRoads">
    <property name="text">
     <string>Clear Roads</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
   <action name="actionPMControlWidget">
@@ -531,6 +579,9 @@
    <property name="text">
     <string>Save Image</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
   </action>
   <action name="actionColorByGroup">
    <property name="text">
@@ -550,6 +601,161 @@
   <action name="actionGenerate3D">
    <property name="text">
     <string>Generate 3D</string>
+   </property>
+  </action>
+  <action name="actionDetectCircle">
+   <property name="text">
+    <string>Circle</string>
+   </property>
+  </action>
+  <action name="actionDetectStructure">
+   <property name="text">
+    <string>Structure</string>
+   </property>
+  </action>
+  <action name="actionLoadCamera">
+   <property name="text">
+    <string>Load Camera</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
+  </action>
+  <action name="actionSaveCamera">
+   <property name="text">
+    <string>Save Camera</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
+   </property>
+  </action>
+  <action name="actionDebug">
+   <property name="text">
+    <string>Debug</string>
+   </property>
+  </action>
+  <action name="actionControlPoints">
+   <property name="text">
+    <string>Control Points</string>
+   </property>
+  </action>
+  <action name="actionConvert">
+   <property name="text">
+    <string>Convert</string>
+   </property>
+  </action>
+  <action name="actionCutRoads">
+   <property name="text">
+    <string>Cut Roads</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionSaveImageHD">
+   <property name="text">
+    <string>Save Image HD</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionStreetSketch">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Street Sketch</string>
+   </property>
+  </action>
+  <action name="actionGenerateRegularGrid">
+   <property name="text">
+    <string>Generate Regular Grid</string>
+   </property>
+  </action>
+  <action name="actionGenerateCurvyGrid">
+   <property name="text">
+    <string>Generate Curvy Grid</string>
+   </property>
+  </action>
+  <action name="actionAddRoads">
+   <property name="text">
+    <string>Add Roads</string>
+   </property>
+  </action>
+  <action name="actionResetCamera">
+   <property name="text">
+    <string>Reset Camera</string>
+   </property>
+  </action>
+  <action name="actionRotationVideo">
+   <property name="text">
+    <string>Rotation Video</string>
+   </property>
+  </action>
+  <action name="actionInterpolationVideo">
+   <property name="text">
+    <string>Interpolation Video</string>
+   </property>
+  </action>
+  <action name="actionGrowingVideo">
+   <property name="text">
+    <string>Growing Video</string>
+   </property>
+  </action>
+  <action name="actionGenerate2D">
+   <property name="text">
+    <string>Generate 2D</string>
+   </property>
+  </action>
+  <action name="actionBlendingVideo">
+   <property name="text">
+    <string>Blending Video</string>
+   </property>
+  </action>
+  <action name="action3DVideo">
+   <property name="text">
+    <string>3D Video</string>
+   </property>
+  </action>
+  <action name="actionTerrainSegmentation">
+   <property name="text">
+    <string>Terrain Segmentation</string>
+   </property>
+  </action>
+  <action name="actionTerrainGeneration">
+   <property name="text">
+    <string>Terrain Generation</string>
+   </property>
+  </action>
+  <action name="actionUpdateMountain">
+   <property name="text">
+    <string>Update Mountains</string>
+   </property>
+  </action>
+  <action name="actionMountainVideo">
+   <property name="text">
+    <string>Mountains Video</string>
+   </property>
+  </action>
+  <action name="actionGenerate3DRoads">
+   <property name="text">
+    <string>Generate 3D Roads</string>
+   </property>
+  </action>
+  <action name="actionAreaDeleteAll">
+   <property name="text">
+    <string>Delete All</string>
+   </property>
+  </action>
+  <action name="actionStatistics">
+   <property name="text">
+    <string>Statistics</string>
+   </property>
+  </action>
+  <action name="actionDetailedStatistics">
+   <property name="text">
+    <string>DetailedStatistics</string>
    </property>
   </action>
  </widget>

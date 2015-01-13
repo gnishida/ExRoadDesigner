@@ -24,9 +24,13 @@ public:
 	static bool initialized;
 	static void init();
 
+	static bool initializedLC;
+	static void initLC();
+
 	static PlaceTypesMainClass placeTypes;
 
 	static bool generateGeometry(VBORenderManager& rendManager,RoadGraph &roadGraph);
+	static bool generate2DGeometry(VBORenderManager& rendManager,RoadGraph &roadGraph);
 
 private:
 

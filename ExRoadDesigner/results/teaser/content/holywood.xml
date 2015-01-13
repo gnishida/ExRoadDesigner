@@ -1,0 +1,14 @@
+<feature>
+    <area>
+        <point x="1967.965576171875" y="2692.159912109375"/>
+        <point x="-2758.012939453125" y="582.9144287109375"/>
+        <point x="-4597.65576171875" y="4087.7509765625"/>
+        <point x="683.3875122070313" y="5990.82958984375"/>
+        <point x="1967.965576171875" y="2692.159912109375"/>
+    </area>
+    <hintLine>
+        <point x="-1537.443603515625" y="2827.317138671875"/>
+    </hintLine>
+    <avenues filename="holywood.xml.avenues.gsm"/>
+    <streets filename="holywood.xml.streets.gsm"/>
+</feature>

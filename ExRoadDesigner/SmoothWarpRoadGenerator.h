@@ -6,7 +6,8 @@
 #include "RoadAreaSet.h"
 #include "ExFeature.h"
 #include "MainWindow.h"
-#include "Terrain.h"
+//#include "Terrain.h"
+#include "VBORenderManager.h"
 
 class SmoothWarpRoadGenerator {
 private:
@@ -14,14 +15,14 @@ private:
 	RoadGraph &roads;
 	Polygon2D targetArea;
 	Polyline2D hintLine;
-	Terrain *terrain;
+	VBORenderManager *vboRenderManager;
 	ExFeature &feature;
 	bool animation;
 
 	TensorField tensorField;
 
 public:
-	SmoothWarpRoadGenerator(MainWindow *mainWin, RoadGraph &roads, const Polygon2D &targetArea, const Polyline2D &hintLine, Terrain *terrain, ExFeature &feature) : mainWin(mainWin), roads(roads), targetArea(targetArea), hintLine(hintLine), terrain(terrain), feature(feature) {}
+	SmoothWarpRoadGenerator(MainWindow *mainWin, RoadGraph &roads, const Polygon2D &targetArea, const Polyline2D &hintLine, VBORenderManager *vboRenderManager, ExFeature &feature) : mainWin(mainWin), roads(roads), targetArea(targetArea), hintLine(hintLine), vboRenderManager(vboRenderManager), feature(feature) {}
 	~SmoothWarpRoadGenerator() {}
 
 	void generateRoadNetwork(bool animation = false);

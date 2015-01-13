@@ -15,15 +15,11 @@ private:
 	MainWindow* mainWin;
 
 public:
-	int width;
-	int depth;
-	int cellLength;
+	int side;
+	int cellResolution;
 
 public:
 	TerrainSizeInputDialog(MainWindow* mainWin);
-
-	//void setRoadVertex(RoadVertexDesc vertexDesc, RoadVertexPtr selectedVertex);
-	//void setRoadEdge(RoadEdgePtr selectedEdge);
 
 public slots:
 	void onOK();

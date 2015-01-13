@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "glew.h"
+
 #include <vector>
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
@@ -34,6 +36,8 @@ public:
 	static RoadVertexDesc getCentralVertex(RoadGraph& roads);
 	static float getDensity(RoadGraph& roads, const QVector2D& pos, float radius);
 	static bool hasRedundantEdge(RoadGraph& roads, RoadVertexDesc desc, const Polyline2D &polyline, float threshold);
+	static bool tshape(RoadGraph &roads, RoadVertexDesc v, RoadEdgeDesc edge);
+	static void setVertexType(RoadGraph &roads);
 
 	// Edge related functions
 	static RoadEdgeDesc getEdge(RoadGraph& roads, int index, bool onlyValidEdge = true);
@@ -58,17 +62,24 @@ public:
 	static RoadVertexDesc splitEdge(RoadGraph &roads, RoadEdgeDesc edge_desc, const QVector2D& pt);
 	static RoadVertexDesc splitEdge(RoadGraph &roads, RoadEdgeDesc edge_desc, const QVector2D& pt, RoadEdgeDesc &edge1, RoadEdgeDesc &edge2);
 	static bool hasCloseEdge(RoadGraph* roads, RoadVertexDesc v1, RoadVertexDesc v2, float angle_threshold = 0.3f);
-	static bool isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline);
-	static bool isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline, QVector2D &intPoint);
-	static bool isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline, RoadEdgeDesc ignoreEdge);
-	static bool isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline1, std::vector<QVector2D>& polyline2);
-	static bool isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline1, std::vector<QVector2D>& polyline2, QVector2D &intPoint);
+	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline);
+	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline, QVector2D &intPoint);
+	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline, RoadVertexDesc srcDesc, QVector2D &intPoint);
+	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline, RoadEdgeDesc ignoreEdge);
+	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline1, const Polyline2D &polyline2);
+	static bool isIntersect(RoadGraph &roads, const Polyline2D &polyline1, const Polyline2D &polyline2, QVector2D &intPoint);
 	static std::vector<QVector2D> simplifyPolyLine(std::vector<QVector2D>& polyline, float threshold);
 	static void removeShortEdges(RoadGraph& roads, float threshold);
 	static void removeLinkEdges(RoadGraph& roads);
 	static Polyline2D finerEdge(RoadGraph& roads, RoadEdgeDesc e, float step = 1.0f);
 	static Polyline2D finerEdge(Polyline2D &polyline, float step = 1.0f);
 	static float distance(RoadGraph& roads, const QVector2D& pt, RoadEdgeDesc e, QVector2D &closestPt);
+	static void cleanEdges(RoadGraph &roads);
+	static void cleanEdge(RoadEdgePtr &edge);
+	static void cleanPolyline(Polyline2D &polyline);
+	static bool isStraightEdge(RoadGraph &roads, RoadVertexDesc v, RoadEdgeDesc e);
+	static bool isPotentiallyStraightEdge(RoadGraph &roads, RoadVertexDesc v, RoadEdgeDesc e);
+	static RoadVertexDesc cutoffEdge(RoadGraph &roads, RoadEdgeDesc edge, RoadVertexDesc v_desc, const QVector2D &pt);
 
 	// File I/O
 	static void loadRoads(RoadGraph& roads, const QString& filename, int roadType = 0);
@@ -83,6 +94,7 @@ public:
 	static void extractRoads(RoadGraph& roads, int roadType = 0);
 	static void extractRoads(RoadGraph& roads, Polygon2D& area, bool strict, int roadType = 0);
 	static void extractRoads2(RoadGraph& roads, const Polygon2D& area, int roadType = 0);
+	static void trim(RoadGraph& roads, const Polygon2D& area);
 	static void subtractRoads(RoadGraph& roads, Polygon2D& area, bool strict);
 	static void subtractRoads2(RoadGraph& roads, Polygon2D& area);
 	static void perturb(RoadGraph &roads, const Polygon2D &area, float factor);
@@ -118,11 +130,16 @@ public:
 	static void snapDeadendEdges(RoadGraph& roads, float threshold);
 	static void snapDeadendEdges2(RoadGraph& roads, int degree, float threshold);
 	static void removeShortDeadend(RoadGraph& roads, float threshold);
-	static void realize(RoadGraph& roads);
+	static void realize(RoadGraph &roads);
+	static BBox bbox(RoadGraph &roads);
+	static Polygon2D hull(RoadGraph &roads);
 
 	// statistic
+	static float getTotalEdgeLength(RoadGraph &roads);
 	static void computeStatistics(RoadGraph &roads, float &avgEdgeLength, float &varEdgeLength, float &avgEdgeCurvature, float &varEdgeCurvature);
 	static void computeStatistics(RoadGraph &roads, const QVector2D &pt, float dist, float &avgEdgeLength, float &varEdgeLength, float &avgEdgeCurvature, float &varEdgeCurvature);
+
+	static void buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding);
 
 	// Others
 	static bool isRoadTypeMatched(int type, int ref_type);
@@ -130,5 +147,9 @@ public:
 	// OpenCV
 	static void convertToMat(RoadGraph& roads, cv::Mat_<uchar>& mat, const cv::Size& size, int width = 3, bool flip = true);
 	static void drawRoadSegmentOnMat(RoadGraph& roads, RoadEdgeDesc e, cv::Mat& mat, int width = 3, int brightness = 255);
+
+	// Simple Road Generation
+	static void generateRegularGrid(RoadGraph &roads, float size, float avenueInterval, float streetInterval);
+	static void generateCurvyGrid(RoadGraph &roads, float size, float avenueInterval, float streetInterval);
 };
 

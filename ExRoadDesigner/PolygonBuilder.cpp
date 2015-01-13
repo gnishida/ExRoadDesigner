@@ -72,11 +72,11 @@ const Polyline3D& PolygonBuilder::polyline3D() const {
 	return _polyline3D;
 }
 
-void PolygonBuilder::adaptToTerrain(Terrain* terrain) {
+void PolygonBuilder::adaptToTerrain(VBORenderManager* vboRenderManager) {
 	_polyline3D.clear();
 
 	for (int i = 0; i < _polyline.size(); ++i) {
-		float z = terrain->getValue(_polyline[i].x(), _polyline[i].y());
+		float z = vboRenderManager->getTerrainHeight(_polyline[i].x(), _polyline[i].y());
 		_polyline3D.push_back(QVector3D(_polyline[i].x(), _polyline[i].y(), z + 30));
 	}
 }

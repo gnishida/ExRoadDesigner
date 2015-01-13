@@ -131,6 +131,49 @@ void Polygon2D::rotate(float angle, const QVector2D &orig) {
 	translate(orig.x(), orig.y());
 }
 
+std::vector<Polygon2D> Polygon2D::union_(const Polygon2D &polygon) {
+	typedef boost::geometry::model::polygon<QVector2D> boostPolygon;
+	boostPolygon pgon1, pgon2;
+	for (int i = 0; i < size(); ++i) {
+		pgon1.outer().push_back(at(i));
+	}
+	boost::geometry::correct(pgon1);
+	for (int i = 0; i < polygon.size(); ++i) {
+		pgon2.outer().push_back(polygon[i]);
+	}
+	boost::geometry::correct(pgon2);
+
+	std::vector<boostPolygon> output;
+    boost::geometry::union_(pgon1, pgon2, output);
+
+	std::vector<Polygon2D> ret;
+	for (int i = 0; i < output.size(); ++i) {
+		Polygon2D pg;
+		for (int j = output[i].outer().size() - 2; j >= 0; --j) {
+			pg.push_back(output[i].outer()[j]);
+		}
+		ret.push_back(pg);
+	}
+
+	return ret;
+}
+
+void Polygon2D::simplify(float threshold) {
+	Polyline2D polyline;
+	for (int i = 0; i < size(); i++) {
+		polyline.push_back(at(i));
+	}
+
+	Polyline2D simplified;
+	boost::geometry::simplify(polyline, simplified, threshold);
+
+	clear();
+
+	for (int i = 0; i < simplified.size(); i++) {
+		push_back(simplified[i]);
+	}
+}
+
 /**
  * tessellate this polygon.
  * assume that the polygon is open and the vertices are in CCW order.

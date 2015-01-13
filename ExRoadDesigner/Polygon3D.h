@@ -173,6 +173,17 @@ public:
 
 	float computeArea(bool parallelToXY = false);
 
+	bool isPointWithinLoop(QVector3D &pt){
+		int i, j, c = 0;
+		for (i = 0, j = contour.size()-1; i < contour.size(); j = i++) {
+			if ( ((contour[i].y()>pt.y()) != (contour[j].y()>pt.y())) &&
+				(pt.x() < (contour[j].x()-contour[i].x()) * (pt.y()-contour[i].y()) / (contour[j].y()-contour[i].y()) + contour[i].x()) )
+				c = !c;
+		}
+		return c;
+
+	}//
+
 	/**
 	* Vector containing 3D points of polygon contour
 	**/

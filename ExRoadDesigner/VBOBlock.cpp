@@ -16,6 +16,7 @@ Block::Block()
 {		
 	//myParcels.m_vertices[0].m_out_edges
 	myColor = QVector3D(((float)qrand()/(RAND_MAX)), 0.0f, 0.0f);
+	isPark=false;
 }
 
 /**
@@ -182,7 +183,7 @@ float loopArea(Loop3D &loop)
 }
 
 /**
-* Adapt block to terrain
+* Adapt block to vboRenderManager
 **/
 /*void Block::adaptBlockToTerrain(MTC::geometry::ElevationGrid *elGrid)
 {

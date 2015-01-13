@@ -5,7 +5,8 @@
 #include "RoadAreaSet.h"
 #include "ExFeature.h"
 #include "MainWindow.h"
-#include "Terrain.h"
+//#include "Terrain.h"
+#include "VBORenderManager.h"
 
 class IntRoadGenerator {
 private:
@@ -13,12 +14,12 @@ private:
 	RoadGraph &roads;
 	Polygon2D targetArea;
 	Polyline2D hintLine;
-	Terrain *terrain;
+	VBORenderManager *vboRenderManager;
 	ExFeature &feature;
 	bool animation;
 
 public:
-	IntRoadGenerator(MainWindow *mainWin, RoadGraph &roads, const Polygon2D &targetArea, const Polyline2D &hintLine, Terrain *terrain, ExFeature &feature) : mainWin(mainWin), roads(roads), targetArea(targetArea), hintLine(hintLine), terrain(terrain), feature(feature) {}
+	IntRoadGenerator(MainWindow *mainWin, RoadGraph &roads, const Polygon2D &targetArea, const Polyline2D &hintLine, VBORenderManager* vboRenderManager, ExFeature &feature) : mainWin(mainWin), roads(roads), targetArea(targetArea), hintLine(hintLine), vboRenderManager(vboRenderManager), feature(feature) {}
 	~IntRoadGenerator() {}
 
 	void generateRoadNetwork(bool animation = false);

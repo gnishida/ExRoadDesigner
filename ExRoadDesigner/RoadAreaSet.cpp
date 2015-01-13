@@ -20,6 +20,7 @@ void RoadAreaSet::add(RoadAreaPtr area) {
 void RoadAreaSet::clear() {
 	roads.clear();
 	areas.clear();
+	selectedIndex = -1;
 }
 
 void RoadAreaSet::remove(int index) {

@@ -1,0 +1,12 @@
+<feature>
+    <area>
+        <point x="-2564.9931640625" y="2588.226806640625"/>
+        <point x="2574.28662109375" y="2578.933349609375"/>
+        <point x="2564.9931640625" y="-2569.639892578125"/>
+        <point x="-2574.28662109375" y="-2588.226806640625"/>
+        <point x="-2564.9931640625" y="2588.226806640625"/>
+    </area>
+    <hintLine/>
+    <avenues filename="grid.xml.avenues.gsm"/>
+    <streets filename="grid.xml.streets.gsm"/>
+</feature>

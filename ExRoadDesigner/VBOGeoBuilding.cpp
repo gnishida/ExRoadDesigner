@@ -15,6 +15,7 @@ bool VBOGeoBuilding::bldgInitialized=false;
 static std::vector<QString> facadeTex;
 static std::vector<QVector3D> facadeScale;
 static std::vector<QString> windowTex;
+static std::vector<QString> roofTex;
 
 void addTexConvexPoly(VBORenderManager& rendManager,QString geoName,QString textureName,GLenum geometryType,int shaderMode,
 	std::vector<QVector3D> pos,QVector3D col,QVector3D norm,float zShift,bool inverseLoop,bool texZeroToOne,QVector3D texScale){
@@ -101,7 +102,7 @@ void addFirstFloor(VBORenderManager& rendManager,std::vector<QVector3D>& footpri
 			sideVert.push_back(Vertex(QVector3D(footprint[nextN].x(),footprint[nextN].y(),initHeight+floorHeight),floorColor,normal,QVector3D()));
 			sideVert.push_back(Vertex(QVector3D(footprint[curN].x(),footprint[curN].y(),initHeight+floorHeight),floorColor,normal,QVector3D()));			
 		}
-		rendManager.addStaticGeometry("3d_building",sideVert,"",GL_QUADS,1|mode_Lighting);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
+		rendManager.addStaticGeometry("3d_building",sideVert,"",GL_QUADS,1|mode_Lighting|mode_AdaptTerrain);//|LC::mode_Lighting);
 	}
 }//
 
@@ -124,9 +125,9 @@ void addBox(VBORenderManager& rendManager,std::vector<QVector3D>& roofOffCont,QV
 }//
 
 void addRoof(VBORenderManager& rendManager,std::vector<QVector3D>& roofOffCont,QVector3D boxColor,float initHeight,float boxSize){
-	addTexConvexPoly(rendManager,"3d_building","../data/textures/LC/roof/roof0.jpg",GL_QUADS,2|mode_Lighting,//|LC::mode_AdaptTerrain|LC::mode_Lighting,
+	addTexConvexPoly(rendManager,"3d_building",roofTex[qrand()%roofTex.size()],GL_QUADS,2|mode_Lighting|mode_AdaptTerrain,//|LC::mode_AdaptTerrain|LC::mode_Lighting, "../data/textures/LC/roof/roof0.jpg"
 		roofOffCont,boxColor,QVector3D(0,0,1.0f),initHeight+boxSize,false,true,QVector3D(1,1,1));
-	addTexConvexPoly(rendManager,"3d_building","",GL_QUADS,1|mode_Lighting,//|LC::mode_AdaptTerrain|LC::mode_Lighting,
+	addTexConvexPoly(rendManager,"3d_building","",GL_QUADS,1|mode_Lighting|mode_AdaptTerrain,//|LC::mode_AdaptTerrain|LC::mode_Lighting,
 		roofOffCont,boxColor,QVector3D(0,0,-1.0f),initHeight,true,true,QVector3D(1,1,1));
 	addFirstFloor(rendManager,roofOffCont,boxColor,initHeight,boxSize);
 }//
@@ -254,7 +255,7 @@ void addWindow(VBORenderManager& rendManager,
 			vertWind.push_back(Vertex(vert[5],color,norm,QVector3D()));
 			vertWind.push_back(Vertex(vert[4],color,norm,QVector3D()));
 			vertWind.push_back(Vertex(vert[1],color,norm,QVector3D()));
-			rendManager.addStaticGeometry("3d_building",vertWind,"",GL_QUADS,1|mode_Lighting);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
+			rendManager.addStaticGeometry("3d_building",vertWind,"",GL_QUADS,1|mode_Lighting|mode_AdaptTerrain);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
 			//////////////////////////////////////////////////////
 			// BACK
 			vertWind.clear();
@@ -265,7 +266,7 @@ void addWindow(VBORenderManager& rendManager,
 			vertWind.push_back(Vertex(vert[2],color,norm,QVector3D(0,1,0)));
 
 			//rendManager.addStaticGeometry("buildingsTop",vertWind,"../data/textures/LC/wind/c_window1.jpg",GL_QUADS,2|LC::mode_AdaptTerrain|LC::mode_Lighting);
-			rendManager.addStaticGeometry("3d_building",vertWind,windowTex[((int)randN.x())%windowTex.size()],GL_QUADS,2|mode_Lighting);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
+			rendManager.addStaticGeometry("3d_building",vertWind,windowTex[((int)randN.x())%windowTex.size()],GL_QUADS,2|mode_Lighting|mode_AdaptTerrain);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
 
 			/*tex.push_back(QVector3D(0,0,0));tex.push_back(QVector3D(1.0f,0,0));tex.push_back(QVector3D(1.0f,1.0f,0));tex.push_back(QVector3D(0,1.0f,0));
 			texN=window_frameTex[((int)randN.x())%window_frameTex.size()];
@@ -454,7 +455,7 @@ void addColumnGeometry(VBORenderManager& rendManager,
 			accPerimeter+=sideLenght;
 		}
 		//rendManager.addStaticGeometry("buildingsTop",vert,"../data/textures/LC/facade/SeamlessBrick05_1.25_1.3_8.JPG",GL_QUADS,2|LC::mode_AdaptTerrain|LC::mode_Lighting);
-		rendManager.addStaticGeometry("3d_building",vert,facadeTex[randomFacade],GL_QUADS,2|mode_Lighting);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
+		rendManager.addStaticGeometry("3d_building",vert,facadeTex[randomFacade],GL_QUADS,2|mode_Lighting|mode_AdaptTerrain);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
 }//
 
 void VBOGeoBuilding::initBuildingsTex(){
@@ -482,13 +483,19 @@ void VBOGeoBuilding::initBuildingsTex(){
 	for(int lE=0;lE<list.size();lE++){
 		windowTex.push_back(pathName+"wind/"+list[lE]);
 	}
-	printf("initBuildingsTex %d %d\n",facadeTex.size(),windowTex.size());
+	// 3. roof
+
+		QDir directoryR(pathName+"roof/");
+		list = directoryR.entryList( nameFilter, QDir::Files );
+		for(int lE=0;lE<list.size();lE++){
+			roofTex.push_back(pathName+"roof/"+list[lE]);
+		}
+		printf("initBuildingsTex f %d w %d r %d\n",facadeTex.size(),windowTex.size(),roofTex.size());
 	bldgInitialized=true;
 }
 
-void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager,Building& building){//LC::misctools::Polygon3D& footprint, int numStories){
+void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager,Building& building,int type){
 
-	int type=3;
 	Polygon3D& footprint=building.buildingFootprint;
 	int numStories=building.numStories;
 	//printf("numSt %d numSides %d\n",numStories,footprint.contour.size());
@@ -510,7 +517,7 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager,Building& bu
 			sideVert.push_back(Vertex(QVector3D(footprint[nextN].x(),footprint[nextN].y(),0.0f+height),color,normal,QVector3D()));
 			sideVert.push_back(Vertex(QVector3D(footprint[curN].x(),footprint[curN].y(),0.0f+height),color,normal,QVector3D()));			
 		}
-		rendManager.addStaticGeometry("3d_building",sideVert,"",GL_QUADS,1|mode_Lighting);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
+		rendManager.addStaticGeometry("3d_building",sideVert,"",GL_QUADS,1|mode_Lighting|mode_AdaptTerrain);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
 
 		// ROOF
 		if(footprint.contour.size()==3||footprint.contour.size()==4){
@@ -525,7 +532,7 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager,Building& bu
 			}else{
 				topVert.push_back(Vertex(QVector3D(footprint[2].x(),footprint[2].y(),0.0f+height),color,normal,QVector3D()));
 			}
-			rendManager.addStaticGeometry("3d_building",topVert,"",GL_QUADS,1|mode_Lighting);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
+			rendManager.addStaticGeometry("3d_building",topVert,"",GL_QUADS,1|mode_Lighting|mode_AdaptTerrain);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
 		}
 	}
 	/*if(footprint.size()==3||footprint.size()==4){
@@ -639,14 +646,14 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager,Building& bu
 				sideVert.push_back(Vertex(c-dir*blackWidth,colorB,normal,QVector3D()));
 			}
 		}
-		rendManager.addStaticGeometry("3d_building",sideVert,"",GL_QUADS,1);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
+		rendManager.addStaticGeometry("3d_building",sideVert,"",GL_QUADS,1|mode_AdaptTerrain);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
 
 		// ROOF
 		Polygon3D roofRed;
 		footprint.computeInset(1.0f,roofRed.contour,false);
 		//rendManager.addStaticGeometry2("3d_building",footprint.contour,height,false,"",GL_QUADS,1,QVector3D(1,1,1));
-		rendManager.addStaticGeometry2("3d_building",roofRed.contour,height+sideWalkEl,false,"",GL_QUADS,1,QVector3D(1,1,1),colorW);
-		rendManager.addStaticGeometry2("3d_building",footprint.contour,height-blackWidth/2.0f+sideWalkEl,false,"",GL_QUADS,1,QVector3D(1,1,1),colorB);
+		rendManager.addStaticGeometry2("3d_building",roofRed.contour,height+sideWalkEl,false,"",GL_QUADS,1|mode_AdaptTerrain,QVector3D(1,1,1),colorW);
+		rendManager.addStaticGeometry2("3d_building",footprint.contour,height-blackWidth/2.0f+sideWalkEl,false,"",GL_QUADS,1|mode_AdaptTerrain,QVector3D(1,1,1),colorB);
 	}
 
 	///////////////////////////
@@ -701,7 +708,7 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager,Building& bu
 			hatchFiles.push_back("../data/textures/LC/hatch/h"+QString::number(i)+"b.png");
 		}
 		rendManager.loadArrayTexture("hatching_array",hatchFiles);*/
-		rendManager.addStaticGeometry("3d_building_fac",sideVert,"hatching_array",GL_QUADS,9|0x0200|mode_TexArray);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
+		rendManager.addStaticGeometry("3d_building_fac",sideVert,"hatching_array",GL_QUADS,9|0x0200|mode_TexArray|mode_AdaptTerrain);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
 		//rendManager.addStaticGeometry("3d_building_fac",sideVert,"../data/textures/LC/hatch/h1.png",GL_QUADS,8);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
 
 		// ROOF
@@ -709,7 +716,7 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager,Building& bu
 		Polygon3D roofRed;
 		footprint.computeInset(blackWidth,roofRed.contour,false);
 		//rendManager.addStaticGeometry2("3d_building",roofRed.contour,height+sideWalkEl,false,"",GL_QUADS,1,QVector3D(1,1,1),colorW);
-		rendManager.addStaticGeometry2("3d_building",footprint.contour,height-0.2+sideWalkEl,false,"hatching_array",GL_QUADS,10|mode_TexArray,QVector3D(1,1,1),QVector3D(0.1f,0.1f,0.1f));
+		rendManager.addStaticGeometry2("3d_building",footprint.contour,height-0.2+sideWalkEl,false,"hatching_array",GL_QUADS,10|mode_TexArray|mode_AdaptTerrain,QVector3D(1,1,1),QVector3D(0.1f,0.1f,0.1f));
 	}
 
 	///////////////////////////
@@ -772,15 +779,15 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager,Building& bu
 				sideVertT.push_back(Vertex(c-dir*blackWidth,colorB,normal,QVector3D(leng-blackWidth,height,0)));
 			}
 		}
-		rendManager.addStaticGeometry("3d_building",sideVert,"",GL_QUADS,1);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
-		rendManager.addStaticGeometry("3d_building",sideVertT,"../data/textures/LC/hatch/h2.png",GL_QUADS,2);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
+		rendManager.addStaticGeometry("3d_building",sideVert,"",GL_QUADS,1|mode_AdaptTerrain);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
+		rendManager.addStaticGeometry("3d_building",sideVertT,"../data/textures/LC/hatch/h2.png",GL_QUADS,2|mode_AdaptTerrain);//|LC::mode_AdaptTerrain|LC::mode_Lighting);
 
 		// ROOF
 		Polygon3D roofRed;
 		footprint.computeInset(1.0f,roofRed.contour,false);
 		//rendManager.addStaticGeometry2("3d_building",footprint.contour,height,false,"",GL_QUADS,1,QVector3D(1,1,1));
-		rendManager.addStaticGeometry2("3d_building",roofRed.contour,height+sideWalkEl,false,"",GL_QUADS,1,QVector3D(1,1,1),colorW);
-		rendManager.addStaticGeometry2("3d_building",footprint.contour,height-blackWidth/2.0f+sideWalkEl,false,"",GL_QUADS,1,QVector3D(1,1,1),colorB);
+		rendManager.addStaticGeometry2("3d_building",roofRed.contour,height+sideWalkEl,false,"",GL_QUADS,1|mode_AdaptTerrain,QVector3D(1,1,1),colorW);
+		rendManager.addStaticGeometry2("3d_building",footprint.contour,height-blackWidth/2.0f+sideWalkEl,false,"",GL_QUADS,1|mode_AdaptTerrain,QVector3D(1,1,1),colorB);
 	}
 
 }//

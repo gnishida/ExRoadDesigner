@@ -9,26 +9,37 @@ class ControlWidget : public QDockWidget {
 Q_OBJECT
 
 private:
-	Ui::ControlWidget ui;
+	
 	MainWindow* mainWin;
 
 public:
+	Ui::ControlWidget ui;
 	ControlWidget(MainWindow* mainWin);
 
 	//void setRoadVertex(RoadVertexDesc vertexDesc, RoadVertexPtr selectedVertex);
 	//void setRoadEdge(RoadEdgePtr selectedEdge);
 
 public slots:
-	void updateInterpolationFactor(int value);
-	void generateRoadsMultiEx();
-	void generateRoadsMultiIntEx();
-	void generateRoadsInterpolation();
-	void generateRoadsWarp();
-	void generateRoadsSmoothWarp();
+	void generateRoadsPatch();
+	void generateRoadsPatchWarp();
+	void generateRoadsPatchWarp2();
 	void generateRoadsVerySmoothWarp();
+	void generateRoadsPM();
 	void clear();
 	void mergeRoads();
+	void trimRoads();
 	void connectRoads();
-	//void camera3D();
+	void connectRoads2();
+	void removeIntersectionOnRiver();
+	void removeIntersectingEdge();
+	void planarGraph();
+	void updateTerrainLabels(int newValue);
+	void updateRender2D(int newValue);
+	void changeTerrainShader(int);
+	void smoothTerrain();
+
+	void contentDesign(int);
+	void contentDesignLevel();
+
 };
 

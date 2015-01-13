@@ -19,7 +19,7 @@ public:
 	PropertyWidget(MainWindow* mainWin);
 
 	void setRoadVertex(RoadGraph &roads, RoadVertexDesc vertexDesc, RoadVertexPtr selectedVertex);
-	void setRoadEdge(RoadEdgePtr selectedEdge);
+	void setRoadEdge(RoadGraph &roads, RoadEdgeDesc edgeDesc, RoadEdgePtr selectedEdge);
 	void resetRoadVertex();
 	void resetRoadEdge();
 

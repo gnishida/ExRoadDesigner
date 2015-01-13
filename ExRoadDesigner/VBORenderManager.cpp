@@ -4,10 +4,11 @@
 
 
 	VBORenderManager::VBORenderManager(){
-		/*editionMode=false;
-		minPos=QVector3D (-1000.0f,-1000.0f,0);
-		maxPos=QVector3D (1000.0f,1000.0f,0);
-		initializedStreetElements=false;*/
+		editionMode=false;
+		side=5000.0f;
+		minPos=QVector3D (-side/2.0f,-side/2.0f,0);
+		maxPos=QVector3D (side/2.0f,side/2.0f,0);
+		//initializedStreetElements=false;
 	}
 
 	VBORenderManager::~VBORenderManager() {
@@ -19,8 +20,8 @@
 		program=Shader::initShader(QString("../data/shaders/lc_vertex_sk.glsl"),QString("../data/shaders/lc_fragment_sk.glsl"));
 		glUseProgram(program);
 
-		//vboTerrain.init(*this);
-		//vboSkyBox.init(*this);
+		vboTerrain.init(*this);
+		vboSkyBox.init(*this);
 
 		nameToTexId[""]=0;
 
@@ -159,11 +160,41 @@
 
 	/*void VBORenderManager::renderWater(){
 		vboWater.render(*this);
+	}//*/
+
+	/*void VBORenderManager::updateLayer(QVector3D mouse3D,float change){
+		vboTerrain.updateTerrain(mouse3D,change);
 	}//
 
-	void VBORenderManager::updateLayer(QVector3D mouse3D,float change){
-		vboTerrain.updateTerrain(mouse3D,change);
-	}//*/
+	void VBORenderManager::updateTerrain(float coordX,float coordY,float rad,float change){
+		printf("CHANGE %f\n",change);//coords are 0-1
+		vboTerrain.updateTerrain(coordX,coordY,change,rad);
+	}
+
+	/**
+	 * If "actual" flag is on, then the actual elevation will be returned even if the 2D flat terrain is used.
+	 */
+	float VBORenderManager::getTerrainHeight(float xP,float xY,bool actual){
+		float xM=1.0f-(side/2.0f-xP)/side;
+		float yM=1.0f-(side/2.0f-xY)/side;
+		return vboTerrain.getTerrainHeight(xM,yM,actual);
+		//return 90.0f;
+		//vboTerrain.updateTerrain(coordX,coordY,change,rad);
+	}
+
+	void VBORenderManager::changeTerrainDimensions(float terrainSide,int resolution){
+		side=terrainSide;
+		minPos=QVector3D (-side/2.0f,-side/2.0f,0);
+		maxPos=QVector3D (side/2.0f,side/2.0f,0);
+		vboTerrain.resolutionX=resolution;
+		vboTerrain.resolutionY=resolution;
+		vboTerrain.init(*this);
+		vboSkyBox.init(*this);
+	}//
+
+	void VBORenderManager::changeTerrainShader(int newMode){
+		glUniform1i(glGetUniformLocation(program, "terrainMode"),newMode);//newMode
+	}//
 
 	///////////////////////////////////////////////////////////////////
 	// STATIC
@@ -362,6 +393,9 @@
 				//}
 				itPoly++;
 			}
+			if(points.size()==0)continue;
+			while(points.size()<4)
+				points.push_back(points.back());
 			/*if(points.size()==4){//last vertex repited
 				addTexTriang(texInd,points,texP,col,norm);
 			}
@@ -462,9 +496,8 @@
 	void VBORenderManager::renderGridGeometry(QString geoName){
 		
 	}//
-	/*///////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////
 	// MODEL
-	//QHash<QString,std::vector<ModelSpec>> nameToVectorModels;
 	void VBORenderManager::addStreetElementModel(QString name,ModelSpec mSpec){
 		nameToVectorModels[name].push_back(mSpec);
 	}//
@@ -472,9 +505,9 @@
 		for(int i=0;i<nameToVectorModels[name].size();i++){
 			VBOModel_StreetElements::renderOneStreetElement(program,nameToVectorModels[name][i]);
 		}
-		printf("name %s --> %d\n",name.toAscii().constData(),nameToVectorModels[name].size());
+		//printf("name %s --> %d\n",name.toAscii().constData(),nameToVectorModels[name].size());
 	}//
 	void VBORenderManager::removeAllStreetElementName(QString name){
 		nameToVectorModels[name].clear();
-	}*/
+	}
 	

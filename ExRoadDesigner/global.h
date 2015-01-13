@@ -30,6 +30,9 @@ public:
 	static float getFloat(QString i){
 		if(!g.contains(i)){printf("Global does not contain type %s\n",i.toAscii().constData());return 0;}
 		return g[i].toFloat();}
+	static float getDouble(QString i){
+		if(!g.contains(i)){printf("Global does not contain type %s\n",i.toAscii().constData());return 0;}
+		return g[i].toDouble();}
 	static int getInt(QString i){
 		if(!g.contains(i)){printf("Global does not contain type %s\n",i.toAscii().constData());return 0;}
 		return g[i].toInt();}

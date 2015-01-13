@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include "RoadVertex.h"
 #include "RoadEdge.h"
-#include "Terrain.h"
 #include "VBORenderManager.h"
 
 using namespace boost;
@@ -17,6 +16,10 @@ typedef graph_traits<BGLGraph>::vertex_iterator RoadVertexIter;
 typedef graph_traits<BGLGraph>::edge_iterator RoadEdgeIter;
 typedef graph_traits<BGLGraph>::out_edge_iterator RoadOutEdgeIter;
 typedef graph_traits<BGLGraph>::in_edge_iterator RoadInEdgeIter;
+
+
+typedef std::vector<RoadEdgeDesc> RoadEdgeDescs;
+typedef std::vector<RoadVertexDesc> RoadVertexDescs;
 
 class Terrain;
 
@@ -55,13 +58,15 @@ public:
 
 	void clear();
 	//void setZ(float z);
-	void adaptToTerrain(Terrain* terrain);
+	void adaptToTerrain(VBORenderManager* vboRenderManager);
 
 private:
 	void _generateMeshVerticesDefault(VBORenderManager& renderManager, const QString &linesN, const QString &pointsN);
 	void _generateMeshVerticesTexture(VBORenderManager& renderManager, const QString &linesN, const QString &pointsN);
 	void _generateMeshVerticesGroupBy(VBORenderManager& renderManager, const QString &linesN, const QString &pointsN);
 	void _generateMeshVerticesGenerationType(VBORenderManager& renderManager, const QString &linesN, const QString &pointsN);
+	float getBridgeElevationFromClosestNeighbors(RoadVertexDesc srcDesc, VBORenderManager &renderManager, float seaLevel);
+	float getBridgeElevationFromClosestNeighbors(RoadEdgeDesc edge_desc, const Polyline2D &polyline, int index, VBORenderManager &renderManager, float seaLevel);
 };
 
 typedef boost::shared_ptr<RoadGraph> RoadGraphPtr;

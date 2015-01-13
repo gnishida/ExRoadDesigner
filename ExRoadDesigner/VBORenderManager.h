@@ -5,12 +5,11 @@
 #include "VBOUtil.h"
 #include "qmap.h"
 
-/*#include "VBOWater.h"
+#include "VBOWater.h"
 #include "VBOSkyBox.h"
 #include "VBOTerrain.h"
-#include "VBOGUI.h"
 
-#include "VBOModel_StreetElements.h"*/
+#include "VBOModel_StreetElements.h"
 
 #ifndef Q_MOC_RUN
 #include <boost/geometry/geometry.hpp>
@@ -22,15 +21,15 @@
 #include <boost/polygon/polygon.hpp>
 #endif
 
-class VBOTerrain;
-class VBOSkyBox;
-class vboWater;
+//class VBOTerrain;
+//class vboWater;
 
 const int mode_AdaptTerrain=0x0100;
 const int mode_Lighting=0x0200;
 const int mode_TexArray=0x0400;
+const int mode_Tex3D=0x0800;
 
-//0x0100 --> adapt terrain
+//0x0100 --> adapt vboRenderManager
 //0x0200 --> lighting
 
 struct RenderSt{
@@ -82,20 +81,25 @@ public:
 
 	void init();
 
-	// layers & terrain
-	/*bool editionMode;
+	// layers & vboRenderManager
+	bool editionMode;
 	QVector3D mousePos3D;
 	VBOTerrain vboTerrain;
-	void updateLayer(QVector3D mouse3D,float change);
+	//void updateLayer(QVector3D mouse3D,float change);
+	//void updateTerrain(float coordX,float coordY,float rad,float change);
+	void changeTerrainDimensions(float terrainSide,int resolution);
+	float getTerrainHeight(float xP,float xY,bool actual=false);/// !!
+	void changeTerrainShader(int newMode);
 	QVector3D minPos;
-	QVector3D maxPos;*/
+	QVector3D maxPos;
+	float side;
 
 	// sky
-	//VBOSkyBox vboSkyBox;
+	VBOSkyBox vboSkyBox;
 
 	/// water
-	//VBOWater vboWater;
-	//void renderWater();
+	VBOWater vboWater;
+	void renderWater();
 
 	/// GUI
 	//VBOGUI vboGUI;
@@ -120,11 +124,11 @@ public:
 	void renderGridGeometry(QString geoName);
 
 	//models
-	/*QHash<QString,std::vector<ModelSpec>> nameToVectorModels;
+	QHash<QString,std::vector<ModelSpec>> nameToVectorModels;
 	bool initializedStreetElements;
 	void addStreetElementModel(QString name,ModelSpec mSpec);
 	void renderAllStreetElementName(QString name);
-	void removeAllStreetElementName(QString name);*/
+	void removeAllStreetElementName(QString name);
 
 
 	void renderAll(bool cleanVertex);

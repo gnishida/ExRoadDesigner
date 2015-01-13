@@ -31,6 +31,9 @@ public:
 	void rotate(float angle, Polygon2D &ret) const;
 	void rotate(float angle, const QVector2D &orig);
 
+	std::vector<Polygon2D> union_(const Polygon2D &polygon);
+	void simplify(float threshold);
+
 	std::vector<Polygon2D> tessellate();
 	QVector2D getOBB(Polygon2D &obb) const;
 	QVector2D getOBB(const QVector2D& dir, Polygon2D& obb) const;

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "glew.h"
-#include "Camera.h"
+#include "Camera2D.h"
 #include "qvector4d.h"
 #include "qmatrix4x4.h"
 
-class Camera3D : public Camera{
+class Camera3D : public Camera2D{
 public:
 	QVector3D cam_pos; 
 	QVector3D cam_view;
@@ -23,8 +23,8 @@ public:
 	}
 
 	void resetCamera(){
-		//cam_pos=QVector3D(70.0, 500.0f, -900);
-		cam_pos=QVector3D(0, 12000.0f, 0);
+		cam_pos=QVector3D(70.0, 500.0f, -900);
+		//cam_pos=QVector3D(0, 12000.0f, 0);
 		//cam_view=QVector3D(-0.5f, -0.5f, 0.7f);
 		cam_view=QVector3D(0.0f, -1.0f, 0.001f);
 
@@ -95,6 +95,7 @@ public:
 		normalMatrix=mvMatrix.normalMatrix();
 		// mvp
 		mvpMatrix=pMatrix*mvMatrix;
+		//printf("cam3d updateM\n");
 	}//
 
 	void Camera3D::moveKey(int typeMode){

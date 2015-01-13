@@ -24,10 +24,6 @@ RoadEdge::RoadEdge(unsigned int type, unsigned int lanes, bool oneWay, bool link
 		color = QColor(255, 225, 104);
 		bgColor = QColor(229, 153, 21);
 		break;
-	case TYPE_BOULEVARD:
-		color = QColor(248, 213, 169);
-		bgColor = QColor(210, 170, 119);
-		break;
 	case TYPE_AVENUE:
 		//color = QColor(247, 247, 185);
 		//bgColor = QColor(203, 202, 149);
@@ -45,12 +41,15 @@ RoadEdge::~RoadEdge() {
 }
 
 float RoadEdge::getLength() {
+	return polyline.length();
+	/*
 	float length = 0.0f;
 	for (int i = 0; i < polyline.size() - 1; i++) {
 		length += (polyline[i + 1] - polyline[i]).length();
 	}
 
 	return length;
+	*/
 }
 
 /**
@@ -66,7 +65,6 @@ float RoadEdge::getWidth(float widthPerLane) {
 	switch (type) {
 	case TYPE_HIGHWAY:
 		return widthPerLane * 3.0f;// * lanes;
-	case TYPE_BOULEVARD:
 	case TYPE_AVENUE:
 		return widthPerLane * 2.0f;// * lanes;
 	case TYPE_STREET:

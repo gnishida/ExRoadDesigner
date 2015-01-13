@@ -28,6 +28,11 @@ public:
 	float avgStreetCurvature;
 	float varStreetCurvature;
 
+	bool avenueShapesDetected;
+	bool streetShapesDetected;
+	std::vector<RoadEdgeDescs> avenueShapes;
+	std::vector<RoadEdgeDescs> streetShapes;
+
 public:
 	ExFeature() {}
 	~ExFeature() {}
@@ -58,5 +63,11 @@ public:
 	void saveStreet(QDomDocument& doc, QDomNode& node);
 	void saveArea(QDomDocument &doc, QDomNode &parent);
 	void saveHintLine(QDomDocument &doc, QDomNode &parent);
+
+	void init();
+
+	std::vector<RoadEdgeDescs> shapes(int roadType, float houghScale, float patchDistance);
+	void detectAvenueShapes(float houghScale, float patchDistance);
+	void detectStreetShapes(float houghScale, float patchDistance);
 };
 

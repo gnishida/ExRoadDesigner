@@ -49,14 +49,15 @@ void PropertyWidget::setRoadVertex(RoadGraph &roads, RoadVertexDesc vertexDesc, 
 	QString generationType = selectedVertex->properties["generation_type"].toString();
 	QString exampleDesc;
 	QString exampleStreetDesc;
-	if (generationType == "example") {
+	if (selectedVertex->properties.contains("example_desc")) {
 		exampleDesc = selectedVertex->properties["example_desc"].toString();
-		if (selectedVertex->properties.contains("example_street_desc")) {
-			exampleStreetDesc = selectedVertex->properties["example_street_desc"].toString();
-		}
+	}
+	if (selectedVertex->properties.contains("example_street_desc")) {
+		exampleStreetDesc = selectedVertex->properties["example_street_desc"].toString();
 	}
 
 	QString deadend = selectedVertex->properties["deadend"].toBool() ? "Yes" : "No";
+	QString rotationAngle = QString("%1").arg(selectedVertex->properties["rotation_angle"].toFloat());
 
 	ui.lineEditVertexDesc->setText(desc);
 	ui.lineEditVertexPos->setText(location);
@@ -69,12 +70,15 @@ void PropertyWidget::setRoadVertex(RoadGraph &roads, RoadVertexDesc vertexDesc, 
 	ui.lineEditVertexExampleDesc->setText(exampleDesc);
 	ui.lineEditVertexExampleStreetDesc->setText(exampleStreetDesc);
 	ui.lineEditVertexDeadend->setText(deadend);
+	ui.lineEditVertexRotationAngle->setText(rotationAngle);
 }
 
 /**
  * Display the selected edge information.
  */
-void PropertyWidget::setRoadEdge(RoadEdgePtr selectedEdge) {
+void PropertyWidget::setRoadEdge(RoadGraph &roads, RoadEdgeDesc edgeDesc, RoadEdgePtr selectedEdge) {
+	QString source;
+	QString target;
 	QString type;
 	QString numLanes;
 	QString oneWay;
@@ -84,12 +88,14 @@ void PropertyWidget::setRoadEdge(RoadEdgePtr selectedEdge) {
 	QString generationType;
 
 	if (selectedEdge != NULL) {
+		RoadVertexDesc src = boost::source(edgeDesc, roads.graph);
+		RoadVertexDesc tgt = boost::target(edgeDesc, roads.graph);
+		source = QString("%1").arg(src);
+		target = QString("%1").arg(tgt);
+
 		switch (selectedEdge->type) {
 		case RoadEdge::TYPE_HIGHWAY:
 			type = "Highway";
-			break;
-		case RoadEdge::TYPE_BOULEVARD:
-			type = "Boulevard";
 			break;
 		case RoadEdge::TYPE_AVENUE:
 			type = "Avenue";
@@ -112,6 +118,8 @@ void PropertyWidget::setRoadEdge(RoadEdgePtr selectedEdge) {
 		generationType = selectedEdge->properties["generation_type"].toString();
 	}
 
+	ui.lineEditEdgeSource->setText(source);
+	ui.lineEditEdgeTarget->setText(target);
 	ui.lineEditEdgeType->setText(type);
 	ui.lineEditEdgeLanes->setText(numLanes);
 	ui.lineEditEdgeOneWay->setText(oneWay);
@@ -133,9 +141,12 @@ void PropertyWidget::resetRoadVertex() {
 	ui.lineEditVertexExampleDesc->setText("");
 	ui.lineEditVertexExampleStreetDesc->setText("");
 	ui.lineEditVertexDeadend->setText("");
+	ui.lineEditVertexRotationAngle->setText("");
 }
 
 void PropertyWidget::resetRoadEdge() {
+	ui.lineEditEdgeSource->setText("");
+	ui.lineEditEdgeTarget->setText("");
 	ui.lineEditEdgeType->setText("");
 	ui.lineEditEdgeLanes->setText("");
 	ui.lineEditEdgeOneWay->setText("");
@@ -150,7 +161,6 @@ void PropertyWidget::resetRoadEdge() {
 // Event handlers
 
 void PropertyWidget::searchVertex() {
-	/*
 	RoadVertexDesc v_desc = ui.lineEditVertexSearch->text().toUInt();
 
 	if (mainWin->urbanGeometry->areas.selectedIndex >= 0) {
@@ -159,6 +169,11 @@ void PropertyWidget::searchVertex() {
 
 			mainWin->glWidget->updateGL();
 		}
+	} else {
+		if (v_desc < boost::num_vertices(mainWin->urbanGeometry->roads.graph)) {
+			mainWin->glWidget->selectVertex(mainWin->urbanGeometry->roads, v_desc);
+
+			mainWin->glWidget->updateGL();
+		}
 	}
-	*/
 }

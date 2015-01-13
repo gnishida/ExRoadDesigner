@@ -1,10 +1,13 @@
 ﻿#include "RoadArea.h"
+#include "global.h"
 
 RoadArea::RoadArea() {
+	controlPointSelected = false;
 }
 
 RoadArea::RoadArea(const Polygon2D &area) {
 	this->area = area;
+	controlPointSelected = false;
 }
 
 void RoadArea::clear() {
@@ -80,17 +83,62 @@ void RoadArea::save(QDomDocument& doc, QDomNode& parent) {
 	}
 }
 
-void RoadArea::adaptToTerrain(Terrain* terrain) {
+void RoadArea::adaptToTerrain(VBORenderManager* vboRenderManager) {
 	area3D.clear();
 	hintLine3D.clear();
+	controlPoints3D.clear();
 
 	for (int i = 0; i < area.size(); ++i) {
-		float z = terrain->getValue(area[i].x(), area[i].y());
+		float z = 0.0f;
+		if (!G::getBool("shader2D")) {
+			z = vboRenderManager->getTerrainHeight(area[i].x(), area[i].y(), true);
+		}
 		area3D.push_back(QVector3D(area[i].x(), area[i].y(), z + 30));
 	}
 
 	for (int i = 0; i < hintLine.size(); ++i) {
-		float z = terrain->getValue(hintLine[i].x(), hintLine[i].y());
+		float z = 0.0f;
+		if (!G::getBool("shader2D")) {
+			z = vboRenderManager->getTerrainHeight(hintLine[i].x(), hintLine[i].y(), true);
+		}
 		hintLine3D.push_back(QVector3D(hintLine[i].x(), hintLine[i].y(), z + 30));
+	}
+
+	for (int i = 0; i < controlPoints.size(); ++i) {
+		float z = 0.0f;
+		if (!G::getBool("shader2D")) {
+			z = vboRenderManager->getTerrainHeight(controlPoints[i].x(), controlPoints[i].y(), true);
+		}
+		controlPoints3D.push_back(QVector3D(controlPoints[i].x(), controlPoints[i].y(), z + 30));
+	}
+
+}
+
+void RoadArea::selectAreaPoint(const QVector2D &pt) {
+	float min_dist = std::numeric_limits<float>::max();
+	int min_index;
+	for (int i = 0; i < area.size(); ++i) {
+		float dist = (pt - area[i]).lengthSquared();
+		if (dist < min_dist) {
+			min_dist = dist;
+			min_index = i;
+		}
+	}
+
+	if (min_dist < 10000) {
+		areaPointSelected = true;
+		areaPointSelectedIndex = min_index;
+	}
+}
+
+void RoadArea::updateAreaPoint(const QVector2D &pt) {
+	if (areaPointSelected && areaPointSelectedIndex >= 0 && areaPointSelectedIndex < area.size()) {
+		area[areaPointSelectedIndex] = pt;
+		if (areaPointSelectedIndex == 0) {
+			area[area.size() - 1] = pt;
+		}
+		if (areaPointSelectedIndex == area.size() - 1) {
+			area[0] = pt;
+		}
 	}
 }

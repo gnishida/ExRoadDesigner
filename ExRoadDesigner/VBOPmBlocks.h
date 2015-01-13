@@ -21,12 +21,6 @@ class VBOPmBlocks
 {
 public:
 
-	static std::vector<QString> sideWalkFileNames;
-	static std::vector<QVector3D> sideWalkScale;
-
-	static bool initialized;
-	static void init();
-
 	//Generate Blocks
 	static bool generateBlocks(
 		PlaceTypesMainClass &placeTypesIn,

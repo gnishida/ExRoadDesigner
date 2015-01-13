@@ -14,3 +14,16 @@ void ConvexHull::convexHull(Polygon2D& hull) {
 		hull.push_back(QVector2D(it->x(), it->y()));
 	}
 }
+
+Polygon2D ConvexHull::convexHull() {
+	Polygon2D polygon;
+
+	boost::geometry::model::polygon<point_xy<float> > hull2;
+    boost::geometry::convex_hull(all_points, hull2);
+
+	for (boost::geometry::model::polygon<point_xy<float> >::ring_type::iterator it = hull2.outer().begin(); it != hull2.outer().end(); ++it) {
+		polygon.push_back(QVector2D(it->x(), it->y()));
+	}
+
+	return polygon;
+}

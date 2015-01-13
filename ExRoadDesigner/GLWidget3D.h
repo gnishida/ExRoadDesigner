@@ -18,12 +18,15 @@ This file is part of QtUrban.
 
 #include "glew.h"
 #include "VBORenderManager.h"
+#include "GLWidget3D_Shadows.h"
 
 #include <QGLWidget>
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include "Camera.h"
+#include "Camera2D.h"
 #include "Camera3D.h"
+#include "FlyThroughCamera.h"
 #include "RoadGraph.h"
 
 class MainWindow;
@@ -31,8 +34,9 @@ class MainWindow;
 class GLWidget3D : public QGLWidget {
 public:
 	MainWindow* mainWin;
-	Camera camera2D;
+	Camera2D camera2D;
 	Camera3D camera3D;
+	FlyThroughCamera flyCamera;
 	Camera* camera;
 
 	bool shiftPressed;
@@ -53,6 +57,8 @@ public:
 	bool edgeSelected;
 
 	VBORenderManager vboRenderManager;
+	GLWidgetSimpleShadow shadow;
+	bool shadowEnabled;
 
 public:
 	GLWidget3D(MainWindow *parent);
@@ -71,12 +77,13 @@ public:
 
 	void mouseTo2D(int x, int y, QVector2D &result);
 
-	void drawScene();
+	void drawScene(int drawMode);
 	void selectVertex(RoadGraph &roads, RoadVertexDesc v_desc);
 	void selectEdge(RoadGraph &roads, RoadEdgeDesc e_desc);
 
 	void updateCamera();
-	void generate3DGeometry();
+	void generate2DGeometry();
+	void generate3DGeometry(bool justRoads=false);
 
 
 protected:

@@ -77,6 +77,13 @@ QVector2D Util::projLatLonToMeter(const QVector2D &latLon, const QVector2D &cent
 	return  result; 
 }
 
+bool Util::segmentSegmentIntersectXY3D(const QVector3D& a, const QVector3D& b, const QVector3D& c, const QVector3D& d, float *tab, float *tcd, bool segmentOnly, QVector3D& intPoint) {
+	QVector2D interPoint;
+	bool res=segmentSegmentIntersectXY(QVector2D(a.x(),a.y()),QVector2D(b.x(),b.y()),QVector2D(c.x(),c.y()),QVector2D(d.x(),d.y()),tab,tcd,segmentOnly,interPoint);
+	intPoint=interPoint.toVector3D();
+	return res;
+}//
+
 /**
  * Computes the intersection between two line segments on the XY plane.
  * Segments must intersect within their extents for the intersection to be valid. z coordinate is ignored.
@@ -289,6 +296,14 @@ void Util::cartesian2polar(const QVector2D &pt, float &radius, float &theta) {
 }
 
 /**
+ * 指定されたptを、座標変換する。
+ * 座標変換は、sourcePtで指定された点がtargetPtへ移り、且つ、rad[radian]回転するような変換だ。
+ */
+QVector2D Util::transform(const QVector2D &pt, const QVector2D &sourcePt, float rad, const QVector2D &targetPt) {
+	return rotate(pt - sourcePt, rad) + targetPt;
+}
+
+/**
  * 曲率を計算する
  */
 float Util::curvature(const Polyline2D &polyline) {
@@ -364,6 +379,16 @@ float Util::genRandNormal(float mean, float variance) {
 
 	return m + y1 * s;
 #endif
+}
+
+int Util::sampleFromCdf(std::vector<float> &cdf) {
+	float rnd = genRand(0, 1);
+
+	for (int i = 0; i < cdf.size(); ++i) {
+		if (rnd <= cdf[i]) return i;
+	}
+
+	return cdf.size() - 1;
 }
 
 /**

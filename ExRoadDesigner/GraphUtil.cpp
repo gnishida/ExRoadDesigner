@@ -1,4 +1,5 @@
-﻿#include <time.h>
+﻿#include "GraphUtil.h"
+#include <time.h>
 #include <QList>
 #include <QSet>
 #include <QDebug>
@@ -7,7 +8,7 @@
 #include <boost/geometry/geometries/linestring.hpp>
 #include "common.h"
 #include "Util.h"
-#include "GraphUtil.h"
+#include "ConvexHull.h"
 
 /**
  * Return the number of vertices.
@@ -479,6 +480,71 @@ bool GraphUtil::hasRedundantEdge(RoadGraph& roads, RoadVertexDesc desc, const Po
 }
 
 /**
+ * 当該頂点がT字路で、且つ、edgeが、Tの垂直な部分のエッジに相当するか？
+ */
+bool GraphUtil::tshape(RoadGraph &roads, RoadVertexDesc v, RoadEdgeDesc edge) {
+	RoadEdgeDesc edge1, edge2;
+	int cnt = 0;
+
+	RoadOutEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::out_edges(v, roads.graph); ei != eend; ++ei) {
+		if (*ei == edge) continue;
+
+		if (cnt == 0) {
+			edge1 = *ei;
+			cnt++;
+		} else if (cnt == 1) {
+			edge2 = *ei;
+			cnt++;
+		} else {
+			return false;
+		}
+	}
+
+	if (cnt != 2) return false;
+
+	Polyline2D polyline = orderPolyLine(roads, edge, v);
+	cleanPolyline(polyline);
+	Polyline2D polyline1 = orderPolyLine(roads, edge1, v);
+	cleanPolyline(polyline1);
+	Polyline2D polyline2 = orderPolyLine(roads, edge2, v);
+	cleanPolyline(polyline2);
+
+	float angle1 = Util::diffAngle(polyline1[1] - polyline1[0], polyline2[1] - polyline2[0]);
+	float angle2 = Util::diffAngle(polyline1[1] - polyline1[0], polyline[1] - polyline[0]);
+	float angle3 = Util::diffAngle(polyline2[1] - polyline2[0], polyline[1] - polyline[0]);
+
+	if (angle1 > angle2 + 0.5f && angle1 > angle3 + 0.5f) return true;
+	else return false;
+
+	//if (Util::diffAngle(polyline1[1] - polyline1[0], polyline2[0] - polyline2[1]) < 0.1f) return true;
+	//else return false;
+}
+
+/**
+ * classify the vertices into avenues and local streets.
+ */
+void GraphUtil::setVertexType(RoadGraph &roads) {
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		if (!roads.graph[*vi]->valid) continue;
+
+		int type = 0;
+
+		RoadOutEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::out_edges(*vi, roads.graph); ei != eend; ++ei) {
+			if (!roads.graph[*ei]->valid) continue;
+
+			if (roads.graph[*ei]->type > type) {
+				type = roads.graph[*ei]->type;
+			}
+		}
+
+		roads.graph[*vi]->type = type;
+	}
+}
+
+/**
  * Return the index-th edge.
  */
 RoadEdgeDesc GraphUtil::getEdge(RoadGraph& roads, int index, bool onlyValidEdge) {
@@ -772,14 +838,17 @@ void GraphUtil::moveEdge(RoadGraph& roads, RoadEdgeDesc e, QVector2D& src_pos, Q
 void GraphUtil::movePolyline(RoadGraph& roads, Polyline2D &polyline, const QVector2D& src_pos, const QVector2D& tgt_pos) {
 	float scale = (tgt_pos - src_pos).length() / (polyline.last() - polyline[0]).length();
 
-	if (scale > 2.0f || scale < 0.5f) {
+	//if (scale > 2.0f || scale < 0.5f) {
 		// スケーリング＆回転で、ポリラインを指定された座標にフィットさせる
 		float rotation_degree = Util::rad2deg(Util::diffAngle(polyline.last() - polyline[0], tgt_pos- src_pos, false));
 
 		polyline.scale(scale);
 		polyline.rotate(rotation_degree, QVector2D(0, 0));
 		polyline.translate(src_pos - polyline[0]);
-	} else {
+
+		polyline[0] = src_pos;
+		polyline[polyline.size() - 1] = tgt_pos;
+	/*} else {
 		// 指定された座標に、Linear Interpolationにより移動する
 		Polyline2D temp_polyline = polyline;
 		QVector2D offset = src_pos - temp_polyline[0];
@@ -789,7 +858,8 @@ void GraphUtil::movePolyline(RoadGraph& roads, Polyline2D &polyline, const QVect
 		}
 		polyline[0] = src_pos;
 		polyline[polyline.size() - 1] = tgt_pos;
-	}
+
+	}*/
 }
 
 /**
@@ -910,6 +980,13 @@ RoadVertexDesc GraphUtil::splitEdge(RoadGraph &roads, RoadEdgeDesc edge_desc, co
 		return tgt;
 	}
 
+	// もしエッジが2つの点で構成されていて、しかも、同じ座標の場合、splitしない
+	if ((roads.graph[src]->pt - roads.graph[tgt]->pt).lengthSquared() < 0.1f && edge->polyline.size() == 2) {
+		edge1 = edge_desc;
+		edge2 = edge_desc;
+		return src;
+	}
+
 	// find which point along the polyline is the closest to the specified split point.
 	int index;
 	QVector2D pos;
@@ -926,6 +1003,18 @@ RoadVertexDesc GraphUtil::splitEdge(RoadGraph &roads, RoadEdgeDesc edge_desc, co
 				pos = pt2;
 			}
 		}
+	}
+
+	// もし、直近の点が端点なら、splitしない
+	if ((roads.graph[src]->pt - pos).lengthSquared() < 0.1f) {
+		edge1 = edge_desc;
+		edge2 = edge_desc;
+		return src;
+	}
+	if ((roads.graph[tgt]->pt - pos).lengthSquared() < 0.1f) {
+		edge1 = edge_desc;
+		edge2 = edge_desc;
+		return tgt;
 	}
 
 	// add a new vertex at the specified point on the edge
@@ -993,7 +1082,7 @@ bool GraphUtil::hasCloseEdge(RoadGraph* roads, RoadVertexDesc v1, RoadVertexDesc
 /**
  * Check if the poly line intersects with the existing road segments.
  */
-bool GraphUtil::isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline) {
+bool GraphUtil::isIntersect(RoadGraph &roads, const Polyline2D& polyline) {
 	if (polyline.size() < 2) return false;
 
 	RoadEdgeIter ei, eend;
@@ -1009,7 +1098,7 @@ bool GraphUtil::isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline) 
 /**
  * Check if the poly line intersects with the existing road segments.
  */
-bool GraphUtil::isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline, QVector2D &intPoint) {
+bool GraphUtil::isIntersect(RoadGraph &roads, const Polyline2D &polyline, QVector2D &intPoint) {
 	if (polyline.size() < 2) return false;
 
 	RoadEdgeIter ei, eend;
@@ -1022,7 +1111,36 @@ bool GraphUtil::isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline, 
 	return false;
 }
 
-bool GraphUtil::isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline, RoadEdgeDesc ignoreEdge) {
+/**
+ * Check if the poly line intersects with the existing road segments.
+ */
+bool GraphUtil::isIntersect(RoadGraph &roads, const Polyline2D &polyline, RoadVertexDesc srcDesc, QVector2D &intPoint) {
+	if (polyline.size() < 2) return false;
+
+	float min_dist = std::numeric_limits<float>::max();
+
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		QVector2D pt;
+		if (isIntersect(roads, roads.graph[*ei]->polyline, polyline, pt)) {
+			float dist = (roads.graph[srcDesc]->pt - pt).lengthSquared();
+			if (dist < min_dist) {
+				min_dist = dist;
+				intPoint = pt;
+			}
+		}
+	}
+
+	if (min_dist < std::numeric_limits<float>::max()) {
+		return true;
+	}
+
+	return false;
+}
+
+bool GraphUtil::isIntersect(RoadGraph &roads, const Polyline2D &polyline, RoadEdgeDesc ignoreEdge) {
 	if (polyline.size() < 2) return false;
 
 	RoadEdgeIter ei, eend;
@@ -1039,7 +1157,7 @@ bool GraphUtil::isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline, 
 /**
  * Check if the two poly lines intersect with each other.
  */
-bool GraphUtil::isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline1, std::vector<QVector2D>& polyline2) {
+bool GraphUtil::isIntersect(RoadGraph &roads, const Polyline2D& polyline1, const Polyline2D& polyline2) {
 	if (polyline1.size() < 2 || polyline1.size() < 2) return false;
 
 	for (int i = 0; i < polyline1.size() - 1; i++) {
@@ -1058,7 +1176,7 @@ bool GraphUtil::isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline1,
 /**
  * Check if the two poly lines intersect with each other.
  */
-bool GraphUtil::isIntersect(RoadGraph &roads, std::vector<QVector2D>& polyline1, std::vector<QVector2D>& polyline2, QVector2D &intPoint) {
+bool GraphUtil::isIntersect(RoadGraph &roads, const Polyline2D &polyline1, const Polyline2D &polyline2, QVector2D &intPoint) {
 	if (polyline1.size() < 2 || polyline1.size() < 2) return false;
 
 	for (int i = 0; i < polyline1.size() - 1; i++) {
@@ -1107,6 +1225,8 @@ void GraphUtil::removeShortEdges(RoadGraph& roads, float threshold) {
 			roads.graph[*ei]->valid = false;
 		}
 	}
+
+	removeIsolatedVertices(roads);
 }
 
 /**
@@ -1130,6 +1250,44 @@ void GraphUtil::realize(RoadGraph& roads) {
 }
 
 /**
+ * Compute the bounding box of the geometric graph.
+ */
+BBox GraphUtil::bbox(RoadGraph& roads) {
+	BBox bbox;
+	/*
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		if (!roads.graph[*vi]->valid) continue;
+
+		bbox.addPoint(roads.graph[*vi]->pt);
+	}
+	*/
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		for (int i = 0;  i < roads.graph[*ei]->polyline.size(); ++i) {
+			bbox.addPoint(roads.graph[*ei]->polyline[i]);
+		}
+	}
+
+	return bbox;
+}
+
+Polygon2D GraphUtil::hull(RoadGraph &roads) {
+	ConvexHull ch;
+
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		if (!roads.graph[*vi]->valid) continue;
+
+		ch.addPoint(roads.graph[*vi]->pt);
+	}
+
+	return ch.convexHull();
+}
+
+/**
  * Make the edge finer by inserting more points along the polyline.
  */
 Polyline2D GraphUtil::finerEdge(RoadGraph& roads, RoadEdgeDesc e, float step) {
@@ -1138,8 +1296,9 @@ Polyline2D GraphUtil::finerEdge(RoadGraph& roads, RoadEdgeDesc e, float step) {
 	for (int i = 0; i < roads.graph[e]->polyline.size() - 1; i++) {
 		QVector2D vec = roads.graph[e]->polyline[i + 1] - roads.graph[e]->polyline[i];
 		float length = vec.length();
-		for (int j = 0; j < length; j += step) {
-			polyline.push_back(roads.graph[e]->polyline[i] + vec * (float)j / length);
+		vec.normalize();
+		for (float j = 0.0f; j < length - 0.1f; j += step) {
+			polyline.push_back(roads.graph[e]->polyline[i] + vec * j);
 		}
 	}
 	polyline.push_back(roads.graph[e]->polyline.last());
@@ -1153,8 +1312,9 @@ Polyline2D GraphUtil::finerEdge(Polyline2D &polyline, float step) {
 	for (int i = 0; i < polyline.size() - 1; i++) {
 		QVector2D vec = polyline[i + 1] - polyline[i];
 		float length = vec.length();
-		for (int j = 0; j < length; j += step) {
-			ret.push_back(polyline[i] + vec * (float)j / length);
+		vec.normalize();
+		for (float j = 0.0f; j < length - 0.1f; j += step) {
+			ret.push_back(polyline[i] + vec * j);
 		}
 	}
 	ret.push_back(polyline.last());
@@ -1180,6 +1340,130 @@ float GraphUtil::distance(RoadGraph& roads, const QVector2D& pt, RoadEdgeDesc e,
 	return min_dist;
 }
 
+void GraphUtil::cleanEdges(RoadGraph &roads) {
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		cleanPolyline(roads.graph[*ei]->polyline);
+	}
+}
+
+void GraphUtil::cleanEdge(RoadEdgePtr &edge) {
+	cleanPolyline(edge->polyline);
+}
+
+void GraphUtil::cleanPolyline(Polyline2D &polyline) {
+	QVector2D last = polyline.back();
+	QVector2D prev = polyline[0];
+
+	for (int i = 1; i < polyline.size(); ) {
+		if ((polyline[i] - prev).lengthSquared() < 0.1f && polyline.size() > 2) {
+			polyline.erase(polyline.begin() + i);
+		} else {
+			prev = polyline[i];
+			++i;
+		}
+	}
+
+	polyline.back() = last;
+}
+
+/**
+ * 当該頂点において、指定されたエッジが、隣接するエッジと、ほぼ180度をなすか？
+ */
+bool GraphUtil::isStraightEdge(RoadGraph &roads, RoadVertexDesc v, RoadEdgeDesc e) {
+	if (getDegree(roads, v) <= 1) return false;
+
+	QMap<float, RoadEdgeDesc> edges;
+
+	float thisAngle;
+	{
+		Polyline2D polyline = orderPolyLine(roads, e, v);
+		QVector2D vec = polyline[1] - polyline[0];
+		thisAngle = atan2f(vec.y(), vec.x());
+		edges[0] = e;
+	}
+
+	RoadOutEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::out_edges(v, roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+		if (*ei == e) continue;
+
+		Polyline2D polyline = orderPolyLine(roads, *ei, v);
+		QVector2D vec = polyline[1] - polyline[0];
+		float diff_angle = Util::diffAngle(atan2f(vec.y(), vec.x()), thisAngle, false);
+		edges[diff_angle] = *ei;
+
+		if (diff_angle > 0) {
+			edges[diff_angle - M_PI * 2] = *ei;
+		} else {
+			edges[M_PI * 2 + diff_angle] = *ei;
+		}
+	}
+
+	QMap<float, RoadEdgeDesc>::iterator it = edges.find(0);
+	float k = it.key();
+	if (it != edges.begin()) {
+		--it;
+		float k1 = it.key();
+		if (fabs(-it.key() - M_PI) < 0.3f) return true;
+		++it;
+		float k2 = it.key();
+	}
+	++it;
+	float k3 = it.key();
+	if (it != edges.end()) {
+		if (fabs(it.key() - M_PI) < 0.3f) return true;
+	}
+
+	return false;
+}
+
+/**
+ * 当該頂点において、指定されたエッジとほぼ180度をなすエッジがあるか？
+ */
+bool GraphUtil::isPotentiallyStraightEdge(RoadGraph &roads, RoadVertexDesc v, RoadEdgeDesc e) {
+	if (getDegree(roads, v) <= 1) return false;
+
+	QVector2D thisVec;
+	{
+		Polyline2D polyline = orderPolyLine(roads, e, v);
+		thisVec = polyline[1] - polyline[0];
+	}
+
+	RoadOutEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::out_edges(v, roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+		if (*ei == e) continue;
+
+		Polyline2D polyline = orderPolyLine(roads, *ei, v);
+		QVector2D vec = polyline[1] - polyline[0];
+
+		if (Util::diffAngle(vec, -thisVec) < 0.3f) return true;
+	}
+
+	return false;
+}
+
+RoadVertexDesc GraphUtil::cutoffEdge(RoadGraph &roads, RoadEdgeDesc edge, RoadVertexDesc v_desc, const QVector2D &pt) {
+	Polyline2D polyline = orderPolyLine(roads, edge, v_desc);
+	polyline = finerEdge(polyline);
+	roads.graph[edge]->polyline = polyline;
+
+	// Add a vertex on the border
+	RoadEdgeDesc e1, e2;
+	RoadVertexDesc v = splitEdge(roads, edge, pt, e1, e2);
+
+	if ((polyline[0] - roads.graph[v_desc]->pt).lengthSquared() <= (polyline.back() - roads.graph[v_desc]->pt).lengthSquared()) {
+		roads.graph[e2]->valid = false;
+	} else {
+		roads.graph[e1]->valid = false;
+	}
+
+	return v;
+}
+
 /**
  * Load the road from a file.
  */
@@ -1198,11 +1482,14 @@ void GraphUtil::loadRoads(RoadGraph& roads, const QString& filename, int roadTyp
 	for (int i = 0; i < nVertices; i++) {
 		RoadVertexDesc id;
 		float x, y;
+		unsigned int onBoundary;
 		fread(&id, sizeof(RoadVertexDesc), 1, fp);
 		fread(&x, sizeof(float), 1, fp);
 		fread(&y, sizeof(float), 1, fp);
+		fread(&onBoundary, sizeof(unsigned int), 1, fp);
 
 		RoadVertexPtr vertex = RoadVertexPtr(new RoadVertex(QVector2D(x, y)));
+		vertex->onBoundary = onBoundary == 1;
 
 		RoadVertexDesc desc = boost::add_vertex(roads.graph);
 		roads.graph[desc] = vertex;
@@ -1243,6 +1530,8 @@ void GraphUtil::loadRoads(RoadGraph& roads, const QString& filename, int roadTyp
 			edge->addPoint(QVector2D(x, y));
 		}
 
+		cleanEdge(edge);
+
 		// 指定されたタイプの道路エッジのみを読み込む
 		if (isRoadTypeMatched(edge->type, roadType)) {
 			std::pair<RoadEdgeDesc, bool> edge_pair = boost::add_edge(src, tgt, roads.graph);
@@ -1251,6 +1540,8 @@ void GraphUtil::loadRoads(RoadGraph& roads, const QString& filename, int roadTyp
 	}
 
 	fclose(fp);
+
+	std::cout << "Total length: " << getTotalEdgeLength(roads) << std::endl;
 
 	roads.setModified();
 }
@@ -1270,7 +1561,7 @@ void GraphUtil::saveRoads(RoadGraph& roads, const QString& filename) {
 		if (!roads.graph[*vi]->valid) continue;
 
 		// isolatedの頂点は、保存しない
-		if (getDegree(roads, *vi) == 0) continue;
+		//if (getDegree(roads, *vi) == 0) continue;
 
 		RoadVertexPtr v = roads.graph[*vi];
 	
@@ -1280,6 +1571,10 @@ void GraphUtil::saveRoads(RoadGraph& roads, const QString& filename) {
 		fwrite(&desc, sizeof(RoadVertexDesc), 1, fp);
 		fwrite(&x, sizeof(float), 1, fp);
 		fwrite(&y, sizeof(float), 1, fp);
+
+		// onBoundary? (1/0)
+		unsigned int onBoundary = v->onBoundary ? 1 : 0;
+		fwrite(&onBoundary, sizeof(unsigned int), 1, fp);
 	}
 
 	int nEdges = getNumEdges(roads);//boost::num_edges(roads.graph);
@@ -1654,6 +1949,104 @@ void GraphUtil::extractRoads2(RoadGraph& roads, const Polygon2D& area, int roadT
 }
 
 /**
+ * Trim roads that reside in the specified area.
+ * If a edge is across the border of the area, add a vertex on the border and split the edge at the vertex.
+ */
+void GraphUtil::trim(RoadGraph& roads, const Polygon2D& area) {
+	QList<RoadEdgeDesc> edges;
+
+	// create a list of edges that are partially outside the area
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		RoadVertexDesc src = boost::source(*ei, roads.graph);
+		RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+
+		if (!area.contains(roads.graph[src]->pt) && !area.contains(roads.graph[tgt]->pt)) {
+			roads.graph[*ei]->valid = false;
+		} else if (!area.contains(roads.graph[src]->pt) || !area.contains(roads.graph[tgt]->pt)) {
+			edges.push_back(*ei);
+		} else {
+			for (int i = 0; i < roads.graph[*ei]->polyline.size(); ++i) {
+				if (!area.contains(roads.graph[*ei]->polyline[i])) {
+					edges.push_back(*ei);
+					break;
+				}
+			}
+		}
+	}
+
+	for (int e_id = 0; e_id < edges.size(); e_id++) {
+		RoadVertexDesc src = boost::source(edges[e_id], roads.graph);
+		RoadVertexDesc tgt = boost::target(edges[e_id], roads.graph);
+
+		if (area.contains(roads.graph[src]->pt) && area.contains(roads.graph[tgt]->pt)) {
+			QVector2D intPt;
+			{
+				Polyline2D polyline = orderPolyLine(roads, edges[e_id], src);
+				polyline = finerEdge(polyline);
+				for (int i = 1; i < polyline.size(); ++i) {
+					if (!area.contains(polyline[i])) {
+						intPt = polyline[i - 1];
+						break;
+					}
+				}
+			}
+			RoadVertexDesc v = cutoffEdge(roads, edges[e_id], src, intPt);
+			roads.graph[v]->onBoundary = true;
+
+			{
+				Polyline2D polyline = orderPolyLine(roads, edges[e_id], tgt);
+				polyline = finerEdge(polyline);
+				for (int i = 1; i < polyline.size(); ++i) {
+					if (!area.contains(polyline[i])) {
+						intPt = polyline[i - 1];
+						break;
+					}
+				}
+			}
+			v = cutoffEdge(roads, edges[e_id], tgt, intPt);
+			roads.graph[v]->onBoundary = true;
+		} else if (area.contains(roads.graph[src]->pt)) {
+			QVector2D intPt;
+			{
+				Polyline2D polyline = orderPolyLine(roads, edges[e_id], src);
+				polyline = finerEdge(polyline);
+				for (int i = 1; i < polyline.size(); ++i) {
+					if (!area.contains(polyline[i])) {
+						intPt = polyline[i - 1];
+						break;
+					}
+				}
+			}
+			RoadVertexDesc v = cutoffEdge(roads, edges[e_id], src, intPt);
+			roads.graph[v]->onBoundary = true;
+			roads.graph[tgt]->valid = false;
+		} else {
+			QVector2D intPt;
+			{
+				Polyline2D polyline = orderPolyLine(roads, edges[e_id], tgt);
+				polyline = finerEdge(polyline);
+				for (int i = 1; i < polyline.size(); ++i) {
+					if (!area.contains(polyline[i])) {
+						intPt = polyline[i - 1];
+						break;
+					}
+				}
+			}
+			RoadVertexDesc v = cutoffEdge(roads, edges[e_id], tgt, intPt);
+			roads.graph[v]->onBoundary = true;
+			roads.graph[src]->valid = false;
+		}
+	}
+
+	removeIsolatedVertices(roads);
+
+	roads.setModified();
+}
+
+/**
  * Subtract an area from the road graph.
  * If "strict" is true, only the edges that are completely within the area will be subtracted.
  * Note that this function does not change neighter the vertex desc nor the edge desc.
@@ -1777,6 +2170,8 @@ void GraphUtil::perturb(RoadGraph &roads, const Polygon2D &area, float factor) {
  * 交差しているエッジを探し、あればレベルが低い方を削除する。
  */
 void GraphUtil::removeSelfIntersectingRoads(RoadGraph &roads) {
+	setVertexType(roads);
+
 	float ta, tb;
 	QVector2D intPt;
 	RoadEdgeIter ei, eend;
@@ -2100,7 +2495,7 @@ void GraphUtil::clean(RoadGraph& roads) {
 		// Add a vertex
 		RoadVertexPtr new_v = RoadVertexPtr(new RoadVertex(*temp.graph[*vi]));
 		RoadVertexDesc new_v_desc = boost::add_vertex(roads.graph);
-		roads.graph[new_v_desc] = new_v;	
+		roads.graph[new_v_desc] = new_v;
 
 		conv[*vi] = new_v_desc;
 	}
@@ -2368,7 +2763,7 @@ void GraphUtil::simplify3(RoadGraph& roads, float dist_threshold) {
 		int numAvenues = 0;
 		RoadOutEdgeIter ei, eend;
 		for (boost::tie(ei, eend) = boost::out_edges(*vi, temp.graph); ei != eend; ++ei) {
-			if (temp.graph[*ei]->type == RoadEdge::TYPE_AVENUE || temp.graph[*ei]->type == RoadEdge::TYPE_BOULEVARD || temp.graph[*ei]->type == RoadEdge::TYPE_HIGHWAY) {
+			if (temp.graph[*ei]->type == RoadEdge::TYPE_AVENUE || temp.graph[*ei]->type == RoadEdge::TYPE_HIGHWAY) {
 				 numAvenues++;
 			}
 		}
@@ -3109,6 +3504,19 @@ void GraphUtil::removeShortDeadend(RoadGraph& roads, float threshold) {
 	if (actuallyDeleted) roads.setModified();
 }
 
+float GraphUtil::getTotalEdgeLength(RoadGraph &roads) {
+	float totalLength = 0.0f;
+
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		totalLength += roads.graph[*ei]->polyline.length();
+	}
+
+	return totalLength;
+}
+
 /**
  * 道路の統計情報を計算する。
  */
@@ -3179,6 +3587,30 @@ void GraphUtil::computeStatistics(RoadGraph &roads, const QVector2D &pt, float d
 	varEdgeCurvature = totalCurvature2 / (float)num - SQR(avgEdgeCurvature);
 }
 
+void GraphUtil::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding) {
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		std::map<float, RoadEdgeDesc> edges;
+
+		RoadOutEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::out_edges(*vi, roads.graph); ei != eend; ++ei) {
+			if ((roads.graph[*ei]->polyline[0] - roads.graph[*vi]->pt).lengthSquared() > (roads.graph[*ei]->polyline.last() - roads.graph[*vi]->pt).lengthSquared()) {
+				std::reverse(roads.graph[*ei]->polyline.begin(), roads.graph[*ei]->polyline.end());
+			}
+
+			QVector2D vec = roads.graph[*ei]->polyline[1] - roads.graph[*ei]->polyline[0];
+			edges[-atan2f(vec.y(), vec.x())] = *ei;
+		}
+
+		std::vector<RoadEdgeDesc> edge_descs;
+		for (std::map<float, RoadEdgeDesc>::iterator it = edges.begin(); it != edges.end(); ++it) {
+			edge_descs.push_back(it->second);
+		}
+
+		embedding.push_back(edge_descs);
+	}
+}
+
 /**
  * 指定した道路エッジのタイプが、指定されたタイプに含まれるかチェックする。
  * 例えば、タイプとして3を指定した場合、Local streetsとAvenuesが含まれる。
@@ -3219,4 +3651,198 @@ void GraphUtil::drawRoadSegmentOnMat(RoadGraph& roads, RoadEdgeDesc e, cv::Mat& 
 		QVector2D p1 = roads.graph[e]->polyline[i + 1];
 		cv::line(mat, cv::Point(p0.x(), p0.y()), cv::Point(p1.x(), p1.y()), cv::Scalar(brightness), width, CV_AA);
 	}
+}
+
+void GraphUtil::generateRegularGrid(RoadGraph &roads, float size, float avenueInterval, float streetInterval) {
+	int numAvenueStep = size / avenueInterval;
+	int numStreetStep = avenueInterval / streetInterval;
+
+	// add all the vertices
+	for (int ra = 0; ra <= numAvenueStep; ++ra) {
+		for (int ca = 0; ca <= numAvenueStep; ++ca) {
+			for (int rs = 0; rs < numStreetStep; ++rs) {
+				for (int cs = 0; cs < numStreetStep; ++cs) {
+					if (ra == numAvenueStep && rs > 0) continue;
+					if (ca == numAvenueStep && cs > 0) continue;
+
+					QVector2D pt(size * -0.5f + ca * avenueInterval + cs * streetInterval, size * -0.5f + ra * avenueInterval + rs * streetInterval);
+					RoadVertexPtr v = RoadVertexPtr(new RoadVertex(pt));
+					RoadVertexDesc v_desc0 = GraphUtil::addVertex(roads, v);
+
+					// add the horizontal edge
+					if ((ca > 0 || cs > 0) && ((ra > 0 || rs > 0) && ra < numAvenueStep)) {
+						RoadVertexDesc v_desc1;
+						if (ra == numAvenueStep) {
+							v_desc1 = v_desc0 - 1;
+							GraphUtil::addEdge(roads, v_desc1, v_desc0, rs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+						} else {
+							if (cs > 0) {
+								v_desc1 = v_desc0 - 1;
+								GraphUtil::addEdge(roads, v_desc1, v_desc0, rs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+							} else {
+								if (ca < numAvenueStep) {
+									v_desc1 = v_desc0 - numStreetStep * (numStreetStep - 1) - 1;
+									GraphUtil::addEdge(roads, v_desc1, v_desc0, rs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+								} else {
+									v_desc1 = v_desc0 - (numStreetStep - rs - 1) * numStreetStep - rs - 1;
+									GraphUtil::addEdge(roads, v_desc1, v_desc0, rs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+								}
+							}
+						}
+					}
+
+					// add the vertical edge
+					if ((ra > 0 || rs > 0) && ((ca > 0 || cs > 0) && ca < numAvenueStep)) {
+						RoadVertexDesc v_desc2;
+						if (rs > 0) {
+							if (ca < numAvenueStep) {
+								v_desc2 = v_desc0 - numStreetStep;
+							} else {
+								v_desc2 = v_desc0 - 1;
+							}
+							GraphUtil::addEdge(roads, v_desc2, v_desc0, cs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+						} else {
+							if (ra == numAvenueStep && ca == numAvenueStep) {
+								v_desc2 = v_desc0 - numStreetStep * numAvenueStep - 1;
+								GraphUtil::addEdge(roads, v_desc2, v_desc0, cs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+							} else if (ra == numAvenueStep) {
+								v_desc2 = v_desc0 - (numAvenueStep - ca - 1) * numStreetStep * numStreetStep - (ca + 2) * numStreetStep;
+								GraphUtil::addEdge(roads, v_desc2, v_desc0, cs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+							} else if (ca == numAvenueStep) {
+								v_desc2 = v_desc0 - numStreetStep * numStreetStep * numAvenueStep - 1;
+								GraphUtil::addEdge(roads, v_desc2, v_desc0, cs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+							} else {
+								v_desc2 = v_desc0 - numStreetStep * numStreetStep * numAvenueStep - numStreetStep + numStreetStep * (numStreetStep - 1);
+								GraphUtil::addEdge(roads, v_desc2, v_desc0, cs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	GraphUtil::removeIsolatedVertices(roads);
+	GraphUtil::clean(roads);
+}
+
+void GraphUtil::generateCurvyGrid(RoadGraph &roads, float size, float avenueInterval, float streetInterval) {
+	int numAvenueStep = size / avenueInterval;
+	int numStreetStep = avenueInterval / streetInterval;
+
+	// add all the vertices
+	for (int ra = 0; ra <= numAvenueStep; ++ra) {
+		for (int ca = 0; ca <= numAvenueStep; ++ca) {
+			for (int rs = 0; rs < numStreetStep; ++rs) {
+				for (int cs = 0; cs < numStreetStep; ++cs) {
+					if (ra == numAvenueStep && rs > 0) continue;
+					if (ca == numAvenueStep && cs > 0) continue;
+
+					QVector2D pt(size * -0.5f + ca * avenueInterval + cs * streetInterval, size * -0.5f + ra * avenueInterval + rs * streetInterval);
+
+					// ptの位置を、sin/cosでずらす
+					float th_x = M_PI * (ca + (float)cs / (float)numStreetStep);
+					float th_y = M_PI * (ra + (float)rs / (float)numStreetStep);
+					QVector2D curvedPt = pt;
+					curvedPt.setX(pt.x() + streetInterval * sinf(th_y));
+					curvedPt.setY(pt.y() + streetInterval * sinf(th_x));
+
+					RoadVertexPtr v = RoadVertexPtr(new RoadVertex(curvedPt));
+					RoadVertexDesc v_desc0 = GraphUtil::addVertex(roads, v);
+
+					// add the horizontal edge
+					if ((ca > 0 || cs > 0) && ((ra > 0 || rs > 0) && ra < numAvenueStep)) {
+						// edge polyline
+						QVector2D pt1 = pt - QVector2D(streetInterval, 0.0f);
+						Polyline2D polyline;
+						float th_x1 = M_PI * (ca + (float)cs / (float)numStreetStep);
+						float th_x0 = th_x1 - M_PI / (float)numStreetStep;
+						float th_y1 = M_PI * (ra + (float)rs / (float)numStreetStep);
+						for (int i = 0; i <= 10; ++i) {
+							float th_xx = th_x0 + (th_x1 - th_x0) / 10.0f * (float)i;
+							QVector2D polylinePt = pt1 + (pt - pt1) / 10.0f * (float)i;
+
+							// sin/cosでずらす
+							polylinePt.setX(polylinePt.x() + streetInterval * sinf(th_y1));
+							polylinePt.setY(polylinePt.y() + streetInterval * sinf(th_xx));
+							polyline.push_back(polylinePt);
+						}
+
+
+						RoadVertexDesc v_desc1;
+						RoadEdgeDesc edge;
+						if (ra == numAvenueStep) {
+							v_desc1 = v_desc0 - 1;
+							edge = GraphUtil::addEdge(roads, v_desc1, v_desc0, rs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+						} else {
+							if (cs > 0) {
+								v_desc1 = v_desc0 - 1;
+								edge = GraphUtil::addEdge(roads, v_desc1, v_desc0, rs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+							} else {
+								if (ca < numAvenueStep) {
+									v_desc1 = v_desc0 - numStreetStep * (numStreetStep - 1) - 1;
+									edge = GraphUtil::addEdge(roads, v_desc1, v_desc0, rs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+								} else {
+									v_desc1 = v_desc0 - (numStreetStep - rs - 1) * numStreetStep - rs - 1;
+									edge = GraphUtil::addEdge(roads, v_desc1, v_desc0, rs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+								}
+							}
+						}
+						roads.graph[edge]->polyline = polyline;
+					}
+
+					// add the vertical edge
+					if ((ra > 0 || rs > 0) && ((ca > 0 || cs > 0) && ca < numAvenueStep)) {
+						// edge polyline
+						QVector2D pt1 = pt - QVector2D(0.0f, streetInterval);
+						Polyline2D polyline;
+						float th_x1 = M_PI * (ca + (float)cs / (float)numStreetStep);
+						float th_y1 = M_PI * (ra + (float)rs / (float)numStreetStep);
+						float th_y0 = th_y1 - M_PI / (float)numStreetStep;
+						for (int i = 0; i <= 10; ++i) {
+							float th_yy = th_y0 + (th_y1 - th_y0) / 10.0f * (float)i;
+							QVector2D polylinePt = pt1 + (pt - pt1) / 10.0f * (float)i;
+
+							// sin/cosでずらす
+							polylinePt.setX(polylinePt.x() + streetInterval * sinf(th_yy));
+							polylinePt.setY(polylinePt.y() + streetInterval * sinf(th_x1));
+							polyline.push_back(polylinePt);
+						}
+
+
+
+						RoadVertexDesc v_desc2;
+						RoadEdgeDesc edge;
+						if (rs > 0) {
+							if (ca < numAvenueStep) {
+								v_desc2 = v_desc0 - numStreetStep;
+							} else {
+								v_desc2 = v_desc0 - 1;
+							}
+							edge = GraphUtil::addEdge(roads, v_desc2, v_desc0, cs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+						} else {
+							if (ra == numAvenueStep && ca == numAvenueStep) {
+								v_desc2 = v_desc0 - numStreetStep * numAvenueStep - 1;
+								edge = GraphUtil::addEdge(roads, v_desc2, v_desc0, cs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+							} else if (ra == numAvenueStep) {
+								v_desc2 = v_desc0 - (numAvenueStep - ca - 1) * numStreetStep * numStreetStep - (ca + 2) * numStreetStep;
+								edge = GraphUtil::addEdge(roads, v_desc2, v_desc0, cs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+							} else if (ca == numAvenueStep) {
+								v_desc2 = v_desc0 - numStreetStep * numStreetStep * numAvenueStep - 1;
+								edge = GraphUtil::addEdge(roads, v_desc2, v_desc0, cs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+							} else {
+								v_desc2 = v_desc0 - numStreetStep * numStreetStep * numAvenueStep - numStreetStep + numStreetStep * (numStreetStep - 1);
+								edge = GraphUtil::addEdge(roads, v_desc2, v_desc0, cs == 0 ? RoadEdge::TYPE_AVENUE : RoadEdge::TYPE_STREET, 1);
+							}
+						}
+
+						roads.graph[edge]->polyline = polyline;
+					}
+				}
+			}
+		}
+	}
+
+	GraphUtil::removeIsolatedVertices(roads);
+	GraphUtil::clean(roads);
 }

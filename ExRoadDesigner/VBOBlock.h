@@ -44,6 +44,7 @@ public:
 		randSeed = ref.randSeed;
 		myPlaceTypeIdx = ref.myPlaceTypeIdx;
 		myColor = ref.myColor;
+		isPark=ref.isPark;
 	}
 
 	/**
@@ -60,6 +61,7 @@ public:
 		randSeed = ref.randSeed;
 		myPlaceTypeIdx = ref.myPlaceTypeIdx;
 		myColor = ref.myColor;
+		isPark=ref.isPark;
 		return (*this);
 	}
 
@@ -114,7 +116,7 @@ public:
 	std::vector<float> blockContourRoadsWidths;
 
 	/**
-	* Adapt block to terrain
+	* Adapt block to vboRenderManager
 	**/
 	//void adaptBlockToTerrain(MTC::geometry::ElevationGrid *elGrid);
 
@@ -148,6 +150,7 @@ public:
 	BBox3D bbox;
 
 	int randSeed;
+	bool isPark;
 
 private:
 	int myPlaceTypeIdx;

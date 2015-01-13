@@ -121,9 +121,11 @@ void main(){
 		vec3 n = normalize( normalMatrix * normal );
 		vec3 r = reflect( u, n );
 		float m = 2.0 * sqrt( r.x*r.x + r.y*r.y + (r.z+1.0)*(r.z+1.0) );
-		m*=1.0;// NACHO
+		m*=2.0;// NACHO
 		outUV.s = r.x/m + 0.5;
 		outUV.t = r.y/m + 0.5;
+		/*//varyingNormal=-r;//reflect ray (for sky)*/
+		//varyingNormal=normalize(normal);
 	}
 
 	// LIGHTING

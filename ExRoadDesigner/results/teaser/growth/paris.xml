@@ -1,0 +1,15 @@
+<feature>
+    <area>
+        <point x="-2906.58447265625" y="1433.2666015625"/>
+        <point x="-3013.731201171875" y="1497.5546875"/>
+        <point x="-2342.2783203125" y="3061.897216796875"/>
+        <point x="-513.6406860351563" y="2261.8681640625"/>
+        <point x="-1199.379760742188" y="626.0945434570313"/>
+        <point x="-2906.58447265625" y="1433.2666015625"/>
+    </area>
+    <hintLine>
+        <point x="-2070.83984375" y="1311.833618164063"/>
+    </hintLine>
+    <avenues filename="paris.xml.avenues.gsm"/>
+    <streets filename="paris.xml.streets.gsm"/>
+</feature>

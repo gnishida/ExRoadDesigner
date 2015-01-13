@@ -8,7 +8,8 @@
 #include "Polygon3D.h"
 #include "Polyline2D.h"
 #include "Polyline3D.h"
-#include "Terrain.h"
+//#include "Terrain.h"
+#include "VBORenderManager.h"
 
 class PolygonBuilder {
 private:
@@ -34,6 +35,6 @@ public:
 	Polygon3D polygon3D() const;
 	const Polyline3D& polyline3D() const;
 
-	void adaptToTerrain(Terrain* terrain);
+	void adaptToTerrain(VBORenderManager* vboRenderManager);
 };
 

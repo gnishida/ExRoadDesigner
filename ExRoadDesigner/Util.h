@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+#include "glew.h"
+
+#include <QGenericMatrix>
 #include "common.h"
 #include "Polyline2D.h"
 
@@ -19,6 +22,7 @@ public:
 	static QVector2D projLatLonToMeter(double longitude, double latitude, const QVector2D &centerLatLon);
 
 	static bool segmentSegmentIntersectXY(const QVector2D& a, const QVector2D& b, const QVector2D& c, const QVector2D& d, float *tab, float *tcd, bool segmentOnly, QVector2D &intPoint);
+	static bool segmentSegmentIntersectXY3D(const QVector3D& a, const QVector3D& b, const QVector3D& c, const QVector3D& d, float *tab, float *tcd, bool segmentOnly, QVector3D &intPoint);
 	static float pointSegmentDistanceXY(const QVector2D& a, const QVector2D& b, const QVector2D& c, QVector2D& closestPtInAB);
 
 	static bool leftTurn(const QVector2D& a, const QVector2D& b, const QVector2D& c);
@@ -37,6 +41,7 @@ public:
 
 	// coordinate conversion
 	static void cartesian2polar(const QVector2D &pt, float &radius, float &theta);
+	static QVector2D transform(const QVector2D &pt, const QVector2D &sourcePt, float rad, const QVector2D &targetPt);
 
 	// curvature
 	static float curvature(const Polyline2D &polyline);
@@ -45,6 +50,7 @@ public:
 	static float genRand();
 	static float genRand(float a, float b);
 	static float genRandNormal(float mean, float variance);
+	static int sampleFromCdf(std::vector<float> &cdf);
 
 	// Barycentric interpolation
 	static float barycentricInterpolation(const QVector3D& p0, const QVector3D& p1, const QVector3D& p2, const QVector2D& p);

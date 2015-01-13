@@ -16,5 +16,6 @@ public:
 
 	void addPoint(const QVector2D& p);
 	void convexHull(Polygon2D& hull);
+	Polygon2D convexHull();
 };
 

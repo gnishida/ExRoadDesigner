@@ -24,8 +24,8 @@ void MultiIntExRoadGenerator::generateRoadNetwork(bool animation) {
 			RoadVertexDesc desc = seeds.front();
 			seeds.pop_front();
 
-			float z = terrain->getValue(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
-			if (z < 0.0f || z > 100.0f) {
+			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
+			if (false&&(z < 0.0f || z > 100.0f)) {
 				std::cout << "attemptExpansion (avenue): " << i << " (skipped because it is under the sea or on the mountains)" << std::endl;
 				continue;
 			}
@@ -70,8 +70,8 @@ void MultiIntExRoadGenerator::generateRoadNetwork(bool animation) {
 			RoadVertexDesc desc = seeds.front();
 			seeds.pop_front();
 
-			float z = terrain->getValue(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
-			if (z < 0.0f || z > 100.0f) {
+			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
+			if (false&&(z < 0.0f || z > 100.0f)) {
 				std::cout << "attemptExpansion (street): " << i << " (skipped because it is under the sea or on the mountains)" << std::endl;
 				continue;
 			}
@@ -461,12 +461,12 @@ bool MultiIntExRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDe
 		new_edge->polyline.push_back(pt);
 
 		// 水没、または、山の上なら、道路生成をストップ
-		float z = terrain->getValue(pt.x(), pt.y());
-		if (z < 0.0f || z > 100.0f) {
+		float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y());
+		if (false&&(z < 0.0f || z > 100.0f)) {
 			// 最初っから水没している場合は、そもそもエッジ生成をキャンセル
 			if (new_edge->polyline.size() <= 1) return false;
 
-			RoadGeneratorHelper::cutEdgeBySteepElevationChange(new_edge->polyline, terrain);
+			RoadGeneratorHelper::cutEdgeBySteepElevationChange(new_edge->polyline, vboRenderManager);
 
 			intercepted = true;
 			break;
