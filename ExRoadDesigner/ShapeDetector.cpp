@@ -4,6 +4,14 @@
 #include "CircleHoughTransform.h"
 #include "RoadGeneratorHelper.h"
 
+/**
+ * 与えられた道路網に対して、パッチを検出し、各頂点に、属するpatchIdをセットする。
+ *
+ * @param roads			道路網
+ * @param maxRadius		検知したい円の半径の最大値
+ * @param threshold		近接頂点を探すためのしきい値
+ * @return				パッチのエッジリスト
+ */
 std::vector<RoadEdgeDescs> ShapeDetector::detect(RoadGraph &roads, float maxRadius, float threshold) {
 	float threshold2 = SQR(threshold);
 
@@ -71,13 +79,22 @@ std::vector<RoadEdgeDescs> ShapeDetector::detect(RoadGraph &roads, float maxRadi
 			if (GraphUtil::getDegree(roads, *vi) == 2) {
 				std::vector<RoadEdgeDesc> shape;
 				
+				bool visited = false;
 				RoadOutEdgeIter ei, eend;
 				for (boost::tie(ei, eend) = boost::out_edges(*vi, roads.graph); ei != eend; ++ei) {
 					if (!roads.graph[*ei]->valid) continue;
+					if (usedEdges.contains(*ei)) {
+						visited = true;
+						break;
+					}
+
+					usedEdges[*ei] = 1;
 					RoadVertexDesc src = boost::source(*ei, roads.graph);
 					RoadVertexDesc tgt = boost::target(*ei, roads.graph);
 					shape.push_back(*ei);
 				}
+
+				if (visited) continue;
 
 				usedVertices[*vi] = true;
 
@@ -94,6 +111,7 @@ std::vector<RoadEdgeDescs> ShapeDetector::detect(RoadGraph &roads, float maxRadi
 		RoadEdgeIter ei, eend;
 		for (boost::tie(ei, eend) = edges(roads.graph); ei != eend; ++ei) {
 			if (!roads.graph[*ei]->valid) continue;
+			if (usedEdges.contains(*ei)) continue;
 
 			RoadVertexDesc src = boost::source(*ei, roads.graph);
 			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
@@ -219,7 +237,7 @@ void ShapeDetector::addVerticesToCircle(RoadGraph &roads, RoadEdgeDescs& shape, 
  * @param threshold		近隣チェックのためのしきい値
  * @param shape [OUT]	近隣のエッジリストを格納する
  * @param usedVertices	訪問済みの頂点。ただし、degree=2の頂点には、このフラグはセットしない！
- * @param usedEdges		未使用？
+ * @param usedEdges		属するパッチの数
  */
 void ShapeDetector::addVerticesToGroup(RoadGraph &roads, RoadVertexDesc srcDesc, int patchId, float threshold, RoadEdgeDescs &shape, QMap<RoadVertexDesc, bool> &usedVertices, QMap<RoadEdgeDesc, int> &usedEdges) {
 	std::cout << "shape is detected..." << srcDesc << std::endl;
@@ -247,7 +265,11 @@ void ShapeDetector::addVerticesToGroup(RoadGraph &roads, RoadVertexDesc srcDesc,
 			if (!roads.graph[*ei]->valid) continue;
 			//if (usedEdges.contains(*ei)) continue;
 
-			usedEdges[*ei] = 1;
+			if (!usedEdges.contains(*ei)) {
+				usedEdges[*ei] = 1;
+			} else {
+				usedEdges[*ei]++;
+			}
 			edge_descs[*ei] = true;
 			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
 			if (usedVertices.contains(tgt)) continue;
