@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Wed Jan 14 10:52:23 2015
+** Created: Wed Jan 14 11:15:30 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -299,7 +299,7 @@ public:
         render_2DroadsStrokeSlider->setGeometry(QRect(80, 120, 81, 17));
         render_2DroadsStrokeSlider->setMaximumSize(QSize(16777215, 17));
         render_2DroadsStrokeSlider->setMaximum(100);
-        render_2DroadsStrokeSlider->setValue(35);
+        render_2DroadsStrokeSlider->setValue(15);
         render_2DroadsStrokeSlider->setOrientation(Qt::Horizontal);
         render_2DroadsExtraWidthSlider = new QSlider(groupBox_6);
         render_2DroadsExtraWidthSlider->setObjectName(QString::fromUtf8("render_2DroadsExtraWidthSlider"));
@@ -470,7 +470,7 @@ public:
         terrainPaint_sizeLabel->setText(QApplication::translate("ControlWidget", "Size: 5%", 0, QApplication::UnicodeUTF8));
         terrainPaint_changeLabel->setText(QApplication::translate("ControlWidget", "Change", 0, QApplication::UnicodeUTF8));
         terrain_2DShader->setText(QApplication::translate("ControlWidget", "2D Shader", 0, QApplication::UnicodeUTF8));
-        render_2DroadsStrokeLabel->setText(QApplication::translate("ControlWidget", "Stroke: 3.5", 0, QApplication::UnicodeUTF8));
+        render_2DroadsStrokeLabel->setText(QApplication::translate("ControlWidget", "Stroke: 1.5", 0, QApplication::UnicodeUTF8));
         render_2DroadsExtraWidthLabel->setText(QApplication::translate("ControlWidget", "R Width: 0.0", 0, QApplication::UnicodeUTF8));
         render_2DparksLabel->setText(QApplication::translate("ControlWidget", "Park 10 %", 0, QApplication::UnicodeUTF8));
         render_3DtreesCheckBox->setText(QApplication::translate("ControlWidget", "3D Trees", 0, QApplication::UnicodeUTF8));

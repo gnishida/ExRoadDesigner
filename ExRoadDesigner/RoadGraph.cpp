@@ -216,7 +216,7 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 					heightOffsetO = 0.3f;
 					color=QColor(0xfa,0x9e,0x25);
 					colorO=QColor(0x00, 0x00, 0x00);//QColor(0xdf,0x9c,0x13);
-					halfWidth*=1.4f;
+					//halfWidth*=1.4f;
 				}
 				break;
 			case RoadEdge::TYPE_BOULEVARD:
@@ -226,7 +226,7 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 					heightOffsetO = 0.2f;
 					color=QColor(0xff,0xe1,0x68);
 					colorO=QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
-					halfWidth*=1.4f;
+					//halfWidth*=1.4f;
 				}
 				break;
 			case RoadEdge::TYPE_AVENUE:
@@ -236,7 +236,7 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 					heightOffsetO = 0.1f;
 					color=QColor(0xff,0xe1,0x68);
 					colorO=QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
-					halfWidth*=1.4f;
+					//halfWidth*=1.4f;
 				}
 				break;
 			case RoadEdge::TYPE_STREET:
@@ -246,14 +246,14 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 					heightOffsetO = 0.1f;
 					color=QColor(0xff,0xff,0xff);
 					colorO=QColor(0x00, 0x00, 0x00);//QColor(0xd7,0xd1,0xc7);
-					halfWidth*=1.8f;
+					//halfWidth*=1.8f;
 				}
 				break;
 			}
 
 			if(render==false)
 				continue;
-			halfWidth+= G::global().getFloat("2DroadsExtraWidth");
+			//halfWidth+= G::global().getFloat("2DroadsExtraWidth");
 			heightOffset+=0.45f;//to have park below
 			heightOffsetO+=0.45f;//to have park below
 
@@ -345,7 +345,7 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 						heightOffsetO = 0.3f;
 						color=QColor(0xfa,0x9e,0x25);
 						colorO=QColor(0x00, 0x00, 0x00);//QColor(0xdf,0x9c,0x13);
-						halfWidth*=1.4f;
+						//halfWidth*=1.4f;
 					}
 					continue;
 				case RoadEdge::TYPE_BOULEVARD:
@@ -355,7 +355,7 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 						heightOffsetO = 0.2f;
 						color=QColor(0xff,0xe1,0x68);
 						colorO=QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
-						halfWidth*=1.4f;
+						//halfWidth*=1.4f;
 					}
 					continue;
 				case RoadEdge::TYPE_AVENUE:
@@ -365,7 +365,7 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 						heightOffsetO = 0.2f;
 						color=QColor(0xff,0xe1,0x68);
 						colorO=QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
-						halfWidth*=1.4f;
+						//halfWidth*=1.4f;
 					}
 					continue;
 				case RoadEdge::TYPE_STREET:
@@ -375,7 +375,7 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 						heightOffsetO = 0.2f;
 						color=QColor(0xff,0xff,0xff);
 						colorO=QColor(0x00, 0x00, 0x00);//QColor(0xd7,0xd1,0xc7);
-						halfWidth*=1.8f;
+						//halfWidth*=1.8f;
 					}
 					continue;
 				}
@@ -383,7 +383,7 @@ void RoadGraph::_generateMeshVerticesDefault(VBORenderManager& renderManager, co
 			//printf("** maxtype %d\n",maxType);
 			if(render==false)
 				continue;//noone active
-			halfWidth+= G::global().getFloat("2DroadsExtraWidth");
+			//halfWidth+= G::global().getFloat("2DroadsExtraWidth");
 			heightOffset+=0.45f;//to have park below
 			heightOffsetO+=0.45f;//to have park below
 
