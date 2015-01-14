@@ -70,7 +70,18 @@ std::vector<RoadEdgeDescs> ShapeDetector::detect(RoadGraph &roads, float maxRadi
 			// start from the non-intersection.
 			if (GraphUtil::getDegree(roads, *vi) == 2) {
 				std::vector<RoadEdgeDesc> shape;
-				addVerticesToGroup(roads, *vi, shapes.size(), threshold, shape, usedVertices, usedEdges);
+				
+				RoadOutEdgeIter ei, eend;
+				for (boost::tie(ei, eend) = boost::out_edges(*vi, roads.graph); ei != eend; ++ei) {
+					if (!roads.graph[*ei]->valid) continue;
+					RoadVertexDesc src = boost::source(*ei, roads.graph);
+					RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+					shape.push_back(*ei);
+				}
+
+				usedVertices[*vi] = true;
+
+				roads.graph[*vi]->patchId = shapes.size();
 				shapes.push_back(shape);
 			}
 		}
@@ -100,6 +111,29 @@ std::vector<RoadEdgeDescs> ShapeDetector::detect(RoadGraph &roads, float maxRadi
 				shapes.push_back(shape);
 
 			}		
+		}
+	}
+
+	// さらに、patchIdが未設定の頂点のために、
+	{
+		RoadEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = edges(roads.graph); ei != eend; ++ei) {
+			if (!roads.graph[*ei]->valid) continue;
+
+			RoadVertexDesc src = boost::source(*ei, roads.graph);
+			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+
+			if (roads.graph[src]->patchId < 0 && roads.graph[tgt]->patchId < 0) {
+				printf("ERROR: both src and tgt do not have patchId set.\n");
+				continue;
+			}
+
+			if (roads.graph[src]->patchId < 0) {
+				roads.graph[src]->patchId = roads.graph[tgt]->patchId;
+			}
+			if (roads.graph[tgt]->patchId < 0) {
+				roads.graph[tgt]->patchId = roads.graph[src]->patchId;
+			}
 		}
 	}
 
