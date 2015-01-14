@@ -273,15 +273,6 @@ void GLWidget3D::mouseReleaseEvent(QMouseEvent *event) {
 			}
 		}
 		break;
-	case MainWindow::MODE_CONTROL_POINTS:
-		if (controlPressed) {
-			//RoadGraph tempRoads;
-			//GraphUtil::copyRoads(mainWin->urbanGeometry->roads, tempRoads);
-			RoadGeneratorHelper::elasticTransform(mainWin->urbanGeometry->origRoads, mainWin->urbanGeometry->origControlPoints, mainWin->urbanGeometry->controlPoints, mainWin->urbanGeometry->roads);
-
-			mainWin->urbanGeometry->adaptToTerrain();
-		}
-		break;
 	}
 
 	updateGL();

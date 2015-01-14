@@ -24,9 +24,6 @@ This file is part of QtUrban.
 #include "GraphUtil.h"
 #include "PatchRoadGenerator.h"
 #include "WarpRoadGenerator.h"
-#include "PatchMultiIntExRoadGenerator.h"
-#include "PatchWarpRoadGenerator.h"
-#include "PatchWarp2RoadGenerator.h"
 #include "PMRoadGenerator.h"
 #include "AliagaRoadGenerator.h"
 #include "RoadGeneratorHelper.h"
@@ -67,7 +64,7 @@ void UrbanGeometry::clearGeometry() {
 	*/
 }
 
-void UrbanGeometry::generateRoadsTest(std::vector<ExFeature> &features) {
+void UrbanGeometry::generateRoadsEx(std::vector<ExFeature> &features) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
@@ -92,51 +89,6 @@ void UrbanGeometry::generateRoadsWarp(std::vector<ExFeature> &features) {
 		areas.selectedArea()->roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 	} else {
 		WarpRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
-		generator.generateRoadNetwork();
-		roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
-	}
-}
-
-void UrbanGeometry::generateRoadsPatchMulti(std::vector<ExFeature> &features) {
-	if (areas.selectedIndex == -1) return;
-	if (areas.selectedArea()->hintLine.size() == 0) return;
-
-	if (G::getBool("useLayer")) {
-		PatchMultiIntExRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
-		generator.generateRoadNetwork();
-		areas.selectedArea()->roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
-	} else {
-		PatchMultiIntExRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
-		generator.generateRoadNetwork();
-		roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
-	}
-}
-
-void UrbanGeometry::generateRoadsPatchWarp(std::vector<ExFeature> &features) {
-	if (areas.selectedIndex == -1) return;
-	if (areas.selectedArea()->hintLine.size() == 0) return;
-
-	if (G::getBool("useLayer")) {
-		PatchWarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
-		generator.generateRoadNetwork();
-		areas.selectedArea()->roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);		
-	} else {
-		PatchWarpRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
-		generator.generateRoadNetwork();
-		roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
-	}
-}
-
-void UrbanGeometry::generateRoadsPatchWarp2(std::vector<ExFeature> &features) {
-	if (areas.selectedIndex == -1) return;
-	if (areas.selectedArea()->hintLine.size() == 0) return;
-
-	if (G::getBool("useLayer")) {
-		PatchWarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
-		generator.generateRoadNetwork();
-		areas.selectedArea()->roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
-	} else {
-		PatchWarp2RoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
 		roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 	}

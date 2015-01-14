@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Tue Jan 13 14:53:38 2015
+** Created: Wed Jan 14 10:52:23 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -31,7 +31,6 @@ class Ui_ControlWidget
 public:
     QWidget *dockWidgetContents;
     QGroupBox *groupBox_8;
-    QPushButton *pushButtonGeneratePatch;
     QLabel *label_2;
     QLineEdit *lineEditInterpolateSigma2;
     QLabel *label_4;
@@ -40,7 +39,6 @@ public:
     QLabel *label_6;
     QPushButton *pushButtonGeneratePM;
     QPushButton *pushButtonClear;
-    QPushButton *pushButtonGeneratePatchWarp2;
     QLabel *label_8;
     QLineEdit *lineEditPatchDistance1;
     QLineEdit *lineEditPatchDistance2;
@@ -55,8 +53,8 @@ public:
     QLineEdit *lineEditRoadAngleTolerance;
     QLabel *label_14;
     QLineEdit *lineEditRotationForSteepSlope;
-    QPushButton *pushButtonGenerateTest;
-    QPushButton *pushButtonGenerateTestWarp;
+    QPushButton *pushButtonGenerateEx;
+    QPushButton *pushButtonGenerateWarp;
     QPushButton *pushButtonGenerateAliaga;
     QGroupBox *groupBox;
     QLabel *label;
@@ -119,10 +117,7 @@ public:
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         groupBox_8 = new QGroupBox(dockWidgetContents);
         groupBox_8->setObjectName(QString::fromUtf8("groupBox_8"));
-        groupBox_8->setGeometry(QRect(10, 230, 171, 311));
-        pushButtonGeneratePatch = new QPushButton(groupBox_8);
-        pushButtonGeneratePatch->setObjectName(QString::fromUtf8("pushButtonGeneratePatch"));
-        pushButtonGeneratePatch->setGeometry(QRect(10, 250, 71, 28));
+        groupBox_8->setGeometry(QRect(10, 230, 171, 281));
         label_2 = new QLabel(groupBox_8);
         label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setGeometry(QRect(10, 100, 61, 21));
@@ -143,13 +138,10 @@ public:
         label_6->setGeometry(QRect(10, 80, 61, 21));
         pushButtonGeneratePM = new QPushButton(groupBox_8);
         pushButtonGeneratePM->setObjectName(QString::fromUtf8("pushButtonGeneratePM"));
-        pushButtonGeneratePM->setGeometry(QRect(10, 280, 51, 28));
+        pushButtonGeneratePM->setGeometry(QRect(10, 250, 51, 28));
         pushButtonClear = new QPushButton(groupBox_8);
         pushButtonClear->setObjectName(QString::fromUtf8("pushButtonClear"));
-        pushButtonClear->setGeometry(QRect(110, 280, 51, 28));
-        pushButtonGeneratePatchWarp2 = new QPushButton(groupBox_8);
-        pushButtonGeneratePatchWarp2->setObjectName(QString::fromUtf8("pushButtonGeneratePatchWarp2"));
-        pushButtonGeneratePatchWarp2->setGeometry(QRect(90, 250, 71, 28));
+        pushButtonClear->setGeometry(QRect(110, 250, 51, 28));
         label_8 = new QLabel(groupBox_8);
         label_8->setObjectName(QString::fromUtf8("label_8"));
         label_8->setGeometry(QRect(10, 40, 101, 21));
@@ -192,15 +184,15 @@ public:
         lineEditRotationForSteepSlope = new QLineEdit(groupBox_8);
         lineEditRotationForSteepSlope->setObjectName(QString::fromUtf8("lineEditRotationForSteepSlope"));
         lineEditRotationForSteepSlope->setGeometry(QRect(110, 200, 51, 20));
-        pushButtonGenerateTest = new QPushButton(groupBox_8);
-        pushButtonGenerateTest->setObjectName(QString::fromUtf8("pushButtonGenerateTest"));
-        pushButtonGenerateTest->setGeometry(QRect(10, 220, 71, 28));
-        pushButtonGenerateTestWarp = new QPushButton(groupBox_8);
-        pushButtonGenerateTestWarp->setObjectName(QString::fromUtf8("pushButtonGenerateTestWarp"));
-        pushButtonGenerateTestWarp->setGeometry(QRect(90, 220, 71, 28));
+        pushButtonGenerateEx = new QPushButton(groupBox_8);
+        pushButtonGenerateEx->setObjectName(QString::fromUtf8("pushButtonGenerateEx"));
+        pushButtonGenerateEx->setGeometry(QRect(10, 220, 71, 28));
+        pushButtonGenerateWarp = new QPushButton(groupBox_8);
+        pushButtonGenerateWarp->setObjectName(QString::fromUtf8("pushButtonGenerateWarp"));
+        pushButtonGenerateWarp->setGeometry(QRect(90, 220, 71, 28));
         pushButtonGenerateAliaga = new QPushButton(groupBox_8);
         pushButtonGenerateAliaga->setObjectName(QString::fromUtf8("pushButtonGenerateAliaga"));
-        pushButtonGenerateAliaga->setGeometry(QRect(60, 280, 51, 28));
+        pushButtonGenerateAliaga->setGeometry(QRect(60, 250, 51, 28));
         groupBox = new QGroupBox(dockWidgetContents);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
         groupBox->setGeometry(QRect(10, 0, 171, 221));
@@ -252,7 +244,7 @@ public:
         label_13->setGeometry(QRect(130, 170, 31, 21));
         groupBox_5 = new QGroupBox(dockWidgetContents);
         groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
-        groupBox_5->setGeometry(QRect(10, 540, 171, 171));
+        groupBox_5->setGeometry(QRect(10, 520, 171, 171));
         pushButtonMerge = new QPushButton(groupBox_5);
         pushButtonMerge->setObjectName(QString::fromUtf8("pushButtonMerge"));
         pushButtonMerge->setGeometry(QRect(10, 20, 71, 28));
@@ -273,7 +265,7 @@ public:
         pushButtonPlanarGraph->setGeometry(QRect(10, 140, 151, 28));
         groupBox_6 = new QGroupBox(dockWidgetContents);
         groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
-        groupBox_6->setGeometry(QRect(10, 720, 171, 271));
+        groupBox_6->setGeometry(QRect(10, 700, 171, 271));
         terrainPaint_sizeLabel = new QLabel(groupBox_6);
         terrainPaint_sizeLabel->setObjectName(QString::fromUtf8("terrainPaint_sizeLabel"));
         terrainPaint_sizeLabel->setGeometry(QRect(10, 20, 61, 16));
@@ -400,8 +392,6 @@ public:
         label_15->setObjectName(QString::fromUtf8("label_15"));
         label_15->setGeometry(QRect(50, 170, 31, 21));
         ControlWidget->setWidget(dockWidgetContents);
-        QWidget::setTabOrder(pushButtonGeneratePatch, pushButtonGeneratePatchWarp2);
-        QWidget::setTabOrder(pushButtonGeneratePatchWarp2, pushButtonGeneratePM);
         QWidget::setTabOrder(pushButtonGeneratePM, pushButtonClear);
         QWidget::setTabOrder(pushButtonClear, pushButtonMerge);
         QWidget::setTabOrder(pushButtonMerge, pushButtonConnect2);
@@ -438,14 +428,11 @@ public:
     void retranslateUi(QDockWidget *ControlWidget)
     {
         groupBox_8->setTitle(QApplication::translate("ControlWidget", "Road Generation", 0, QApplication::UnicodeUTF8));
-        pushButtonGeneratePatch->setText(QApplication::translate("ControlWidget", "Multi Ex", 0, QApplication::UnicodeUTF8));
         label_2->setText(QApplication::translate("ControlWidget", "sigma2 ^2", 0, QApplication::UnicodeUTF8));
         label_4->setText(QApplication::translate("ControlWidget", "threshold", 0, QApplication::UnicodeUTF8));
         label_6->setText(QApplication::translate("ControlWidget", "sigma1 ^2", 0, QApplication::UnicodeUTF8));
         pushButtonGeneratePM->setText(QApplication::translate("ControlWidget", "PM", 0, QApplication::UnicodeUTF8));
         pushButtonClear->setText(QApplication::translate("ControlWidget", "Clear", 0, QApplication::UnicodeUTF8));
-        pushButtonGeneratePatchWarp2->setText(QApplication::translate("ControlWidget", "Warp", 0, QApplication::UnicodeUTF8));
-        pushButtonGeneratePatchWarp2->setShortcut(QApplication::translate("ControlWidget", "Ctrl+W", 0, QApplication::UnicodeUTF8));
         label_8->setText(QApplication::translate("ControlWidget", "Avenue patch dist", 0, QApplication::UnicodeUTF8));
         label_9->setText(QApplication::translate("ControlWidget", "Street patch dist", 0, QApplication::UnicodeUTF8));
         label_5->setText(QApplication::translate("ControlWidget", "rotation", 0, QApplication::UnicodeUTF8));
@@ -453,8 +440,8 @@ public:
         label_11->setText(QApplication::translate("ControlWidget", "snap tolerance", 0, QApplication::UnicodeUTF8));
         label_12->setText(QApplication::translate("ControlWidget", "angle tolerance", 0, QApplication::UnicodeUTF8));
         label_14->setText(QApplication::translate("ControlWidget", "rotation for slope", 0, QApplication::UnicodeUTF8));
-        pushButtonGenerateTest->setText(QApplication::translate("ControlWidget", "Test", 0, QApplication::UnicodeUTF8));
-        pushButtonGenerateTestWarp->setText(QApplication::translate("ControlWidget", "New Warp", 0, QApplication::UnicodeUTF8));
+        pushButtonGenerateEx->setText(QApplication::translate("ControlWidget", "Example", 0, QApplication::UnicodeUTF8));
+        pushButtonGenerateWarp->setText(QApplication::translate("ControlWidget", "Warp", 0, QApplication::UnicodeUTF8));
         pushButtonGenerateAliaga->setText(QApplication::translate("ControlWidget", "Aliaga", 0, QApplication::UnicodeUTF8));
         groupBox->setTitle(QApplication::translate("ControlWidget", "Options", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("ControlWidget", "Avenue Iteration:", 0, QApplication::UnicodeUTF8));

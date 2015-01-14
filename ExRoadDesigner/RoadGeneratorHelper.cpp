@@ -6,7 +6,6 @@
 #include "GraphUtil.h"
 #include "TopNSearch.h"
 #include "BSpline.h"
-#include "MorphGrid.h"
 /**
 * Checks if new edge will intersect an existing edge
 **/
@@ -1679,7 +1678,7 @@ void RoadGeneratorHelper::createFourEdges(ExFeature &f, int roadType, const QVec
 	BBox bbox = f.area.envelope();
 	float dist = (bbox.dx() + bbox.dy()) * 0.25f;
 	//float avgLength, varLength, avgCurvature, varCurvature;
-	//GraphUtil::computeStatistics(f.reducedRoads(roadType), ex_pt, dist, avgLength, varLength, avgCurvature, varCurvature);
+	//GraphUtil::computeStatistics(f.roads(roadType), ex_pt, dist, avgLength, varLength, avgCurvature, varCurvature);
 
 	std::vector<float> directions;
 	createFourDirection(direction, directions);
@@ -1688,7 +1687,7 @@ void RoadGeneratorHelper::createFourEdges(ExFeature &f, int roadType, const QVec
 	
 	for (int i = 0; i < directions.size(); ++i) {
 		float length, curvature;
-		chooseEdgeLengthAndCurvature(f.reducedRoads(roadType), ex_pt, dist, directions[i], length, curvature);
+		chooseEdgeLengthAndCurvature(f.roads(roadType), ex_pt, dist, directions[i], length, curvature);
 
 		// 50%の確率で、どっちに曲がるか決定
 		if (Util::genRand() >= 0.5f) {
@@ -1982,130 +1981,6 @@ void RoadGeneratorHelper::check(RoadGraph &roads) {
 	*/
 }
 
-void RoadGeneratorHelper::elasticTransform(RoadGraph &srcRoads, const Polyline2D &srcLine, const Polyline2D &dstLine, RoadGraph &dstRoads) {
-	dstRoads.clear();
-
-	BBox bbox = GraphUtil::bbox(srcRoads);
-	bbox.minPt.setX(bbox.minPt.x() - 500);
-	bbox.minPt.setY(bbox.minPt.y() - 500);
-	bbox.maxPt.setX(bbox.maxPt.x() + 500);
-	bbox.maxPt.setY(bbox.maxPt.y() + 500);
-
-	Polyline2D srcSpline = BSpline::spline(srcLine, 6);
-	Polyline2D dstSpline = BSpline::spline(dstLine, 6);
-
-	Polyline2D srcLeftSpline;
-	Polyline2D srcRightSpline;
-	Polyline2D dstLeftSpline;
-	Polyline2D dstRightSpline;
-
-	MorphGrid grid;
-	//std::vector<Polygon2D> srcGrid;
-	//std::vector<Polygon2D> dstGrid;
-
-	for (int i = 0; i < srcSpline.size(); ++i) {
-		QVector2D srcVec;
-		if (i == 0) {
-			srcVec = (srcSpline[i + 1] - srcSpline[i]).normalized();
-		} else if (i == srcSpline.size() - 1) {
-			srcVec = (srcSpline[i] - srcSpline[i - 1]).normalized();
-		} else {
-			srcVec = (srcSpline[i + 1] - srcSpline[i - 1]).normalized();
-		}
-
-		QVector2D srcPer = QVector2D(-srcVec.y(), srcVec.x());
-
-		QVector2D leftFarPt = srcSpline[i] + srcPer * 100000.0f;
-		QVector2D srcLeftPt;
-		bbox.intersects(srcSpline[i], leftFarPt, srcLeftPt);
-		srcLeftSpline.push_back(srcLeftPt);
-		float leftDist = (srcLeftPt - srcSpline[i]).length();
-
-		QVector2D rightFarPt = srcSpline[i] - srcPer * 100000.0f;
-		QVector2D srcRightPt;
-		bbox.intersects(srcSpline[i], rightFarPt, srcRightPt);
-		srcRightSpline.push_back(srcRightPt);
-		float rightDist = (srcRightPt - srcSpline[i]).length();
-
-
-		// dst
-		QVector2D dstVec;
-		if (i == 0) {
-			dstVec = (dstSpline[i + 1] - dstSpline[i]).normalized();
-		} else if (i == dstSpline.size() - 1) {
-			dstVec = (dstSpline[i] - dstSpline[i - 1]).normalized();
-		} else {
-			dstVec = (dstSpline[i + 1] - dstSpline[i - 1]).normalized();
-		}
-
-		QVector2D dstPer = QVector2D(-dstVec.y(), dstVec.x());
-	
-
-		QVector2D dstLeftPt = dstSpline[i] + dstPer * leftDist;
-		dstLeftSpline.push_back(dstLeftPt);
-
-		QVector2D dstRightPt = dstSpline[i] - dstPer * rightDist;
-		dstRightSpline.push_back(dstRightPt);
-	}
-
-	for (int i = 0; i < srcSpline.size() - 1; ++i) {
-		Polygon2D srcPolygon, dstPolygon;
-
-		srcPolygon.push_back(srcSpline[i]);
-		srcPolygon.push_back(srcSpline[i + 1]);
-		srcPolygon.push_back(srcLeftSpline[i + 1]);
-		srcPolygon.push_back(srcLeftSpline[i]);
-
-		dstPolygon.push_back(dstSpline[i]);
-		dstPolygon.push_back(dstSpline[i + 1]);
-		dstPolygon.push_back(dstLeftSpline[i + 1]);
-		dstPolygon.push_back(dstLeftSpline[i]);
-
-		grid.addGrid(srcPolygon, dstPolygon);
-
-
-		srcPolygon.clear();
-		srcPolygon.push_back(srcRightSpline[i]);
-		srcPolygon.push_back(srcRightSpline[i + 1]);
-		srcPolygon.push_back(srcSpline[i + 1]);
-		srcPolygon.push_back(srcSpline[i]);
-
-		dstPolygon.clear();
-		dstPolygon.push_back(dstRightSpline[i]);
-		dstPolygon.push_back(dstRightSpline[i + 1]);
-		dstPolygon.push_back(dstSpline[i + 1]);
-		dstPolygon.push_back(dstSpline[i]);
-
-		grid.addGrid(srcPolygon, dstPolygon);
-	}
-
-	QMap<RoadVertexDesc, RoadVertexDesc> conv;
-
-	RoadVertexIter vi, vend;
-	for (boost::tie(vi, vend) = boost::vertices(srcRoads.graph); vi != vend; ++vi) {
-		RoadVertexPtr v = RoadVertexPtr(new RoadVertex(*srcRoads.graph[*vi]));
-		v->pt = grid.transform(v->pt);
-
-		RoadVertexDesc new_v_desc = GraphUtil::addVertex(dstRoads, v);
-		conv[*vi] = new_v_desc;
-	}
-
-	RoadEdgeIter ei, eend;
-	for (boost::tie(ei, eend) = boost::edges(srcRoads.graph); ei != eend; ++ei) {
-		RoadEdgePtr e = RoadEdgePtr(new RoadEdge(*srcRoads.graph[*ei]));
-
-		for (int i = 0; i < e->polyline.size(); ++i) {
-			e->polyline[i] = grid.transform(e->polyline[i]);
-		}
-
-		RoadVertexDesc src = boost::source(*ei, srcRoads.graph);
-		RoadVertexDesc tgt = boost::target(*ei, srcRoads.graph);
-		GraphUtil::addEdge(dstRoads, conv[src], conv[tgt], e);
-	}
-
-	dstRoads.setModified();
-}
-
 /**
  * 当該頂点が、interesting shapeの一部かどうか？
  */
@@ -2134,6 +2009,10 @@ std::vector<Patch> RoadGeneratorHelper::convertToPatch(int roadType, RoadGraph& 
 		for (int j = 0; j < shapes[i].size(); ++j) {
 			RoadVertexDesc src = boost::source(shapes[i][j], roads.graph);
 			RoadVertexDesc tgt = boost::target(shapes[i][j], roads.graph);
+
+			if (src == 63 || tgt == 63) {
+				int xxx = 0;
+			}
 
 			if (!conv.contains(src)) {
 				RoadVertexPtr v = RoadVertexPtr(new RoadVertex(*roads.graph[src]));

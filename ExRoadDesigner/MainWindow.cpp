@@ -520,7 +520,7 @@ void MainWindow::onRotationVideo() {
 		GraphUtil::subtractRoads(urbanGeometry->roads, area.area, false);
 
 		// generate roads within the area
-		urbanGeometry->generateRoadsPatchMulti(features);
+		urbanGeometry->generateRoadsEx(features);
 	
 		urbanGeometry->areas.deleteArea();
 
@@ -703,7 +703,7 @@ void MainWindow::onBlendingVideo() {
 		GraphUtil::subtractRoads(urbanGeometry->roads, area.area, false);
 
 		// generate roads within the area
-		urbanGeometry->generateRoadsPatchMulti(features);
+		urbanGeometry->generateRoadsEx(features);
 	
 		urbanGeometry->areas.deleteArea();
 
@@ -795,9 +795,9 @@ void MainWindow::onGrowingVideo() {
 		GraphUtil::subtractRoads(urbanGeometry->roads, area.area, false);
 
 		if (dlg.generationMethod == "Multi Examples") {
-			urbanGeometry->generateRoadsPatchMulti(features);
+			urbanGeometry->generateRoadsEx(features);
 		} else if (dlg.generationMethod == "Warp") {
-			urbanGeometry->generateRoadsPatchWarp2(features);
+			urbanGeometry->generateRoadsWarp(features);
 		} else {
 			urbanGeometry->generateRoadsPM(features);
 		}
@@ -839,9 +839,9 @@ void MainWindow::onGrowingVideo() {
 		GraphUtil::subtractRoads(urbanGeometry->roads, area.area, false);
 
 		if (dlg.generationMethod == "Multi Examples") {
-			urbanGeometry->generateRoadsPatchMulti(features);
+			urbanGeometry->generateRoadsEx(features);
 		} else if (dlg.generationMethod == "Warp") {
-			urbanGeometry->generateRoadsPatchWarp2(features);
+			urbanGeometry->generateRoadsWarp(features);
 		} else {
 			urbanGeometry->generateRoadsPM(features);
 		}

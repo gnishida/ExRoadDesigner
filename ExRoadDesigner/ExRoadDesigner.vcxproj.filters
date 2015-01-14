@@ -193,16 +193,10 @@
     <ClCompile Include="CircleHoughTransform.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="PatchMultiIntExRoadGenerator.cpp">
-      <Filter>road generator</Filter>
-    </ClCompile>
     <ClCompile Include="BSpline.cpp">
       <Filter>common</Filter>
     </ClCompile>
     <ClCompile Include="PMRoadGenerator.cpp">
-      <Filter>road generator</Filter>
-    </ClCompile>
-    <ClCompile Include="PatchWarp2RoadGenerator.cpp">
       <Filter>road generator</Filter>
     </ClCompile>
     <ClCompile Include="clipper.cpp">
@@ -286,12 +280,6 @@
     <ClCompile Include="FlyThroughCamera.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="MassSpring.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="MorphGrid.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
     <ClCompile Include="VideoCaptureSettingDialog.cpp">
       <Filter>Form Files</Filter>
     </ClCompile>
@@ -350,9 +338,6 @@
       <Filter>road</Filter>
     </ClCompile>
     <ClCompile Include="PatchRoadGenerator.cpp">
-      <Filter>road generator</Filter>
-    </ClCompile>
-    <ClCompile Include="PatchWarpRoadGenerator.cpp">
       <Filter>road generator</Filter>
     </ClCompile>
     <ClCompile Include="WarpRoadGenerator.cpp">
@@ -563,16 +548,10 @@
     <ClInclude Include="CircleHoughTransform.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="PatchMultiIntExRoadGenerator.h">
-      <Filter>road generator</Filter>
-    </ClInclude>
     <ClInclude Include="BSpline.h">
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="PMRoadGenerator.h">
-      <Filter>road generator</Filter>
-    </ClInclude>
-    <ClInclude Include="PatchWarp2RoadGenerator.h">
       <Filter>road generator</Filter>
     </ClInclude>
     <ClInclude Include="clipper.hpp">
@@ -650,12 +629,6 @@
     <ClInclude Include="FlyThroughCamera.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="MassSpring.h">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="MorphGrid.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="Camera3D.h">
       <Filter>common</Filter>
     </ClInclude>
@@ -681,9 +654,6 @@
       <Filter>road</Filter>
     </ClInclude>
     <ClInclude Include="PatchRoadGenerator.h">
-      <Filter>road generator</Filter>
-    </ClInclude>
-    <ClInclude Include="PatchWarpRoadGenerator.h">
       <Filter>road generator</Filter>
     </ClInclude>
     <ClInclude Include="WarpRoadGenerator.h">

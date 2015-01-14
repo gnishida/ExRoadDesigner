@@ -26,25 +26,12 @@
       <x>10</x>
       <y>230</y>
       <width>171</width>
-      <height>311</height>
+      <height>281</height>
      </rect>
     </property>
     <property name="title">
      <string>Road Generation</string>
     </property>
-    <widget class="QPushButton" name="pushButtonGeneratePatch">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>250</y>
-       <width>71</width>
-       <height>28</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Multi Ex</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
@@ -118,7 +105,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>280</y>
+       <y>250</y>
        <width>51</width>
        <height>28</height>
       </rect>
@@ -131,29 +118,13 @@
      <property name="geometry">
       <rect>
        <x>110</x>
-       <y>280</y>
+       <y>250</y>
        <width>51</width>
        <height>28</height>
       </rect>
      </property>
      <property name="text">
       <string>Clear</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButtonGeneratePatchWarp2">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>250</y>
-       <width>71</width>
-       <height>28</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Warp</string>
-     </property>
-     <property name="shortcut">
-      <string>Ctrl+W</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_8">
@@ -317,7 +288,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButtonGenerateTest">
+    <widget class="QPushButton" name="pushButtonGenerateEx">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -327,10 +298,10 @@
       </rect>
      </property>
      <property name="text">
-      <string>Test</string>
+      <string>Example</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButtonGenerateTestWarp">
+    <widget class="QPushButton" name="pushButtonGenerateWarp">
      <property name="geometry">
       <rect>
        <x>90</x>
@@ -340,14 +311,14 @@
       </rect>
      </property>
      <property name="text">
-      <string>New Warp</string>
+      <string>Warp</string>
      </property>
     </widget>
     <widget class="QPushButton" name="pushButtonGenerateAliaga">
      <property name="geometry">
       <rect>
        <x>60</x>
-       <y>280</y>
+       <y>250</y>
        <width>51</width>
        <height>28</height>
       </rect>
@@ -556,7 +527,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>540</y>
+      <y>520</y>
       <width>171</width>
       <height>171</height>
      </rect>
@@ -656,7 +627,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>720</y>
+      <y>700</y>
       <width>171</width>
       <height>271</height>
      </rect>
@@ -1165,8 +1136,6 @@
   </widget>
  </widget>
  <tabstops>
-  <tabstop>pushButtonGeneratePatch</tabstop>
-  <tabstop>pushButtonGeneratePatchWarp2</tabstop>
   <tabstop>pushButtonGeneratePM</tabstop>
   <tabstop>pushButtonClear</tabstop>
   <tabstop>pushButtonMerge</tabstop>

@@ -196,14 +196,11 @@
     </ClCompile>
     <ClCompile Include="GrowingVideoSettingDialog.cpp" />
     <ClCompile Include="InterpolationVideoSettingDialog.cpp" />
-    <ClCompile Include="MassSpring.cpp" />
     <ClCompile Include="nvModel\nvModel.cpp" />
     <ClCompile Include="nvModel\nvModelObj.cpp" />
     <ClCompile Include="nvModel\nvModelQuery.cpp" />
     <ClCompile Include="Patch.cpp" />
     <ClCompile Include="PatchRoadGenerator.cpp" />
-    <ClCompile Include="PatchWarp2RoadGenerator.cpp" />
-    <ClCompile Include="PatchWarpRoadGenerator.cpp" />
     <ClCompile Include="PMRoadGenerator.cpp" />
     <ClCompile Include="RotationVideoSettingDialog.cpp" />
     <ClCompile Include="ShapeDetector.cpp" />
@@ -263,8 +260,6 @@
     <ClCompile Include="LC_Layer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="MorphGrid.cpp" />
-    <ClCompile Include="PatchMultiIntExRoadGenerator.cpp" />
     <ClCompile Include="Polygon2D.cpp" />
     <ClCompile Include="Polygon3D.cpp" />
     <ClCompile Include="PolygonBuilder.cpp" />
@@ -475,7 +470,6 @@
     </CustomBuild>
     <ClInclude Include="Patch.h" />
     <ClInclude Include="PatchRoadGenerator.h" />
-    <ClInclude Include="PatchWarpRoadGenerator.h" />
     <ClInclude Include="VoronoiUtil.h" />
     <CustomBuild Include="CircleDetectionScaleInputDialog.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
@@ -498,13 +492,11 @@
     <ClInclude Include="CircleHoughTransform.h" />
     <ClInclude Include="clipper.hpp" />
     <ClInclude Include="GeneratedFiles\ui_CircleDetectionScaleInputDialog.h" />
-    <ClInclude Include="MassSpring.h" />
     <ClInclude Include="nvModel\nvMath.h" />
     <ClInclude Include="nvModel\nvMatrix.h" />
     <ClInclude Include="nvModel\nvModel.h" />
     <ClInclude Include="nvModel\nvQuaternion.h" />
     <ClInclude Include="nvModel\nvVector.h" />
-    <ClInclude Include="PatchWarp2RoadGenerator.h" />
     <ClInclude Include="PMRoadGenerator.h" />
     <ClInclude Include="ShapeDetector.h" />
     <ClInclude Include="ColorTable.h" />
@@ -522,8 +514,6 @@
     <ClInclude Include="Histogram.h" />
     <ClInclude Include="HoughTransform.h" />
     <ClInclude Include="LC_Layer.h" />
-    <ClInclude Include="MorphGrid.h" />
-    <ClInclude Include="PatchMultiIntExRoadGenerator.h" />
     <ClInclude Include="Polygon2D.h" />
     <ClInclude Include="Polygon3D.h" />
     <ClInclude Include="PolygonBuilder.h" />
