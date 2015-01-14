@@ -432,7 +432,7 @@ void ExFeature::savePatchImages(int roadType, int ex_id, RoadGraph& roads, std::
 
 				// 属するパッチIDを描画
 				if (roads.graph[*vi]->patchId < 0 && !roads.graph[*vi]->onBoundary) {
-					printf("ERROR!!!!!!!!!!!!!!  patchID should be >= 0.");
+					printf("ERROR!!!!!!!!!!!!!!  patchID should be >= 0.\n");
 				}
 				QString str = QString::number(roads.graph[*vi]->patchId);
 				cv::putText(img, str.toUtf8().data(), cv::Point(x, y), cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 1, cv::Scalar(0, 128, 0), 2);
@@ -506,5 +506,5 @@ void ExFeature::detectStreetShapes(float houghScale, float patchDistance) {
 	streetPatches = RoadGeneratorHelper::convertToPatch(RoadEdge::TYPE_STREET, streets, avenues, streetShapes);
 
 	// save patch images
-	//savePatchImages(RoadEdge::TYPE_STREET, 1, streets, streetPatches, 1.0f, true);
+	savePatchImages(RoadEdge::TYPE_STREET, 1, streets, streetPatches, 1.0f, true);
 }

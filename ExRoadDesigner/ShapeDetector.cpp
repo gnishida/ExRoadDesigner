@@ -58,8 +58,27 @@ std::vector<RoadEdgeDescs> ShapeDetector::detect(RoadGraph &roads, float maxRadi
 	}
 
 	// 基本的に、全てのエッジを、いずれかのパッチに属するようにしたい。
-	// しかし、上のclose verticesの方法だと、孤立したエッジは、パッチになれない。
-	// そこで、以下で、強引にパッチにする
+	// しかし、上のclose verticesの方法だと、交差点のないエッジや、孤立したエッジは、パッチになれない。
+	// degree>2の制約をdegree=2に変更し、上のチェックを繰り返すことで、交差点のないエッジに対応
+	{
+		time_t start = clock();
+		RoadVertexIter vi, vend;
+		for (boost::tie(vi, vend) = vertices(roads.graph); vi != vend; ++vi) {
+			if (!roads.graph[*vi]->valid) continue;
+			if (usedVertices.contains(*vi)) continue;
+
+			// start from the non-intersection.
+			if (GraphUtil::getDegree(roads, *vi) == 2) {
+				std::vector<RoadEdgeDesc> shape;
+				addVerticesToGroup(roads, *vi, shapes.size(), threshold, shape, usedVertices, usedEdges);
+				shapes.push_back(shape);
+			}
+		}
+		time_t end = clock();
+		std::cout << "Close vertices detection 2: " << (double)(end - start) / CLOCKS_PER_SEC << " [sec]" << std::endl;
+	}
+
+	// さらに、孤立したエッジのために、
 	{
 		RoadEdgeIter ei, eend;
 		for (boost::tie(ei, eend) = edges(roads.graph); ei != eend; ++ei) {
@@ -157,6 +176,17 @@ void ShapeDetector::addVerticesToCircle(RoadGraph &roads, RoadEdgeDescs& shape, 
 	}
 }
 
+/**
+ * 頂点srcDescからスタートし、近隣のエッジのリストをshapeに格納する。
+ *
+ * @param roads			道路グラフ
+ * @param srcDesc		この頂点からスタート
+ * @param patchId		近隣の頂点に、このpatchIdを設定する。ただし、すでに非負の値が設定されている場合は、上書きしないで、そのまま
+ * @param threshold		近隣チェックのためのしきい値
+ * @param shape [OUT]	近隣のエッジリストを格納する
+ * @param usedVertices	訪問済みの頂点。ただし、degree=2の頂点には、このフラグはセットしない！
+ * @param usedEdges		未使用？
+ */
 void ShapeDetector::addVerticesToGroup(RoadGraph &roads, RoadVertexDesc srcDesc, int patchId, float threshold, RoadEdgeDescs &shape, QMap<RoadVertexDesc, bool> &usedVertices, QMap<RoadEdgeDesc, int> &usedEdges) {
 	std::cout << "shape is detected..." << srcDesc << std::endl;
 
