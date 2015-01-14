@@ -587,6 +587,19 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 	return true;
 }
 
+/**
+ * replacement グラフを構築する。ただし、現在頂点srcDescから伸びる既存エッジと重複するエッジは削除しておく。
+ *
+ * @param roadType					道路タイプ (Avenue / local street)
+ * @param replacementGraph [OUT]	構築されたreplacementグラフ
+ * @param srcDesc					ターゲットグラフにおける現在頂点ID
+ * @param ex_id						使用するexampleのID
+ * @param exRoads					example道路グラフ
+ * @param ex_srcDesc				srcDescに対応する、exampleグラフの頂点ID
+ * @param angle						回転させるべき角度
+ * @param patch						使用するパッチ
+ * @param patchId					使用するパッチのID
+ */
 void PatchRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph &replacementGraph, RoadVertexDesc srcDesc, int ex_id, RoadGraph &exRoads, RoadVertexDesc ex_srcDesc, float angle, Patch &patch, int patchId) {
 	replacementGraph.clear();
 
@@ -612,10 +625,11 @@ void PatchRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph 
 			if (v->patchId != patchId) {
 				int xxxx = 0;
 			}
-			v->patchId = patchId;
+			//v->patchId = patchId;
 
 			// 元のExampleで境界上の頂点だったかどうかは、ターゲットエリアでは関係ないので、一旦リセットする
-			v->onBoundary = false;
+			// GEN 1/14  ↓コメントアウト
+			//v->onBoundary = false;
 
 			RoadVertexDesc v_desc = GraphUtil::addVertex(replacementGraph, v);
 			conv[*vi] = v_desc;
