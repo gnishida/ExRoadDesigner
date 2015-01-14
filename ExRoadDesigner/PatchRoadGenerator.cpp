@@ -604,7 +604,7 @@ void PatchRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph 
 	replacementGraph.clear();
 
 	QMap<RoadVertexDesc, RoadVertexDesc> conv;
-	RoadVertexDesc root_desc;
+	RoadVertexDesc root_desc = 9999999;
 
 	// add vertices of the patch
 	{
@@ -623,7 +623,7 @@ void PatchRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph 
 			v->properties["ex_id"] = ex_id;//roads.graph[srcDesc]->properties["ex_id"];
 			v->properties["group_id"] = roads.graph[srcDesc]->properties["group_id"];
 			if (v->patchId != patchId) {
-				int xxxx = 0;
+				printf("ERROR!!! patchId has not been copied.\n");
 			}
 			//v->patchId = patchId;
 
@@ -638,6 +638,10 @@ void PatchRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph 
 				root_desc = v_desc;
 			}
 		}
+	}
+
+	if (root_desc == 9999999) {
+		printf("ERROR!!!! root_desc is not found!\n");
 	}
 
 	// patchのエッジを追加
@@ -694,8 +698,8 @@ void PatchRoadGenerator::buildReplacementGraphByExample2(int roadType, RoadGraph
 	replacementGraph.clear();
 
 	QMap<RoadVertexDesc, RoadVertexDesc> conv;
-	RoadVertexDesc connector_desc;
-	RoadVertexDesc root_desc;
+	RoadVertexDesc connector_desc = 9999999;
+	RoadVertexDesc root_desc = 9999999;
 
 	// add vertices of the patch
 	{
@@ -714,12 +718,13 @@ void PatchRoadGenerator::buildReplacementGraphByExample2(int roadType, RoadGraph
 			v->properties["ex_id"] = ex_id;//roads.graph[srcDesc]->properties["ex_id"];
 			v->properties["group_id"] = roads.graph[srcDesc]->properties["group_id"];
 			if (v->patchId != patchId) {
-				int xxxx = 0;
+				printf("ERROR!!! patchId has not been copied.\n");
 			}
-			v->patchId = patchId;
+			//v->patchId = patchId;
 
 			// 元のExampleで境界上の頂点だったかどうかは、ターゲットエリアでは関係ないので、一旦リセットする
-			v->onBoundary = false;
+			// GEN 1/14  ↓コメントアウト
+			//v->onBoundary = false;
 
 			RoadVertexDesc v_desc = GraphUtil::addVertex(replacementGraph, v);
 			conv[*vi] = v_desc;
@@ -731,6 +736,13 @@ void PatchRoadGenerator::buildReplacementGraphByExample2(int roadType, RoadGraph
 				root_desc = v_desc;
 			}
 		}
+	}
+
+	if (root_desc == 9999999) {
+		printf("ERROR!!!! root_desc is not found!\n");
+	}
+	if (connector_desc == 9999999) {
+		printf("ERROR!!!! connector_desc is not found!\n");
 	}
 
 	// patchのエッジを追加
@@ -803,7 +815,9 @@ void PatchRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph
 				v_desc = GraphUtil::addVertex(roads, v);
 
 				// エリア外なら、onBoundaryフラグをセット
-				if (!targetArea.contains(roads.graph[v_desc]->pt)) {
+				if (targetArea.contains(roads.graph[v_desc]->pt)) {
+					roads.graph[v_desc]->onBoundary = false;
+				} else {
 					roads.graph[v_desc]->onBoundary = true;
 				}
 
@@ -812,7 +826,7 @@ void PatchRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph
 					&& replacementGraph.graph[*vi]->deadend == false
 					&& !roads.graph[v_desc]->onBoundary) {*/
 				// 新規追加された頂点について、もとのreplacementGraphでconnectorなら、シードに追加
-				if (replacementGraph.graph[*vi]->connector) {
+				if (replacementGraph.graph[*vi]->connector && !roads.graph[v_desc]->onBoundary) {
 					seeds.push_back(v_desc);
 				}
 			} else {
@@ -1128,7 +1142,7 @@ void PatchRoadGenerator::synthesizeItem(int roadType, RoadVertexDesc v_desc, flo
 		e->polyline.push_back(QVector2D(0, 0));
 		//e->polyline.push_back(QVector2D(500.0f * cosf(direction), 500.0f * sinf(direction)));
 		float len = Util::genRand(length * 0.7, length * 1.5);
-		e->polyline.push_back(QVector2D(len * cosf(direction), len * 1.5f * sinf(direction)));
+		e->polyline.push_back(QVector2D(len * cosf(direction), len * sinf(direction)));
 		
 		edges.push_back(e);
 
