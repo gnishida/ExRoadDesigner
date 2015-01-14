@@ -18,6 +18,7 @@ public:
 	bool deadend;
 	bool onBoundary;
 	float rotationAngle;
+	bool connector;
 
 	QHash<QString, QVariant> properties;
 

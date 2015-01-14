@@ -2010,10 +2010,6 @@ std::vector<Patch> RoadGeneratorHelper::convertToPatch(int roadType, RoadGraph& 
 			RoadVertexDesc src = boost::source(shapes[i][j], roads.graph);
 			RoadVertexDesc tgt = boost::target(shapes[i][j], roads.graph);
 
-			if (src == 63 || tgt == 63) {
-				int xxx = 0;
-			}
-
 			if (!conv.contains(src)) {
 				RoadVertexPtr v = RoadVertexPtr(new RoadVertex(*roads.graph[src]));
 				RoadVertexDesc v_desc = GraphUtil::addVertex(patch.roads, v);
@@ -2036,8 +2032,10 @@ std::vector<Patch> RoadGeneratorHelper::convertToPatch(int roadType, RoadGraph& 
 						}
 					}
 				}
+				patch.roads.graph[v_desc]->onBoundary = roads.graph[tgt]->onBoundary;
 				patch.roads.graph[v_desc]->patchId = i;
 				patch.roads.graph[v_desc]->type = roadType;
+				patch.roads.graph[v_desc]->properties["orig_degree"] = GraphUtil::getDegree(roads, src);
 				conv[src] = v_desc;
 			}
 			if (!conv.contains(tgt)) {
@@ -2062,8 +2060,10 @@ std::vector<Patch> RoadGeneratorHelper::convertToPatch(int roadType, RoadGraph& 
 						}
 					}
 				}
+				patch.roads.graph[v_desc]->onBoundary = roads.graph[tgt]->onBoundary;
 				patch.roads.graph[v_desc]->patchId = i;
 				patch.roads.graph[v_desc]->type = roadType;
+				patch.roads.graph[v_desc]->properties["orig_degree"] = GraphUtil::getDegree(roads, tgt);
 				conv[tgt] = v_desc;
 			}
 
@@ -2071,18 +2071,23 @@ std::vector<Patch> RoadGeneratorHelper::convertToPatch(int roadType, RoadGraph& 
 			GraphUtil::addEdge(patch.roads, conv[src], conv[tgt], e);
 		}
 
-		// 各パッチのコネクタを設定
+		patches.push_back(patch);
+	}
+
+	// 各パッチのコネクタを設定
+	for (int i = 0; i < patches.size(); ++i) {
 		RoadVertexIter vi, vend;
-		for (boost::tie(vi, vend) = boost::vertices(patch.roads.graph); vi != vend; ++vi) {
-			if (GraphUtil::getDegree(patch.roads, *vi) == 1) {
-				patch.connectors.push_back(*vi);
+		for (boost::tie(vi, vend) = boost::vertices(patches[i].roads.graph); vi != vend; ++vi) {
+			if (GraphUtil::getDegree(patches[i].roads, *vi) < patches[i].roads.graph[*vi]->properties["orig_degree"].toInt()
+				|| (GraphUtil::getDegree(patches[i].roads, *vi) == 1 && !patches[i].roads.graph[*vi]->deadend)) {
+			//if (GraphUtil::getDegree(patches[i].roads, *vi) == 1) {
+				patches[i].connectors.push_back(*vi);
+				patches[i].roads.graph[*vi]->connector = true;
 
 				// この頂点からエッジを辿りながら、各エッジにconnectorフラグをマークする
-				markConnectorToEdge(patch.roads, *vi);
+				markConnectorToEdge(patches[i].roads, *vi);
 			}
 		}
-
-		patches.push_back(patch);
 	}
 
 	return patches;

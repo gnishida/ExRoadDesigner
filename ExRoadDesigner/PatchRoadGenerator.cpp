@@ -794,9 +794,11 @@ void PatchRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph
 				}
 
 				// 新規追加された頂点について、もとのreplacementGraphでdegree==1で、deadendでないなら、シードに追加
-				if (GraphUtil::getDegree(replacementGraph, *vi) == 1 
+				/*if (GraphUtil::getDegree(replacementGraph, *vi) == 1 
 					&& replacementGraph.graph[*vi]->deadend == false
-					&& !roads.graph[v_desc]->onBoundary) {
+					&& !roads.graph[v_desc]->onBoundary) {*/
+				// 新規追加された頂点について、もとのreplacementGraphでconnectorなら、シードに追加
+				if (replacementGraph.graph[*vi]->connector) {
 					seeds.push_back(v_desc);
 				}
 			} else {

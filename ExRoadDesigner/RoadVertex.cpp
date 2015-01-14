@@ -7,6 +7,7 @@ RoadVertex::RoadVertex() {
 	this->fixed = false;
 	this->patchId = -1;
 	this->deadend = false;
+	connector = false;
 }
 
 RoadVertex::RoadVertex(const QVector2D &pt) {
@@ -17,6 +18,7 @@ RoadVertex::RoadVertex(const QVector2D &pt) {
 	this->fixed = false;
 	this->patchId = -1;
 	this->deadend = false;
+	this->connector = false;
 }
 
 const QVector2D& RoadVertex::getPt() const {
