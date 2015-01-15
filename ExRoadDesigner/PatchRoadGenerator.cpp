@@ -817,22 +817,12 @@ void PatchRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph
 				}
 
 				// 新規追加された頂点について、もとのreplacementGraphでconnectorなら、シードに追加
-				// GEN 1/15 既存頂点もシードに入れる必要があるかも。なので、下（＊）に移動した！！
-				/*if (replacementGraph.graph[*vi]->connector && !roads.graph[v_desc]->onBoundary) {
+				if (replacementGraph.graph[*vi]->connector && !roads.graph[v_desc]->onBoundary) {
 					seeds.push_back(v_desc);
-				}*/
+				}
 			} else {
 				roads.graph[v_desc]->properties = replacementGraph.graph[*vi]->properties;
 				flag = true;
-			}
-
-			// 新規追加された頂点について、もとのreplacementGraphでconnectorなら、シードに追加
-			// （＊）上から移動してきた！
-			if (replacementGraph.graph[*vi]->connector && !roads.graph[v_desc]->onBoundary) {
-				seeds.push_back(v_desc);
-				if (flag) {
-					printf("WARNING! The existing vertex (%d) was added as a seed\n", srcDesc);
-				}
 			}
 
 			conv[*vi] = v_desc;
