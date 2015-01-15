@@ -578,6 +578,55 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 		buildReplacementGraphByExample(roadType, replacementGraph, srcDesc, ex_id, f.roads(roadType), ex_v_desc, angle, patches[patch_id], patch_id);
 	}
 
+	printf("Underlying slope diff: %lf\n", RoadGeneratorHelper::diffSlopeAngle(replacementGraph, vboRenderManager));
+
+	// 山チェック
+	if (RoadGeneratorHelper::maxZ(replacementGraph, vboRenderManager) >= 70.0f && RoadGeneratorHelper::diffSlopeAngle(replacementGraph, vboRenderManager) > 0.3f) {
+		float max_rotation = G::getFloat("rotationForSteepSlope");
+		float min_slope = std::numeric_limits<float>::max();
+		float min_rotation;
+
+		RoadGraph backup;
+		GraphUtil::copyRoads(replacementGraph, backup);
+
+		// try the turn in CCW direction
+		// Note: th is the rotation angle in addition to the current rotaion angle "angle"
+		for (float th = 0; th <= max_rotation; th += 0.1f) {
+			GraphUtil::copyRoads(backup, replacementGraph);
+			GraphUtil::rotate(replacementGraph, th, roads.graph[srcDesc]->pt);
+			float diffSlope = RoadGeneratorHelper::diffSlopeAngle(replacementGraph, vboRenderManager);
+			if (diffSlope < min_slope) {
+				min_slope = diffSlope;
+				min_rotation = th;
+			}
+		}
+
+		// try the turn in CW direction
+		// Note: th is the rotation angle in addition to the current rotaion angle "angle"
+		for (float th = 0; th >= -max_rotation; th -= 0.1f) {
+			GraphUtil::copyRoads(backup, replacementGraph);
+			GraphUtil::rotate(replacementGraph, th, roads.graph[srcDesc]->pt);
+			float diffSlope = RoadGeneratorHelper::diffZ(replacementGraph, vboRenderManager);
+			if (diffSlope < min_slope) {
+				min_slope = diffSlope;
+				min_rotation = th;
+			}
+		}
+
+		// 回転しても駄目なら、exampleを使用しない
+		if (min_slope > 0.3f) return false;
+
+		printf("Patch is rotated by %lf [rad].\n", min_rotation);
+		GraphUtil::copyRoads(backup, replacementGraph);
+		GraphUtil::rotate(replacementGraph, min_rotation, roads.graph[srcDesc]->pt);
+
+		// rotationAngleを設定
+		RoadVertexIter vi, vend;
+		for (boost::tie(vi, vend) = boost::vertices(replacementGraph.graph); vi != vend; ++vi) {
+			replacementGraph.graph[*vi]->rotationAngle = angle + min_rotation;
+		}
+	}
+
 	// replacementGraphが、既に生成済みのグラフと重なるかどうかチェック
 	if (GraphUtil::isIntersect(replacementGraph, roads)) {
 		printf("replacement graph is intersected with the existing roads.\n");
@@ -592,6 +641,7 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 
 /**
  * replacement グラフを構築する。ただし、現在頂点srcDescから伸びる既存エッジと重複するエッジは削除しておく。
+ * 生成されたreplacement グラフの座標は、ターゲットグラフのそれに合わせてある。
  *
  * @param roadType					道路タイプ (Avenue / local street)
  * @param replacementGraph [OUT]	構築されたreplacementグラフ
@@ -671,7 +721,7 @@ void PatchRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph 
 				if (!replacementGraph.graph[*ei2]->valid) continue;
 
 				// もしこのエッジがコネクタじゃないなら、削除させない
-				if (replacementGraph.graph[*ei2]->connector) continue;
+				if (!replacementGraph.graph[*ei2]->connector) continue;
 
 				Polyline2D polyline2 = GraphUtil::orderPolyLine(replacementGraph, *ei2, root_desc);
 
@@ -687,8 +737,8 @@ void PatchRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph 
 }
 
 /**
- * replacement graphを生成する。
- * ただし、既存グラフと接続するコネクタ部分を削除する。
+ * replacement graphを生成する。ただし、既存グラフと接続するコネクタ部分を削除する。
+ * 生成されたreplacement グラフの座標は、ターゲットグラフのそれに合わせてある。
  */
 void PatchRoadGenerator::buildReplacementGraphByExample2(int roadType, RoadGraph &replacementGraph, RoadVertexDesc srcDesc, int ex_id, RoadGraph &exRoads, RoadVertexDesc ex_srcDesc, float angle, Patch &patch, int patchId, RoadVertexDesc v_connect, RoadVertexDesc v_root) {
 	replacementGraph.clear();

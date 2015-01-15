@@ -3426,7 +3426,7 @@ void GraphUtil::skeltonize(RoadGraph* roads) {
 }
 
 /**
- * Rotate the road graph by theta [rad].
+ * Rotate the road graph by theta [rad] in CCW direction.
  */
 void GraphUtil::rotate(RoadGraph& roads, float theta, const QVector2D& rotationCenter) {
 	// Rotate vertices

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <vector>
 #include <QVector2D>
@@ -17,7 +17,7 @@ public:
 	int patchId;
 	bool deadend;
 	bool onBoundary;
-	float rotationAngle;
+	float rotationAngle;	// 反時計回りの回転角 [rad]
 	bool connector;
 
 	QHash<QString, QVariant> properties;

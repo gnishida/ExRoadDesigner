@@ -1488,8 +1488,29 @@ float RoadGeneratorHelper::diffZ(RoadGraph &roads, VBORenderManager *vboRenderMa
 		if (z < min_z) min_z = z;
 		if (z > max_z) max_z = z;
 	}
-	
+
 	return max_z - min_z;
+}
+
+float RoadGeneratorHelper::diffSlopeAngle(RoadGraph &roads, VBORenderManager *vboRenderManager) {
+	float min_slope = std::numeric_limits<float>::max();
+	float max_slope = -std::numeric_limits<float>::max();
+
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		for (int i = 0; i < roads.graph[*ei]->polyline.size() - 1; ++i) {
+			float z1 = vboRenderManager->getTerrainHeight(roads.graph[*ei]->polyline[i].x(), roads.graph[*ei]->polyline[i].y(), true);
+			float z2 = vboRenderManager->getTerrainHeight(roads.graph[*ei]->polyline[i + 1].x(), roads.graph[*ei]->polyline[i + 1].y(), true);
+			float len = (roads.graph[*ei]->polyline[i + 1] - roads.graph[*ei]->polyline[i]).length();
+			float slope = atan2f(z2 - z1, len);
+			if (slope < min_slope) min_slope = slope;
+			if (slope > max_slope) max_slope = slope;
+		}
+	}
+	
+	return max_slope - min_slope;
 }
 
 void RoadGeneratorHelper::removeIntersectionsOnRiver(RoadGraph &roads, VBORenderManager *vboRenderManager, float seaLevel) {
