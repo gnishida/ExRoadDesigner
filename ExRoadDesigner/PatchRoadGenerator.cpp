@@ -83,7 +83,8 @@ void PatchRoadGenerator::generateRoadNetwork() {
 			//int ex_id = roads.graph[desc]->properties["ex_id"].toInt();
 			int ex_id = defineExId(roads.graph[desc]->pt);
 
-			if (!attemptConnect(RoadEdge::TYPE_AVENUE, desc, ex_id, features, seeds)) {
+			attemptConnect(RoadEdge::TYPE_AVENUE, desc, ex_id, features, seeds);
+			if (RoadGeneratorHelper::largestAngleBetweenEdges(roads, desc) > M_PI * 1.4f) {
 				if (!attemptExpansion(RoadEdge::TYPE_AVENUE, desc, ex_id, features[ex_id], patches[ex_id], seeds)) {
 					attemptExpansion2(RoadEdge::TYPE_AVENUE, desc, features[ex_id], seeds);
 				}
@@ -160,13 +161,13 @@ void PatchRoadGenerator::generateRoadNetwork() {
 			}
 
 			std::cout << "attemptExpansion (street): " << iter << " (Seed: " << desc << ")" << std::endl;
-
 			int ex_id = roads.graph[desc]->properties["ex_id"].toInt();
-			//if (!attemptConnect(RoadEdge::TYPE_STREET, desc, features[ex_id], seeds)) {
+			//attemptConnect(RoadEdge::TYPE_STREET, desc, features[ex_id], seeds);
+			if (RoadGeneratorHelper::largestAngleBetweenEdges(roads, desc) > M_PI * 1.4f) {
 				if (!attemptExpansion(RoadEdge::TYPE_STREET, desc, ex_id, features[ex_id], patches[ex_id], seeds)) {
 					attemptExpansion2(RoadEdge::TYPE_STREET, desc, features[ex_id], seeds);
 				}
-			//}
+			}
 
 			char filename[255];
 			sprintf(filename, "road_images/streets_%d.jpg", iter);
@@ -279,8 +280,8 @@ void PatchRoadGenerator::generateStreetSeeds(std::list<RoadVertexDesc> &seeds) {
 
 /**
  * 近くに頂点またはエッジがあるなら、コネクトしちゃう。
- * コネクトできた場合は、trueを返却する。
- * コネクトできなかった場合は、falseを返却する。
+ * これ以上、この頂点からエッジを生成させたくない場合は、trueを返却する。
+ * さらい生成させたい場合は、falseを返却する。
  */
 bool PatchRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int ex_id, std::vector<ExFeature>& features, std::list<RoadVertexDesc> &seeds) {
 	float length = 0.0f;
@@ -467,6 +468,12 @@ bool PatchRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, in
 			RoadEdgePtr e = RoadEdgePtr(new RoadEdge(roadType, 1));
 			e->polyline.push_back(roads.graph[srcDesc]->pt);
 			e->polyline.push_back(roads.graph[nearestDesc]->pt);
+
+			// 自分にとってredundantなら、コネクトしない。
+			// 理由：このエッジは、角度を考慮せず、単純に距離で見つけたもの。従って、角度が鋭角すぎるケースがあり得る
+			if (RoadGeneratorHelper::isRedundantEdge(roads, srcDesc, e->polyline, roadAngleTolerance)) {
+				return false;
+			}
 
 			// スナップ先にとってredundantなら、コネクトしないで、終了。
 			// つまり、trueを返却して、終わったことにしちゃう。
@@ -923,66 +930,6 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 
 	// 既にあるエッジと正反対の方向を計算
 	direction += 3.141592653;
-
-	// ものすごい近くに、他の頂点がないかあれば、そことコネクトして終わり。
-	// それ以外の余計なエッジは生成しない。さもないと、ものすごい密度の濃い道路網になっちゃう。
-	{
-		RoadVertexDesc nearestDesc;
-		if (GraphUtil::getVertexExceptDeadend(roads, srcDesc, length, direction, 0.3f, nearestDesc)) {
-			// もし、既にエッジがあるなら、キャンセル
-			if (GraphUtil::hasEdge(roads, srcDesc, nearestDesc)) return;
-
-			RoadEdgePtr e = RoadEdgePtr(new RoadEdge(roadType, 1));
-			e->polyline.push_back(roads.graph[srcDesc]->pt);
-			e->polyline.push_back(roads.graph[nearestDesc]->pt);
-
-			if (!GraphUtil::isIntersect(roads, e->polyline)) {
-				RoadEdgeDesc e_desc = GraphUtil::addEdge(roads, srcDesc, nearestDesc, e);
-				return;
-			}
-		}
-	}
-
-	// 近くにエッジがあれば、コネクト
-	{
-		RoadVertexDesc nearestDesc;
-		RoadEdgeDesc nearestEdgeDesc;
-		QVector2D intPoint;
-		if (GraphUtil::getCloseEdge(roads, srcDesc, length, direction, 0.3f, nearestEdgeDesc, intPoint)) {
-			// エッジにスナップ
-			nearestDesc = GraphUtil::splitEdge(roads, nearestEdgeDesc, intPoint);
-			roads.graph[nearestDesc]->properties["generation_type"] = "snapped";
-			roads.graph[nearestDesc]->properties["group_id"] = roads.graph[nearestEdgeDesc]->properties["group_id"];
-			roads.graph[nearestDesc]->properties["ex_id"] = roads.graph[nearestEdgeDesc]->properties["ex_id"];
-			roads.graph[nearestDesc]->properties.remove("example_desc");
-
-			RoadEdgePtr e = RoadEdgePtr(new RoadEdge(roadType, 1));
-			e->polyline.push_back(roads.graph[srcDesc]->pt);
-			e->polyline.push_back(roads.graph[nearestDesc]->pt);
-			RoadEdgeDesc e_desc = GraphUtil::addEdge(roads, srcDesc, nearestDesc, e);
-
-			return;
-		}
-	}
-
-	// ものすごい近くに、他の頂点がないかあれば、そことコネクトして終わり。
-	// それ以外の余計なエッジは生成しない。さもないと、ものすごい密度の濃い道路網になっちゃう。
-	{
-		RoadVertexDesc nearestDesc;
-		if (GraphUtil::getVertexExceptDeadend(roads, srcDesc, length, direction, 1.5f, nearestDesc)) {
-			// もし、既にエッジがあるなら、キャンセル
-			if (GraphUtil::hasEdge(roads, srcDesc, nearestDesc)) return;
-
-			RoadEdgePtr e = RoadEdgePtr(new RoadEdge(roadType, 1));
-			e->polyline.push_back(roads.graph[srcDesc]->pt);
-			e->polyline.push_back(roads.graph[nearestDesc]->pt);
-
-			if (!GraphUtil::isIntersect(roads, e->polyline)) {
-				RoadEdgeDesc e_desc = GraphUtil::addEdge(roads, srcDesc, nearestDesc, e);
-				return;
-			}
-		}
-	}
 
 	// 道路生成用のカーネルを合成する
 	synthesizeItem(roadType, srcDesc, length, 5.0f, edges);
