@@ -1543,6 +1543,36 @@ float RoadGeneratorHelper::largestAngleBetweenEdges(RoadGraph& roads, RoadVertex
 	return max_diff;
 }
 
+float RoadGeneratorHelper::getFirstEdgeAngle(RoadGraph& roads, RoadVertexDesc srcDesc) {
+	QVector2D dir(1, 0);
+
+	RoadOutEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		Polyline2D polyline = GraphUtil::orderPolyLine(roads, *ei, srcDesc);
+		dir = polyline[1] - polyline[0];
+		break;
+	}
+
+	return atan2f(dir.y(), dir.x());
+}
+
+QVector2D RoadGeneratorHelper::getFirstEdgeDir(RoadGraph& roads, RoadVertexDesc srcDesc) {
+	QVector2D dir(1, 0);
+
+	RoadOutEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		Polyline2D polyline = GraphUtil::orderPolyLine(roads, *ei, srcDesc);
+		dir = polyline[1] - polyline[0];
+		break;
+	}
+
+	return dir;
+}
+
 void RoadGeneratorHelper::removeIntersectionsOnRiver(RoadGraph &roads, VBORenderManager *vboRenderManager, float seaLevel) {
 	GraphUtil::reduce(roads);
 

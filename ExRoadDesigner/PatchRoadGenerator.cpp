@@ -72,10 +72,10 @@ void PatchRoadGenerator::generateRoadNetwork() {
 				continue;
 			}
 
-			// 水中なら、スキップする
+			// 水中なら、伸ばして水中から脱出できるなら伸ばす。
 			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y(), true);
 			if (z < G::getFloat("seaLevelForAvenue")) {
-				std::cout << "attemptExpansion (avenue): " << iter << " (skipped because it is under the sea)" << std::endl;
+				extendRoadAcrossRiver(RoadEdge::TYPE_AVENUE, desc, seeds, 200.0f);
 				continue;
 			}
 
@@ -298,19 +298,8 @@ bool PatchRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, in
 
 	std::vector<RoadEdgePtr> edges;
 
-	// 当該頂点から出るエッジをリストアップし、基底の方向を決定する
-	float direction = 0.0f;
-	{
-		RoadOutEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
-			if (!roads.graph[*ei]->valid) continue;
-
-			Polyline2D polyline  = GraphUtil::orderPolyLine(roads, *ei, srcDesc);
-			QVector2D vec = polyline[1] - polyline[0];
-			direction = atan2f(vec.y(), vec.x());
-			break;
-		}
-	}
+	// 当該頂点から出るエッジの方向を取得する
+	float direction = RoadGeneratorHelper::getFirstEdgeAngle(roads, srcDesc);
 
 	// 既にあるエッジと正反対の方向を計算
 	direction += 3.141592653;
@@ -912,19 +901,8 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 
 	std::vector<RoadEdgePtr> edges;
 
-	// 当該頂点から出るエッジをリストアップし、基底の方向を決定する
-	float direction = 0.0f;
-	{
-		RoadOutEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
-			if (!roads.graph[*ei]->valid) continue;
-
-			Polyline2D polyline  = GraphUtil::orderPolyLine(roads, *ei, srcDesc);
-			QVector2D vec = polyline[1] - polyline[0];
-			direction = atan2f(vec.y(), vec.x());
-			break;
-		}
-	}
+	// 当該頂点から出るエッジの方向を取得する
+	float direction = RoadGeneratorHelper::getFirstEdgeAngle(roads, srcDesc);
 
 	// 既にあるエッジと正反対の方向を計算
 	direction += 3.141592653;
@@ -1089,6 +1067,47 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 }
 
 /**
+ * 道路を延長し、川を越えさせる。指定された長さ伸ばして、依然として川の中なら、延長をキャンセルする。
+ */
+void PatchRoadGenerator::extendRoadAcrossRiver(int roadType, RoadVertexDesc v_desc, std::list<RoadVertexDesc> &seeds, float max_length) {
+	// 既存のエッジから方向を決定する
+	QVector2D dir;
+	int lanes;
+	{
+		RoadOutEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::out_edges(v_desc, roads.graph); ei != eend; ++ei) {
+			if (!roads.graph[*ei]->valid) continue;
+
+			lanes = roads.graph[*ei]->lanes;
+			Polyline2D polyline  = GraphUtil::orderPolyLine(roads, *ei, v_desc);
+			dir = polyline[1] - polyline[0];
+			break;
+		}
+	}
+	dir.normalize();
+
+	QVector2D pt = roads.graph[v_desc]->pt - dir * max_length;
+
+	float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y(), true);
+	if (z < G::getFloat("seaLevelForAvenue")) return;
+
+	// エッジ生成
+	RoadEdgePtr e = RoadEdgePtr(new RoadEdge(roadType, lanes));
+
+	// 頂点を追加
+	RoadVertexPtr v = RoadVertexPtr(new RoadVertex(pt));
+	RoadVertexDesc tgtDesc = GraphUtil::addVertex(roads, v);
+
+	// エリア内なら、seedsに追加
+	if (targetArea.contains(roads.graph[tgtDesc]->pt)) {
+		roads.graph[tgtDesc]->onBoundary = false;
+		seeds.push_back(tgtDesc);
+	} else { // エリア外なら、onBoundaryフラグをセット
+		roads.graph[tgtDesc]->onBoundary = true;
+	}
+}
+
+/**
  * PMに従って、カーネルを合成する
  * edgesに、エッジのリストを格納して返却する。
  * 各エッジのpolylineは、(0, 0)からスタートする。つまり、始点となる頂点の座標を(0, 0)とするということだ。
@@ -1100,19 +1119,8 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
  * @param edges [OUT]		返却するエッジリスト
  */
 void PatchRoadGenerator::synthesizeItem(int roadType, RoadVertexDesc v_desc, float length, float step, std::vector<RoadEdgePtr> &edges) {
-	// 当該頂点から出るエッジをリストアップし、基底の方向を決定する
-	float direction = 0.0f;
-	{
-		RoadOutEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::out_edges(v_desc, roads.graph); ei != eend; ++ei) {
-			if (!roads.graph[*ei]->valid) continue;
-
-			Polyline2D polyline  = GraphUtil::orderPolyLine(roads, *ei, v_desc);
-			QVector2D vec = polyline[1] - polyline[0];
-			direction = atan2f(vec.y(), vec.x());
-			break;
-		}
-	}
+	// 当該頂点から出るエッジの方向を取得する
+	float direction = RoadGeneratorHelper::getFirstEdgeAngle(roads, v_desc);
 
 	for (int i = 0; i < 4; ++i) {
 		RoadEdgePtr e = RoadEdgePtr(new RoadEdge(roadType, 1));

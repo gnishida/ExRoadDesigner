@@ -312,19 +312,8 @@ bool WarpRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int
 
 	std::vector<RoadEdgePtr> edges;
 
-	// 当該頂点から出るエッジをリストアップし、基底の方向を決定する
-	float direction = 0.0f;
-	{
-		RoadOutEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
-			if (!roads.graph[*ei]->valid) continue;
-
-			Polyline2D polyline  = GraphUtil::orderPolyLine(roads, *ei, srcDesc);
-			QVector2D vec = polyline[1] - polyline[0];
-			direction = atan2f(vec.y(), vec.x());
-			break;
-		}
-	}
+	// 当該頂点から出るエッジの方向を取得する
+	float direction = RoadGeneratorHelper::getFirstEdgeAngle(roads, srcDesc);
 
 	// 既にあるエッジと正反対の方向を計算
 	direction += 3.141592653;
@@ -881,19 +870,8 @@ void WarpRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc, 
 
 	std::vector<RoadEdgePtr> edges;
 
-	// 当該頂点から出るエッジをリストアップし、基底の方向を決定する
-	float direction = 0.0f;
-	{
-		RoadOutEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
-			if (!roads.graph[*ei]->valid) continue;
-
-			Polyline2D polyline  = GraphUtil::orderPolyLine(roads, *ei, srcDesc);
-			QVector2D vec = polyline[1] - polyline[0];
-			direction = atan2f(vec.y(), vec.x());
-			break;
-		}
-	}
+	// 当該頂点から出るエッジの方向を決定する
+	float direction = RoadGeneratorHelper::getFirstEdgeAngle(roads, srcDesc);
 
 	// 既にあるエッジと正反対の方向を計算
 	direction += 3.141592653;

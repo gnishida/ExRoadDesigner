@@ -65,6 +65,8 @@ public:
 	static float diffZ(RoadGraph &roads, VBORenderManager *vboRenderManager);
 	static float diffSlope(RoadGraph &roads, VBORenderManager *vboRenderManager);
 	static float largestAngleBetweenEdges(RoadGraph& roads, RoadVertexDesc srcDesc, int roadType);
+	static float getFirstEdgeAngle(RoadGraph& roads, RoadVertexDesc srcDesc);
+	static QVector2D getFirstEdgeDir(RoadGraph& roads, RoadVertexDesc srcDesc);
 
 	static void removeIntersectionsOnRiver(RoadGraph &roads, VBORenderManager *vboRenderManager, float seaLevel);
 
