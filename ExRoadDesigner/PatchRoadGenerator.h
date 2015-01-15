@@ -40,7 +40,7 @@ private:
 	void attemptExpansion2(int roadType, RoadVertexDesc srcDesc, ExFeature& f, std::list<RoadVertexDesc> &seeds);
 	bool growRoadSegment(int roadType, RoadVertexDesc srcDesc, ExFeature& f, const Polyline2D &polyline, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds);
 
-	void synthesizeItem(int roadType, RoadVertexDesc v_desc, float length, std::vector<RoadEdgePtr> &edges);
+	void synthesizeItem(int roadType, RoadVertexDesc v_desc, float length, float step, std::vector<RoadEdgePtr> &edges);
 
 	void removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc, RoadEdgeDesc start_e_desc);
 	int defineExId(const QVector2D& pt);

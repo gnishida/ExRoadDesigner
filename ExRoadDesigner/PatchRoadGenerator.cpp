@@ -985,7 +985,7 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 	}
 
 	// 道路生成用のカーネルを合成する
-	synthesizeItem(roadType, srcDesc, length, edges);
+	synthesizeItem(roadType, srcDesc, length, 5.0f, edges);
 
 	float z = vboRenderManager->getTerrainHeight(roads.graph[srcDesc]->pt.x(), roads.graph[srcDesc]->pt.y(), true);
 
@@ -1007,6 +1007,7 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 /**
  * 指定されたpolylineに従って、srcDesc頂点からエッジを伸ばす。
  * エッジの端点が、srcDescとは違うセルに入る場合は、falseを返却する。
+ * この関数は、PM方式での道路生成でのみ使用される。
  */
 bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, ExFeature& f, const Polyline2D &polyline, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
 	float angle = atan2f(polyline[1].y() - polyline[0].y(), polyline[1].x() - polyline[0].x());
@@ -1043,7 +1044,7 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 			Polyline2D snapped_polyline;
 			snapped_polyline.push_back(QVector2D(0, 0));
 			snapped_polyline.push_back(QVector2D(roads.graph[srcDesc]->pt - roads.graph[tgtDesc]->pt));
-			if (RoadGeneratorHelper::isRedundantEdge(roads, tgtDesc, snapped_polyline, 0.3f)) {
+			if (RoadGeneratorHelper::isRedundantEdge(roads, tgtDesc, snapped_polyline, 0.4f)) {
 				//（とりあえず、ものすごい鋭角の場合は、必ずキャンセル)
 				return false;
 			}
@@ -1064,8 +1065,6 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 				roads.graph[tgtDesc]->properties["group_id"] = roads.graph[closestEdge]->properties["group_id"];
 				roads.graph[tgtDesc]->properties["ex_id"] = roads.graph[closestEdge]->properties["ex_id"];
 				roads.graph[tgtDesc]->properties.remove("example_desc");
-			} else {
-				new_edge->polyline.push_back(roads.graph[tgtDesc]->pt);
 			}
 		}
 	}
@@ -1148,8 +1147,14 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
  * PMに従って、カーネルを合成する
  * edgesに、エッジのリストを格納して返却する。
  * 各エッジのpolylineは、(0, 0)からスタートする。つまり、始点となる頂点の座標を(0, 0)とするということだ。
+ *
+ * @param roadType			avenue / local street
+ * @param v_desc			現在の頂点ID
+ * @param length			エッジの長さの基準値（統計データから取得したもの）
+ * @param step				各セグメントの長さ
+ * @param edges [OUT]		返却するエッジリスト
  */
-void PatchRoadGenerator::synthesizeItem(int roadType, RoadVertexDesc v_desc, float length, std::vector<RoadEdgePtr> &edges) {
+void PatchRoadGenerator::synthesizeItem(int roadType, RoadVertexDesc v_desc, float length, float step, std::vector<RoadEdgePtr> &edges) {
 	// 当該頂点から出るエッジをリストアップし、基底の方向を決定する
 	float direction = 0.0f;
 	{

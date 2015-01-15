@@ -1035,8 +1035,6 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, Ex
 				roads.graph[tgtDesc]->properties["group_id"] = roads.graph[closestEdge]->properties["group_id"];
 				roads.graph[tgtDesc]->properties["ex_id"] = roads.graph[closestEdge]->properties["ex_id"];
 				roads.graph[tgtDesc]->properties.remove("example_desc");
-			} else {
-				new_edge->polyline.push_back(roads.graph[tgtDesc]->pt);
 			}
 		}
 	}
