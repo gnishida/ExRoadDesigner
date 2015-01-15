@@ -1093,6 +1093,8 @@ void PatchRoadGenerator::extendRoadAcrossRiver(int roadType, RoadVertexDesc v_de
 
 	// エッジ生成
 	RoadEdgePtr e = RoadEdgePtr(new RoadEdge(roadType, lanes));
+	e->polyline.push_back(roads.graph[v_desc]->pt);
+	e->polyline.push_back(pt);
 
 	// 頂点を追加
 	RoadVertexPtr v = RoadVertexPtr(new RoadVertex(pt));
@@ -1105,6 +1107,9 @@ void PatchRoadGenerator::extendRoadAcrossRiver(int roadType, RoadVertexDesc v_de
 	} else { // エリア外なら、onBoundaryフラグをセット
 		roads.graph[tgtDesc]->onBoundary = true;
 	}
+
+	// エッジを追加
+	GraphUtil::addEdge(roads, v_desc, tgtDesc, e);
 }
 
 /**
