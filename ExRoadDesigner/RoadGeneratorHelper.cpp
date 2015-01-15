@@ -1516,18 +1516,19 @@ float RoadGeneratorHelper::diffSlopeAngle(RoadGraph &roads, VBORenderManager *vb
 /**
  * 指定した頂点から出るエッジについて、間の角度の最大値 [rad]を返却する。
  */
-float RoadGeneratorHelper::largestAngleBetweenEdges(RoadGraph& roads, RoadVertexDesc srcDesc) {
-	if (GraphUtil::getDegree(roads, srcDesc) <= 1) return M_PI * 2.0f;
-
+float RoadGeneratorHelper::largestAngleBetweenEdges(RoadGraph& roads, RoadVertexDesc srcDesc, int roadType) {
 	std::vector<float> angles;
 
 	RoadOutEdgeIter ei, eend;
 	for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
 		if (!roads.graph[*ei]->valid) continue;
+		if (roads.graph[*ei]->type != roadType) continue;
 
 		Polyline2D polyline = GraphUtil::orderPolyLine(roads, *ei, srcDesc);
 		angles.push_back(atan2f((polyline[1] - polyline[0]).y(), (polyline[1] - polyline[0]).x()));
 	}
+
+	if (angles.size() <= 1) return M_PI * 2.0f;
 
 	std::sort(angles.begin(), angles.end());
 

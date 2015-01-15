@@ -83,7 +83,7 @@ void WarpRoadGenerator::generateRoadNetwork() {
 			
 			int ex_id = defineExId(roads.graph[desc]->pt);
 			attemptConnect(RoadEdge::TYPE_AVENUE, desc, ex_id, features, seeds);
-			if (RoadGeneratorHelper::largestAngleBetweenEdges(roads, desc) > M_PI * 1.4f) {
+			if (RoadGeneratorHelper::largestAngleBetweenEdges(roads, desc, RoadEdge::TYPE_AVENUE) > M_PI * 1.4f) {
 				if (!attemptExpansion(RoadEdge::TYPE_AVENUE, desc, ex_id, features[ex_id], patches[ex_id], seeds)) {
 					attemptExpansion2(RoadEdge::TYPE_AVENUE, desc, features[ex_id], seeds);
 				}
@@ -160,7 +160,7 @@ void WarpRoadGenerator::generateRoadNetwork() {
 			std::cout << "attemptExpansion (street): " << iter << " (Seed: " << desc << ")" << std::endl;
 			int ex_id = roads.graph[desc]->properties["ex_id"].toInt();
 			//attemptConnect(RoadEdge::TYPE_STREET, desc, features[ex_id], seeds);
-			if (RoadGeneratorHelper::largestAngleBetweenEdges(roads, desc) > M_PI * 1.4f) {
+			if (RoadGeneratorHelper::largestAngleBetweenEdges(roads, desc, RoadEdge::TYPE_STREET) > M_PI * 1.4f) {
 				if (!attemptExpansion(RoadEdge::TYPE_STREET, desc, ex_id, features[ex_id], patches[ex_id], seeds)) {
 					attemptExpansion2(RoadEdge::TYPE_STREET, desc, features[ex_id], seeds);
 				}
