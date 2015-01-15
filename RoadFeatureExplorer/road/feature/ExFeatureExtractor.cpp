@@ -29,10 +29,10 @@ void ExFeatureExtractor::extractFeature(RoadGraph& roads, Polygon2D& area, Polyl
 	//GraphUtil::removeRoundabout(temp_roads);
 
 	// linkを削除する
-	GraphUtil::removeLinkEdges(feature.avenues);
+	//GraphUtil::removeLinkEdges(feature.avenues);
 	//GraphUtil::reduce(feature.avenues);
-	GraphUtil::removeIsolatedVertices(feature.avenues);
-	GraphUtil::clean(feature.avenues);
+	//GraphUtil::removeIsolatedVertices(feature.avenues);
+	//GraphUtil::clean(feature.avenues);
 
 	// 中心が(0,0)となるよう座標変換する
 	//GraphUtil::translate(feature.avenues, center * -1.0f);
@@ -44,8 +44,8 @@ void ExFeatureExtractor::extractFeature(RoadGraph& roads, Polygon2D& area, Polyl
 	//GraphUtil::reduce(temp_roads);  <- わざとreduceしない
 
 	// linkを削除する
-	GraphUtil::removeLinkEdges(feature.streets);
-	GraphUtil::removeIsolatedVertices(feature.streets);
+	//GraphUtil::removeLinkEdges(feature.streets);
+	//GraphUtil::removeIsolatedVertices(feature.streets);
 	GraphUtil::clean(feature.streets);
 
 	// 中心が(0,0)となるよう座標変換する
