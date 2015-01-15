@@ -9,6 +9,7 @@
 #include "RoadGeneratorHelper.h"
 #include "SmallBlockRemover.h"
 #include "ShapeDetector.h"
+#include <assert.h>
 
 void WarpRoadGenerator::generateRoadNetwork() {
 	srand(12345);
@@ -549,7 +550,8 @@ bool WarpRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, i
 	} else {
 		patch_id = f.roads(roadType).graph[ex_v_desc]->patchId;
 		if (patch_id < 0) {
-			printf("ERROR!!!!!!!!!!!!!!");
+			printf("ERROR! patch_id has to >= 0.");
+			assert(false);
 		}
 
 		buildReplacementGraphByExample(roadType, replacementGraph, srcDesc, ex_id, f.roads(roadType), ex_v_desc, angle, patches[patch_id], patch_id);
@@ -612,8 +614,7 @@ bool WarpRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, i
 
 	// replacementGraphが、既に生成済みのグラフと重なるかどうかチェック
 	if (GraphUtil::isIntersect(replacementGraph, roads)) {
-		int xxx = 0;
-
+		printf("replacement graph is intersected with the existing roads.\n");
 		return false;
 	}
 		
@@ -626,31 +627,24 @@ void WarpRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph &
 	replacementGraph.clear();
 
 	QMap<RoadVertexDesc, RoadVertexDesc> conv;
-	RoadVertexDesc root_desc;
+	RoadVertexDesc root_desc = 9999999;
 
 	// add vertices of the patch
 	{
 		RoadVertexIter vi, vend;
 		for (boost::tie(vi, vend) = boost::vertices(patch.roads.graph); vi != vend; ++vi) {
-			if (patch.roads.graph[*vi]->onBoundary) {
-				int xxx = 0;
-			}
-
 			// Transformした後の座標を計算
 			QVector2D pt = Util::transform(patch.roads.graph[*vi]->pt, exRoads.graph[ex_srcDesc]->pt, angle, roads.graph[srcDesc]->pt);
 
 			RoadVertexPtr v = RoadVertexPtr(new RoadVertex(*patch.roads.graph[*vi]));
 			v->pt = pt;
 			v->rotationAngle = angle;
-			v->properties["ex_id"] = ex_id;//roads.graph[srcDesc]->properties["ex_id"];
+			v->properties["ex_id"] = ex_id;
 			v->properties["group_id"] = roads.graph[srcDesc]->properties["group_id"];
 			if (v->patchId != patchId) {
-				int xxxx = 0;
+				printf("ERROR!!! patchId has not been copied.\n");
+				assert(false);
 			}
-			v->patchId = patchId;
-
-			// 元のExampleで境界上の頂点だったかどうかは、ターゲットエリアでは関係ないので、一旦リセットする
-			v->onBoundary = false;
 
 			RoadVertexDesc v_desc = GraphUtil::addVertex(replacementGraph, v);
 			conv[*vi] = v_desc;
@@ -659,6 +653,11 @@ void WarpRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph &
 				root_desc = v_desc;
 			}
 		}
+	}
+
+	if (root_desc == 9999999) {
+		printf("ERROR!!!! root_desc is not found!\n");
+		assert(false);
 	}
 
 	// patchのエッジを追加
@@ -691,6 +690,9 @@ void WarpRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph &
 			for (boost::tie(ei2, eend2) = boost::out_edges(root_desc, replacementGraph.graph); ei2 != eend2; ++ei2) {
 				if (!replacementGraph.graph[*ei2]->valid) continue;
 
+				// もしこのエッジがコネクタじゃないなら、削除させない
+				if (!replacementGraph.graph[*ei2]->connector) continue;
+
 				Polyline2D polyline2 = GraphUtil::orderPolyLine(replacementGraph, *ei2, root_desc);
 
 				if (Util::diffAngle(polyline[1] - polyline[0], polyline2[1] - polyline2[0]) < 0.3f) {
@@ -712,32 +714,25 @@ void WarpRoadGenerator::buildReplacementGraphByExample2(int roadType, RoadGraph 
 	replacementGraph.clear();
 
 	QMap<RoadVertexDesc, RoadVertexDesc> conv;
-	RoadVertexDesc connector_desc;
-	RoadVertexDesc root_desc;
+	RoadVertexDesc connector_desc = 9999999;
+	RoadVertexDesc root_desc = 9999999;
 
 	// add vertices of the patch
 	{
 		RoadVertexIter vi, vend;
 		for (boost::tie(vi, vend) = boost::vertices(patch.roads.graph); vi != vend; ++vi) {
-			if (patch.roads.graph[*vi]->onBoundary) {
-				int xxx = 0;
-			}
-
 			// Transformした後の座標を計算
 			QVector2D pt = Util::transform(patch.roads.graph[*vi]->pt, exRoads.graph[ex_srcDesc]->pt, angle, roads.graph[srcDesc]->pt);
 
 			RoadVertexPtr v = RoadVertexPtr(new RoadVertex(*patch.roads.graph[*vi]));
 			v->pt = pt;
 			v->rotationAngle = angle;
-			v->properties["ex_id"] = ex_id;//roads.graph[srcDesc]->properties["ex_id"];
+			v->properties["ex_id"] = ex_id;
 			v->properties["group_id"] = roads.graph[srcDesc]->properties["group_id"];
 			if (v->patchId != patchId) {
-				int xxxx = 0;
+				printf("ERROR!!! patchId has not been copied.\n");
+				assert(false);
 			}
-			v->patchId = patchId;
-
-			// 元のExampleで境界上の頂点だったかどうかは、ターゲットエリアでは関係ないので、一旦リセットする
-			v->onBoundary = false;
 
 			RoadVertexDesc v_desc = GraphUtil::addVertex(replacementGraph, v);
 			conv[*vi] = v_desc;
@@ -749,6 +744,15 @@ void WarpRoadGenerator::buildReplacementGraphByExample2(int roadType, RoadGraph 
 				root_desc = v_desc;
 			}
 		}
+	}
+
+	if (root_desc == 9999999) {
+		printf("ERROR!!!! root_desc is not found!\n");
+		assert(false);
+	}
+	if (connector_desc == 9999999) {
+		printf("ERROR!!!! connector_desc is not found!\n");
+		assert(false);
 	}
 
 	// patchのエッジを追加
@@ -823,21 +827,16 @@ void WarpRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph 
 				// エリア外なら、onBoundaryフラグをセット
 				if (!targetArea.contains(roads.graph[v_desc]->pt)) {
 					roads.graph[v_desc]->onBoundary = true;
+				} else {
+					roads.graph[v_desc]->onBoundary = true;
 				}
 
-				// 新規追加された頂点について、もとのreplacementGraphでdegree==1で、deadendでないなら、シードに追加
-				if (GraphUtil::getDegree(replacementGraph, *vi) == 1 
-					&& replacementGraph.graph[*vi]->deadend == false
-					&& !roads.graph[v_desc]->onBoundary) {
+				// 新規追加された頂点について、もとのreplacementGraphでconnectorなら、シードに追加
+				if (replacementGraph.graph[*vi]->connector && !roads.graph[v_desc]->onBoundary) {
 					seeds.push_back(v_desc);
 				}
 			} else {
 				roads.graph[v_desc]->properties = replacementGraph.graph[*vi]->properties;
-
-				// initial seed自体がrewriteされる場合、seedに入れないと、そこからエッジが延びていかない
-				//if (GraphUtil::getDegree(roads, v_desc) == 0) {
-				//	seeds.push_back(v_desc);
-				//}
 			}
 
 			conv[*vi] = v_desc;
@@ -1143,9 +1142,8 @@ void WarpRoadGenerator::synthesizeItem(int roadType, RoadVertexDesc v_desc, floa
 	for (int i = 0; i < 4; ++i) {
 		RoadEdgePtr e = RoadEdgePtr(new RoadEdge(roadType, 1));
 		e->polyline.push_back(QVector2D(0, 0));
-		//e->polyline.push_back(QVector2D(500.0f * cosf(direction), 500.0f * sinf(direction)));
 		float len = Util::genRand(length * 0.7, length * 1.5);
-		e->polyline.push_back(QVector2D(len * cosf(direction), len * 1.5f * sinf(direction)));
+		e->polyline.push_back(QVector2D(len * cosf(direction), len * sinf(direction)));
 		
 		edges.push_back(e);
 
@@ -1166,6 +1164,8 @@ void WarpRoadGenerator::removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc, Roa
 		queue.push_back(tgt);
 	}
 
+	if (GraphUtil::getDegree(roads, srcDesc) == 0) roads.graph[srcDesc]->valid = false;
+
 	while (!queue.empty()) {
 		RoadVertexDesc v = queue.front();
 		queue.pop_front();
@@ -1174,9 +1174,12 @@ void WarpRoadGenerator::removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc, Roa
 		for (boost::tie(ei, eend) = boost::out_edges(v, roads.graph); ei != eend; ++ei) {
 			if (!roads.graph[*ei]->valid) continue;
 
-			roads.graph[*ei]->valid = false;
-
 			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+
+			roads.graph[*ei]->valid = false;
+			if (GraphUtil::getDegree(roads, v) == 0) roads.graph[v]->valid = false;
+			if (GraphUtil::getDegree(roads, tgt) == 0) roads.graph[tgt]->valid = false;
+
 			if (visited[tgt]) continue;
 
 			// 上で既に一本のエッジを無効にしているので、もともとdegree=2の頂点は、残り一本だけエッジが残っているはず。

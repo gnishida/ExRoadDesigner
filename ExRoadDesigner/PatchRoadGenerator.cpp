@@ -633,7 +633,6 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 		return false;
 	}
 	
-
 	rewrite(roadType, srcDesc, replacementGraph, seeds);
 
 	return true;
@@ -669,7 +668,7 @@ void PatchRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph 
 			RoadVertexPtr v = RoadVertexPtr(new RoadVertex(*patch.roads.graph[*vi]));
 			v->pt = pt;
 			v->rotationAngle = angle;
-			v->properties["ex_id"] = ex_id;//roads.graph[srcDesc]->properties["ex_id"];
+			v->properties["ex_id"] = ex_id;
 			v->properties["group_id"] = roads.graph[srcDesc]->properties["group_id"];
 			if (v->patchId != patchId) {
 				printf("ERROR!!! patchId has not been copied.\n");
@@ -751,17 +750,13 @@ void PatchRoadGenerator::buildReplacementGraphByExample2(int roadType, RoadGraph
 	{
 		RoadVertexIter vi, vend;
 		for (boost::tie(vi, vend) = boost::vertices(patch.roads.graph); vi != vend; ++vi) {
-			if (patch.roads.graph[*vi]->onBoundary) {
-				int xxx = 0;
-			}
-
 			// Transformした後の座標を計算
 			QVector2D pt = Util::transform(patch.roads.graph[*vi]->pt, exRoads.graph[ex_srcDesc]->pt, angle, roads.graph[srcDesc]->pt);
 
 			RoadVertexPtr v = RoadVertexPtr(new RoadVertex(*patch.roads.graph[*vi]));
 			v->pt = pt;
 			v->rotationAngle = angle;
-			v->properties["ex_id"] = ex_id;//roads.graph[srcDesc]->properties["ex_id"];
+			v->properties["ex_id"] = ex_id;
 			v->properties["group_id"] = roads.graph[srcDesc]->properties["group_id"];
 			if (v->patchId != patchId) {
 				printf("ERROR!!! patchId has not been copied.\n");
@@ -854,7 +849,6 @@ void PatchRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph
 
 			RoadVertexPtr v = RoadVertexPtr(new RoadVertex(*replacementGraph.graph[*vi]));
 			RoadVertexDesc v_desc;
-			bool flag = false;
 			if (!GraphUtil::getVertex(roads, replacementGraph.graph[*vi]->pt, 1.0f, v_desc)) {
 				// 頂点を新規追加
 				v_desc = GraphUtil::addVertex(roads, v);
@@ -872,7 +866,6 @@ void PatchRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph
 				}
 			} else {
 				roads.graph[v_desc]->properties = replacementGraph.graph[*vi]->properties;
-				flag = true;
 			}
 
 			conv[*vi] = v_desc;
