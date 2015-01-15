@@ -63,7 +63,7 @@ public:
 	//static bool steepSlope(RoadGraph &roads, VBORenderManager *vboRenderManager);
 	static float maxZ(RoadGraph &roads, VBORenderManager *vboRenderManager);
 	static float diffZ(RoadGraph &roads, VBORenderManager *vboRenderManager);
-	static float diffSlopeAngle(RoadGraph &roads, VBORenderManager *vboRenderManager);
+	static float diffSlope(RoadGraph &roads, VBORenderManager *vboRenderManager);
 	static float largestAngleBetweenEdges(RoadGraph& roads, RoadVertexDesc srcDesc, int roadType);
 
 	static void removeIntersectionsOnRiver(RoadGraph &roads, VBORenderManager *vboRenderManager, float seaLevel);

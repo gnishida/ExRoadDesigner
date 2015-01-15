@@ -1492,7 +1492,7 @@ float RoadGeneratorHelper::diffZ(RoadGraph &roads, VBORenderManager *vboRenderMa
 	return max_z - min_z;
 }
 
-float RoadGeneratorHelper::diffSlopeAngle(RoadGraph &roads, VBORenderManager *vboRenderManager) {
+float RoadGeneratorHelper::diffSlope(RoadGraph &roads, VBORenderManager *vboRenderManager) {
 	float min_slope = std::numeric_limits<float>::max();
 	float max_slope = -std::numeric_limits<float>::max();
 

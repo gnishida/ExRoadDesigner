@@ -586,7 +586,7 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 	}
 
 	// 山チェック
-	if (RoadGeneratorHelper::maxZ(replacementGraph, vboRenderManager) >= 70.0f && RoadGeneratorHelper::diffSlopeAngle(replacementGraph, vboRenderManager) > 0.3f) {
+	if (RoadGeneratorHelper::maxZ(replacementGraph, vboRenderManager) >= 70.0f && RoadGeneratorHelper::diffSlope(replacementGraph, vboRenderManager) > 0.3f) {
 		float max_rotation = G::getFloat("rotationForSteepSlope");
 		float min_slope = std::numeric_limits<float>::max();
 		float min_rotation;
@@ -599,7 +599,7 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 		for (float th = 0; th <= max_rotation; th += 0.1f) {
 			GraphUtil::copyRoads(backup, replacementGraph);
 			GraphUtil::rotate(replacementGraph, th, roads.graph[srcDesc]->pt);
-			float diffSlope = RoadGeneratorHelper::diffSlopeAngle(replacementGraph, vboRenderManager);
+			float diffSlope = RoadGeneratorHelper::diffSlope(replacementGraph, vboRenderManager);
 			if (diffSlope < min_slope) {
 				min_slope = diffSlope;
 				min_rotation = th;
@@ -611,7 +611,7 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 		for (float th = 0; th >= -max_rotation; th -= 0.1f) {
 			GraphUtil::copyRoads(backup, replacementGraph);
 			GraphUtil::rotate(replacementGraph, th, roads.graph[srcDesc]->pt);
-			float diffSlope = RoadGeneratorHelper::diffZ(replacementGraph, vboRenderManager);
+			float diffSlope = RoadGeneratorHelper::diffSlope(replacementGraph, vboRenderManager);
 			if (diffSlope < min_slope) {
 				min_slope = diffSlope;
 				min_rotation = th;
