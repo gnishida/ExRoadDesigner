@@ -240,8 +240,6 @@ void ShapeDetector::addVerticesToCircle(RoadGraph &roads, RoadEdgeDescs& shape, 
  * @param usedEdges		属するパッチの数
  */
 void ShapeDetector::addVerticesToGroup(RoadGraph &roads, RoadVertexDesc srcDesc, int patchId, float threshold, RoadEdgeDescs &shape, QMap<RoadVertexDesc, bool> &usedVertices, QMap<RoadEdgeDesc, int> &usedEdges) {
-	std::cout << "shape is detected..." << srcDesc << std::endl;
-
 	// パッチに含まれるエッジのセット
 	QMap<RoadEdgeDesc, bool> edge_descs;
 
