@@ -7,7 +7,8 @@ RoadVertex::RoadVertex() {
 	this->fixed = false;
 	this->patchId = -1;
 	this->deadend = false;
-	connector = false;
+	this->connector = false;
+	this->rotationAngle = 0.0f;
 }
 
 RoadVertex::RoadVertex(const QVector2D &pt) {
@@ -19,6 +20,7 @@ RoadVertex::RoadVertex(const QVector2D &pt) {
 	this->patchId = -1;
 	this->deadend = false;
 	this->connector = false;
+	this->rotationAngle = 0.0f;
 }
 
 const QVector2D& RoadVertex::getPt() const {
