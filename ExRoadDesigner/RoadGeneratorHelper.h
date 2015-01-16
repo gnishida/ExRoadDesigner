@@ -62,7 +62,6 @@ public:
 	static QVector2D getFirstEdgeDir(RoadGraph& roads, RoadVertexDesc srcDesc);
 
 	static void removeIntersectionsOnRiver(RoadGraph &roads, VBORenderManager *vboRenderManager, float seaLevel);
-
 	static void removeSmallBlocks(RoadGraph &roads, float minArea);
 
 	static RoadVertexDesc getClosestVertexByExample(RoadGraph &roads, RoadVertexDesc v_desc);

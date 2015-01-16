@@ -72,10 +72,10 @@ void WarpRoadGenerator::generateRoadNetwork() {
 				continue;
 			}
 
-			// 水中なら、スキップする
+			// 水中なら、伸ばして水中から脱出できるなら伸ばす。
 			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y(), true);
-			if (z < G::getFloat("seaLevelForAvenue")) {
-				std::cout << "attemptExpansion (avenue): " << iter << " (skipped because it is under the sea or on the mountains)" << std::endl;
+			if (z < G::getFloat("seaLevel")) {
+				extendRoadAcrossRiver(RoadEdge::TYPE_AVENUE, desc, seeds, 200.0f);
 				continue;
 			}
 
@@ -1026,6 +1026,55 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, Ex
 	//RoadEdgeDesc e_desc = GraphUtil::addEdge(roads, srcDesc, tgtDesc, new_edge);
 
 	return true;
+}
+
+/**
+ * 道路を延長し、川を越えさせる。指定された長さ伸ばして、依然として川の中なら、延長をキャンセルする。
+ */
+void WarpRoadGenerator::extendRoadAcrossRiver(int roadType, RoadVertexDesc v_desc, std::list<RoadVertexDesc> &seeds, float max_length) {
+	// 既存のエッジから方向を決定する
+	QVector2D dir;
+	int lanes;
+	{
+		RoadOutEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::out_edges(v_desc, roads.graph); ei != eend; ++ei) {
+			if (!roads.graph[*ei]->valid) continue;
+
+			lanes = roads.graph[*ei]->lanes;
+			Polyline2D polyline  = GraphUtil::orderPolyLine(roads, *ei, v_desc);
+			dir = polyline[1] - polyline[0];
+			break;
+		}
+	}
+	dir.normalize();
+
+	QVector2D pt = roads.graph[v_desc]->pt - dir * max_length;
+
+	float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y(), true);
+	if (z < G::getFloat("seaLevel")) return;
+
+	// エッジ生成
+	RoadEdgePtr e = RoadEdgePtr(new RoadEdge(roadType, lanes));
+	e->polyline.push_back(roads.graph[v_desc]->pt);
+	e->polyline.push_back(pt);
+
+	// 頂点を追加
+	RoadVertexPtr v = RoadVertexPtr(new RoadVertex(pt));
+	v->generationType = "pm";
+	RoadVertexDesc tgtDesc = GraphUtil::addVertex(roads, v);
+
+	// エリア外なら、onBoundaryフラグをセット
+	if (!targetArea.contains(roads.graph[tgtDesc]->pt)) {
+		roads.graph[tgtDesc]->onBoundary = true;
+	}
+
+	// シードに追加
+	// NOTE: エリア外でもとりあえずシードに追加する。
+	// 理由: シード頂点へのスナップさせたい時があるので。
+	seeds.push_back(tgtDesc);
+
+	// エッジを追加
+	GraphUtil::addEdge(roads, v_desc, tgtDesc, e);
 }
 
 /**

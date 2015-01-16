@@ -72,7 +72,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 
 			// 水中なら、伸ばして水中から脱出できるなら伸ばす。
 			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y(), true);
-			if (z < G::getFloat("seaLevelForAvenue")) {
+			if (z < G::getFloat("seaLevel")) {
 				extendRoadAcrossRiver(RoadEdge::TYPE_AVENUE, desc, seeds, 200.0f);
 				continue;
 			}
@@ -1085,7 +1085,7 @@ void PatchRoadGenerator::extendRoadAcrossRiver(int roadType, RoadVertexDesc v_de
 	QVector2D pt = roads.graph[v_desc]->pt - dir * max_length;
 
 	float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y(), true);
-	if (z < G::getFloat("seaLevelForAvenue")) return;
+	if (z < G::getFloat("seaLevel")) return;
 
 	// エッジ生成
 	RoadEdgePtr e = RoadEdgePtr(new RoadEdge(roadType, lanes));

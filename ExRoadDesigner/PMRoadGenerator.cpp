@@ -49,7 +49,7 @@ void PMRoadGenerator::generateRoadNetwork() {
 			seeds.pop_front();
 
 			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y(), true);
-			if (z < G::getFloat("seaLevelForAvenue")) {
+			if (z < G::getFloat("seaLevel")) {
 				std::cout << "attemptExpansion (avenue): " << i << " (skipped because it is under the sea or on the mountains)" << std::endl;
 				continue;
 			}
