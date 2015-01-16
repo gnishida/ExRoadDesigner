@@ -92,6 +92,8 @@ void PatchRoadGenerator::generateRoadNetwork() {
 			sprintf(filename, "road_images/avenues_%d.jpg", iter);
 			RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
 
+			check();
+
 			iter++;
 		}
 	}
@@ -838,6 +840,7 @@ void PatchRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph
 			if (!replacementGraph.graph[*vi]->valid) continue;
 
 			RoadVertexPtr v = RoadVertexPtr(new RoadVertex(*replacementGraph.graph[*vi]));
+			v->generationType = "example";
 			RoadVertexDesc v_desc;
 			if (!GraphUtil::getVertex(roads, replacementGraph.graph[*vi]->pt, 1.0f, v_desc)) {
 				// 頂点を新規追加
@@ -1041,6 +1044,7 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 
 			// 頂点を作成
 			RoadVertexPtr v = RoadVertexPtr(new RoadVertex(nextPt));
+			v->generationType = "pm";
 			RoadVertexDesc nextDesc = GraphUtil::addVertex(roads, v);
 
 			// エッジを作成
@@ -1254,4 +1258,19 @@ void PatchRoadGenerator::removeDeadend(RoadGraph& roads) {
 			}
 		}
 	} while (removed);
+}
+
+void PatchRoadGenerator::check() {
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		if (!roads.graph[*vi]->valid) continue;
+
+		if (roads.graph[*vi]->generationType == "") {
+			printf("No generation type is set for vertex %d.\n", *vi);
+			assert(false);
+			return;
+		}
+	}
+
+
 }
