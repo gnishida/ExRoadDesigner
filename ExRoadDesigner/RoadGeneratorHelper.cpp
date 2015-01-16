@@ -1107,12 +1107,23 @@ bool RoadGeneratorHelper::growRoadOneStep(RoadGraph& roads, RoadVertexDesc srcDe
 }
 
 /**
- * 急激な標高の変化がある場合に、エッジをその境界でカットする
- * polylineのlast()が、カットされる側にあることを前提とする
+ * 海岸の手間で、エッジをカットする
+ * polylineのlast()側が、カットされる側にあることを前提とする
  */
-void RoadGeneratorHelper::cutEdgeBySteepElevationChange(int roadType, Polyline2D &polyline, VBORenderManager *vboRenderManager) {
+void RoadGeneratorHelper::cutEdgeByWater(Polyline2D &polyline, VBORenderManager& vboRenderManager, float z_threshold) {
 	// 点が2つ未満の場合は、処理不能
 	if (polyline.size() < 2) return;
+
+	// polylineの中で、海岸をまたぐセグメントを探す
+	for (int i = 0; i < polyline.size(); ++i) {
+		float z = vboRenderManager.getTerrainHeight(polyline[i].x(), polyline[i].y(), true);
+		if (z < z_threshold) {
+			// またいだ後のセグメントを全て削除
+			for (int j = i + 1; j < polyline.size(); ) {
+				polyline.erase(polyline.begin() + j);
+			}
+		}
+	}
 
 	// 海岸ぎりぎりの場所を探す
 	QVector2D vec = polyline.last() - polyline.nextLast();
@@ -1120,13 +1131,12 @@ void RoadGeneratorHelper::cutEdgeBySteepElevationChange(int roadType, Polyline2D
 	QVector2D pt = polyline.last();
 	while (true) {
 		pt -= vec;
-		float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y(), true);
-		if ((roadType == RoadEdge::TYPE_AVENUE && z < G::getFloat("seaLevelForAvenue")) || (roadType == RoadEdge::TYPE_STREET && z < G::getFloat("seaLevelForStreet"))) {
+		float z = vboRenderManager.getTerrainHeight(pt.x(), pt.y(), true);
+		if (z < z_threshold) {
 			continue;
 		} else {
 			break;
 		}
-		//if (z >= 0.0f && z <= 100.0f) break;
 	}
 
 	polyline[polyline.size() - 1] = pt;

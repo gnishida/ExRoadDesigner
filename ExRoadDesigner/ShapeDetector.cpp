@@ -184,6 +184,8 @@ void ShapeDetector::addVerticesToCircle(RoadGraph &roads, RoadEdgeDescs& shape, 
 		edge_descs[shape[i]] = true;
 	}
 
+	shape.clear();
+
 	while (!queue.empty()) {
 		RoadVertexDesc desc = queue.front();
 		queue.pop_front();
@@ -193,18 +195,26 @@ void ShapeDetector::addVerticesToCircle(RoadGraph &roads, RoadEdgeDescs& shape, 
 			if (!roads.graph[*ei]->valid) continue;
 			//if (usedEdges.contains(*ei)) continue;
 
-			usedEdges[*ei] = 1;
+			if (!usedEdges.contains(*ei)) {
+				shape.push_back(*ei);
+				usedEdges[*ei] = 1;
+			}
 			edge_descs[*ei] = true;
 			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+
 			if (usedVertices.contains(tgt)) continue;
 			if (visited.contains(tgt)) continue;
 
-			if (GraphUtil::getDegree(roads, tgt) <= 2 || roads.graph[desc]->properties["length"].toFloat() + roads.graph[*ei]->polyline.length() <= threshold) {
+			float length = 0.0f;
+			if (roads.graph[desc]->properties.contains("length")) {
+				length = roads.graph[desc]->properties["length"].toFloat();
+			}
+			if (GraphUtil::getDegree(roads, tgt) <= 2 || length + roads.graph[*ei]->polyline.length() <= threshold) {
 				queue.push_back(tgt);
 				visited[tgt] = true;
 
 				if (GraphUtil::getDegree(roads, tgt) <= 2) {
-					roads.graph[tgt]->properties["length"] = roads.graph[desc]->properties["length"].toFloat() + roads.graph[*ei]->polyline.length();
+					roads.graph[tgt]->properties["length"] = length + roads.graph[*ei]->polyline.length();
 
 					// この頂点は、複数のパッチに属する可能性があるので、パッチIDが未設定の場合だけセットする
 					// ただし、境界上の頂点には、パッチIDをセットしない。なぜなら、境界上の頂点は、対応するパッチがないから！！
@@ -220,11 +230,6 @@ void ShapeDetector::addVerticesToCircle(RoadGraph &roads, RoadEdgeDescs& shape, 
 				}
 			}
 		}
-	}
-
-	shape.clear();
-	for (QMap<RoadEdgeDesc, bool>::iterator it = edge_descs.begin(); it != edge_descs.end(); ++it) {
-		shape.push_back(it.key());
 	}
 }
 
@@ -268,7 +273,10 @@ void ShapeDetector::addVerticesToGroup(RoadGraph &roads, RoadVertexDesc srcDesc,
 			} else {
 				usedEdges[*ei]++;
 			}
-			edge_descs[*ei] = true;
+			if (!edge_descs.contains(*ei)) {
+				shape.push_back(*ei);
+				edge_descs[*ei] = true;
+			}
 			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
 			if (usedVertices.contains(tgt)) continue;
 			if (visited.contains(tgt)) continue;
@@ -294,10 +302,6 @@ void ShapeDetector::addVerticesToGroup(RoadGraph &roads, RoadVertexDesc srcDesc,
 				}
 			}
 		}
-	}
-
-	for (QMap<RoadEdgeDesc, bool>::iterator it = edge_descs.begin(); it != edge_descs.end(); ++it) {
-		shape.push_back(it.key());
 	}
 }
 

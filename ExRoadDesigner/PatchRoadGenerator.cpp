@@ -914,6 +914,11 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 	synthesizeItem(roadType, srcDesc, length, 5.0f, edges);
 
 	float z = vboRenderManager->getTerrainHeight(roads.graph[srcDesc]->pt.x(), roads.graph[srcDesc]->pt.y(), true);
+	if (z < G::getFloat("seaLevel")) {
+		printf("ERROR! The current vertex should be above sea leve.\n");
+		assert(false);
+		return;
+	}
 
 	int cnt = 0;
 	for (int i = 0; i < edges.size(); ++i) {
@@ -923,7 +928,7 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 		}
 
 		// hack: to avoid creating an intersection on the river.
-		if (roadType == RoadEdge::TYPE_AVENUE && z < G::getFloat("seaLevelForStreet")) {
+		if (roadType == RoadEdge::TYPE_AVENUE && z < G::getFloat("seaLevel")) {
 			if (cnt >= 1) break;
 		}
 
@@ -936,6 +941,7 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
  * この関数は、PM方式での道路生成でのみ使用される。
  */
 bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, ExFeature& f, const Polyline2D &polyline, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
+	float step = polyline.length() / 5.0f;
 	float angle = atan2f(polyline[1].y() - polyline[0].y(), polyline[1].x() - polyline[0].x());
 
 	RoadEdgePtr new_edge = RoadEdgePtr(new RoadEdge(roadType, lanes));
@@ -951,8 +957,8 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 		if (found) {
 			// もしスナップ先が、シードじゃないなら、エッジ生成をキャンセル
 			if (std::find(seeds.begin(), seeds.end(), tgtDesc) == seeds.end()) {
-				//（要検討。80%の確率ぐらいにすべきか？)
-				if (Util::genRand(0, 1) < 0.8f) return false;
+				//（要検討。50%の確率ぐらいにすべきか？)
+				if (Util::genRand(0, 1) < 0.5f) return false;
 			}
 
 			// もしスナップ先の頂点が、redundantなエッジを持っているなら、エッジ生成をキャンセル
@@ -1015,6 +1021,16 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 		v->generationType = "pm";
 		tgtDesc = GraphUtil::addVertex(roads, v);
 
+		// 水面下なら頂点の座標を岸ぎりぎりに移動する
+		float z = vboRenderManager->getTerrainHeight(roads.graph[tgtDesc]->pt.x(), roads.graph[tgtDesc]->pt.y(), true);
+		if (z < G::getFloat("seaLevel")) {
+			Polyline2D polyline;
+			polyline.push_back(roads.graph[srcDesc]->pt);
+			polyline.push_back(roads.graph[tgtDesc]->pt);
+			RoadGeneratorHelper::cutEdgeByWater(polyline, *vboRenderManager, G::getFloat("seaLevel"));
+			roads.graph[tgtDesc]->pt = polyline[1];
+		}
+
 		// エリア外なら、onBoundaryフラグをセット
 		if (!targetArea.contains(roads.graph[tgtDesc]->pt)) {
 			roads.graph[tgtDesc]->onBoundary = true;
@@ -1029,7 +1045,6 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 	// エッジを追加
 	// エッジをstepサイズに分割し、分割点に頂点を追加する。この頂点は、後でlocal street生成の初期シードとして使用する。
 	{
-		float step = new_edge->polyline.length() / 5.0f;
 		angle = atan2f(new_edge->polyline[1].y() - new_edge->polyline[0].y(), new_edge->polyline[1].x() - new_edge->polyline[0].x());
 
 		RoadVertexDesc curDesc = srcDesc;
