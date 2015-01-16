@@ -3,8 +3,8 @@
 //#include "Util.h"
 #include <QStringList>
 #include "VBOUtil.h"
-
-
+#include <QImage>
+#include <QGLWidget>
 	
 	Layer::Layer(){
 		initialized=false;
@@ -98,15 +98,36 @@
 	//////////////////////////////////////////////////////////////
 
 	
-
+	// GEN: 1/16/2015. Change to not use a temporary file.
 	void Layer::updateTexFromData(){
-		cv::imwrite( "../data/height.png", layerData );
-		
+		//cv::imwrite( "../data/height.png", layerData );
+		//texData=VBOUtil::loadImage("../data/height.png",false,true);
+
+		cv::Mat dst;
+		cvtColor(layerData, dst, CV_GRAY2RGB);
+
+		QImage img = QImage((uchar*)dst.data, dst.cols, dst.rows, dst.step, QImage::Format_RGB888);
+		if (img.isNull()) {
+			printf("ERROR: GL_formatted_image\n");
+			return;
+		}
+
 		if(texData!=0){
 			glDeleteTextures(1,&texData);
 			texData=0;
 		}
-		texData=VBOUtil::loadImage("../data/height.png",false,true);
+
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+
+		glGenTextures(1, &texData);
+		glBindTexture(GL_TEXTURE_2D, texData);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGB, GL_UNSIGNED_BYTE, img.bits());
+
+		glGenerateMipmap(GL_TEXTURE_2D);
 	}//
 
 	void Layer::updateLayer(float coordX,float coordY,float change,float rad){
