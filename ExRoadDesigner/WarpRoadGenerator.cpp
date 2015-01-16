@@ -82,7 +82,7 @@ void WarpRoadGenerator::generateRoadNetwork() {
 			std::cout << "attemptExpansion (avenue): " << iter << " (Seed: " << desc << ")" << std::endl;
 			
 			int ex_id = defineExId(roads.graph[desc]->pt);
-			attemptConnect(RoadEdge::TYPE_AVENUE, desc, ex_id, features, seeds);
+			attemptConnect(RoadEdge::TYPE_AVENUE, desc, ex_id, features);
 			if (RoadGeneratorHelper::largestAngleBetweenEdges(roads, desc, RoadEdge::TYPE_AVENUE) > M_PI * 1.4f) {
 				if (!attemptExpansion(RoadEdge::TYPE_AVENUE, desc, ex_id, features[ex_id], patches[ex_id], seeds)) {
 					attemptExpansion2(RoadEdge::TYPE_AVENUE, desc, features[ex_id], seeds);
@@ -299,7 +299,7 @@ void WarpRoadGenerator::generateStreetSeeds(std::list<RoadVertexDesc> &seeds) {
  * コネクトできた場合は、trueを返却する。
  * コネクトできなかった場合は、falseを返却する。
  */
-bool WarpRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int ex_id, std::vector<ExFeature>& features, std::list<RoadVertexDesc> &seeds) {
+bool WarpRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int ex_id, std::vector<ExFeature>& features) {
 	float length = 0.0f;
 
 	if (roadType == RoadEdge::TYPE_AVENUE) {
@@ -312,17 +312,61 @@ bool WarpRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int
 
 	std::vector<RoadEdgePtr> edges;
 
-	// 当該頂点から出るエッジの方向を取得する
-	float direction = RoadGeneratorHelper::getFirstEdgeAngle(roads, srcDesc);
+	// 近接頂点を探し、あればコネクトする
+	RoadOutEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
 
-	// 既にあるエッジと正反対の方向を計算
-	direction += 3.141592653;
+		Polyline2D polyline = GraphUtil::orderPolyLine(roads, *ei, srcDesc);
+		float direction = atan2f((polyline[1] - polyline[0]).y(), (polyline[1] - polyline[0]).x());
+		direction += M_PI;
 
+		if (attemptConnectToVertex(roadType, srcDesc, features, length, G::getFloat("seaLevel"), direction, 0.3f, roadAngleTolerance)) return true;
+	}
+
+	// 近接エッジを探し、あればコネクトする
+	for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		Polyline2D polyline = GraphUtil::orderPolyLine(roads, *ei, srcDesc);
+		float direction = atan2f((polyline[1] - polyline[0]).y(), (polyline[1] - polyline[0]).x());
+		direction += M_PI;
+		if (attemptConnectToEdge(roadType, srcDesc, length, G::getFloat("seaLevel"), direction, 0.3f)) return true;
+	}
+
+	// 中距離の頂点を探し、あればコネクトする
+	for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		Polyline2D polyline = GraphUtil::orderPolyLine(roads, *ei, srcDesc);
+		float direction = atan2f((polyline[1] - polyline[0]).y(), (polyline[1] - polyline[0]).x());
+		direction += M_PI;
+
+		if (attemptConnectToVertex(roadType, srcDesc, features, length, G::getFloat("seaLevel"), direction, 1.5f, roadAngleTolerance)) return true;
+	}
+
+	return false;
+}
+
+/**
+ * 近くに頂点があるなら、コネクトしちゃう。
+ *
+ * @param roadType				avenue / local street
+ * @param srcDesc				現在の頂点ID
+ * @param features				featureリスト
+ * @param dist_threshold		距離基準（これより遠い頂点は対象外）
+ * @param z_threshold			最低標高（これより低い頂点は対象外）
+ * @param direction				コネクトする方向基準
+ * @param angle_threshold		方向基準からしきい値以上ずれる頂点は対象外
+ * @param roadAngleTolerance	既存エッジとの成す角度がこれ未満だと、キャンセル
+ * @return						コネクトしたらtrue、コネクトしなかったらfalseを返却する。
+ */
+bool WarpRoadGenerator::attemptConnectToVertex(int roadType, RoadVertexDesc srcDesc, std::vector<ExFeature>& features, float dist_threshold, float z_threshold, float direction, float angle_threshold, float roadAngleTolerance) {
 	// ものすごい近くに、他の頂点がないかあれば、そことコネクトして終わり。
 	// それ以外の余計なエッジは生成しない。さもないと、ものすごい密度の濃い道路網になっちゃう。
 	{
 		RoadVertexDesc nearestDesc;
-		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, srcDesc, length, direction, G::getFloat("seaLevel"), 0.3f, nearestDesc)) {
+		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, srcDesc, dist_threshold, z_threshold, direction, angle_threshold, nearestDesc)) {
 			// もし、既にエッジがあるなら、キャンセル
 			// なお、ここではtrueを返却して、これ以上のエッジ生成をさせない。
 			if (GraphUtil::hasEdge(roads, srcDesc, nearestDesc)) return true;
@@ -359,10 +403,12 @@ bool WarpRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int
 					}
 				}
 
+				// patchがピッタリはまるはずなので、connectしない
+				// なので、trueを返却し、connectを終了させる。
 				if (has_ex_v1 && has_ex_v2) {
 					QVector2D ex_vec = features[pre_ex_id].roads(roadType).graph[ex_v2_desc]->pt - features[pre_ex_id].roads(roadType).graph[ex_v1_desc]->pt;
 					QVector2D vec = roads.graph[nearestDesc]->pt - roads.graph[srcDesc]->pt;
-					if ((vec - ex_vec).lengthSquared() <= 0.1f) return false;
+					if ((vec - ex_vec).lengthSquared() <= 0.1f) return true;
 				}
 			}
 
@@ -370,6 +416,34 @@ bool WarpRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int
 			e->polyline.push_back(roads.graph[srcDesc]->pt);
 			e->polyline.push_back(roads.graph[nearestDesc]->pt);
 
+			// 自分にとってredundantなら、コネクトしない。
+			// 理由：このエッジは、角度を考慮せず、単純に距離で見つけたもの。従って、角度が鋭角すぎるケースがあり得る
+			if (RoadGeneratorHelper::isRedundantEdge(roads, srcDesc, e->polyline, roadAngleTolerance)) {
+				return false;
+			}
+
+			// スナップ先にとってredundantなら、コネクトしないで、終了。
+			// つまり、trueを返却して、終わったことにしちゃう。
+			/*
+			if (roadType == RoadEdge::TYPE_AVENUE) {
+				Polyline2D e2;
+				e2.push_back(QVector2D(0, 0));
+				e2.push_back(roads.graph[srcDesc]->pt - roads.graph[nearestDesc]->pt);
+				if (RoadGeneratorHelper::isRedundantEdge(roads, nearestDesc, e2, roadAngleTolerance)) {
+					// もしdegree=1なら、連なるエッジをごっそり削除
+					if (roadType == RoadEdge::TYPE_AVENUE && GraphUtil::getDegree(roads, srcDesc) == 1) {
+						RoadOutEdgeIter ei, eend;
+						for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
+							removeEdge(roads, srcDesc, *ei);
+						}
+					}
+
+					return true;
+				}
+			}
+			*/
+
+			// コネクトしてtrueを返却する
 			if (!GraphUtil::isIntersect(roads, e->polyline)) {
 				RoadEdgeDesc e_desc = GraphUtil::addEdge(roads, srcDesc, nearestDesc, e);
 				return true;
@@ -377,12 +451,28 @@ bool WarpRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int
 		}
 	}
 
+	return false;
+}
+
+/**
+ * 近くにエッジがあるなら、コネクトしちゃう。
+ *
+ * @param roadType			avenue / local street
+ * @param srcDesc			現在の頂点ID
+ * @param features			featureリスト
+ * @param dist_threshold	距離基準（これより遠い頂点は対象外）
+ * @param z_threshold		最低標高（これより低い頂点は対象外）
+ * @param direction			コネクトする方向基準
+ * @param angle_threshold	方向基準からしきい値以上ずれる頂点は対象外
+ * @return					コネクトしたらtrue、コネクトしなかったらfalseを返却する。
+ */
+bool WarpRoadGenerator::attemptConnectToEdge(int roadType, RoadVertexDesc srcDesc, float dist_threshold, float z_threshold, float direction, float angle_threshold) {
 	// 近くにエッジがあれば、コネクト
 	{
 		RoadVertexDesc nearestDesc;
 		RoadEdgeDesc nearestEdgeDesc;
 		QVector2D intPoint;
-		if (RoadGeneratorHelper::getEdgeForSnapping(*vboRenderManager, roads, srcDesc, length, direction, G::getFloat("seaLevel"), 0.3f, nearestEdgeDesc, intPoint)) {
+		if (RoadGeneratorHelper::getEdgeForSnapping(*vboRenderManager, roads, srcDesc, dist_threshold, G::getFloat("seaLevel"), direction, angle_threshold, nearestEdgeDesc, intPoint)) {
 			// エッジにスナップ
 			nearestDesc = GraphUtil::splitEdge(roads, nearestEdgeDesc, intPoint);
 			roads.graph[nearestDesc]->generationType = "snapped";
@@ -396,65 +486,6 @@ bool WarpRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int
 			RoadEdgeDesc e_desc = GraphUtil::addEdge(roads, srcDesc, nearestDesc, e);
 
 			return true;
-		}
-	}
-
-	// ものすごい近くに、他の頂点がないかあれば、そことコネクトして終わり。
-	// それ以外の余計なエッジは生成しない。さもないと、ものすごい密度の濃い道路網になっちゃう。
-	{
-		RoadVertexDesc nearestDesc;
-		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, srcDesc, length, direction, G::getFloat("seaLevel"), 1.5f, nearestDesc)) {
-			// もし、既にエッジがあるなら、キャンセル
-			// なお、ここではtrueを返却して、これ以上のエッジ生成をさせない。
-			if (GraphUtil::hasEdge(roads, srcDesc, nearestDesc)) return true;
-
-			// その頂点のexample_descと、この頂点のexample_descの位置関係と、実際の位置関係が同じ場合、
-			// patch適用でピッタリはまるはずなので、connectしない。
-			{
-				RoadVertexDesc ex_v1_desc;
-				RoadVertexDesc ex_v2_desc;
-				int pre_ex_id = roads.graph[srcDesc]->properties["ex_id"].toInt();
-				bool has_ex_v1 = false;
-				bool has_ex_v2 = false;
-				if (roadType == RoadEdge::TYPE_AVENUE) {
-					if (roads.graph[srcDesc]->properties.contains("example_desc")) {
-						has_ex_v1 = true;
-						ex_v1_desc = roads.graph[srcDesc]->properties["example_desc"].toUInt();
-					}
-					if (roads.graph[nearestDesc]->properties["ex_id"].toInt() == pre_ex_id) {
-						if (roads.graph[nearestDesc]->properties.contains("example_desc")) {
-							has_ex_v2 = true;
-							ex_v2_desc = roads.graph[nearestDesc]->properties["example_desc"].toUInt();
-						}
-					}
-				} else {
-					if (roads.graph[srcDesc]->properties.contains("example_street_desc")) {
-						has_ex_v1 = true;
-						ex_v1_desc = roads.graph[srcDesc]->properties["example_street_desc"].toUInt();
-					}
-					if (roads.graph[nearestDesc]->properties["ex_id"].toInt() == pre_ex_id) {
-						if (roads.graph[nearestDesc]->properties.contains("example_street_desc")) {
-							has_ex_v2 = true;
-							ex_v2_desc = roads.graph[nearestDesc]->properties["example_street_desc"].toUInt();
-						}
-					}
-				}
-
-				if (has_ex_v1 && has_ex_v2) {
-					QVector2D ex_vec = features[pre_ex_id].roads(roadType).graph[ex_v2_desc]->pt - features[pre_ex_id].roads(roadType).graph[ex_v1_desc]->pt;
-					QVector2D vec = roads.graph[nearestDesc]->pt - roads.graph[srcDesc]->pt;
-					if ((vec - ex_vec).lengthSquared() <= 0.1f) return false;
-				}
-			}
-
-			RoadEdgePtr e = RoadEdgePtr(new RoadEdge(roadType, 1));
-			e->polyline.push_back(roads.graph[srcDesc]->pt);
-			e->polyline.push_back(roads.graph[nearestDesc]->pt);
-
-			if (!GraphUtil::isIntersect(roads, e->polyline)) {
-				RoadEdgeDesc e_desc = GraphUtil::addEdge(roads, srcDesc, nearestDesc, e);
-				return true;
-			}
 		}
 	}
 
