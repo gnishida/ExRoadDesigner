@@ -84,17 +84,12 @@ std::vector<RoadEdgeDescs> ShapeDetector::detect(RoadGraph &roads, float maxRadi
 				for (boost::tie(ei, eend) = boost::out_edges(*vi, roads.graph); ei != eend; ++ei) {
 					if (!roads.graph[*ei]->valid) continue;
 					if (usedEdges.contains(*ei)) {
-						visited = true;
-						break;
+						usedEdges[*ei]++;
+					} else {
+						usedEdges[*ei] = 1;
 					}
-
-					usedEdges[*ei] = 1;
-					RoadVertexDesc src = boost::source(*ei, roads.graph);
-					RoadVertexDesc tgt = boost::target(*ei, roads.graph);
 					shape.push_back(*ei);
 				}
-
-				if (visited) continue;
 
 				usedVertices[*vi] = true;
 
