@@ -253,7 +253,7 @@ bool WarpRoadGenerator::addAvenueSeed(ExFeature &f, const QVector2D &pt, const Q
 	RoadVertexPtr v = RoadVertexPtr(new RoadVertex(pt));
 	RoadVertexDesc desc = GraphUtil::addVertex(roads, v);
 	roads.graph[desc]->properties["group_id"] = group_id;
-	roads.graph[desc]->properties["generation_type"] = "example";
+	roads.graph[desc]->generationType = "example";
 	roads.graph[desc]->properties["ex_id"] = ex_id;
 	roads.graph[desc]->properties["example_desc"] = seedDesc;
 	roads.graph[desc]->rotationAngle = angle;
@@ -385,7 +385,7 @@ bool WarpRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int
 		if (GraphUtil::getCloseEdge(roads, srcDesc, length, direction, 0.3f, nearestEdgeDesc, intPoint)) {
 			// エッジにスナップ
 			nearestDesc = GraphUtil::splitEdge(roads, nearestEdgeDesc, intPoint);
-			roads.graph[nearestDesc]->properties["generation_type"] = "snapped";
+			roads.graph[nearestDesc]->generationType = "snapped";
 			roads.graph[nearestDesc]->properties["group_id"] = roads.graph[nearestEdgeDesc]->properties["group_id"];
 			roads.graph[nearestDesc]->properties["ex_id"] = roads.graph[nearestEdgeDesc]->properties["ex_id"];
 			roads.graph[nearestDesc]->properties.remove("example_desc");
@@ -952,7 +952,7 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, Ex
 
 				// 他のエッジにスナップ
 				tgtDesc = GraphUtil::splitEdge(roads, closestEdge, intPoint);
-				roads.graph[tgtDesc]->properties["generation_type"] = "snapped";
+				roads.graph[tgtDesc]->generationType = "snapped";
 				roads.graph[tgtDesc]->properties["group_id"] = roads.graph[closestEdge]->properties["group_id"];
 				roads.graph[tgtDesc]->properties["ex_id"] = roads.graph[closestEdge]->properties["ex_id"];
 				roads.graph[tgtDesc]->properties.remove("example_desc");
@@ -976,7 +976,7 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, Ex
 
 			// 他のエッジにスナップ
 			tgtDesc = GraphUtil::splitEdge(roads, closestEdge, intPoint);
-			roads.graph[tgtDesc]->properties["generation_type"] = "snapped";
+			roads.graph[tgtDesc]->generationType = "snapped";
 			roads.graph[tgtDesc]->properties["group_id"] = roads.graph[closestEdge]->properties["group_id"];
 			roads.graph[tgtDesc]->properties["ex_id"] = roads.graph[closestEdge]->properties["ex_id"];
 			roads.graph[tgtDesc]->properties.remove("example_desc");
@@ -988,6 +988,7 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, Ex
 	if (!found) {
 		// 頂点を追加
 		RoadVertexPtr v = RoadVertexPtr(new RoadVertex(new_edge->polyline.last()));
+		v->generationType = "pm";
 		v->rotationAngle = roads.graph[srcDesc]->rotationAngle;
 		tgtDesc = GraphUtil::addVertex(roads, v);
 

@@ -67,8 +67,6 @@ void PatchRoadGenerator::generateRoadNetwork() {
 
 			// エリアの外なら、スキップする
 			if (!targetArea.contains(roads.graph[desc]->pt)) {
-				printf("ERROR: this check should have been done before.\n");
-				assert(false);
 				continue;
 			}
 
@@ -149,8 +147,6 @@ void PatchRoadGenerator::generateRoadNetwork() {
 
 			// エリアの外なら、スキップする
 			if (!targetArea.contains(roads.graph[desc]->pt)) {
-				printf("ERROR: this check should have been done before.\n");
-				assert(false);
 				continue;
 			}
 
@@ -223,7 +219,7 @@ bool PatchRoadGenerator::addAvenueSeed(ExFeature &f, const QVector2D &pt, const 
 	RoadVertexPtr v = RoadVertexPtr(new RoadVertex(pt));
 	RoadVertexDesc desc = GraphUtil::addVertex(roads, v);
 	roads.graph[desc]->properties["group_id"] = group_id;
-	roads.graph[desc]->properties["generation_type"] = "example";
+	roads.graph[desc]->generationType = "example";
 	roads.graph[desc]->properties["ex_id"] = ex_id;
 	roads.graph[desc]->properties["example_desc"] = seedDesc;
 	roads.graph[desc]->rotationAngle = G::getFloat("rotationAngle");//0.0f;
@@ -392,7 +388,7 @@ bool PatchRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, in
 		if (GraphUtil::getCloseEdge(roads, srcDesc, length, direction, 0.3f, nearestEdgeDesc, intPoint)) {
 			// エッジにスナップ
 			nearestDesc = GraphUtil::splitEdge(roads, nearestEdgeDesc, intPoint);
-			roads.graph[nearestDesc]->properties["generation_type"] = "snapped";
+			roads.graph[nearestDesc]->generationType = "snapped";
 			roads.graph[nearestDesc]->properties["group_id"] = roads.graph[nearestEdgeDesc]->properties["group_id"];
 			roads.graph[nearestDesc]->properties["ex_id"] = roads.graph[nearestEdgeDesc]->properties["ex_id"];
 			roads.graph[nearestDesc]->properties.remove("example_desc");
@@ -848,14 +844,12 @@ void PatchRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph
 				v_desc = GraphUtil::addVertex(roads, v);
 
 				// エリア外なら、onBoundaryフラグをセット
-				if (targetArea.contains(roads.graph[v_desc]->pt)) {
-					roads.graph[v_desc]->onBoundary = false;
-				} else {
+				if (!targetArea.contains(roads.graph[v_desc]->pt)) {
 					roads.graph[v_desc]->onBoundary = true;
 				}
 
 				// 新規追加された頂点について、もとのreplacementGraphでconnectorなら、シードに追加
-				if (replacementGraph.graph[*vi]->connector && !roads.graph[v_desc]->onBoundary) {
+				if (replacementGraph.graph[*vi]->connector) {
 					seeds.push_back(v_desc);
 				}
 			} else {
@@ -984,7 +978,7 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 
 				// 他のエッジにスナップ
 				tgtDesc = GraphUtil::splitEdge(roads, closestEdge, intPoint);
-				roads.graph[tgtDesc]->properties["generation_type"] = "snapped";
+				roads.graph[tgtDesc]->generationType = "snapped";
 				roads.graph[tgtDesc]->properties["group_id"] = roads.graph[closestEdge]->properties["group_id"];
 				roads.graph[tgtDesc]->properties["ex_id"] = roads.graph[closestEdge]->properties["ex_id"];
 				roads.graph[tgtDesc]->properties.remove("example_desc");
@@ -1008,7 +1002,7 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 
 			// 他のエッジにスナップ
 			tgtDesc = GraphUtil::splitEdge(roads, closestEdge, intPoint);
-			roads.graph[tgtDesc]->properties["generation_type"] = "snapped";
+			roads.graph[tgtDesc]->generationType = "snapped";
 			roads.graph[tgtDesc]->properties["group_id"] = roads.graph[closestEdge]->properties["group_id"];
 			roads.graph[tgtDesc]->properties["ex_id"] = roads.graph[closestEdge]->properties["ex_id"];
 			roads.graph[tgtDesc]->properties.remove("example_desc");
@@ -1020,15 +1014,18 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 	if (!found) {
 		// 頂点を追加
 		RoadVertexPtr v = RoadVertexPtr(new RoadVertex(new_edge->polyline.last()));
+		v->generationType = "pm";
 		tgtDesc = GraphUtil::addVertex(roads, v);
 
-		// エリア内なら、seedsに追加
-		if (targetArea.contains(roads.graph[tgtDesc]->pt)) {
-			roads.graph[tgtDesc]->onBoundary = false;
-			seeds.push_back(tgtDesc);
-		} else { // エリア外なら、onBoundaryフラグをセット
+		// エリア外なら、onBoundaryフラグをセット
+		if (!targetArea.contains(roads.graph[tgtDesc]->pt)) {
 			roads.graph[tgtDesc]->onBoundary = true;
 		}
+
+		// シードに追加
+		// NOTE: エリア外でもとりあえずシードに追加する。
+		// 理由: シード頂点へのスナップさせたい時があるので。
+		seeds.push_back(tgtDesc);
 	}
 	
 	// エッジを追加
@@ -1098,15 +1095,18 @@ void PatchRoadGenerator::extendRoadAcrossRiver(int roadType, RoadVertexDesc v_de
 
 	// 頂点を追加
 	RoadVertexPtr v = RoadVertexPtr(new RoadVertex(pt));
+	v->generationType = "pm";
 	RoadVertexDesc tgtDesc = GraphUtil::addVertex(roads, v);
 
-	// エリア内なら、seedsに追加
-	if (targetArea.contains(roads.graph[tgtDesc]->pt)) {
-		roads.graph[tgtDesc]->onBoundary = false;
-		seeds.push_back(tgtDesc);
-	} else { // エリア外なら、onBoundaryフラグをセット
+	// エリア外なら、onBoundaryフラグをセット
+	if (!targetArea.contains(roads.graph[tgtDesc]->pt)) {
 		roads.graph[tgtDesc]->onBoundary = true;
 	}
+
+	// シードに追加
+	// NOTE: エリア外でもとりあえずシードに追加する。
+	// 理由: シード頂点へのスナップさせたい時があるので。
+	seeds.push_back(tgtDesc);
 
 	// エッジを追加
 	GraphUtil::addEdge(roads, v_desc, tgtDesc, e);
