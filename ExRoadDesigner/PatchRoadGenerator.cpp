@@ -608,7 +608,6 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 		// 回転しても駄目なら、exampleを使用しない
 		if (min_slope > 0.3f) return false;
 
-		printf("Patch is rotated by %lf [rad].\n", min_rotation);
 		GraphUtil::copyRoads(backup, replacementGraph);
 		GraphUtil::rotate(replacementGraph, min_rotation, roads.graph[srcDesc]->pt);
 
@@ -627,7 +626,6 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 
 	// replacementGraphが、既に生成済みのグラフと重なるかどうかチェック
 	if (GraphUtil::isIntersect(replacementGraph, roads)) {
-		printf("replacement graph is intersected with the existing roads.\n");
 		return false;
 	}
 	
