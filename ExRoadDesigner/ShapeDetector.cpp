@@ -184,8 +184,6 @@ void ShapeDetector::addVerticesToCircle(RoadGraph &roads, RoadEdgeDescs& shape, 
 		edge_descs[shape[i]] = true;
 	}
 
-	shape.clear();
-
 	while (!queue.empty()) {
 		RoadVertexDesc desc = queue.front();
 		queue.pop_front();
