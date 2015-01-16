@@ -155,7 +155,6 @@
 			}
 		}else{
 			// Normal
-			printf("UpdateLayer x %f y %f ch %f rad %f x0 %f y0 %f imgResX %d imgResY %d layerData.cols %d layerData.rows %d\n",coordX,coordY,change,rad,x0,y0,imgResX,imgResY,layerData.cols,layerData.rows);
 			float diff;
 			for(int c=0;c<layerData.cols;c++){
 				for(int r=0;r<layerData.rows;r++){

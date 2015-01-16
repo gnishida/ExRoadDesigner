@@ -183,7 +183,6 @@
 			 glPointSize(10.0f);
 
 			 VBOUtil::check_gl_error(">>editionMode");
-			 printf("**************** editionMode\n");
 			const float pointOffset=5.0f;
 			GLuint vao;
 			glGenVertexArrays(1,&vao);
@@ -230,9 +229,6 @@
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindVertexArray(0);
 			glDeleteVertexArrays(1,&vao);
-
-
-			printf("****************\n");
 		 }
 	}//
 
