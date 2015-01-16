@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
 
 	G::global()["seaLevelForAvenue"] = 0.1f;
 	G::global()["seaLevelForStreet"] = 48.9f;
+	G::global()["seaLevel"] = 48.9f;
 
 	G::global()["MAX_Z"] = 4500.0f;
 	G::global()["shader2D"] = true;

@@ -306,7 +306,7 @@ bool PatchRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, in
 	// それ以外の余計なエッジは生成しない。さもないと、ものすごい密度の濃い道路網になっちゃう。
 	{
 		RoadVertexDesc nearestDesc;
-		if (GraphUtil::getVertexExceptDeadend(roads, srcDesc, length, direction, 0.3f, nearestDesc)) {
+		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, srcDesc, length, direction, G::getFloat("seaLevel"), 0.3f, nearestDesc)) {
 			// もし、既にエッジがあるなら、キャンセル
 			// なお、ここではtrueを返却して、これ以上のエッジ生成をさせない。
 			if (GraphUtil::hasEdge(roads, srcDesc, nearestDesc)) return true;
@@ -387,7 +387,7 @@ bool PatchRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, in
 		RoadVertexDesc nearestDesc;
 		RoadEdgeDesc nearestEdgeDesc;
 		QVector2D intPoint;
-		if (GraphUtil::getCloseEdge(roads, srcDesc, length, direction, 0.3f, nearestEdgeDesc, intPoint)) {
+		if (RoadGeneratorHelper::getEdgeForSnapping(*vboRenderManager, roads, srcDesc, length, direction, G::getFloat("seaLevel"), 0.3f, nearestEdgeDesc, intPoint)) {
 			// エッジにスナップ
 			nearestDesc = GraphUtil::splitEdge(roads, nearestEdgeDesc, intPoint);
 			roads.graph[nearestDesc]->generationType = "snapped";
@@ -408,7 +408,7 @@ bool PatchRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, in
 	// それ以外の余計なエッジは生成しない。さもないと、ものすごい密度の濃い道路網になっちゃう。
 	{
 		RoadVertexDesc nearestDesc;
-		if (GraphUtil::getVertexExceptDeadend(roads, srcDesc, length, direction, 1.5f, nearestDesc)) {
+		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, srcDesc, length, direction, G::getFloat("seaLevel"), 1.5f, nearestDesc)) {
 			// もし、既にエッジがあるなら、キャンセル
 			// なお、ここではtrueを返却して、これ以上のエッジ生成をさせない。
 			if (GraphUtil::hasEdge(roads, srcDesc, nearestDesc)) return true;
@@ -618,6 +618,12 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 			replacementGraph.graph[*vi]->rotationAngle = angle + min_rotation;
 		}
 	}
+
+	// 川チェック
+	if (RoadGeneratorHelper::minZ(replacementGraph, vboRenderManager, false) <= 50.0f) {
+		return false;
+	}
+
 
 	// replacementGraphが、既に生成済みのグラフと重なるかどうかチェック
 	if (GraphUtil::isIntersect(replacementGraph, roads)) {
@@ -938,18 +944,7 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 	RoadVertexDesc tgtDesc;
 	bool found = false;
 	{
-		// 指定された方向で、直近の頂点があるかチェックする。
-		// まずは、指定された方向に非常に近い頂点があるかチェックする。この際、距離は少し遠くまで許容する。
-		// 次に、方向のレンジを少し広げて、その代わり、距離を短くして、改めてチェックする。
-		/*if (GraphUtil::getVertex(roads, srcDesc, polyline.length() * 2.0f, angle, 0.1f, tgtDesc)) {
-			found = true;
-		} else if (GraphUtil::getVertex(roads, srcDesc, polyline.length() * 1.5f, angle, 0.2f, tgtDesc)) {
-			found = true;
-		} else if (GraphUtil::getVertex(roads, srcDesc, polyline.length(), angle, 0.3f, tgtDesc)) {
-			found = true;
-		}
-		*/
-		if (GraphUtil::getVertexExceptDeadend(roads, srcDesc, polyline.length() * 2.0f, angle, 0.3f, tgtDesc)) {
+		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, srcDesc, polyline.length() * 2.0f, angle, G::getFloat("seaLevel"), 0.3f, tgtDesc)) {
 			found = true;
 		}
 

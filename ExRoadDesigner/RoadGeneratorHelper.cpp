@@ -69,84 +69,6 @@ bool RoadGeneratorHelper::intersects(RoadGraph &roads, RoadVertexDesc srcDesc, c
  * @param snapDesc			最も近い頂点
  * @return					もしsnapすべき頂点があれば、trueを返却する
  */
-bool RoadGeneratorHelper::canSnapToVertex(RoadGraph& roads, RoadVertexDesc v_desc, float threshold, RoadVertexDesc& snapDesc) {
-	float min_dist = std::numeric_limits<float>::max();
-
-	// 当該頂点から出るポリラインを取得
-	bool flag = false;
-	Polyline2D polyline;
-	RoadVertexDesc prev_desc;
-	{
-		RoadOutEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::out_edges(v_desc, roads.graph); ei != eend; ++ei) {
-			if (!roads.graph[*ei]->valid) continue;
-
-			if (flag) {
-				// 当該頂点から複数のエッジが出ているので、スナップさせない
-				return false;
-			}
-
-			prev_desc = boost::target(*ei, roads.graph);
-
-			// 当該頂点から並ぶように、polylineを並べ替える
-			if ((roads.graph[*ei]->polyline[0] - roads.graph[v_desc]->pt).lengthSquared() > (roads.graph[*ei]->polyline.last() - roads.graph[v_desc]->pt).lengthSquared()) {
-				std::reverse(roads.graph[*ei]->polyline.begin(), roads.graph[*ei]->polyline.end());
-			}
-			polyline = roads.graph[*ei]->polyline;
-
-			flag = true;
-		}
-	}
-
-	if (!flag) {
-		// エッジがないので、スナップさせない
-		return false;
-	}
-
-	RoadVertexIter vi, vend;
-	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
-		if (!roads.graph[*vi]->valid) continue;
-
-		// 自分自身にはスナップしない
-		if (*vi == v_desc) continue;
-
-		// 隣接頂点にもスナップしない
-		if (*vi == prev_desc) continue;
-
-		// prev_desc - v_desc - *vi のなす角が90度未満なら、スナップしない
-		if (Util::diffAngle(roads.graph[*vi]->pt - roads.graph[v_desc]->pt, polyline.last() - polyline[0]) < M_PI * 0.5f) continue;
-
-		float dist2 = (roads.graph[*vi]->pt - roads.graph[v_desc]->pt).lengthSquared();
-		if (dist2 < min_dist) {
-			// スナップすることで、他エッジと交差するかチェック
-			Polyline2D polyline;
-			polyline.push_back(roads.graph[v_desc]->pt);
-			polyline.push_back(roads.graph[*vi]->pt);
-			if (!GraphUtil::isIntersect(roads, polyline)) {
-				min_dist = dist2;
-				snapDesc = *vi;
-			}
-		}
-	}
-
-	if (min_dist <= threshold * threshold) return true;
-	else return false;
-}
-
-/**
- * 近くの頂点にsnapすべきか、チェックする。
- * （この関数は、最新！！　これ以外は、使ってないはず）
- * v_descに近い頂点を探す。
- * ただし、v_descとスナップ先とのなす角度が９０度以上であること。
- * また、スナップによる移動距離が閾値以下であるものの中で、最短のものを選ぶ。
- * 
- * @param pos				エッジ先端
- * @param threshold			距離の閾値
- * @param srcDesc			この頂点からエッジを延ばしている
- * @param edge				このエッジ
- * @param snapDesc			最も近い頂点
- * @return					もしsnapすべき頂点があれば、trueを返却する
- */
 bool RoadGeneratorHelper::canConnectToVertex(RoadGraph& roads, RoadVertexDesc v_desc, float threshold, RoadVertexDesc& snapDesc) {
 	float min_dist = std::numeric_limits<float>::max();
 
@@ -428,236 +350,115 @@ bool RoadGeneratorHelper::canSnapToFixEdge(RoadGraph& roads, RoadVertexDesc v_de
 	else return false;
 }
 
-bool RoadGeneratorHelper::getCloseVertex(RoadGraph &roads, const QVector2D &pt, bool example, int group_id, float threshold, RoadVertexDesc ignore, RoadVertexDesc &snapDesc) {
-	float min_dist = std::numeric_limits<float>::max();
+/**
+ * snap先の頂点を探す。ただし、deadendの頂点は対象外。また、水面下の頂点も対象外。
+ * また、方向ベクトルがangle方向からしきい値を超えてる場合、その頂点はスキップする。
+ * さらに、距離がdistance_threshold未満であること。
+ *
+ * @param vboRenderManager		標高を取得するため
+ * @param roads					道路グラフ
+ * @param srcDesc				snap元の頂点ID
+ * @param distance_threshold	snap先との距離のしきい値（これより遠い頂点は、対象外）
+ * @param z_threshold			snap先までの間の標高のしきい値（これより低い所を通り場合は、対象外）
+ * @param angle					snap元頂点からの方向基準
+ * @param angle_threshold		方向のしきい値（方向基準からこのしきい値を超える場合は、対象外）
+ * @param nearest_desc [OUT]	snap先の頂点ID
+ * @return						snap先が見つかった場合はtrueを返却する。
+ */
+bool RoadGeneratorHelper::getVertexForSnapping(VBORenderManager& vboRenderManager, RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float z_threshold, float angle, float angle_threshold, RoadVertexDesc& nearest_desc) {
+	float distance_threshold2 = distance_threshold * distance_threshold;
+	float min_cost = std::numeric_limits<float>::max();
+	bool found = false;;
 
 	RoadVertexIter vi, vend;
 	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
 		if (!roads.graph[*vi]->valid) continue;
-		if (*vi == ignore) continue;
+		if (*vi == srcDesc) continue;
 
-		float dist = (roads.graph[*vi]->getPt() - pt).lengthSquared();
+		if (roads.graph[*vi]->deadend) continue;
 
-		// ２つの頂点が、ともにexampleベースで、且つ、同じgroup_idの場合、ピッタリ同じ場所でない限りは、スナップさせない
-		if (example && roads.graph[*vi]->properties["generation_type"] == "example" && roads.graph[*vi]->properties["group_id"] == group_id) {
-			if (dist > 1.0f) continue;
-		}
+		QVector2D vec = roads.graph[*vi]->pt - roads.graph[srcDesc]->pt;
+		float angle2 = atan2f(vec.y(), vec.x());
+		if (Util::diffAngle(angle, angle2) > angle_threshold) continue;
 
-		if (dist < min_dist) {
-			min_dist = dist;
-			snapDesc = *vi;
-		}
-	}
+		float dist = vec.lengthSquared();
+		if (dist > distance_threshold2) continue;
 
-	if (min_dist <= threshold * threshold) return true;
-	else return false;
-}
+		// エッジが水面下かチェック
+		float z = vboRenderManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), true);
+		if (z < z_threshold) continue;
 
-bool RoadGeneratorHelper::getCloseEdge(RoadGraph &roads, const QVector2D &pt, bool example, int group_id, float threshold, RoadVertexDesc ignore, RoadEdgeDesc &snapDesc, QVector2D &closePt) {
-	float min_dist = std::numeric_limits<float>::max();
-	RoadEdgeDesc min_e;
+		// 適当なコスト関数で、最適な頂点を探す。
+		// 基本的には、距離が近く、角度の差が小さいやつ。でも、係数はむずかしい。。。
+		float cost = dist + Util::diffAngle(angle, angle2) * 1000.0;
 
-	RoadVertexDesc min_src;
-	RoadVertexDesc min_tgt;
-
-	RoadEdgeIter ei, eend;
-	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
-		if (!roads.graph[*ei]->valid) continue;
-
-		RoadVertexDesc src = boost::source(*ei, roads.graph);
-		RoadVertexDesc tgt = boost::target(*ei, roads.graph);
-
-		if (!roads.graph[src]->valid) continue;
-		if (!roads.graph[tgt]->valid) continue;
-
-		if (src == ignore || tgt == ignore) continue;
-
-		bool bothExample = false;
-		if (example && roads.graph[*ei]->properties["generation_type"] == "example") {
-			bothExample = true;
-		}
-
-		bool sameGroup = false;
-		if (roads.graph[*ei]->properties["group_id"].toInt() == group_id) {
-			sameGroup = true;
-		}
-
-		QVector2D pt2;
-		for (int i = 0; i < roads.graph[*ei]->polyline.size() - 1; i++) {
-			float dist = Util::pointSegmentDistanceXY(roads.graph[*ei]->polyline[i], roads.graph[*ei]->polyline[i + 1], pt, pt2);
-
-			if (bothExample && sameGroup) {
-				if (dist > 1.0) continue;
-			}
-
-			if (dist < min_dist) {
-				min_dist = dist;
-				snapDesc = *ei;
-				closePt = pt2;
-
-				min_src = src;
-				min_tgt = tgt;
-			}
-		}
-	}
-
-	if (min_dist < threshold) return true;
-	else return false;
-}
-
-/**
- * 指定された位置posに最も近い頂点snapDescを取得し、そこまでの距離を返却する。
- * ただし、srcDesc、又は、その隣接頂点は、スナップ対象外とする。
- * 現在、この関数は使用されていない。
- */
-float RoadGeneratorHelper::getNearestVertex(RoadGraph& roads, const QVector2D& pos, RoadVertexDesc srcDesc, RoadVertexDesc& snapDesc) {
-	float min_dist = std::numeric_limits<float>::max();
-
-	RoadEdgeIter ei, eend;
-	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
-		if (!roads.graph[*ei]->valid) continue;
-
-		RoadVertexDesc src = boost::source(*ei, roads.graph);
-		RoadVertexDesc tgt = boost::target(*ei, roads.graph);
-
-		if (src == srcDesc || tgt == srcDesc) continue;
-
-		float dist1 = (roads.graph[src]->pt - pos).lengthSquared();
-		float dist2 = (roads.graph[tgt]->pt - pos).lengthSquared();
-		if (dist1 < min_dist) {
-			min_dist = dist1;
-			snapDesc = src;
-		}
-		if (dist2 < min_dist) {
-			min_dist = dist2;
-			snapDesc = tgt;
-		}
-	}
-
-	return min_dist;
-}
-
-/**
- * 指定された位置posに最も近いエッジsnapEdgeを取得し、そこまでの距離を返却する。
- * ただし、srcDesc、又は、その隣接頂点は、スナップ対象外とする。
- * 現在、この関数は使用されていない。
- */
-float RoadGeneratorHelper::getNearestEdge(RoadGraph& roads, const QVector2D& pt, RoadVertexDesc srcDesc, RoadEdgeDesc& snapEdge, QVector2D &closestPt) {
-	float min_dist = std::numeric_limits<float>::max();
-	RoadEdgeDesc min_e;
-
-	RoadEdgeIter ei, eend;
-	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
-		if (!roads.graph[*ei]->valid) continue;
-
-		RoadVertexDesc src = boost::source(*ei, roads.graph);
-		RoadVertexDesc tgt = boost::target(*ei, roads.graph);
-
-		if (!roads.graph[src]->valid) continue;
-		if (!roads.graph[tgt]->valid) continue;
-
-		if (src == srcDesc || tgt == srcDesc) continue;
-
-		QVector2D pt2;
-		for (int i = 0; i < roads.graph[*ei]->polyline.size() - 1; i++) {
-			float dist = Util::pointSegmentDistanceXY(roads.graph[*ei]->polyline[i], roads.graph[*ei]->polyline[i + 1], pt, pt2);
-			if (dist < min_dist) {
-				min_dist = dist;
-				snapEdge = *ei;
-				closestPt = pt2;
-			}
-		}
-	}
-
-	return min_dist;
-}
-
-/**
- * カーネル設定済みの頂点の中から、直近のものを探す。
- * 現在、KDERoadGeneratorクラスでのみ使用。KDERoadGenerator2クラスでは使用していない。
- */
-/*RoadVertexDesc RoadGeneratorHelper::getNearestVertexWithKernel(RoadGraph &roads, const QVector2D &pt) {
-	RoadVertexDesc nearest_desc;
-	float min_dist = std::numeric_limits<float>::max();
-
-	RoadVertexIter vi, vend;
-	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
-		if (!roads.graph[*vi]->valid) continue;
-
-		// カーネルのない頂点はスキップ
-		if (roads.graph[*vi]->kernel.id == -1) continue;
-
-		float dist = (roads.graph[*vi]->getPt() - pt).lengthSquared();
-		if (dist < min_dist) {
+		if (cost < min_cost) {
+			min_cost = cost;
 			nearest_desc = *vi;
-			min_dist = dist;
+			found = true;
 		}
 	}
 
-	return nearest_desc;
+	return found;
 }
-*/
 
 /**
- * 指定された点が、いずれかの頂点のテリトリーに入っているかチェックする。
- * ただし、頂点srcVertexは除く。
- * また、対象となる頂点へ伸びていて、且つ、対象となる頂点から、頂点srcVertexへもエッジが来る場合も、除外する。
+ * snap先のエッジを探す。ただし、水面下のエッジは対象外。
+ * また、方向ベクトルがangle方向からしきい値を超えてる場合、その頂点はスキップする。
+ * さらに、距離がdistance_threshold未満であること。
+ *
+ * @param vboRenderManager		標高を取得するため
+ * @param roads					道路グラフ
+ * @param srcDesc				snap元の頂点ID
+ * @param distance_threshold	snap先との距離のしきい値（これより遠い頂点は、対象外）
+ * @param z_threshold			snap先までの間の標高のしきい値（これより低い所を通り場合は、対象外）
+ * @param angle					snap元頂点からの方向基準
+ * @param angle_threshold		方向のしきい値（方向基準からこのしきい値を超える場合は、対象外）
+ * @param nearest_desc [OUT]	snap先の頂点ID
+ * @return						snap先が見つかった場合はtrueを返却する。
  */
-/*
-bool RoadGeneratorHelper::invadingTerritory(RoadGraph &roads, const QVector2D &pt, RoadVertexDesc srcVertex, const QVector2D &targetPt) {
-	RoadVertexIter vi, vend;
-	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
-		if (*vi == srcVertex) continue;
-		if (!roads.graph[*vi]->valid) continue;
+bool RoadGeneratorHelper::getEdgeForSnapping(VBORenderManager& vboRenderManager, RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float z_threshold, float angle, float angle_threshold, RoadEdgeDesc& nearest_desc, QVector2D& nearestPt) {
+	if (angle < 0) {
+		angle += 3.14159265 * 2.0f;
+	}
 
-		// ベクトルsrcVertex→*viと、ベクトルsrcVertex→ptが、逆方向なら、スキップ
-		if (QVector2D::dotProduct(roads.graph[*vi]->pt - roads.graph[srcVertex]->pt, pt - roads.graph[srcVertex]->pt) < 0) continue;
+	float min_dist = distance_threshold;
+	bool found = false;
 
-		// カーネルのない頂点はスキップ
-		if (roads.graph[*vi]->kernel.id == -1) continue;
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
 
-		// 誤差により、テリトリーに入っていると判断されてしまうのを防ぐため、0.9fをかける。
-		if ((roads.graph[*vi]->pt - pt).lengthSquared() < roads.graph[*vi]->kernel.territory * roads.graph[*vi]->kernel.territory * 0.81f) {
-			// 対象となる頂点方向へ、エッジが伸びていない場合（角度が15度より大きい）は、「侵入」と判断する
-			if (Util::diffAngle(roads.graph[*vi]->pt - pt, targetPt - pt) > M_PI * 15.0f / 180.0f) return true;
+		RoadVertexDesc src = boost::source(*ei, roads.graph);
+		RoadVertexDesc tgt = boost::target(*ei, roads.graph);
 
-			if (roads.graph[*vi]->kernel.id == -1) return true;
+		if (src == srcDesc || tgt == srcDesc) continue;
 
-			// 対象となる頂点から、頂点srcVertex方向へ向かうエッジがなければ、「侵入」と判断する
-			bool close = false;
-			for (int i = 0; i < roads.graph[*vi]->kernel.edges.size(); ++i) {
-				if (Util::diffAngle(roads.graph[*vi]->kernel.edges[i].edge.last(), roads.graph[srcVertex]->pt - roads.graph[*vi]->pt) < M_PI * 15.0f / 180.0f) {
-					close = true;
-					break;
-				}
+		// エッジが水面下かチェック
+		float z1 = vboRenderManager.getTerrainHeight(roads.graph[src]->pt.x(), roads.graph[src]->pt.y(), true);
+		if (z1 < z_threshold) continue;
+		float z2 = vboRenderManager.getTerrainHeight(roads.graph[tgt]->pt.x(), roads.graph[tgt]->pt.y(), true);
+		if (z2 < z_threshold) continue;
+
+		QVector2D vec1 = roads.graph[src]->pt - roads.graph[srcDesc]->pt;
+		QVector2D vec2 = roads.graph[tgt]->pt - roads.graph[srcDesc]->pt;
+		float angle1 = atan2f(vec1.y(), vec1.x());
+		float angle2 = atan2f(vec2.y(), vec2.x());
+
+		if (Util::withinAngle(angle, angle1, angle2) || Util::diffAngle(angle, angle1) < angle_threshold || Util::diffAngle(angle, angle2) < angle_threshold) {
+			QVector2D pt;
+			float dist = GraphUtil::distance(roads, roads.graph[srcDesc]->pt, *ei, pt);
+			if (dist < min_dist) {
+				min_dist = dist;
+				found = true;
+				nearest_desc = *ei;
+				nearestPt = pt;
 			}
-
-			if (!close) return true;
-
-			continue;
 		}
 	}
 
-	return false;
+	return found;
 }
-*/
-
-/**
- * カーネルの中で、指定された位置に最も近いものを探し、そのインデックスを返却する。
- */
-/*int RoadGeneratorHelper::getClosestItem(const KDEFeature &f, int roadType, const QVector2D &pt) {
-	float min_dist = std::numeric_limits<float>::max();
-	int min_index = -1;
-	for (int i = 0; i < f.items(roadType).size(); ++i) {
-		float dist = (f.items(roadType)[i].pt - pt).lengthSquared();
-		if (dist < min_dist) {
-			min_dist = dist;
-			min_index = i;
-		}
-	}
-
-	return min_index;
-}*/
 
 /**
  * 指定された頂点について、指定されたエッジに似たエッジが既に登録済みかどうかチェックする。
@@ -1465,28 +1266,59 @@ bool RoadGeneratorHelper::steepSlope(RoadGraph &roads, VBORenderManager *vboRend
 float RoadGeneratorHelper::maxZ(RoadGraph &roads, VBORenderManager *vboRenderManager) {
 	float max_z = -std::numeric_limits<float>::max();
 
-	RoadVertexIter vi, vend;
-	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
-		if (!roads.graph[*vi]->valid) continue;
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
 
-		float z = vboRenderManager->getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), true);
-		if (z > max_z) max_z = z;
+		Polyline2D polyline = GraphUtil::finerEdge(roads.graph[*ei]->polyline, 5.0f);
+
+		for (int i = 0; i < polyline.size(); ++i) {
+			float z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y(), true);
+			max_z = std::max(max_z, z);
+		}
 	}
 
 	return max_z;
+}
+
+/**
+ * 道路網がZ座標の最小値を返却する。
+ * checkConnectors=trueなら、connector=trueのエッジも対象。falseなら、対象外とする。
+ */
+float RoadGeneratorHelper::minZ(RoadGraph &roads, VBORenderManager *vboRenderManager, bool checkConnectors) {
+	float min_z = std::numeric_limits<float>::max();
+
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+		if (!checkConnectors && roads.graph[*ei]->connector) continue;
+
+		Polyline2D polyline = GraphUtil::finerEdge(roads.graph[*ei]->polyline, 5.0f);
+
+		for (int i = 0; i < polyline.size(); ++i) {
+			float z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y(), true);
+			min_z = std::min(min_z, z);
+		}
+	}
+
+	return min_z;
 }
 
 float RoadGeneratorHelper::diffZ(RoadGraph &roads, VBORenderManager *vboRenderManager) {
 	float min_z = std::numeric_limits<float>::max();
 	float max_z = -std::numeric_limits<float>::max();
 
-	RoadVertexIter vi, vend;
-	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
-		if (!roads.graph[*vi]->valid) continue;
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
 
-		float z = vboRenderManager->getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), true);
-		if (z < min_z) min_z = z;
-		if (z > max_z) max_z = z;
+		Polyline2D polyline = GraphUtil::finerEdge(roads.graph[*ei]->polyline, 5.0f);
+
+		for (int i = 0; i < polyline.size(); ++i) {
+			float z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y(), true);
+			min_z = std::min(min_z, z);
+			max_z = std::max(max_z, z);
+		}
 	}
 
 	return max_z - min_z;
@@ -1941,125 +1773,6 @@ bool RoadGeneratorHelper::isWithinScaledArea(const Polygon2D &area, float factor
 	}
 
 	return scaledArea.contains(pt);
-}
-
-/*
-void RoadGeneratorHelper::buildGraphFromKernel(RoadGraph& roads, const KDEFeatureItem &item, const QVector2D &offset) {
-	roads.clear();
-
-	RoadVertexPtr v = RoadVertexPtr(new RoadVertex(item.pt + offset));
-	RoadVertexDesc v_desc = GraphUtil::addVertex(roads, v);
-
-	for (int i = 0; i < item.edges.size(); ++i) {
-		RoadVertexPtr u = RoadVertexPtr(new RoadVertex(item.edges[i].edge.last()));
-		RoadVertexDesc u_desc = GraphUtil::addVertex(roads, u);
-
-		Polyline2D polyline;
-		polyline.push_back(roads.graph[v_desc]->pt);
-		for (int j = 0; j < item.edges[i].edge.size(); ++j) {
-			polyline.push_back(roads.graph[v_desc]->pt + item.edges[i].edge[j]);
-		}
-
-		RoadEdgeDesc e_desc = GraphUtil::addEdge(roads, v_desc, u_desc, 1, false);
-		roads.graph[e_desc]->polyline = polyline;
-		roads.graph[e_desc]->color = QColor(192, 192, 255);
-		roads.graph[e_desc]->bgColor = QColor(0, 0, 192);
-	}
-}
-*/
-
-/**
- * スナップの状況を画像として保存する。
- */
-void RoadGeneratorHelper::saveSnappingImage(RoadGraph &roads, const Polygon2D &area, RoadVertexDesc srcDesc, const Polyline2D &old_polyline, const Polyline2D &new_polyline, RoadVertexDesc snapDesc, const QString &filename_prefix) {
-	QString filename = QString(filename_prefix + "_%1_%2.png").arg(srcDesc).arg(snapDesc);
-
-	BBox bbox = area.envelope();
-	cv::Mat mat = cv::Mat::zeros(bbox.dy(), bbox.dx(), CV_8UC3);
-
-	// 道路網を描画
-	RoadEdgeIter ei, eend;
-	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
-		if (!roads.graph[*ei]->valid) continue;
-
-		for (int i = 0; i < roads.graph[*ei]->polyline.size() - 1; ++i) {
-			QVector2D pt1 = roads.graph[*ei]->polyline[i] - bbox.minPt;
-			QVector2D pt2 = roads.graph[*ei]->polyline[i + 1] - bbox.minPt;
-			cv::line(mat, cv::Point(pt1.x(), pt1.y()), cv::Point(pt2.x(), pt2.y()), cv::Scalar(128, 128, 128), 3, CV_AA);
-		}
-	}
-
-	// 頂点を描画
-	QVector2D circle1 = roads.graph[srcDesc]->pt - bbox.minPt;
-	QVector2D circle2 = roads.graph[snapDesc]->pt - bbox.minPt;
-	cv::circle(mat, cv::Point(circle1.x(), circle1.y()), 10, cv::Scalar(0, 0, 255), 3, CV_AA);
-	cv::circle(mat, cv::Point(circle2.x(), circle2.y()), 10, cv::Scalar(255, 0, 0), 3, CV_AA);
-
-	// ポリラインを描画
-	for (int i = 0; i < old_polyline.size() - 1; ++i) {
-		QVector2D pt1 = old_polyline[i] - bbox.minPt;
-		QVector2D pt2 = old_polyline[i + 1] - bbox.minPt;
-		cv::line(mat, cv::Point(pt1.x(), pt1.y()), cv::Point(pt2.x(), pt2.y()), cv::Scalar(128, 128, 255), 3, CV_AA);
-	}
-	for (int i = 0; i < new_polyline.size() - 1; ++i) {
-		QVector2D pt1 = new_polyline[i] - bbox.minPt;
-		QVector2D pt2 = new_polyline[i + 1] - bbox.minPt;
-		cv::line(mat, cv::Point(pt1.x(), pt1.y()), cv::Point(pt2.x(), pt2.y()), cv::Scalar(255, 128, 128), 3, CV_AA);
-	}
-
-	cv::flip(mat, mat, 0);
-
-	cv::imwrite(filename.toUtf8().data(), mat);
-}
-
-/**
- * 道路オブジェクトの整合性をチェック
- */
-void RoadGeneratorHelper::check(RoadGraph &roads) {
-	/*
-	// 全ての頂点、エッジに、group_id、generation_typeが設定されていること
-	{
-		std::cout << "*** Vertex Check ***" << std::endl;
-		RoadVertexIter vi, vend;
-		for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
-			if (!roads.graph[*vi]->valid) continue;
-
-			if (!roads.graph[*vi]->properties.contains("group_id")) {
-				std::cout << "ERROR: group_id is not set." << std::endl;
-			}
-
-			if (!roads.graph[*vi]->properties.contains("generation_type")) {
-				std::cout << "ERROR: generation_type is not set [" << (*vi) << "]." << std::endl;
-			} else if (roads.graph[*vi]->properties["generation_type"] != "example" && roads.graph[*vi]->properties["generation_type"] != "pm") {
-				std::cout << "ERROR: generation_type is unknown [" << roads.graph[*vi]->properties["generation_type"].toString().toUtf8().data() << "]" << std::endl;
-			}
-
-			if (roads.graph[*vi]->properties["generation_type"] == "example") {
-				if (!roads.graph[*vi]->properties.contains("example_desc")) {
-					std::cout << "ERROR: example_desc is not set." << std::endl;
-				}
-			}
-		}
-	}
-
-	{
-		std::cout << "*** Edge Check ***" << std::endl;
-		RoadEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
-			if (!roads.graph[*ei]->valid) continue;
-
-			if (!roads.graph[*ei]->properties.contains("group_id")) {
-				std::cout << "ERROR: group_id is not set." << std::endl;
-			}
-
-			if (!roads.graph[*ei]->properties.contains("generation_type")) {
-				std::cout << "ERROR: generation_type is not set." << std::endl;
-			} else if (roads.graph[*ei]->properties["generation_type"] != "example" && roads.graph[*ei]->properties["generation_type"] != "pm") {
-				std::cout << "ERROR: generation_type is unknown [" << roads.graph[*ei]->properties["generation_type"].toString().toUtf8().data() << "]" << std::endl;
-			}
-		}
-	}
-	*/
 }
 
 /**

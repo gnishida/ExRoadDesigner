@@ -21,22 +21,14 @@ protected:
 public:
 	static bool intersects(RoadGraph &roads, const QVector2D& p0, const QVector2D& p1, RoadEdgeDesc &eiClosest, QVector2D &closestIntPt);
 	static bool intersects(RoadGraph &roads, RoadVertexDesc srcDesc, const Polyline2D &polyline, RoadEdgeDesc &eiClosest, QVector2D &closestIntPt);
-	static bool canSnapToVertex(RoadGraph& roads, RoadVertexDesc v_desc, float threshold, RoadVertexDesc& snapDesc);
 	static bool canConnectToVertex(RoadGraph& roads, RoadVertexDesc v_desc, float threshold, RoadVertexDesc& snapDesc);
 	static bool canConnectToFixVertex(RoadGraph& roads, RoadVertexDesc v_desc, float threshold, RoadVertexDesc& snapDesc);
 	static bool canSnapToEdge(RoadGraph& roads, RoadVertexDesc v_desc, float threshold, RoadEdgeDesc& snapEdge, QVector2D &closestPt);
 	static bool canSnapToFixEdge(RoadGraph& roads, RoadVertexDesc v_desc, float threshold, RoadEdgeDesc& snapEdge, QVector2D &closestPt);
 
-	static bool getCloseVertex(RoadGraph &roads, const QVector2D &pt, bool example, int group_id, float threshold, RoadVertexDesc ignore, RoadVertexDesc &snapDesc);
-	static bool getCloseEdge(RoadGraph &roads, const QVector2D &pt, bool example, int group_id, float threshold, RoadVertexDesc ignore, RoadEdgeDesc &snapDesc, QVector2D &closePt);
+	static bool getVertexForSnapping(VBORenderManager& vboRenderManager, RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float z_threshold, float angle, float angle_threshold, RoadVertexDesc& nearest_desc);
+	static bool getEdgeForSnapping(VBORenderManager& vboRenderManager, RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float z_threshold, float angle, float angle_threshold, RoadEdgeDesc& nearest_desc, QVector2D& nearestPt);
 
-	static float getNearestVertex(RoadGraph& roads, const QVector2D& pos, RoadVertexDesc srcDesc, RoadVertexDesc& snapDesc);
-	static float getNearestEdge(RoadGraph& roads, const QVector2D& pt, RoadVertexDesc srcDesc, RoadEdgeDesc& snapEdge, QVector2D &closestPt);
-	//static RoadVertexDesc getNearestVertexWithKernel(RoadGraph &roads, const QVector2D &pt);
-
-	//static bool invadingTerritory(RoadGraph &roads, const QVector2D &pt, RoadVertexDesc srcVertex, const QVector2D &targetPt);
-
-	//static int getClosestItem(const KDEFeature &f, int roadType, const QVector2D &pt);
 	static bool isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_desc, const Polyline2D &polyline, float angleTolerance);
 
 	static QVector2D modulo(const Polygon2D &targetArea, const Polygon2D &exampleArea, const QVector2D &pt, BBox &bbox);
@@ -62,6 +54,7 @@ public:
 	static bool submerged(int roadType, const Polyline2D &polyline, VBORenderManager *vboRenderManager);
 	//static bool steepSlope(RoadGraph &roads, VBORenderManager *vboRenderManager);
 	static float maxZ(RoadGraph &roads, VBORenderManager *vboRenderManager);
+	static float minZ(RoadGraph &roads, VBORenderManager *vboRenderManager, bool checkConnectors);
 	static float diffZ(RoadGraph &roads, VBORenderManager *vboRenderManager);
 	static float diffSlope(RoadGraph &roads, VBORenderManager *vboRenderManager);
 	static float largestAngleBetweenEdges(RoadGraph& roads, RoadVertexDesc srcDesc, int roadType);
@@ -77,13 +70,6 @@ public:
 	static int getRelativeDirectionInArea(const BBox &bbox, const QVector2D &pt);
 
 	static bool isWithinScaledArea(const Polygon2D &area, float factor, const QVector2D &pt);
-
-	//static void buildGraphFromKernel(RoadGraph& roads, const KDEFeatureItem &item, const QVector2D &offset);
-
-	static void saveSnappingImage(RoadGraph &roads, const Polygon2D &area, RoadVertexDesc srcDesc, const Polyline2D &old_polyline, const Polyline2D &new_polyline, RoadVertexDesc snapDesc, const QString &filename_prefix);
-
-
-	static void check(RoadGraph &roads);
 
 	static bool isShape(RoadGraph &roads, RoadVertexDesc desc, std::vector<RoadEdgeDescs> &shapes, int &shape_index);
 	static std::vector<Patch> convertToPatch(int roadType, RoadGraph& roads, RoadGraph& avenues, std::vector<RoadEdgeDescs> &shapes);

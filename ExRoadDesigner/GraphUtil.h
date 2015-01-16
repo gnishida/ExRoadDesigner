@@ -23,7 +23,6 @@ public:
 	static RoadVertexDesc getVertex(RoadGraph& roads, const QVector2D& pt, RoadVertexDesc ignore, bool onlyValidVertex = true);
 	static RoadVertexDesc getVertex(RoadGraph& roads, const QVector2D& pt, float angle, float angle_threshold, bool onlyValidVertex = true);
 	static bool getVertex(RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float angle, float angle_threshold, RoadVertexDesc& nearest_desc, bool onlyValidVertex = true);
-	static bool getVertexExceptDeadend(RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float angle, float angle_threshold, RoadVertexDesc& nearest_desc, bool onlyValidVertex = true);
 	static bool getVertex(RoadGraph& roads, const QVector2D& pos, float threshold, RoadVertexDesc& desc, bool onlyValidVertex = true);
 	static bool getVertex(RoadGraph& roads, RoadVertexDesc v, float threshold, RoadVertexDesc& desc, bool onlyValidVertex = true);
 	static bool getVertex(RoadGraph& roads, const QVector2D& pos, float threshold, RoadVertexDesc ignore, RoadVertexDesc& desc, bool onlyValidVertex = true);
@@ -43,7 +42,6 @@ public:
 
 	// Edge related functions
 	static RoadEdgeDesc getEdge(RoadGraph& roads, int index, bool onlyValidEdge = true);
-	static bool getCloseEdge(RoadGraph& roads, RoadVertexDesc src, float distance_threshold, float angle, float angle_threshold, RoadEdgeDesc& nearest_desc, QVector2D& nearestPt, bool onlyValidEdge = true);
 	static float getTotalEdgeLength(RoadGraph& roads, RoadVertexDesc v);
 	static int getNumEdges(RoadGraph& roads, bool onlyValidEdge = true);
 	static int getNumEdges(RoadGraph& roads, RoadVertexDesc v, bool onlyValidEdge = true);
