@@ -119,17 +119,19 @@ void Layer::updateTexFromData() {
 }
 
 /**
- * ガウシアン分布に基づく山を作成する。既存の高さの方が高い場所については、高さをそのままキープする。
+ * ガウシアン分布に基づく山を作成する。
+ * 指定した座標を中心としてガウス分布に基づき高さを決定する。
+ * ただし、既存の高さの方が高い場所については、既存の高さをそのままキープする。
  *
- * @param coordX			X座標 [0, 1]
- * @param coordY			Y座標 [0, 1]
- * @param height			ガウス分布の最大高さ
- * @param sigma				標準偏差
+ * @param u				中心のX座標 [0, 1]
+ * @param v				中心のY座標 [0, 1]
+ * @param height		ガウス分布の最大高さ
+ * @param rad_ratio		半径のサイズ（グリッドサイズに対する比）
  */
-void Layer::addGaussian(float coordX, float coordY, float height, float rad) {
-	float x0 = coordX * imgResX;
-	float y0 = coordY * imgResY;
-	float sigma = rad * imgResX;
+void Layer::addGaussian(float u, float v, float height, float rad_ratio) {
+	float x0 = u * imgResX;
+	float y0 = v * imgResY;
+	float sigma = rad_ratio * imgResX;
 
 	for (int c = 0; c < layerData.cols; c++) {
 		for (int r = 0; r < layerData.rows; r++) {
@@ -156,15 +158,15 @@ void Layer::addGaussian(float coordX, float coordY, float height, float rad) {
 /**
  * ガウシアン分布に基づき、高さを上げる。
  *
- * @param coordX			X座標 [0, 1]
- * @param coordY			Y座標 [0, 1]
- * @param height			ガウス分布の最大高さ
- * @param sigma				標準偏差
+ * @param u				中心のX座標 [0, 1]
+ * @param v				中心のY座標 [0, 1]
+ * @param height		ガウス分布の最大高さ
+ * @param rad_ratio		半径のサイズ（グリッドサイズに対する比）
  */
-void Layer::updateGaussian(float coordX, float coordY, float height, float rad) {
-	float x0 = coordX * imgResX;
-	float y0 = coordY * imgResY;
-	float sigma = rad * imgResX;
+void Layer::updateGaussian(float u, float v, float height, float rad_ratio) {
+	float x0 = u * imgResX;
+	float y0 = v * imgResY;
+	float sigma = rad_ratio * imgResX;
 
 	for (int c = 0; c < layerData.cols; c++) {
 		for (int r = 0; r < layerData.rows; r++) {
@@ -174,6 +176,37 @@ void Layer::updateGaussian(float coordX, float coordY, float height, float rad) 
 			float z = layerData.at<float>(r,c) + height * expf(-(SQR(x - x0) + SQR(y - y0)) / (2 * sigma * sigma));
 			if (z < 0) z = 0.0f;
 			layerData.at<float>(r,c) = z;
+		}
+	}
+
+	// update image
+	updateTexFromData();
+}
+
+/**
+ * 指定した位置を中心とする円の範囲の高さを0にする。
+ *
+ * @param u				中心のX座標 [0, 1]
+ * @param v				中心のY座標 [0, 1]
+ * @param height		ガウス分布の最大高さ
+ * @param rad_ratio		半径のサイズ（グリッドサイズに対する比）
+ */
+void Layer::excavate(float u, float v, float rad_ratio) {
+	float x0 = u * imgResX;
+	float y0 = v * imgResY;
+	float rad = rad_ratio * imgResX;
+
+	for (int c = x0 - rad; c <= x0 + rad + 1; ++c) {
+		if (c < 0 || c >= layerData.cols) continue;
+		for (int r = y0 - rad; r <= y0 + rad + 1; ++r) {
+			if (r < 0 || r >= layerData.rows) continue;
+
+			float x = c + 0.5f;
+			float y = r + 0.5f;
+
+			if (SQR(x - x0) + SQR(y - y0) > SQR(rad)) continue;
+			
+			layerData.at<float>(r, c) = 0.0f;
 		}
 	}
 

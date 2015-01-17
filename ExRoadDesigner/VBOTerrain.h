@@ -15,8 +15,9 @@ public:
 	void init(VBORenderManager& rendManager);
 
 	void render(VBORenderManager& rendManager);
-	void updateTerrain(float coordX,float coordY,float change,float rad);
+	void updateGaussian(float coordX,float coordY,float change,float rad);
 	void updateTerrainNewValue(float coordX,float coordY,float newValue,float rad);
+	void excavate(float x, float y, float rad_ratio);
 	void smoothTerrain();
 	float getTerrainHeight(float xM,float yM,bool actual=false);
 	void loadTerrain(QString& fileName);

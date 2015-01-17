@@ -99,16 +99,18 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 				}else{
 					// normal Gaussian edition
 					float change = mainWin->controlWidget->ui.terrainPaint_changeSlider->value();
-					float radi = mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.side;
-					if (event->buttons() & Qt::RightButton) {
-						change = -change;
-					}
-					if (event->buttons() & Qt::MiddleButton) {
-						change=FLT_MAX;//hack: flat terrain
-					}
 					float xM = 1.0f - (vboRenderManager.side/2.0f-pos.x()) / vboRenderManager.side;
 					float yM = 1.0f - (vboRenderManager.side/2.0f-pos.y()) / vboRenderManager.side;
-					vboRenderManager.vboTerrain.updateTerrain(xM, yM, change, radi);
+					float radi = mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.side;
+
+					if (event->buttons() & Qt::LeftButton) {
+						vboRenderManager.vboTerrain.updateGaussian(xM, yM, change, radi);
+					} else if (event->buttons() & Qt::RightButton) {
+						vboRenderManager.vboTerrain.excavate(xM, yM, radi);
+					} else if (event->buttons() & Qt::MiddleButton) {
+						vboRenderManager.vboTerrain.updateGaussian(xM, yM, FLT_MAX, radi);
+					}
+
 					mainWin->urbanGeometry->adaptToTerrain();/// !! GEN did not have it here (enough in move?)
 					shadow.makeShadowMap(this);
 					updateGL();
@@ -314,16 +316,17 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 					// normal Gaussian edition
 					float change = mainWin->controlWidget->ui.terrainPaint_changeSlider->value();
 					float radi = mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.side;
-					change*=0.2f;//while moving, it is not necessary to change much
-					if (event->buttons() & Qt::RightButton) {
-						change = -change;
-					}
-					if (event->buttons() & Qt::MiddleButton) {
-						change=FLT_MAX;//hack: flat terrain
-					}
 					float xM = 1.0f - (vboRenderManager.side/2.0f-pos.x()) / vboRenderManager.side;
 					float yM = 1.0f - (vboRenderManager.side/2.0f-pos.y()) / vboRenderManager.side;
-					vboRenderManager.vboTerrain.updateTerrain(xM, yM, change, radi);
+					change*=0.2f;//while moving, it is not necessary to change much
+
+					if (event->buttons() & Qt::LeftButton) {
+						vboRenderManager.vboTerrain.updateGaussian(xM, yM, change, radi);
+					} else if (event->buttons() & Qt::RightButton) {
+						vboRenderManager.vboTerrain.excavate(xM, yM, radi);
+					} else if (event->buttons() & Qt::MiddleButton) {
+						vboRenderManager.vboTerrain.updateGaussian(xM, yM, FLT_MAX, radi);
+					}
 
 					mainWin->urbanGeometry->adaptToTerrain();
 					shadow.makeShadowMap(this);

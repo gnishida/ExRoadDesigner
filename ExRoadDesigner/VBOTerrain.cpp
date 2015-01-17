@@ -239,8 +239,18 @@ void VBOTerrain::updateTerrainNewValue(float coordX,float coordY,float newValue,
 	glActiveTexture(GL_TEXTURE0);
 }//
 
-void VBOTerrain::updateTerrain(float coordX,float coordY,float change,float rad){
+void VBOTerrain::updateGaussian(float coordX,float coordY,float change,float rad) {
 	terrainLayer.updateGaussian(coordX, coordY, change, rad);
+
+	glActiveTexture(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_2D,terrainLayer.texData); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glActiveTexture(GL_TEXTURE0);
+}//
+
+void VBOTerrain::excavate(float x, float y, float rad_ratio) {
+	terrainLayer.excavate(x, y, rad_ratio);
 
 	glActiveTexture(GL_TEXTURE7);
 	glBindTexture(GL_TEXTURE_2D,terrainLayer.texData); 

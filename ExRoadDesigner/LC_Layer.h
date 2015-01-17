@@ -35,8 +35,9 @@ public:
 	GLuint texData;
 
 	// control
-	void addGaussian(float coordX, float coordY, float height, float sigma);
-	void updateGaussian(float coordX, float coordY, float height, float rad);
+	void addGaussian(float u, float v, float height, float rad_ratio);
+	void updateGaussian(float u, float v, float height, float rad_ratio);
+	void excavate(float u, float v, float rad);
 	void updateLayer(float coordX,float coordY,float change,float rad);
 	void updateLayerNewValue(float coordX,float coordY,float newValue,float rad);
 	float getValue(float xM,float yM);

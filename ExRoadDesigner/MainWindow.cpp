@@ -1067,7 +1067,7 @@ void MainWindow::onUpdateMountain() {
 		float change = Util::genRand(0, 0.01);
 		float radi = Util::genRand(0.03, 0.07f);
 
-		glWidget->vboRenderManager.vboTerrain.updateTerrain(x, y, change,radi);
+		glWidget->vboRenderManager.vboTerrain.updateGaussian(x, y, change,radi);
 	}
 
 	urbanGeometry->adaptToTerrain();
