@@ -66,59 +66,24 @@ void main(){
 	//////////////////////////////////////
 	// 2. ADAPT TO TERRAIN
 	if(((mode&0xFF)==0x03)&&(terrainMode==0)){//flat terrain--> Compute height
-		const float maxHeight=7.0;//7=255*7 1785m (change in fragment as well) !!!Also in VBOTerrain
 		vec2 terrainTexCoord=vec2(
 			(origVertex.x-terrain_size.x)/terrain_size.z,
 			(origVertex.y-terrain_size.y)/terrain_size.w
 			);
-		float height=maxHeight*255.0f*texture(terrain_tex,terrainTexCoord.rg).r;
+		float height = texture(terrain_tex,terrainTexCoord.rg).r;
 		outColor.r=height;
 	}
 
 	if((((mode&0xFF)==0x03)||((mode&0x0100)==0x0100))&&terrainMode==1){// terrain or adapt to terrain (and terrainMode=1)
-		const float maxHeight=7.0;//7=255*7 1785m (change in fragment as well) !!!Also in VBOTerrain
 		vec2 terrainTexCoord=vec2(
 			(origVertex.x-terrain_size.x)/terrain_size.z,
 			(origVertex.y-terrain_size.y)/terrain_size.w
 			);
 		//float height=255.0f*length(texture(terrain_tex,terrainTexCoord.rg));
-		float height=maxHeight*255.0f*texture(terrain_tex,terrainTexCoord.rg).r;
-		/*if((mode&0x0100)==0x0100){//adapt to terrain-->check if water and planarize
-			if(height<(7.0f*maxHeight)){
-				height=70.0f;
-			}
-			const float waterElv=15.0f;
-			const float waterElvTex=15.0f/(maxHeight*255.0f);
-			if(height<waterElv){
-				const vec2 size = vec2(1.0,0.0);
-				const ivec3 offG = ivec3(-1,0,1);
-				bool contLoop=true;
-				for(int i=1;i<5&&contLoop;i++){//1-5
-					//for(int j=-1;j<2&&contLoop;j=j+2){//-5 5
-						ivec3 off=offG*i;
-						if((height=textureOffset(terrain_tex, terrainTexCoord.rg, off.xy).r)>waterElvTex){
-							contLoop=false;break;
-						}
-						if((height=textureOffset(terrain_tex, terrainTexCoord.rg, off.zy).r)>waterElvTex){
-							contLoop=false;break;
-						}
-						if((height=textureOffset(terrain_tex, terrainTexCoord.rg, off.yx).r)>waterElvTex){
-							contLoop=false;break;
-						}
-						if((height=textureOffset(terrain_tex, terrainTexCoord.rg, off.yz).r)>waterElvTex){
-							contLoop=false;break;
-						}
-					//}
-				}
-				if(contLoop==true)height=0;
-				else height*=maxHeight*255.0f;
-				//height=70.0f;
-			}
+		float height = texture(terrain_tex,terrainTexCoord.rg).r;
 
-		}*/
 		origVertex.z+=height;
-		//if(height<15.0f)//water height
-		//	origVertex.z=-100.0f;
+
 		if((mode&0xFF)==0x03){// terrain
 			// computer normal from heightmap
 			const vec2 size = vec2(1.0,0.0);
@@ -128,10 +93,17 @@ void main(){
 			float s21 = textureOffset(terrain_tex, terrainTexCoord.rg, off.zy).r;
 			float s10 = textureOffset(terrain_tex, terrainTexCoord.rg, off.yx).r;
 			float s12 = textureOffset(terrain_tex, terrainTexCoord.rg, off.yz).r;
-			vec3 va = normalize(vec3(size.xy,10*(s21-s01)));
-			vec3 vb = normalize(vec3(size.yx,10*(s12-s10)));
-			//vec3 va = normalize(vec3(size.x,s21-s01,size.y));
-			//vec3 vb = normalize(vec3(size.y,s12-s10,size.x));
+
+			//vec3 va = normalize(vec3(size.xy,10*(s21-s01)));
+			//vec3 vb = normalize(vec3(size.yx,10*(s12-s10)));
+
+			// GEN 1/17/2015
+			// Originally UCHAR image is used and the texture data is [0, 1]
+			// Now I use FLOAT image and the texture data is [0, infinate]
+			// 0.039 is just a good number to make the things look 3D
+			vec3 va = normalize(vec3(size.xy, (s21-s01) * 0.039));
+			vec3 vb = normalize(vec3(size.yx, (s12-s10) * 0.039));
+
 			varyingNormal=cross(va,vb);
 		}
 	}

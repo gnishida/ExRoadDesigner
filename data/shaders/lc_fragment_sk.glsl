@@ -191,7 +191,7 @@ void main(){
 				int(origVertex.x-terrain_size.x)/terrain_size.z,
 				int(origVertex.y-terrain_size.y)/terrain_size.w
 				);
-			float height=255.0f*texture(terrain_tex,terrainTexCoord.rg).r;
+			float height=texture(terrain_tex,terrainTexCoord.rg).r;
 
 			if(height<=6){//water
 				if(height<=0){

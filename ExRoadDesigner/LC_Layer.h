@@ -16,7 +16,7 @@
 class Layer{
 public:
 	Layer();
-	void init(QVector3D _minPos,QVector3D _maxPos,int _resolutionX,int _resolutionY,int _typeLayer,int imgResX,int imgResY);
+	void init(const QVector3D& _minPos, const QVector3D& _maxPos, int imgResX, int imgResY);
 	//std::vector<float> amplitudes;
 	//std::vector<QVector3D> samplePosition;
 	//float stdev;
@@ -30,23 +30,13 @@ public:
 
 	int imgResX;
 	int imgResY;
-	int resolutionX;
-	int resolutionY;
-	float sideX;
-	float sideY;
-
-	int typeLayer;
-	// 0 vboRenderManager
-
-	//void createRandomDistribution();
-	//float sample(QVector3D samPos);
 
 	//text
-	//void updateTexture();
 	GLuint texData;
 
 	// control
-	//void updateLayer(QVector3D pos,float change);
+	void addGaussian(float coordX, float coordY, float height, float sigma);
+	void updateGaussian(float coordX, float coordY, float height, float rad);
 	void updateLayer(float coordX,float coordY,float change,float rad);
 	void updateLayerNewValue(float coordX,float coordY,float newValue,float rad);
 	float getValue(float xM,float yM);

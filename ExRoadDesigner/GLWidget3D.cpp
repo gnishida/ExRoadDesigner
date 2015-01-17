@@ -98,8 +98,8 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 					updateGL();
 				}else{
 					// normal Gaussian edition
-					float change=mainWin->controlWidget->ui.terrainPaint_changeSlider->value()*0.003f;
-					float radi=mainWin->controlWidget->ui.terrainPaint_sizeSlider->value()*0.01f;
+					float change = mainWin->controlWidget->ui.terrainPaint_changeSlider->value();
+					float radi = mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.side;
 					if (event->buttons() & Qt::RightButton) {
 						change = -change;
 					}
@@ -107,9 +107,9 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 						change=FLT_MAX;//hack: flat terrain
 					}
 					//mainWin->urbanGeometry->vboRenderManager->addValue(pos.x(), pos.y(), change);
-					float xM=1.0f-(vboRenderManager.side/2.0f-pos.x())/vboRenderManager.side;
-					float yM=1.0f-(vboRenderManager.side/2.0f-pos.y())/vboRenderManager.side;
-					vboRenderManager.vboTerrain.updateTerrain(xM,yM,change,radi);//rad,change);
+					float xM = 1.0f - (vboRenderManager.side/2.0f-pos.x()) / vboRenderManager.side;
+					float yM = 1.0f - (vboRenderManager.side/2.0f-pos.y()) / vboRenderManager.side;
+					vboRenderManager.vboTerrain.updateTerrain(xM, yM, change, radi);
 					mainWin->urbanGeometry->adaptToTerrain();/// !! GEN did not have it here (enough in move?)
 					shadow.makeShadowMap(this);
 					updateGL();

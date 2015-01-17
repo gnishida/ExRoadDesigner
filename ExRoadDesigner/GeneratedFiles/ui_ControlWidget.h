@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Fri Jan 16 11:09:41 2015
+** Created: Sat Jan 17 10:51:27 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -277,7 +277,7 @@ public:
         terrainPaint_sizeSlider->setGeometry(QRect(80, 20, 81, 15));
         terrainPaint_sizeSlider->setMaximumSize(QSize(16777215, 17));
         terrainPaint_sizeSlider->setMinimum(1);
-        terrainPaint_sizeSlider->setMaximum(25);
+        terrainPaint_sizeSlider->setMaximum(1000);
         terrainPaint_sizeSlider->setValue(5);
         terrainPaint_sizeSlider->setOrientation(Qt::Horizontal);
         terrainPaint_changeSlider = new QSlider(groupBox_6);

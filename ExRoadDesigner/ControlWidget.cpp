@@ -36,6 +36,11 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.lineEditRotationForSteepSlope->setText("30");
 	ui.lineEditMaxBlockSizeForPark->setText("250000");
 
+	ui.terrainPaint_changeSlider->setMaximum(1000);
+	ui.terrainPaint_changeSlider->setValue(200);
+	ui.terrainPaint_sizeSlider->setMaximum(1000);
+	ui.terrainPaint_sizeSlider->setValue(500);
+
 	// register the event handlers
 	connect(ui.pushButtonGenerateEx, SIGNAL(clicked()), this, SLOT(generateRoadsEx()));
 	connect(ui.pushButtonGenerateWarp, SIGNAL(clicked()), this, SLOT(generateRoadsWarp()));
@@ -70,7 +75,6 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	connect(ui.content_10, SIGNAL(clicked()), this, SLOT(contentDesignLevel()));
 	connect(ui.content_11, SIGNAL(clicked()), this, SLOT(contentDesignLevel()));
 
-	
 	updateRender2D(-1); // update just labels
 	updateTerrainLabels(-1);
 	contentDesignLevel();
@@ -315,10 +319,10 @@ void ControlWidget::planarGraph() {
 
 void ControlWidget::updateTerrainLabels(int newValue){
 		int size=ui.terrainPaint_sizeSlider->value();
-		ui.terrainPaint_sizeLabel->setText("Size: "+QString::number(size)+"%");
-		G::global()["2DterrainEditSize"]=size/100.0f;
+		ui.terrainPaint_sizeLabel->setText("Size: "+QString::number(size,'f',0)+"m");
+		G::global()["2DterrainEditSize"]=size;
 
-		float change=ui.terrainPaint_changeSlider->value()*1785/100.0f;
+		float change = ui.terrainPaint_changeSlider->value();
 		ui.terrainPaint_changeLabel->setText("Ch: "+QString::number(change,'f',0)+"m");
 		G::global()["2DterrainEditChange"]=change;
 }//
