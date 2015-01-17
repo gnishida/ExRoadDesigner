@@ -99,14 +99,8 @@
 
 	
 	// GEN: 1/16/2015. Change to not use a temporary file.
-	void Layer::updateTexFromData(){
-		//cv::imwrite( "../data/height.png", layerData );
-		//texData=VBOUtil::loadImage("../data/height.png",false,true);
-
-		cv::Mat dst;
-		cvtColor(layerData, dst, CV_GRAY2RGB);
-
-		QImage img = QImage((uchar*)dst.data, dst.cols, dst.rows, dst.step, QImage::Format_RGB888);
+	void Layer::updateTexFromData() {
+		QImage img = QImage((uchar*)layerData.data, layerData.cols, layerData.rows, layerData.step, QImage::Format_Mono);
 		if (img.isNull()) {
 			printf("ERROR: GL_formatted_image\n");
 			return;
@@ -125,10 +119,10 @@
 
 		glGenTextures(1, &texData);
 		glBindTexture(GL_TEXTURE_2D, texData);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGB, GL_UNSIGNED_BYTE, img.bits());
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, img.width(), img.height(), 0, GL_RED, GL_UNSIGNED_BYTE, img.bits());
 
 		glGenerateMipmap(GL_TEXTURE_2D);
-	}//
+	}
 
 	void Layer::updateLayer(float coordX,float coordY,float change,float rad){
 		float sigmaX,sigmaY;
