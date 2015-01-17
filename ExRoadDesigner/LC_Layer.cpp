@@ -294,7 +294,8 @@ float Layer::getValue(float xM,float yM){
  */
 void Layer::loadLayer(const QString& fileName) {
 	cv::Mat loadImage = cv::imread(fileName.toUtf8().data(), CV_LOAD_IMAGE_UNCHANGED);
-	layerData = cv::Mat(loadImage.rows, loadImage.cols, CV_32FC1, loadImage.data);
+	cv::Mat tmp = cv::Mat(loadImage.rows, loadImage.cols, CV_32FC1, loadImage.data);
+	tmp.copyTo(layerData);
 
 	// update image
 	updateTexFromData();
