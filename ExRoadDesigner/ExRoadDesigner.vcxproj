@@ -276,7 +276,6 @@
     <ClCompile Include="RoadVertex.cpp" />
     <ClCompile Include="SmallBlockRemover.cpp" />
     <ClCompile Include="StructureDetectionSettingDialog.cpp" />
-    <ClCompile Include="TensorField.cpp" />
     <ClCompile Include="TerrainSizeInputDialog.cpp" />
     <ClCompile Include="TopNSearch.cpp" />
     <ClCompile Include="UrbanGeometry.cpp" />
@@ -525,7 +524,6 @@
     <ClInclude Include="RoadAreaSet.h" />
     <ClInclude Include="RoadGeneratorHelper.h" />
     <ClInclude Include="SmallBlockRemover.h" />
-    <ClInclude Include="TensorField.h" />
     <CustomBuild Include="TerrainSizeInputDialog.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing TerrainSizeInputDialog.h...</Message>

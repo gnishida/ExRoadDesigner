@@ -127,9 +127,6 @@
     <ClCompile Include="Polyline3D.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="TensorField.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
     <ClCompile Include="TopNSearch.cpp">
       <Filter>common</Filter>
     </ClCompile>
@@ -480,9 +477,6 @@
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="Polyline3D.h">
-      <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="TensorField.h">
       <Filter>common</Filter>
     </ClInclude>
     <ClInclude Include="TopNSearch.h">
