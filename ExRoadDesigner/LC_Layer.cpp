@@ -17,13 +17,11 @@ void Layer::init(const QVector3D& _minPos, const QVector3D& _maxPos, int _imgRes
 	imgResX = _imgResX;
 	imgResY = _imgResY;
 		
-	//layerData=cv::Mat::zeros(imgResY,imgResX,CV_8UC1);
-	//layerData = cv::Mat(imgResY,imgResX,CV_8UC1,10);
 	layerData = cv::Mat(imgResY, imgResX, CV_32FC1, cv::Scalar(70.0f));
 
 	updateTexFromData();
 
-	initialized=true;
+	initialized = true;
 }
 
 //////////////////////////////////////////////////////////////
@@ -92,12 +90,6 @@ void Layer::randomPerlineNoise(cv::Mat& perlinNoise){
 	
 // GEN: 1/16/2015. Change to not use a temporary file.
 void Layer::updateTexFromData() {
-	/*QImage img = QImage((uchar*)layerData.data, layerData.cols, layerData.rows, layerData.step, QImage::Format_Mono);
-	if (img.isNull()) {
-		printf("ERROR: GL_formatted_image\n");
-		return;
-	}*/
-
 	if(texData!=0){
 		glDeleteTextures(1,&texData);
 		texData=0;
@@ -111,8 +103,6 @@ void Layer::updateTexFromData() {
 
 	glGenTextures(1, &texData);
 	glBindTexture(GL_TEXTURE_2D, texData);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, img.width(), img.height(), 0, GL_RED, GL_UNSIGNED_BYTE, img.bits());
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, layerData.cols, layerData.rows, 0, GL_RED, GL_UNSIGNED_BYTE, layerData.data);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, layerData.cols, layerData.rows, 0, GL_RED, GL_FLOAT, layerData.data);
 
 	glGenerateMipmap(GL_TEXTURE_2D);
@@ -191,7 +181,7 @@ void Layer::updateGaussian(float u, float v, float height, float rad_ratio) {
  * @param height		ガウス分布の最大高さ
  * @param rad_ratio		半径のサイズ（グリッドサイズに対する比）
  */
-void Layer::excavate(float u, float v, float rad_ratio) {
+void Layer::excavate(float u, float v, float height, float rad_ratio) {
 	float x0 = u * imgResX;
 	float y0 = v * imgResY;
 	float rad = rad_ratio * imgResX;
@@ -213,51 +203,6 @@ void Layer::excavate(float u, float v, float rad_ratio) {
 	// update image
 	updateTexFromData();
 }
-
-void Layer::updateLayer(float coordX,float coordY,float change,float rad){
-	float sigmaX,sigmaY;
-	float x,y,x0,y0,A;
-
-	x0=coordX*imgResX;//0-imgRes
-	y0=coordY*imgResY;
-	A=change;
-	sigmaX=imgResX*rad/2.0f;
-	sigmaY=imgResY*rad/2.0f;
-
-	if(change==FLT_MAX){
-		printf("Hack, flat area\n");
-		// HACK Flat area
-		//int flatValue=(int)layerData.at<uchar>(y0,x0);
-		int flatValue=(int)layerData.at<float>(y0,x0);
-		int radImgX=rad*imgResX;
-		int radImgY=rad*imgResY;
-		for(int c=0;c<layerData.cols;c++){
-			for(int r=0;r<layerData.rows;r++){
-				if(abs(c-x0)<radImgX&&abs(r-y0)<radImgY){
-					layerData.at<float>(r,c)=flatValue;
-				}
-			}
-		}
-	}else{
-		// Normal
-		float diff;
-		for(int c=0;c<layerData.cols;c++){
-			for(int r=0;r<layerData.rows;r++){
-
-				x=(0.5f+c);
-				y=(0.5f+r);
-				diff=(A*qExp(-( (((x-x0)*(x-x0))/(2*sigmaX*sigmaX))+ (((y-y0)*(y-y0))/(2*sigmaY*sigmaY)) )))*255.0f;//0-255
-				int newV=std::floor((int)layerData.at<float>(r,c)+diff+0.5f);//floor +0.5--> round
-				if(newV<0){
-					newV=0;
-				}
-				layerData.at<float>(r,c)=newV;
-			}
-		}
-	}
-	// update image
-	updateTexFromData();
-}//
 
 void Layer::updateLayerNewValue(float coordX,float coordY,float newValue,float rad){
 	float sigmaX,sigmaY;
@@ -342,15 +287,28 @@ float Layer::getValue(float xM,float yM){
 	}
 }
 
-void Layer::loadLayer(QString& fileName){
-	layerData=cv::imread(fileName.toAscii().constData(),0);//load one channel
+/**
+ * 無理やりUCHAR型4チャンネルで保存したデータをFloat型の1チャンネルデータとしてロードする。
+ *
+ * @param fileName	 file name
+ */
+void Layer::loadLayer(const QString& fileName) {
+	cv::Mat loadImage = cv::imread(fileName.toUtf8().data(), CV_LOAD_IMAGE_UNCHANGED);
+	layerData = cv::Mat(loadImage.rows, loadImage.cols, CV_32FC1, loadImage.data);
+
 	// update image
 	updateTexFromData();
 }//
-	
-void Layer::saveLayer(QString& fileName){
-	cv::imwrite( fileName.toAscii().constData(), layerData );
-}//
+
+/**
+ * Float型の1チャンネルデータを、無理やりUCHAR型4チャンネルで保存する。
+ *
+ * @param fileName	 file name
+ */
+void Layer::saveLayer(const QString& fileName) {
+	cv::Mat saveImage	= cv::Mat(layerData.rows, layerData.cols, CV_8UC4, layerData.data);
+	cv::imwrite(fileName.toUtf8().data(), saveImage);
+}
 
 void Layer::smoothLayer(){
 	int smoothV=std::max(imgResX/80,3);

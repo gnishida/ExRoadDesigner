@@ -36,8 +36,10 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.lineEditRotationForSteepSlope->setText("30");
 	ui.lineEditMaxBlockSizeForPark->setText("250000");
 
+	ui.terrainPaint_changeSlider->setMinimum(0);
 	ui.terrainPaint_changeSlider->setMaximum(1000);
 	ui.terrainPaint_changeSlider->setValue(200);
+	ui.terrainPaint_sizeSlider->setMinimum(1);
 	ui.terrainPaint_sizeSlider->setMaximum(1000);
 	ui.terrainPaint_sizeSlider->setValue(500);
 

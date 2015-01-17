@@ -37,18 +37,16 @@ public:
 	// control
 	void addGaussian(float u, float v, float height, float rad_ratio);
 	void updateGaussian(float u, float v, float height, float rad_ratio);
-	void excavate(float u, float v, float rad);
-	void updateLayer(float coordX,float coordY,float change,float rad);
+	void excavate(float u, float v, float height, float rad_ratio);
 	void updateLayerNewValue(float coordX,float coordY,float newValue,float rad);
 	float getValue(float xM,float yM);
 	void smoothLayer();
-	//int closestSample(QVector3D pos);
 
 	// perlin noise
 	void randomPerlineNoise(cv::Mat& perlinNoise);
 
-	void loadLayer(QString& fileName);
-	void saveLayer(QString& fileName);
+	void loadLayer(const QString& fileName);
+	void saveLayer(const QString& fileName);
 
 public: // GEN: to access from the outside
 	void updateTexFromData();

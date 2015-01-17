@@ -98,15 +98,15 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 					updateGL();
 				}else{
 					// normal Gaussian edition
-					float change = mainWin->controlWidget->ui.terrainPaint_changeSlider->value();
+					float height = mainWin->controlWidget->ui.terrainPaint_changeSlider->value();
 					float xM = 1.0f - (vboRenderManager.side/2.0f-pos.x()) / vboRenderManager.side;
 					float yM = 1.0f - (vboRenderManager.side/2.0f-pos.y()) / vboRenderManager.side;
 					float radi = mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.side;
 
 					if (event->buttons() & Qt::LeftButton) {
-						vboRenderManager.vboTerrain.updateGaussian(xM, yM, change, radi);
+						vboRenderManager.vboTerrain.updateGaussian(xM, yM, height, radi);
 					} else if (event->buttons() & Qt::RightButton) {
-						vboRenderManager.vboTerrain.excavate(xM, yM, radi);
+						vboRenderManager.vboTerrain.excavate(xM, yM, height, radi);
 					} else if (event->buttons() & Qt::MiddleButton) {
 						vboRenderManager.vboTerrain.updateGaussian(xM, yM, FLT_MAX, radi);
 					}
@@ -314,16 +314,16 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 					
 				}else{
 					// normal Gaussian edition
-					float change = mainWin->controlWidget->ui.terrainPaint_changeSlider->value();
+					float height = mainWin->controlWidget->ui.terrainPaint_changeSlider->value();
 					float radi = mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.side;
 					float xM = 1.0f - (vboRenderManager.side/2.0f-pos.x()) / vboRenderManager.side;
 					float yM = 1.0f - (vboRenderManager.side/2.0f-pos.y()) / vboRenderManager.side;
-					change*=0.2f;//while moving, it is not necessary to change much
+					height *= 0.2f;//while moving, it is not necessary to change much
 
 					if (event->buttons() & Qt::LeftButton) {
-						vboRenderManager.vboTerrain.updateGaussian(xM, yM, change, radi);
+						vboRenderManager.vboTerrain.updateGaussian(xM, yM, height, radi);
 					} else if (event->buttons() & Qt::RightButton) {
-						vboRenderManager.vboTerrain.excavate(xM, yM, radi);
+						vboRenderManager.vboTerrain.excavate(xM, yM, height, radi);
 					} else if (event->buttons() & Qt::MiddleButton) {
 						vboRenderManager.vboTerrain.updateGaussian(xM, yM, FLT_MAX, radi);
 					}
