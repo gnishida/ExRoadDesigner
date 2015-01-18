@@ -26,7 +26,7 @@ void VBOTerrain::init(VBORenderManager* rendManager, int resolution) {
 
 	// TERRAIN LAYER
 	layerData = cv::Mat(resolution + 1, resolution + 1, CV_32FC1, cv::Scalar(70.0f));
-	updateTexFromData();
+	updateTexture();
 
 	//////////////////
 	// VERTICES
@@ -211,7 +211,7 @@ void VBOTerrain::updateGaussian(float u, float v, float height, float rad_ratio)
 	}
 
 	// update texture
-	updateTexFromData();
+	updateTexture();
 }
 
 /**
@@ -242,7 +242,7 @@ void VBOTerrain::excavate(float u, float v, float height, float rad_ratio) {
 	}
 
 	// update texture
-	updateTexFromData();
+	updateTexture();
 }
 
 /**
@@ -296,7 +296,7 @@ void VBOTerrain::loadTerrain(const QString& fileName) {
 	tmp.copyTo(layerData);
 
 	// update texture
-	updateTexFromData();
+	updateTexture();
 }
 	
 void VBOTerrain::saveTerrain(const QString& fileName) {
@@ -304,25 +304,22 @@ void VBOTerrain::saveTerrain(const QString& fileName) {
 	cv::imwrite(fileName.toUtf8().data(), saveImage);
 }
 
-// GEN: 1/16/2015. Change to not use a temporary file.
-void VBOTerrain::updateTexFromData() {
+/**
+ * Update the texture according to the layer data.
+ */
+void VBOTerrain::updateTexture() {
 	if (texId != 0) {
 		glDeleteTextures(1, &texId);
 		texId = 0;
 	}
 
+	glActiveTexture(GL_TEXTURE7);
 	glGenTextures(1, &texId);
 	glBindTexture(GL_TEXTURE_2D, texId);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, layerData.cols, layerData.rows, 0, GL_RED, GL_FLOAT, layerData.data);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glActiveTexture(GL_TEXTURE7);
-	glBindTexture(GL_TEXTURE_2D, texId);
+	glTexStorage2D(GL_TEXTURE_2D, 1, GL_R32F, layerData.cols, layerData.rows);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, layerData.cols, layerData.rows, GL_RED, GL_FLOAT, layerData.data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
 	glActiveTexture(GL_TEXTURE0);
 }

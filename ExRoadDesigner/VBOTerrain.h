@@ -36,5 +36,6 @@ public:
 	void loadTerrain(const QString& fileName);
 	void saveTerrain(const QString& fileName);
 
-	void updateTexFromData();
+private:
+	void updateTexture();
 };
