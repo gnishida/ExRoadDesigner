@@ -979,7 +979,7 @@ void MainWindow::onTerrainGeneration() {
 				std::cerr << "Unknown color is found. red = " << r << ", green = " << g << ", blue = " << b << std::endl;
 			}
 
-			glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<uchar>(y, x) = value;
+			glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<float>(y, x) = value;
 		}
 	}
 
@@ -1056,7 +1056,7 @@ void MainWindow::onUpdateMountain() {
 	}
 
 	float side = glWidget->vboRenderManager.side;
-	float step = side / glWidget->vboRenderManager.vboTerrain.terrainLayer.imgResX;
+	float step = side / glWidget->vboRenderManager.vboTerrain.resolution();
 
 	srand(clock());
 
@@ -1090,13 +1090,13 @@ void MainWindow::onTerrainSegmentation() {
 	polygonsSet.resize(5);	// 0 -- flat / 1 -- coast / 2 -- park / 3 -- water / 4 -- mountains
 
 	float side = glWidget->vboRenderManager.side;
-	float step = side / glWidget->vboRenderManager.vboTerrain.terrainLayer.imgResX;
+	float step = side / glWidget->vboRenderManager.vboTerrain.resolution();
 
 	std::cout << "start terrain segmentation..." << std::endl;
 
-	for (int r = 0; r < glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.rows - 1; ++r) {
-		for (int c = 0; c < glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.cols - 1; ++c) {
-			uchar value0 = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<uchar>(r, c);
+	for (int r = 0; r < glWidget->vboRenderManager.vboTerrain.resolution() - 1; ++r) {
+		for (int c = 0; c < glWidget->vboRenderManager.vboTerrain.resolution() - 1; ++c) {
+			uchar value0 = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<float>(r, c);
 
 			if (value0 <= 1) {
 				// try to find the closest area type
@@ -1104,8 +1104,8 @@ void MainWindow::onTerrainSegmentation() {
 				for (int d = 1; d <= 10 && !done; ++d) {
 					for (int rr = r - d; rr <= r + d && !done; ++rr) {
 						int cc = c - d;
-						if (rr < 0 || rr >= glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.rows || cc < 0 || cc >= glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.cols) continue;
-						uchar v = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<uchar>(rr, cc);
+						if (rr < 0 || rr >= glWidget->vboRenderManager.vboTerrain.resolution() || cc < 0 || cc >= glWidget->vboRenderManager.vboTerrain.resolution()) continue;
+						float v = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<float>(rr, cc);
 						if (v > 1) {
 							value0 = v;
 							done = true;
@@ -1114,7 +1114,7 @@ void MainWindow::onTerrainSegmentation() {
 
 						cc = c + d;
 						if (rr < 0 || rr >= glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.rows || cc < 0 || cc >= glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.cols) continue;
-						v = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<uchar>(rr, cc);
+						v = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<float>(rr, cc);
 						if (v > 1) {
 							value0 = v;
 							done = true;
@@ -1124,7 +1124,7 @@ void MainWindow::onTerrainSegmentation() {
 					for (int cc = c - d; cc <= c + d && !done; ++cc) {
 						int rr = r - d;
 						if (rr < 0 || rr >= glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.rows || cc < 0 || cc >= glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.cols) continue;
-						uchar v = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<uchar>(rr, cc);
+						float v = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<float>(rr, cc);
 						if (v > 1) {
 							value0 = v;
 							done = true;
@@ -1133,7 +1133,7 @@ void MainWindow::onTerrainSegmentation() {
 
 						rr = r + d;
 						if (rr < 0 || rr >= glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.rows || cc < 0 || cc >= glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.cols) continue;
-						v = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<uchar>(rr, cc);
+						v = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<float>(rr, cc);
 						if (v > 1) {
 							value0 = v;
 							done = true;
@@ -1142,9 +1142,9 @@ void MainWindow::onTerrainSegmentation() {
 				}
 			}
 
-			uchar value1 = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<uchar>(r + 1, c);
-			uchar value2 = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<uchar>(r + 1, c + 1);
-			uchar value3 = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<uchar>(r, c + 1);
+			float value1 = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<float>(r + 1, c);
+			float value2 = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<float>(r + 1, c + 1);
+			float value3 = glWidget->vboRenderManager.vboTerrain.terrainLayer.layerData.at<float>(r, c + 1);
 			
 			if (value0 <= 10 && value0 >= 7) {
 				if (value1 < 8) value1 = value0;
@@ -1158,7 +1158,7 @@ void MainWindow::onTerrainSegmentation() {
 			}
 
 			if (value1 == value0 && value2 == value0 && value3 == value0) {
-				QVector2D pt0 = QVector2D(glWidget->vboRenderManager.vboTerrain.terrainLayer.minPos) + QVector2D((float)c * step, (float)r * step);
+				QVector2D pt0 = QVector2D(glWidget->vboRenderManager.minPos) + QVector2D((float)c * step, (float)r * step);
 				QVector2D pt1 = pt0 + QVector2D(step, 0.0f);
 				QVector2D pt2 = pt1 + QVector2D(0.0f, step);
 				QVector2D pt3 = pt0 + QVector2D(0.0f, step);

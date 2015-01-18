@@ -1003,7 +1003,7 @@ void RoadGraph::adaptToTerrain(VBORenderManager* vboRenderManager) {
 	for (boost::tie(vi, vend) = boost::vertices(graph); vi != vend; ++vi) {
 		float z = 0.0f;
 		if (!G::getBool("shader2D")) {
-			z = vboRenderManager->getTerrainHeight(graph[*vi]->pt.x(), graph[*vi]->pt.y(), true);
+			z = vboRenderManager->getTerrainHeight(graph[*vi]->pt.x(), graph[*vi]->pt.y());
 			if (z < G::getFloat("seaLevelForStreet")) {
 				graph[*vi]->properties["bridge"] = true;
 				z = getBridgeElevationFromClosestNeighbors(*vi, *vboRenderManager, G::getFloat("seaLevelForStreet"));
@@ -1023,7 +1023,7 @@ void RoadGraph::adaptToTerrain(VBORenderManager* vboRenderManager) {
 		for (int i = 0; i < polyline.size(); ++i) {
 			float z = 0.0f;
 			if (!G::getBool("shader2D")) {
-				z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y(), true);
+				z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y());
 				if (z < G::getFloat("seaLevelForStreet")) {
 					bridge = true;
 					z = getBridgeElevationFromClosestNeighbors(*ei, polyline, i, *vboRenderManager, G::getFloat("seaLevelForStreet"));
@@ -1051,7 +1051,7 @@ float RoadGraph::getBridgeElevationFromClosestNeighbors(RoadVertexDesc srcDesc, 
 		if (visited[desc]) continue;
 		visited[desc] = true;
 
-		float z = renderManager.getTerrainHeight(graph[desc]->pt.x(), graph[desc]->pt.y(), true);
+		float z = renderManager.getTerrainHeight(graph[desc]->pt.x(), graph[desc]->pt.y());
 		if (z >= seaLevel) {
 			return z;
 		}

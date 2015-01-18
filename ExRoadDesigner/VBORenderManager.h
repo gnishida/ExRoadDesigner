@@ -88,7 +88,7 @@ public:
 	//void updateLayer(QVector3D mouse3D,float change);
 	//void updateTerrain(float coordX,float coordY,float rad,float change);
 	void changeTerrainDimensions(float terrainSide,int resolution);
-	float getTerrainHeight(float xP,float xY,bool actual=false);/// !!
+	float getTerrainHeight(float x, float y);
 	void changeTerrainShader(int newMode);
 	QVector3D minPos;
 	QVector3D maxPos;
@@ -112,11 +112,8 @@ public:
 	//static
 	bool addStaticGeometry(QString geoName,std::vector<Vertex>& vert,QString textureName,GLenum geometryType,int shaderMode);
 	bool addStaticGeometry2(QString geoName,std::vector<QVector3D>& pos,float zShift,bool inverseLoop,QString textureName,GLenum geometryType,int shaderMode,QVector3D texScale,QVector3D color);
-	bool addStaticConvexPoly(QString geoName,std::vector<QVector3D>& pos,float zShift,bool inverseLoop,QString textureName,int shaderMode,QVector3D texScale,bool tesselate=true,QVector3D* color=0);
 	bool removeStaticGeometry(QString geoName);
 	void renderStaticGeometry(QString geoName);
-	//void renderStaticTexArrayGeometry(QString geoName);
-	bool checkIfGeoNameInUse(QString geoName);
 
 	//grid
 	bool addGridGeometry(QString geoName,std::vector<Vertex>& vert,QString textureName);

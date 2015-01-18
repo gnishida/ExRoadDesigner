@@ -9,23 +9,33 @@
 class VBORenderManager;
 
 class VBOTerrain {
+private:
+	VBORenderManager* rendManager;
+	GLuint _texId;
+
+	GLuint elementbuffer;
+	GLuint vbo;
+	GLuint indicesCount;
+	GLuint grassText;
+
+	bool initialized;			// flag to check if initialization is done
+	int _resolution;			// the number of side of the grid that stores the terrain elevation data
+
+public:
+	Layer terrainLayer;			// the grid that stores the terrain elevation data
+
 public:
 	VBOTerrain();
 
-	void init(VBORenderManager& rendManager);
+	int resolution() { return _resolution; };
+	void init(VBORenderManager* rendManager, int resolution);
 
-	void render(VBORenderManager& rendManager);
-	void updateGaussian(float coordX,float coordY,float change,float rad_ratio);
-	void updateTerrainNewValue(float coordX,float coordY,float newValue,float rad);
-	void excavate(float x, float y, float height, float rad_ratio);
-	void smoothTerrain();
-	float getTerrainHeight(float xM,float yM,bool actual=false);
-	void loadTerrain(QString& fileName);
-	void saveTerrain(QString& fileName);
+	void render();
+	void updateGaussian(float u, float v, float height, float rad_ratio);
+	void excavate(float u, float v, float height, float rad_ratio);
+	float getTerrainHeight(float u, float v);
+	void loadTerrain(const QString& fileName);
+	void saveTerrain(const QString& fileName);
 
-	// edit
-	Layer terrainLayer;
-	bool initialized;
-	int resolutionX;
-	int resolutionY;
+	void updateTexFromData();
 };

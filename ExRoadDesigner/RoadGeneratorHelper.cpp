@@ -385,7 +385,7 @@ bool RoadGeneratorHelper::getVertexForSnapping(VBORenderManager& vboRenderManage
 		if (dist > distance_threshold2) continue;
 
 		// エッジが水面下かチェック
-		float z = vboRenderManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), true);
+		float z = vboRenderManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
 		if (z < z_threshold) continue;
 
 		// 適当なコスト関数で、最適な頂点を探す。
@@ -435,9 +435,9 @@ bool RoadGeneratorHelper::getEdgeForSnapping(VBORenderManager& vboRenderManager,
 		if (src == srcDesc || tgt == srcDesc) continue;
 
 		// エッジが水面下かチェック
-		float z1 = vboRenderManager.getTerrainHeight(roads.graph[src]->pt.x(), roads.graph[src]->pt.y(), true);
+		float z1 = vboRenderManager.getTerrainHeight(roads.graph[src]->pt.x(), roads.graph[src]->pt.y());
 		if (z1 < z_threshold) continue;
-		float z2 = vboRenderManager.getTerrainHeight(roads.graph[tgt]->pt.x(), roads.graph[tgt]->pt.y(), true);
+		float z2 = vboRenderManager.getTerrainHeight(roads.graph[tgt]->pt.x(), roads.graph[tgt]->pt.y());
 		if (z2 < z_threshold) continue;
 
 		QVector2D vec1 = roads.graph[src]->pt - roads.graph[srcDesc]->pt;
@@ -950,7 +950,7 @@ void RoadGeneratorHelper::connectRoads3(RoadGraph &roads, VBORenderManager* vboR
 			if (!roads.graph[*vi2]->valid) continue;
 			if (roads.graph[*vi2]->type < roads.graph[*vi]->type) continue;
 
-			float z = vboRenderManager->getTerrainHeight(roads.graph[*vi2]->pt.x(), roads.graph[*vi2]->pt.y(), true);
+			float z = vboRenderManager->getTerrainHeight(roads.graph[*vi2]->pt.x(), roads.graph[*vi2]->pt.y());
 			if (z < G::getFloat("seaLevelForStreet")) continue;
 
 			// if the change in the angle is not less than 60 degree, skip this vertex.
@@ -1116,7 +1116,7 @@ void RoadGeneratorHelper::cutEdgeByWater(Polyline2D &polyline, VBORenderManager&
 
 	// polylineの中で、海岸をまたぐセグメントを探す
 	for (int i = 0; i < polyline.size(); ++i) {
-		float z = vboRenderManager.getTerrainHeight(polyline[i].x(), polyline[i].y(), true);
+		float z = vboRenderManager.getTerrainHeight(polyline[i].x(), polyline[i].y());
 		if (z < z_threshold) {
 			// またいだ後のセグメントを全て削除
 			for (int j = i + 1; j < polyline.size(); ) {
@@ -1131,7 +1131,7 @@ void RoadGeneratorHelper::cutEdgeByWater(Polyline2D &polyline, VBORenderManager&
 	QVector2D pt = polyline.last();
 	while (true) {
 		pt -= vec;
-		float z = vboRenderManager.getTerrainHeight(pt.x(), pt.y(), true);
+		float z = vboRenderManager.getTerrainHeight(pt.x(), pt.y());
 		if (z < z_threshold) {
 			continue;
 		} else {
@@ -1161,7 +1161,7 @@ void RoadGeneratorHelper::bendEdgeBySteepElevationChange(int roadType, Polyline2
 			{
 				float th = th0 - (float)i * 0.1f;
 				QVector2D pt = polyline.nextLast() + QVector2D(cosf(th), sinf(th)) * length;
-				float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y(), true);
+				float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y());
 				//if (z >= G::getFloat("seaLevel")) {
 				if ((roadType == RoadEdge::TYPE_AVENUE && z < G::getFloat("seaLevelForAvenue")) || (roadType == RoadEdge::TYPE_STREET && z < G::getFloat("seaLevelForStreet"))) {
 				} else {
@@ -1174,7 +1174,7 @@ void RoadGeneratorHelper::bendEdgeBySteepElevationChange(int roadType, Polyline2
 			{
 				float th = th0 + (float)i * 0.1f;
 				QVector2D pt = polyline.nextLast() + QVector2D(cosf(th), sinf(th)) * length;
-				float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y(), true);
+				float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y());
 				//if (z >= G::getFloat("seaLevel")) {
 				if ((roadType == RoadEdge::TYPE_AVENUE && z < G::getFloat("seaLevelForAvenue")) || (roadType == RoadEdge::TYPE_STREET && z < G::getFloat("seaLevelForStreet"))) {
 				} else {
@@ -1208,7 +1208,7 @@ void RoadGeneratorHelper::bendEdgeBySteepElevationChange(Polyline2D &polyline, f
 		// try the left turn
 		for (float th = th0; th <= th0 + max_rotation; th += 0.1f) {
 			QVector2D pt = polyline.nextLast() + QVector2D(cosf(th), sinf(th)) * length;
-			float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y(), true);
+			float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y());
 			if (fabs(z - z0) < min_dz) {
 				min_dz = fabs(z - z0);
 				min_pt = pt;
@@ -1218,7 +1218,7 @@ void RoadGeneratorHelper::bendEdgeBySteepElevationChange(Polyline2D &polyline, f
 		// try the right turn
 		for (float th = th0; th >= th0 - max_rotation; th -= 0.1f) {
 			QVector2D pt = polyline.nextLast() + QVector2D(cosf(th), sinf(th)) * length;
-			float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y(), true);
+			float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y());
 			if (fabs(z - z0) < min_dz) {
 				min_dz = fabs(z - z0);
 				min_pt = pt;
@@ -1247,7 +1247,7 @@ bool RoadGeneratorHelper::submerged(int roadType, RoadGraph &roads, VBORenderMan
 
 bool RoadGeneratorHelper::submerged(int roadType, const Polyline2D &polyline, VBORenderManager *vboRenderManager) {
 	for (int i = 0; i < polyline.size(); ++i) {
-		float z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y(), true);
+		float z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y());
 		if ((roadType == RoadEdge::TYPE_AVENUE && z < G::getFloat("seaLevelForAvenue")) || (roadType == RoadEdge::TYPE_STREET && z < G::getFloat("seaLevelForStreet"))) return true;		
 	}
 
@@ -1283,7 +1283,7 @@ float RoadGeneratorHelper::maxZ(RoadGraph &roads, VBORenderManager *vboRenderMan
 		Polyline2D polyline = GraphUtil::finerEdge(roads.graph[*ei]->polyline, 5.0f);
 
 		for (int i = 0; i < polyline.size(); ++i) {
-			float z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y(), true);
+			float z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y());
 			max_z = std::max(max_z, z);
 		}
 	}
@@ -1306,7 +1306,7 @@ float RoadGeneratorHelper::minZ(RoadGraph &roads, VBORenderManager *vboRenderMan
 		Polyline2D polyline = GraphUtil::finerEdge(roads.graph[*ei]->polyline, 5.0f);
 
 		for (int i = 0; i < polyline.size(); ++i) {
-			float z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y(), true);
+			float z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y());
 			min_z = std::min(min_z, z);
 		}
 	}
@@ -1325,7 +1325,7 @@ float RoadGeneratorHelper::diffZ(RoadGraph &roads, VBORenderManager *vboRenderMa
 		Polyline2D polyline = GraphUtil::finerEdge(roads.graph[*ei]->polyline, 5.0f);
 
 		for (int i = 0; i < polyline.size(); ++i) {
-			float z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y(), true);
+			float z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y());
 			min_z = std::min(min_z, z);
 			max_z = std::max(max_z, z);
 		}
@@ -1343,8 +1343,8 @@ float RoadGeneratorHelper::diffSlope(RoadGraph &roads, VBORenderManager *vboRend
 		if (!roads.graph[*ei]->valid) continue;
 
 		for (int i = 0; i < roads.graph[*ei]->polyline.size() - 1; ++i) {
-			float z1 = vboRenderManager->getTerrainHeight(roads.graph[*ei]->polyline[i].x(), roads.graph[*ei]->polyline[i].y(), true);
-			float z2 = vboRenderManager->getTerrainHeight(roads.graph[*ei]->polyline[i + 1].x(), roads.graph[*ei]->polyline[i + 1].y(), true);
+			float z1 = vboRenderManager->getTerrainHeight(roads.graph[*ei]->polyline[i].x(), roads.graph[*ei]->polyline[i].y());
+			float z2 = vboRenderManager->getTerrainHeight(roads.graph[*ei]->polyline[i + 1].x(), roads.graph[*ei]->polyline[i + 1].y());
 			float len = (roads.graph[*ei]->polyline[i + 1] - roads.graph[*ei]->polyline[i]).length();
 			float slope = atan2f(z2 - z1, len);
 			if (slope < min_slope) min_slope = slope;
@@ -1422,7 +1422,7 @@ void RoadGeneratorHelper::removeIntersectionsOnRiver(RoadGraph &roads, VBORender
 	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
 		if (!roads.graph[*vi]->valid) continue;
 
-		float z = vboRenderManager->getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), true);
+		float z = vboRenderManager->getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
 		if (z > seaLevel) continue;
 
 		int degree = GraphUtil::getDegree(roads, *vi);

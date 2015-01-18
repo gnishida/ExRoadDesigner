@@ -35,7 +35,6 @@ public slots:
 	void updateTerrainLabels(int newValue);
 	void updateRender2D(int newValue);
 	void changeTerrainShader(int);
-	void smoothTerrain();
 
 	void contentDesign(int);
 	void contentDesignLevel();

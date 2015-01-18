@@ -68,10 +68,6 @@ public:
 	void connectRoads();
 	void cutRoads();
 
-	void newTerrain(int width, int depth, int cellLength);
-	void loadTerrain(const QString &filename);
-	void saveTerrain(const QString &filename);
-
 	void loadRoads(const QString &filename);
 	void addRoads(const QString &filename);
 	void saveRoads(const QString &filename);

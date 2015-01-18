@@ -48,7 +48,7 @@ void PMRoadGenerator::generateRoadNetwork() {
 			RoadVertexDesc desc = seeds.front();
 			seeds.pop_front();
 
-			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y(), true);
+			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
 			if (z < G::getFloat("seaLevel")) {
 				std::cout << "attemptExpansion (avenue): " << i << " (skipped because it is under the sea or on the mountains)" << std::endl;
 				continue;
@@ -91,7 +91,7 @@ void PMRoadGenerator::generateRoadNetwork() {
 			RoadVertexDesc desc = seeds.front();
 			seeds.pop_front();
 
-			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y(), true);
+			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
 			if (z < G::getFloat("seaLevelForStreet")) {
 				std::cout << "attemptExpansion (street): " << i << " (skipped because it is under the sea or on the mountains)" << std::endl;
 				continue;
@@ -210,7 +210,7 @@ void PMRoadGenerator::generateStreetSeeds(std::list<RoadVertexDesc> &seeds) {
 				roads.graph[desc]->properties["group_id"] = group_id;
 				roads.graph[desc]->properties["generation_type"] = "pm";
 
-				float z = vboRenderManager->getTerrainHeight(edge->polyline[step].x(), edge->polyline[step].y(), true);
+				float z = vboRenderManager->getTerrainHeight(edge->polyline[step].x(), edge->polyline[step].y());
 
 				// この点が、エリア内なら、シードとして追加
 				if (targetArea.contains(edge->polyline[step]) && z >= G::getFloat("seaLevelForStreet")) {
@@ -251,7 +251,7 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, cons
 
 	bool intercepted = false;
 
-	float z0 = vboRenderManager->getTerrainHeight(roads.graph[srcDesc]->pt.x(), roads.graph[srcDesc]->pt.y(), true);
+	float z0 = vboRenderManager->getTerrainHeight(roads.graph[srcDesc]->pt.x(), roads.graph[srcDesc]->pt.y());
 
 	// 新しいエッジを生成
 	RoadEdgePtr new_edge = RoadEdgePtr(new RoadEdge(roadType, lanes));
@@ -265,7 +265,7 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, cons
 		new_edge->polyline.push_back(pt);
 
 		// 水没、または、山の上なら、道路生成をストップ
-		float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y(), true);
+		float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y());
 		if ((roadType == RoadEdge::TYPE_AVENUE && z < G::getFloat("seaLevelForAvenue")) || (roadType == RoadEdge::TYPE_STREET && z < G::getFloat("seaLevelForStreet"))) {
 			// 最初っから水没している場合は、そもそもエッジ生成をキャンセル
 			if (new_edge->polyline.size() <= 1) return false;
@@ -280,7 +280,7 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, cons
 		if (z0 >= 70.0f && fabs(z - z0) > 7.0f) {
 			RoadGeneratorHelper::bendEdgeBySteepElevationChange(new_edge->polyline, z0, vboRenderManager);
 			pt = new_edge->polyline.back();
-			z = vboRenderManager->getTerrainHeight(pt.x(), pt.y(), true);
+			z = vboRenderManager->getTerrainHeight(pt.x(), pt.y());
 			z0 = z;
 		}
 

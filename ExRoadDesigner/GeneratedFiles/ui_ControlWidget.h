@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Sat Jan 17 14:56:59 2015
+** Created: Sun Jan 18 16:28:41 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -93,7 +93,6 @@ public:
     QCheckBox *render_3DtreesCheckBox;
     QLabel *render_2DparcelLineLabel;
     QSlider *render_2DparcelLineSlider;
-    QPushButton *terrain_smooth;
     QCheckBox *content_checkbox;
     QGroupBox *groupBox_2;
     QPushButton *content_0;
@@ -110,7 +109,7 @@ public:
     {
         if (ControlWidget->objectName().isEmpty())
             ControlWidget->setObjectName(QString::fromUtf8("ControlWidget"));
-        ControlWidget->resize(190, 1021);
+        ControlWidget->resize(190, 916);
         ControlWidget->setMinimumSize(QSize(190, 240));
         ControlWidget->setStyleSheet(QString::fromUtf8("background-color: rgb(181, 181, 181);"));
         dockWidgetContents = new QWidget();
@@ -265,7 +264,7 @@ public:
         pushButtonPlanarGraph->setGeometry(QRect(10, 110, 151, 28));
         groupBox_6 = new QGroupBox(dockWidgetContents);
         groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
-        groupBox_6->setGeometry(QRect(10, 630, 171, 271));
+        groupBox_6->setGeometry(QRect(10, 630, 171, 251));
         terrainPaint_sizeLabel = new QLabel(groupBox_6);
         terrainPaint_sizeLabel->setObjectName(QString::fromUtf8("terrainPaint_sizeLabel"));
         terrainPaint_sizeLabel->setGeometry(QRect(10, 20, 61, 16));
@@ -293,55 +292,52 @@ public:
         terrain_2DShader->setChecked(true);
         render_2DroadsStrokeLabel = new QLabel(groupBox_6);
         render_2DroadsStrokeLabel->setObjectName(QString::fromUtf8("render_2DroadsStrokeLabel"));
-        render_2DroadsStrokeLabel->setGeometry(QRect(10, 120, 71, 16));
+        render_2DroadsStrokeLabel->setGeometry(QRect(10, 100, 71, 16));
         render_2DroadsStrokeSlider = new QSlider(groupBox_6);
         render_2DroadsStrokeSlider->setObjectName(QString::fromUtf8("render_2DroadsStrokeSlider"));
-        render_2DroadsStrokeSlider->setGeometry(QRect(80, 120, 81, 17));
+        render_2DroadsStrokeSlider->setGeometry(QRect(80, 100, 81, 17));
         render_2DroadsStrokeSlider->setMaximumSize(QSize(16777215, 17));
         render_2DroadsStrokeSlider->setMaximum(100);
         render_2DroadsStrokeSlider->setValue(15);
         render_2DroadsStrokeSlider->setOrientation(Qt::Horizontal);
         render_2DroadsExtraWidthSlider = new QSlider(groupBox_6);
         render_2DroadsExtraWidthSlider->setObjectName(QString::fromUtf8("render_2DroadsExtraWidthSlider"));
-        render_2DroadsExtraWidthSlider->setGeometry(QRect(90, 100, 71, 17));
+        render_2DroadsExtraWidthSlider->setGeometry(QRect(90, 80, 71, 17));
         render_2DroadsExtraWidthSlider->setMaximumSize(QSize(16777215, 17));
         render_2DroadsExtraWidthSlider->setMaximum(100);
         render_2DroadsExtraWidthSlider->setOrientation(Qt::Horizontal);
         render_2DroadsExtraWidthLabel = new QLabel(groupBox_6);
         render_2DroadsExtraWidthLabel->setObjectName(QString::fromUtf8("render_2DroadsExtraWidthLabel"));
-        render_2DroadsExtraWidthLabel->setGeometry(QRect(10, 100, 71, 16));
+        render_2DroadsExtraWidthLabel->setGeometry(QRect(10, 80, 71, 16));
         render_2DparksLabel = new QLabel(groupBox_6);
         render_2DparksLabel->setObjectName(QString::fromUtf8("render_2DparksLabel"));
-        render_2DparksLabel->setGeometry(QRect(10, 150, 61, 16));
+        render_2DparksLabel->setGeometry(QRect(10, 130, 61, 16));
         render_2DparksSlider = new QSlider(groupBox_6);
         render_2DparksSlider->setObjectName(QString::fromUtf8("render_2DparksSlider"));
-        render_2DparksSlider->setGeometry(QRect(80, 150, 81, 17));
+        render_2DparksSlider->setGeometry(QRect(80, 130, 81, 17));
         render_2DparksSlider->setMaximumSize(QSize(16777215, 17));
         render_2DparksSlider->setValue(10);
         render_2DparksSlider->setOrientation(Qt::Horizontal);
         render_3DtreesCheckBox = new QCheckBox(groupBox_6);
         render_3DtreesCheckBox->setObjectName(QString::fromUtf8("render_3DtreesCheckBox"));
-        render_3DtreesCheckBox->setGeometry(QRect(10, 80, 101, 20));
+        render_3DtreesCheckBox->setGeometry(QRect(90, 60, 71, 20));
         render_3DtreesCheckBox->setChecked(true);
         render_2DparcelLineLabel = new QLabel(groupBox_6);
         render_2DparcelLineLabel->setObjectName(QString::fromUtf8("render_2DparcelLineLabel"));
-        render_2DparcelLineLabel->setGeometry(QRect(10, 190, 81, 16));
+        render_2DparcelLineLabel->setGeometry(QRect(10, 170, 81, 16));
         render_2DparcelLineSlider = new QSlider(groupBox_6);
         render_2DparcelLineSlider->setObjectName(QString::fromUtf8("render_2DparcelLineSlider"));
-        render_2DparcelLineSlider->setGeometry(QRect(100, 190, 61, 17));
+        render_2DparcelLineSlider->setGeometry(QRect(100, 170, 61, 17));
         render_2DparcelLineSlider->setMaximumSize(QSize(16777215, 17));
         render_2DparcelLineSlider->setMaximum(100);
         render_2DparcelLineSlider->setValue(20);
         render_2DparcelLineSlider->setOrientation(Qt::Horizontal);
-        terrain_smooth = new QPushButton(groupBox_6);
-        terrain_smooth->setObjectName(QString::fromUtf8("terrain_smooth"));
-        terrain_smooth->setGeometry(QRect(90, 60, 75, 23));
         content_checkbox = new QCheckBox(groupBox_6);
         content_checkbox->setObjectName(QString::fromUtf8("content_checkbox"));
-        content_checkbox->setGeometry(QRect(10, 210, 121, 17));
+        content_checkbox->setGeometry(QRect(10, 190, 121, 17));
         groupBox_2 = new QGroupBox(groupBox_6);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
-        groupBox_2->setGeometry(QRect(10, 230, 151, 31));
+        groupBox_2->setGeometry(QRect(10, 210, 151, 31));
         content_0 = new QPushButton(groupBox_2);
         content_0->setObjectName(QString::fromUtf8("content_0"));
         content_0->setGeometry(QRect(10, 10, 19, 19));
@@ -387,10 +383,10 @@ public:
         content_10->setAutoExclusive(true);
         lineEditMaxBlockSizeForPark = new QLineEdit(groupBox_6);
         lineEditMaxBlockSizeForPark->setObjectName(QString::fromUtf8("lineEditMaxBlockSizeForPark"));
-        lineEditMaxBlockSizeForPark->setGeometry(QRect(82, 170, 81, 20));
+        lineEditMaxBlockSizeForPark->setGeometry(QRect(82, 150, 81, 20));
         label_15 = new QLabel(groupBox_6);
         label_15->setObjectName(QString::fromUtf8("label_15"));
-        label_15->setGeometry(QRect(50, 170, 31, 21));
+        label_15->setGeometry(QRect(50, 150, 31, 21));
         ControlWidget->setWidget(dockWidgetContents);
         QWidget::setTabOrder(pushButtonGeneratePM, pushButtonClear);
         QWidget::setTabOrder(pushButtonClear, pushButtonMerge);
@@ -475,7 +471,6 @@ public:
         render_2DparksLabel->setText(QApplication::translate("ControlWidget", "Park 10 %", 0, QApplication::UnicodeUTF8));
         render_3DtreesCheckBox->setText(QApplication::translate("ControlWidget", "3D Trees", 0, QApplication::UnicodeUTF8));
         render_2DparcelLineLabel->setText(QApplication::translate("ControlWidget", "Par. Line: 2.0", 0, QApplication::UnicodeUTF8));
-        terrain_smooth->setText(QApplication::translate("ControlWidget", "Smooth Terrain", 0, QApplication::UnicodeUTF8));
         content_checkbox->setText(QApplication::translate("ControlWidget", "Content Design", 0, QApplication::UnicodeUTF8));
         groupBox_2->setTitle(QString());
         content_0->setText(QApplication::translate("ControlWidget", "S", 0, QApplication::UnicodeUTF8));

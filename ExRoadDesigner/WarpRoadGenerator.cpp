@@ -73,7 +73,7 @@ void WarpRoadGenerator::generateRoadNetwork() {
 			}
 
 			// 水中なら、伸ばして水中から脱出できるなら伸ばす。
-			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y(), true);
+			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
 			if (z < G::getFloat("seaLevel")) {
 				extendRoadAcrossRiver(RoadEdge::TYPE_AVENUE, desc, seeds, 200.0f);
 				continue;
@@ -151,7 +151,7 @@ void WarpRoadGenerator::generateRoadNetwork() {
 				continue;
 			}
 
-			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y(), true);
+			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
 			if (z < G::getFloat("seaLevelForStreet")) {
 				std::cout << "attemptExpansion (street): " << iter << " (skipped because it is under the sea or on the mountains)" << std::endl;
 				continue;
@@ -277,7 +277,7 @@ void WarpRoadGenerator::generateStreetSeeds(std::list<RoadVertexDesc> &seeds) {
 			if (!roads.graph[*vi]->properties.contains("example_desc")) continue;
 
 			if (!targetArea.contains(roads.graph[*vi]->pt)) continue;
-			float z = vboRenderManager->getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), true);
+			float z = vboRenderManager->getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
 			if (z < G::getFloat("seaLevelForStreet")) continue;
 
 			// ターゲットエリア座標空間から、Example座標空間へのオフセットを計算
@@ -910,7 +910,7 @@ void WarpRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc, 
 	// 道路生成用のカーネルを合成する
 	synthesizeItem(roadType, srcDesc, length, edges);
 
-	float z = vboRenderManager->getTerrainHeight(roads.graph[srcDesc]->pt.x(), roads.graph[srcDesc]->pt.y(), true);
+	float z = vboRenderManager->getTerrainHeight(roads.graph[srcDesc]->pt.x(), roads.graph[srcDesc]->pt.y());
 
 	int cnt = 0;
 	for (int i = 0; i < edges.size(); ++i) {
@@ -1081,7 +1081,7 @@ void WarpRoadGenerator::extendRoadAcrossRiver(int roadType, RoadVertexDesc v_des
 
 	QVector2D pt = roads.graph[v_desc]->pt - dir * max_length;
 
-	float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y(), true);
+	float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y());
 	if (z < G::getFloat("seaLevel")) return;
 
 	// エッジ生成

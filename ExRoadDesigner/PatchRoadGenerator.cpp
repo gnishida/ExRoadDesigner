@@ -71,7 +71,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 			}
 
 			// 水中なら、伸ばして水中から脱出できるなら伸ばす。
-			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y(), true);
+			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
 			if (z < G::getFloat("seaLevel")) {
 				extendRoadAcrossRiver(RoadEdge::TYPE_AVENUE, desc, seeds, 200.0f);
 				continue;
@@ -152,7 +152,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 				continue;
 			}
 
-			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y(), true);
+			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
 			if (z < G::getFloat("seaLevelForStreet")) {
 				std::cout << "attemptExpansion (street): " << iter << " (skipped because it is under the sea or on the mountains)" << std::endl;
 				continue;
@@ -251,7 +251,7 @@ void PatchRoadGenerator::generateStreetSeeds(std::list<RoadVertexDesc> &seeds) {
 			if (!targetArea.contains(roads.graph[*vi]->pt)) continue;
 
 			if (roads.graph[*vi]->properties.contains("example_desc")) {
-				float z = vboRenderManager->getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), true);
+				float z = vboRenderManager->getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
 				if (z < G::getFloat("seaLevelForStreet")) continue;
 
 				// ターゲットエリア座標空間から、Example座標空間へのオフセットを計算
@@ -896,7 +896,7 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 
 	// 要注意！！
 	// 既に標高はチェック済みなので、このチェックは不要のはず！！！
-	float z = vboRenderManager->getTerrainHeight(roads.graph[srcDesc]->pt.x(), roads.graph[srcDesc]->pt.y(), true);
+	float z = vboRenderManager->getTerrainHeight(roads.graph[srcDesc]->pt.x(), roads.graph[srcDesc]->pt.y());
 	if (z < G::getFloat("seaLevel")) {
 		printf("ERROR! The current vertex should be above sea leve.\n");
 		assert(false);
@@ -1005,7 +1005,7 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 		tgtDesc = GraphUtil::addVertex(roads, v);
 
 		// 水面下なら頂点の座標を岸ぎりぎりに移動する
-		float z = vboRenderManager->getTerrainHeight(roads.graph[tgtDesc]->pt.x(), roads.graph[tgtDesc]->pt.y(), true);
+		float z = vboRenderManager->getTerrainHeight(roads.graph[tgtDesc]->pt.x(), roads.graph[tgtDesc]->pt.y());
 		if (z < G::getFloat("seaLevel")) {
 			Polyline2D polyline;
 			polyline.push_back(roads.graph[srcDesc]->pt);
@@ -1082,7 +1082,7 @@ void PatchRoadGenerator::extendRoadAcrossRiver(int roadType, RoadVertexDesc v_de
 
 	QVector2D pt = roads.graph[v_desc]->pt - dir * max_length;
 
-	float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y(), true);
+	float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y());
 	if (z < G::getFloat("seaLevel")) return;
 
 	// エッジ生成

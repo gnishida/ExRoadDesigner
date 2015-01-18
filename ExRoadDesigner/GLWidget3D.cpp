@@ -86,21 +86,20 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 			if (altPressed) {
 				if(mainWin->controlWidget->ui.content_checkbox->isChecked()){
 					// content edition
-					float xM=1.0f-(vboRenderManager.side/2.0f-pos.x())/vboRenderManager.side;
-					float yM=1.0f-(vboRenderManager.side/2.0f-pos.y())/vboRenderManager.side;
-					float newValue=0;
-					newValue=G::global().getFloat("content_terrainLevel");
+					float xM = pos.x() / vboRenderManager.side + 0.5f;
+					float yM = pos.y() / vboRenderManager.side + 0.5f;
+					float newValue = G::global().getFloat("content_terrainLevel");
+					float radi = mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.side;
 
-					float radi=mainWin->controlWidget->ui.terrainPaint_sizeSlider->value()*0.01f;
-					vboRenderManager.vboTerrain.updateTerrainNewValue(xM,yM,newValue,radi);
+					vboRenderManager.vboTerrain.excavate(xM, yM, newValue,radi) ;
 					mainWin->urbanGeometry->adaptToTerrain();
 					shadow.makeShadowMap(this);
 					updateGL();
 				}else{
 					// normal Gaussian edition
 					float height = mainWin->controlWidget->ui.terrainPaint_changeSlider->value();
-					float xM = 1.0f - (vboRenderManager.side/2.0f-pos.x()) / vboRenderManager.side;
-					float yM = 1.0f - (vboRenderManager.side/2.0f-pos.y()) / vboRenderManager.side;
+					float xM = pos.x() / vboRenderManager.side + 0.5f;
+					float yM = pos.y() / vboRenderManager.side + 0.5f;
 					float radi = mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.side;
 
 					if (event->buttons() & Qt::LeftButton) {
@@ -302,23 +301,21 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 			if (event->buttons() & Qt::RightButton||event->buttons() & Qt::LeftButton||event->buttons() & Qt::MiddleButton) {//make sure something is clicking
 				if(mainWin->controlWidget->ui.content_checkbox->isChecked()){
 					// content edition
-					float xM=1.0f-(vboRenderManager.side/2.0f-pos.x())/vboRenderManager.side;
-					float yM=1.0f-(vboRenderManager.side/2.0f-pos.y())/vboRenderManager.side;
-					float newValue=0;
-					newValue=G::global().getFloat("content_terrainLevel");
+					float xM = pos.x() / vboRenderManager.side + 0.5f;
+					float yM = pos.y() / vboRenderManager.side + 0.5f;
+					float newValue = G::global().getFloat("content_terrainLevel");
+					float radi=mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.side;
 
-					float radi=mainWin->controlWidget->ui.terrainPaint_sizeSlider->value()*0.01f;
-					vboRenderManager.vboTerrain.updateTerrainNewValue(xM,yM,newValue,radi);
+					vboRenderManager.vboTerrain.excavate(xM, yM, newValue, radi);
 					mainWin->urbanGeometry->adaptToTerrain();
 					shadow.makeShadowMap(this);
-					
-				}else{
+				} else {
 					// normal Gaussian edition
 					float height = mainWin->controlWidget->ui.terrainPaint_changeSlider->value();
 					float radi = mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.side;
-					float xM = 1.0f - (vboRenderManager.side/2.0f-pos.x()) / vboRenderManager.side;
-					float yM = 1.0f - (vboRenderManager.side/2.0f-pos.y()) / vboRenderManager.side;
-					height *= 0.2f;//while moving, it is not necessary to change much
+					float xM = pos.x() / vboRenderManager.side + 0.5f;
+					float yM = pos.y() / vboRenderManager.side + 0.5f;
+					height *= 0.2f; //while moving, it is not necessary to change much
 
 					if (event->buttons() & Qt::LeftButton) {
 						vboRenderManager.vboTerrain.updateGaussian(xM, yM, height, radi);
@@ -473,6 +470,7 @@ void GLWidget3D::initializeGL() {
 
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
+		glLineWidth(5.0f);
 		glPointSize(10.0f);
 
 		////////////////////////////////
@@ -523,7 +521,7 @@ void GLWidget3D::drawScene(int drawMode) {
 		mainWin->urbanGeometry->render(vboRenderManager);
 		glEnable(GL_CULL_FACE);
 		
-		vboRenderManager.vboTerrain.render(vboRenderManager);
+		vboRenderManager.vboTerrain.render();
 		if(mainWin->controlWidget->ui.terrain_2DShader->isChecked()==false)
 			vboRenderManager.vboWater.render(vboRenderManager);
 
@@ -540,7 +538,7 @@ void GLWidget3D::drawScene(int drawMode) {
 	}
 	///////////////////////////////////
 	// LC MODE
-	if(G::global().getInt("3d_render_mode")==1||G::global().getInt("3d_render_mode")==2){//LC HATCH
+	if (G::global().getInt("3d_render_mode")==1) {
 
 		// NORMAL
 		if(drawMode==0){
@@ -556,7 +554,7 @@ void GLWidget3D::drawScene(int drawMode) {
 			if(shadowEnabled)
 				glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 1);//SHADOW: Render Normal with Shadows
 
-			vboRenderManager.vboTerrain.render(vboRenderManager);
+		vboRenderManager.vboTerrain.render();
 
 			vboRenderManager.renderStaticGeometry(QString("3d_sidewalk"));
 			vboRenderManager.renderStaticGeometry(QString("3d_roads"));
@@ -580,7 +578,7 @@ void GLWidget3D::drawScene(int drawMode) {
 		if(drawMode==1){
 			glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 2);// SHADOW: From light
 
-			vboRenderManager.vboTerrain.render(vboRenderManager);
+			vboRenderManager.vboTerrain.render();
 
 			//vboRenderManager.renderStaticGeometry(QString("3d_sidewalk"));
 			//vboRenderManager.renderStaticGeometry(QString("3d_roads"));
@@ -603,7 +601,7 @@ void GLWidget3D::drawScene(int drawMode) {
 		mainWin->urbanGeometry->render(vboRenderManager);
 		glEnable(GL_CULL_FACE);
 		
-		vboRenderManager.vboTerrain.render(vboRenderManager);
+		vboRenderManager.vboTerrain.render();
 
 		vboRenderManager.renderStaticGeometry(QString("2d_blocks"));
 		vboRenderManager.renderStaticGeometry(QString("2d_parks"));

@@ -15,7 +15,7 @@ public:
 	static std::vector<uint> vss;
 	static std::vector<uint> fragments;
 
-	static uint initShader(QString& vertFileName,QString& fragFileName);
+	static uint initShader(const QString& vertFileName, const QString& fragFileName);
 	static void cleanShaders();
 
 };

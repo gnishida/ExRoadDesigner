@@ -91,7 +91,7 @@ void RoadArea::adaptToTerrain(VBORenderManager* vboRenderManager) {
 	for (int i = 0; i < area.size(); ++i) {
 		float z = 0.0f;
 		if (!G::getBool("shader2D")) {
-			z = vboRenderManager->getTerrainHeight(area[i].x(), area[i].y(), true);
+			z = vboRenderManager->getTerrainHeight(area[i].x(), area[i].y());
 		}
 		area3D.push_back(QVector3D(area[i].x(), area[i].y(), z + 30));
 	}
@@ -99,7 +99,7 @@ void RoadArea::adaptToTerrain(VBORenderManager* vboRenderManager) {
 	for (int i = 0; i < hintLine.size(); ++i) {
 		float z = 0.0f;
 		if (!G::getBool("shader2D")) {
-			z = vboRenderManager->getTerrainHeight(hintLine[i].x(), hintLine[i].y(), true);
+			z = vboRenderManager->getTerrainHeight(hintLine[i].x(), hintLine[i].y());
 		}
 		hintLine3D.push_back(QVector3D(hintLine[i].x(), hintLine[i].y(), z + 30));
 	}
@@ -107,7 +107,7 @@ void RoadArea::adaptToTerrain(VBORenderManager* vboRenderManager) {
 	for (int i = 0; i < controlPoints.size(); ++i) {
 		float z = 0.0f;
 		if (!G::getBool("shader2D")) {
-			z = vboRenderManager->getTerrainHeight(controlPoints[i].x(), controlPoints[i].y(), true);
+			z = vboRenderManager->getTerrainHeight(controlPoints[i].x(), controlPoints[i].y());
 		}
 		controlPoints3D.push_back(QVector3D(controlPoints[i].x(), controlPoints[i].y(), z + 30));
 	}

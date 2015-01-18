@@ -16,7 +16,7 @@
 	std::vector<uint> Shader::fragments;
 
 
-	void loadTextFile(QString fileName,std::string& str){
+	void loadTextFile(const QString fileName,std::string& str){
 		QFile file(fileName);
 		if(!file.open(QIODevice::ReadOnly)) {
 			printf("ERROR: loadTexFile: %s\n", file.errorString().toAscii().constData());
@@ -54,7 +54,7 @@
 		return id;
 	}//
 
-	uint Shader::initShader(QString& vertFileName,QString& fragFileName){
+	uint Shader::initShader(const QString& vertFileName, const QString& fragFileName){
 		//GLenum err;
 		// read shaders
 		std::string source;

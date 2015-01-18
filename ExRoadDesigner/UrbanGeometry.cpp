@@ -125,32 +125,13 @@ void UrbanGeometry::generateRoadsAliaga(std::vector<ExFeature> &features) {
 }
 
 void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
+	glLineWidth(5.0f);
+	glPointSize(10.0f);
+
 	// draw the road graph
 	roads.generateMesh(vboRenderManager, "roads_lines", "roads_points");
 	vboRenderManager.renderStaticGeometry("roads_lines");
 	vboRenderManager.renderStaticGeometry("roads_points");
-
-	/*
-	if (waterRenderer != NULL) {
-		waterRenderer->renderMe(textureManager);
-	}
-	*/
-	
-	// draw a vboRenderManager
-	//vboRenderManager->generateMesh(vboRenderManager, "vboRenderManager");
-	//vboRenderManager.renderStaticGeometry("vboRenderManager");
-
-	/*
-	// draw blocks and parcels
-	for (int i = 0; i < blocks.size(); ++i) {
-		renderer.render(blocks[i], textureManager);
-
-		ParcelGraphVertexIter vi, viEnd;
-		for(boost::tie(vi, viEnd) = boost::vertices(blocks[i]->parcels); vi != viEnd; ++vi) {
-			renderer.render(blocks[i]->parcels[*vi], textureManager);
-		}
-	}
-	*/
 
 	// draw the area which is now being defined
 	if (areaBuilder.selecting()) {
@@ -342,77 +323,6 @@ void UrbanGeometry::connectRoads() {
 void UrbanGeometry::cutRoads() {
 	if (areas.selectedIndex < 0) return;
 	GraphUtil::subtractRoads(roads, areas.selectedArea()->area, false);
-}
-
-void UrbanGeometry::newTerrain(int width, int depth, int cellLength) {
-	clear();
-
-	//&mainWin->glWidget->vboRenderManager = new Terrain(width, depth, cellLength);
-
-	/*
-	if (waterRenderer != NULL) {
-		waterRenderer->setWidth(width);
-		waterRenderer->setDepth(depth);
-	}
-	*/
-}
-
-void UrbanGeometry::loadTerrain(const QString &filename) {
-	printf("NOT IMPLEMENTED YET\n");
-	/*QFile file(filename);
-	if (!file.open(QIODevice::ReadOnly)) {
-		std::cerr << "MyUrbanGeometry::loadInfoLayers... The file is not accessible: " << filename.toUtf8().constData() << endl;
-		throw "The file is not accessible: " + filename;
-	}
-
-	clear();
-
-	QTextStream in(&file);
-	QString line = in.readLine();
-	this->width = line.split(" ")[0].toInt();
-	this->depth = line.split(" ")[1].toInt();
-	int cellLength = line.split(" ")[2].toInt();
-
-	&mainWin->glWidget->vboRenderManager = new Terrain(width, depth, cellLength);
-
-	for (int i = 0; i < &mainWin->glWidget->vboRenderManager->getNumRows() * &mainWin->glWidget->vboRenderManager->getNumCols(); ++i) {
-		line = in.readLine();
-		int idxX = line.split(" ").at(1).toInt();
-		int idxY = line.split(" ").at(2).toInt();
-
-		line = in.readLine();
-		float x = line.split(" ").at(0).toFloat();
-		float y = line.split(" ").at(1).toFloat();
-
-		line = in.readLine();
-		&mainWin->glWidget->vboRenderManager->setValue(x, y, line.toFloat());
-	}
-	*/
-
-}
-
-void UrbanGeometry::saveTerrain(const QString &filename) {
-	printf("NOT IMPLEMENTED YET\n");
-	/*QFile file(filename);
-	if (!file.open(QIODevice::WriteOnly)) {
-		std::cerr << "MyUrbanGeometry::saveInfoLayers... The file is not writable: " << filename.toUtf8().constData() << endl;
-		throw "The file is not writable: " + filename;
-	}
-
-	QTextStream out(&file);
-	out << &mainWin->glWidget->vboRenderManager->width << " " << &mainWin->glWidget->vboRenderManager->depth << " " << &mainWin->glWidget->vboRenderManager->getCellLength() << endl;
-	int count = 0;
-	for (int i = 0; i < &mainWin->glWidget->vboRenderManager->getNumCols(); ++i) {
-		for (int j = 0; j < &mainWin->glWidget->vboRenderManager->getNumRows(); ++j) {
-			out << count++ << " " << i << " " << j << endl;
-			float x = &mainWin->glWidget->vboRenderManager->getCell(i, j).getX();
-			float y = &mainWin->glWidget->vboRenderManager->getCell(i, j).getY();
-
-			out << x << " " << y << endl;
-
-			out << &mainWin->glWidget->vboRenderManager->getTerrainHeight(x, y) << endl;
-		}
-	}*/
 }
 
 void UrbanGeometry::loadRoads(const QString &filename) {

@@ -66,7 +66,6 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	connect(ui.render_2DroadsExtraWidthSlider, SIGNAL(valueChanged(int)),this, SLOT(updateRender2D(int)));
 	connect(ui.render_2DparksSlider, SIGNAL(valueChanged(int)),this, SLOT(updateRender2D(int)));
 	connect(ui.render_2DparcelLineSlider, SIGNAL(valueChanged(int)),this, SLOT(updateRender2D(int)));
-	connect(ui.terrain_smooth, SIGNAL(clicked()),this, SLOT(smoothTerrain()));
 	connect(ui.content_checkbox, SIGNAL(stateChanged(int)),this, SLOT(contentDesign(int)));
 
 	connect(ui.content_0, SIGNAL(clicked()), this, SLOT(contentDesignLevel()));
@@ -366,12 +365,6 @@ void ControlWidget::changeTerrainShader(int){
 		terrainMode=1;
 	printf("terrainMode %d\n",terrainMode);
 	mainWin->glWidget->vboRenderManager.changeTerrainShader(terrainMode);//could have used !shader2D
-	mainWin->urbanGeometry->adaptToTerrain();
-	mainWin->glWidget->updateGL();
-}//
-
-void ControlWidget::smoothTerrain(){
-	mainWin->glWidget->vboRenderManager.vboTerrain.smoothTerrain();
 	mainWin->urbanGeometry->adaptToTerrain();
 	mainWin->glWidget->updateGL();
 }//
