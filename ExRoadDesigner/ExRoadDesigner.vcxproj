@@ -257,7 +257,6 @@
     <ClCompile Include="GraphUtil.cpp" />
     <ClCompile Include="Histogram.cpp" />
     <ClCompile Include="HoughTransform.cpp" />
-    <ClCompile Include="LC_Layer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Polygon2D.cpp" />
@@ -512,7 +511,6 @@
     <ClInclude Include="GraphUtil.h" />
     <ClInclude Include="Histogram.h" />
     <ClInclude Include="HoughTransform.h" />
-    <ClInclude Include="LC_Layer.h" />
     <ClInclude Include="Polygon2D.h" />
     <ClInclude Include="Polygon3D.h" />
     <ClInclude Include="PolygonBuilder.h" />

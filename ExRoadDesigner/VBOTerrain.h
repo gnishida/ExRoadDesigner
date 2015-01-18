@@ -1,17 +1,16 @@
 #pragma once
 
-
-#include "LC_Layer.h"
-
+#include "glew.h"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include <QString>
 
 class VBORenderManager;
 
 class VBOTerrain {
 private:
 	VBORenderManager* rendManager;
-	GLuint _texId;
+	GLuint texId;
 
 	GLuint elementbuffer;
 	GLuint vbo;
@@ -22,7 +21,7 @@ private:
 	int _resolution;			// the number of side of the grid that stores the terrain elevation data
 
 public:
-	Layer terrainLayer;			// the grid that stores the terrain elevation data
+	cv::Mat layerData;			// the grid that stores the terrain elevation data
 
 public:
 	VBOTerrain();

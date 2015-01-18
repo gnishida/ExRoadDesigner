@@ -1,17 +1,13 @@
 ﻿#include "VBOTerrain.h"
-#include <QFileInfo>
 #include "VBOUtil.h"
-#include "qimage.h"
+#include <QImage>
 #include <QGLWidget>
-
 #include "global.h"
-
 #include "VBORenderManager.h"
-
 
 VBOTerrain::VBOTerrain() {
 	initialized = false;
-	_texId = 0;
+	texId = 0;
 	_resolution = 200;
 }
 
@@ -22,14 +18,14 @@ void VBOTerrain::init(VBORenderManager* rendManager, int resolution) {
 	if (!initialized) {
 		int numLevels=4;
 		std::vector<QString> fileNames(numLevels);
-		for(int i=0;i<numLevels;i++){
-			fileNames[i]="../data/textures/0"+QString::number(i+1)+"_terrain.jpg";
+		for (int i = 0; i < numLevels; ++i) {
+			fileNames[i] = "../data/textures/0" + QString::number(i+1) + "_terrain.jpg";
 		}
-		grassText=VBOUtil::loadImageArray(fileNames);
+		grassText = VBOUtil::loadImageArray(fileNames);
 	}
 
 	// TERRAIN LAYER
-	terrainLayer.init(rendManager->minPos, rendManager->maxPos, resolution + 1, resolution + 1);
+	layerData = cv::Mat(resolution + 1, resolution + 1, CV_32FC1, cv::Scalar(70.0f));
 	updateTexFromData();
 
 	//////////////////
@@ -82,7 +78,7 @@ void VBOTerrain::init(VBORenderManager* rendManager, int resolution) {
 	initialized = true;
 }
 
-void VBOTerrain::render() {//bool editionMode,QVector3D mousePos
+void VBOTerrain::render() {
 	bool editionMode = rendManager->editionMode;
 	QVector3D mousePos = rendManager->mousePos3D;
 
@@ -199,7 +195,20 @@ void VBOTerrain::render() {//bool editionMode,QVector3D mousePos
  * @param rad_ratio		半径のサイズ（グリッドサイズに対する比）
  */
 void VBOTerrain::updateGaussian(float u, float v, float height, float rad_ratio) {
-	terrainLayer.updateGaussian(u, v, height, rad_ratio);
+	float x0 = u * (_resolution + 1);
+	float y0 = v * (_resolution + 1);
+	float sigma = rad_ratio * (_resolution + 1);
+
+	for (int c = 0; c < layerData.cols; c++) {
+		for (int r = 0; r < layerData.rows; r++) {
+			float x = c + 0.5f;
+			float y = r + 0.5f;
+
+			float z = layerData.at<float>(r,c) + height * expf(-(SQR(x - x0) + SQR(y - y0)) / (2 * sigma * sigma));
+			if (z < 0) z = 0.0f;
+			layerData.at<float>(r,c) = z;
+		}
+	}
 
 	// update texture
 	updateTexFromData();
@@ -214,7 +223,23 @@ void VBOTerrain::updateGaussian(float u, float v, float height, float rad_ratio)
  * @param rad_ratio		半径のサイズ（グリッドサイズに対する比）
  */
 void VBOTerrain::excavate(float u, float v, float height, float rad_ratio) {
-	terrainLayer.excavate(u, v, height, rad_ratio);
+	float x0 = u * (_resolution + 1);
+	float y0 = v * (_resolution + 1);
+	float rad = rad_ratio * (_resolution + 1);
+
+	for (int c = x0 - rad; c <= x0 + rad + 1; ++c) {
+		if (c < 0 || c >= layerData.cols) continue;
+		for (int r = y0 - rad; r <= y0 + rad + 1; ++r) {
+			if (r < 0 || r >= layerData.rows) continue;
+
+			float x = c + 0.5f;
+			float y = r + 0.5f;
+
+			if (SQR(x - x0) + SQR(y - y0) > SQR(rad)) continue;
+			
+			layerData.at<float>(r, c) = 0.0f;
+		}
+	}
 
 	// update texture
 	updateTexFromData();
@@ -227,42 +252,77 @@ void VBOTerrain::excavate(float u, float v, float height, float rad_ratio) {
  * @param v			Y coordinate [0, 1]
  */
 float VBOTerrain::getTerrainHeight(float u, float v) {
-	return terrainLayer.getValue(u, v);
+	if (u < 0) u = 0.0f;
+	if (u >= 1.0f) u = 1.0f;
+	if (v < 0) v = 0.0f;
+	if (v >= 1.0f) v = 1.0f;
+
+	int c1 = u * _resolution;
+	int c2 = u * _resolution + 1;
+	int r1 = v * _resolution;
+	int r2 = v * _resolution + 1;
+
+	if (c1 < 0) c1 = 0;
+	if (c2 >= layerData.cols) c2 = layerData.cols - 1;
+	if (r1 < 0) r1 = 0;
+	if (r2 >= layerData.rows) r2 = layerData.rows - 1;
+
+	float v1 = layerData.at<float>(r1, c1);
+	float v2 = layerData.at<float>(r2, c1);
+	float v3 = layerData.at<float>(r1, c2);
+	float v4 = layerData.at<float>(r2, c2);
+
+	float v12,v34;
+	if (r2 == r1) {
+		v12 = v1;
+		v34 = v3;
+	} else {
+		float t = v * (_resolution + 1) - r1;
+		v12 = v1 * (1-t) + v2 * t;
+		v34 = v3 * (1-t) + v4 * t;
+	}
+
+	if (c2 == c1) {
+		return v12;
+	} else {
+		float s = u * (_resolution + 1) - c1;
+		return v12 * (1-s) + v34 * s;
+	}
 }
 
 void VBOTerrain::loadTerrain(const QString& fileName) {
-	terrainLayer.loadLayer(fileName);
+	cv::Mat loadImage = cv::imread(fileName.toUtf8().data(), CV_LOAD_IMAGE_UNCHANGED);
+	cv::Mat tmp = cv::Mat(loadImage.rows, loadImage.cols, CV_32FC1, loadImage.data);
+	tmp.copyTo(layerData);
 
 	// update texture
 	updateTexFromData();
 }
 	
 void VBOTerrain::saveTerrain(const QString& fileName) {
-	terrainLayer.saveLayer(fileName);
+	cv::Mat saveImage	= cv::Mat(layerData.rows, layerData.cols, CV_8UC4, layerData.data);
+	cv::imwrite(fileName.toUtf8().data(), saveImage);
 }
 
 // GEN: 1/16/2015. Change to not use a temporary file.
 void VBOTerrain::updateTexFromData() {
-	if (_texId != 0) {
-		glDeleteTextures(1, &_texId);
-		_texId = 0;
+	if (texId != 0) {
+		glDeleteTextures(1, &texId);
+		texId = 0;
 	}
 
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glGenTextures(1, &texId);
+	glBindTexture(GL_TEXTURE_2D, texId);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, layerData.cols, layerData.rows, 0, GL_RED, GL_FLOAT, layerData.data);
+
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-
-	glGenTextures(1, &_texId);
-	glBindTexture(GL_TEXTURE_2D, _texId);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, terrainLayer.layerData.cols, terrainLayer.layerData.rows, 0, GL_RED, GL_FLOAT, terrainLayer.layerData.data);
-
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glActiveTexture(GL_TEXTURE7);
-	glBindTexture(GL_TEXTURE_2D, _texId);
+	glBindTexture(GL_TEXTURE_2D, texId);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glActiveTexture(GL_TEXTURE0);
 }

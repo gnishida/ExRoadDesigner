@@ -163,9 +163,6 @@
     <ClCompile Include="VBOWater.cpp">
       <Filter>VBO</Filter>
     </ClCompile>
-    <ClCompile Include="LC_Layer.cpp">
-      <Filter>VBO</Filter>
-    </ClCompile>
     <ClCompile Include="VBOSkyBox.cpp">
       <Filter>VBO</Filter>
     </ClCompile>
@@ -513,9 +510,6 @@
       <Filter>VBO</Filter>
     </ClInclude>
     <ClInclude Include="VBOWater.h">
-      <Filter>VBO</Filter>
-    </ClInclude>
-    <ClInclude Include="LC_Layer.h">
       <Filter>VBO</Filter>
     </ClInclude>
     <ClInclude Include="VBOSkyBox.h">
