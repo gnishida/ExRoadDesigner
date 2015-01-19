@@ -29,9 +29,6 @@ public slots:
 	void trimRoads();
 	void connectRoads();
 	void connectRoads2();
-	void removeIntersectionOnRiver();
-	void removeIntersectingEdge();
-	void planarGraph();
 	void updateTerrainLabels(int newValue);
 	void updateTerrainEdit(const QString &text);
 	void updateRender2D(int newValue);

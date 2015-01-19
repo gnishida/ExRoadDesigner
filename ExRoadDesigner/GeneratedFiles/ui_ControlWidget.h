@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Sun Jan 18 18:40:59 2015
+** Created: Mon Jan 19 12:48:39 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -75,9 +75,6 @@ public:
     QPushButton *pushButtonMerge;
     QPushButton *pushButtonConnect2;
     QPushButton *pushButtonTrim;
-    QPushButton *pushButtonRemoveIntersectionOnRiver;
-    QPushButton *pushButtonRemoveIntersectingEdge;
-    QPushButton *pushButtonPlanarGraph;
     QGroupBox *groupBox_6;
     QLabel *terrainPaint_sizeLabel;
     QLabel *terrainPaint_changeLabel;
@@ -111,7 +108,7 @@ public:
     {
         if (ControlWidget->objectName().isEmpty())
             ControlWidget->setObjectName(QString::fromUtf8("ControlWidget"));
-        ControlWidget->resize(190, 916);
+        ControlWidget->resize(190, 833);
         ControlWidget->setMinimumSize(QSize(190, 240));
         ControlWidget->setStyleSheet(QString::fromUtf8("background-color: rgb(181, 181, 181);"));
         dockWidgetContents = new QWidget();
@@ -245,7 +242,7 @@ public:
         label_13->setGeometry(QRect(130, 163, 31, 21));
         groupBox_5 = new QGroupBox(dockWidgetContents);
         groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
-        groupBox_5->setGeometry(QRect(10, 483, 171, 141));
+        groupBox_5->setGeometry(QRect(10, 483, 171, 51));
         pushButtonMerge = new QPushButton(groupBox_5);
         pushButtonMerge->setObjectName(QString::fromUtf8("pushButtonMerge"));
         pushButtonMerge->setGeometry(QRect(10, 20, 51, 28));
@@ -255,18 +252,9 @@ public:
         pushButtonTrim = new QPushButton(groupBox_5);
         pushButtonTrim->setObjectName(QString::fromUtf8("pushButtonTrim"));
         pushButtonTrim->setGeometry(QRect(60, 20, 51, 28));
-        pushButtonRemoveIntersectionOnRiver = new QPushButton(groupBox_5);
-        pushButtonRemoveIntersectionOnRiver->setObjectName(QString::fromUtf8("pushButtonRemoveIntersectionOnRiver"));
-        pushButtonRemoveIntersectionOnRiver->setGeometry(QRect(10, 50, 151, 28));
-        pushButtonRemoveIntersectingEdge = new QPushButton(groupBox_5);
-        pushButtonRemoveIntersectingEdge->setObjectName(QString::fromUtf8("pushButtonRemoveIntersectingEdge"));
-        pushButtonRemoveIntersectingEdge->setGeometry(QRect(10, 80, 151, 28));
-        pushButtonPlanarGraph = new QPushButton(groupBox_5);
-        pushButtonPlanarGraph->setObjectName(QString::fromUtf8("pushButtonPlanarGraph"));
-        pushButtonPlanarGraph->setGeometry(QRect(10, 110, 151, 28));
         groupBox_6 = new QGroupBox(dockWidgetContents);
         groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
-        groupBox_6->setGeometry(QRect(10, 630, 181, 251));
+        groupBox_6->setGeometry(QRect(10, 540, 171, 251));
         terrainPaint_sizeLabel = new QLabel(groupBox_6);
         terrainPaint_sizeLabel->setObjectName(QString::fromUtf8("terrainPaint_sizeLabel"));
         terrainPaint_sizeLabel->setGeometry(QRect(10, 20, 61, 16));
@@ -467,9 +455,6 @@ public:
 #endif // QT_NO_TOOLTIP
         pushButtonTrim->setText(QApplication::translate("ControlWidget", "Trim", 0, QApplication::UnicodeUTF8));
         pushButtonTrim->setShortcut(QApplication::translate("ControlWidget", "Ctrl+M", 0, QApplication::UnicodeUTF8));
-        pushButtonRemoveIntersectionOnRiver->setText(QApplication::translate("ControlWidget", "Remove Intersection on River", 0, QApplication::UnicodeUTF8));
-        pushButtonRemoveIntersectingEdge->setText(QApplication::translate("ControlWidget", "Remove Intersecting Edges", 0, QApplication::UnicodeUTF8));
-        pushButtonPlanarGraph->setText(QApplication::translate("ControlWidget", "Planar Graph", 0, QApplication::UnicodeUTF8));
         groupBox_6->setTitle(QApplication::translate("ControlWidget", "Terrain Controls/Render", 0, QApplication::UnicodeUTF8));
         terrainPaint_sizeLabel->setText(QApplication::translate("ControlWidget", "Size: 5%", 0, QApplication::UnicodeUTF8));
         terrainPaint_changeLabel->setText(QApplication::translate("ControlWidget", "Change", 0, QApplication::UnicodeUTF8));

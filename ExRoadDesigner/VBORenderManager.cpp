@@ -174,10 +174,6 @@ void VBORenderManager::updateTerrain(float coordX,float coordY,float rad,float c
  * @param y			y coordinate [-side/2, side/2]
  */
 float VBORenderManager::getTerrainHeight(float x, float y) {
-	if (G::getBool("shader2D")) { //for Gen Mode it is flat
-		return 0.0f;
-	}
-
 	float u = x / side + 0.5f;
 	float v = y / side + 0.5f;
 	return vboTerrain.getTerrainHeight(u, v);

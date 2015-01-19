@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>190</width>
-    <height>916</height>
+    <height>833</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -529,7 +529,7 @@
       <x>10</x>
       <y>483</y>
       <width>171</width>
-      <height>141</height>
+      <height>51</height>
      </rect>
     </property>
     <property name="title">
@@ -583,52 +583,13 @@
       <string>Ctrl+M</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButtonRemoveIntersectionOnRiver">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>50</y>
-       <width>151</width>
-       <height>28</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Remove Intersection on River</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButtonRemoveIntersectingEdge">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>80</y>
-       <width>151</width>
-       <height>28</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Remove Intersecting Edges</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButtonPlanarGraph">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>110</y>
-       <width>151</width>
-       <height>28</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Planar Graph</string>
-     </property>
-    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_6">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>630</y>
-      <width>181</width>
+      <y>540</y>
+      <width>171</width>
       <height>251</height>
      </rect>
     </property>

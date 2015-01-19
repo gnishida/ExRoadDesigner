@@ -65,6 +65,18 @@ std::vector<RoadEdgeDescs> ShapeDetector::detect(RoadGraph &roads, float maxRadi
 		std::cout << "Close vertices detection: " << (double)(end - start) / CLOCKS_PER_SEC << " [sec]" << std::endl;
 	}
 
+	// 一旦、shapeのエッジの両端頂点を、usedVerticesに格納する。
+	// なぜこれが必要か？
+	// 上のdetect close verticesでは、degree==2の頂点は、わざとusedVerticesに格納しなかったから。
+	for (int i = 0; i < shapes.size(); ++i) {
+		for (int j = 0; j < shapes[i].size(); ++j) {
+			RoadVertexDesc src = boost::source(shapes[i][j], roads.graph);
+			RoadVertexDesc tgt = boost::source(shapes[i][j], roads.graph);
+			usedVertices[src] = true;
+			usedVertices[tgt] = true;
+		}
+	}
+
 	// 基本的に、全てのエッジを、いずれかのパッチに属するようにしたい。
 	// しかし、上のclose verticesの方法だと、交差点のないエッジや、孤立したエッジは、パッチになれない。
 	// degree>2の制約をdegree=2に変更し、上のチェックを繰り返すことで、交差点のないエッジに対応

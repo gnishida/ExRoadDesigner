@@ -52,9 +52,6 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	connect(ui.pushButtonClear, SIGNAL(clicked()), this, SLOT(clear()));
 	//connect(ui.pushButtonConnect, SIGNAL(clicked()), this, SLOT(connectRoads()));
 	connect(ui.pushButtonConnect2, SIGNAL(clicked()), this, SLOT(connectRoads2()));
-	connect(ui.pushButtonRemoveIntersectionOnRiver, SIGNAL(clicked()), this, SLOT(removeIntersectionOnRiver()));
-	connect(ui.pushButtonRemoveIntersectingEdge, SIGNAL(clicked()), this, SLOT(removeIntersectingEdge()));
-	connect(ui.pushButtonPlanarGraph, SIGNAL(clicked()), this, SLOT(planarGraph()));
 
 	connect(ui.pushButtonMerge, SIGNAL(clicked()), this, SLOT(mergeRoads()));
 	connect(ui.pushButtonTrim, SIGNAL(clicked()), this, SLOT(trimRoads()));
@@ -284,39 +281,6 @@ void ControlWidget::connectRoads2() {
 	RoadGeneratorHelper::connectRoads3(mainWin->urbanGeometry->roads, &mainWin->glWidget->vboRenderManager, 1000.0f, 200.0f);
 	mainWin->urbanGeometry->adaptToTerrain();
 
-	mainWin->glWidget->updateGL();
-}
-
-void ControlWidget::removeIntersectionOnRiver() {
-	RoadGeneratorHelper::removeIntersectionsOnRiver(mainWin->urbanGeometry->roads, &mainWin->glWidget->vboRenderManager, G::getFloat("seaLevelForStreet"));
-	GraphUtil::removeIsolatedEdges(mainWin->urbanGeometry->roads);
-	GraphUtil::removeIsolatedVertices(mainWin->urbanGeometry->roads);
-	GraphUtil::reduce(mainWin->urbanGeometry->roads);
-	GraphUtil::clean(mainWin->urbanGeometry->roads);
-	
-	mainWin->urbanGeometry->adaptToTerrain();
-	mainWin->glWidget->updateGL();
-}
-
-void ControlWidget::removeIntersectingEdge() {
-	GraphUtil::removeSelfIntersectingRoads(mainWin->urbanGeometry->roads);
-	GraphUtil::removeIsolatedEdges(mainWin->urbanGeometry->roads);
-	GraphUtil::removeIsolatedVertices(mainWin->urbanGeometry->roads);
-	GraphUtil::reduce(mainWin->urbanGeometry->roads);
-	GraphUtil::clean(mainWin->urbanGeometry->roads);
-
-	mainWin->urbanGeometry->adaptToTerrain();
-	mainWin->glWidget->updateGL();
-}
-
-void ControlWidget::planarGraph() {
-	GraphUtil::planarify(mainWin->urbanGeometry->roads);
-	GraphUtil::removeIsolatedEdges(mainWin->urbanGeometry->roads);
-	GraphUtil::removeIsolatedVertices(mainWin->urbanGeometry->roads);
-	GraphUtil::reduce(mainWin->urbanGeometry->roads);
-	GraphUtil::clean(mainWin->urbanGeometry->roads);
-
-	mainWin->urbanGeometry->adaptToTerrain();
 	mainWin->glWidget->updateGL();
 }
 
