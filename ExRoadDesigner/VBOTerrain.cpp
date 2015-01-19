@@ -195,18 +195,18 @@ void VBOTerrain::render() {
  * @param rad_ratio		半径のサイズ（グリッドサイズに対する比）
  */
 void VBOTerrain::updateGaussian(float u, float v, float height, float rad_ratio) {
-	float x0 = u * (_resolution + 1);
-	float y0 = v * (_resolution + 1);
-	float sigma = rad_ratio * (_resolution + 1);
+	float x0 = u * _resolution;
+	float y0 = v * _resolution;
+	float sigma = rad_ratio * _resolution;
 
 	for (int c = 0; c < layerData.cols; c++) {
 		for (int r = 0; r < layerData.rows; r++) {
-			float x = c + 0.5f;
-			float y = r + 0.5f;
+			float x = c;
+			float y = r;
 
-			float z = layerData.at<float>(r,c) + height * expf(-(SQR(x - x0) + SQR(y - y0)) / (2 * sigma * sigma));
+			float z = layerData.at<float>(r, c) + height * expf(-(SQR(x - x0) + SQR(y - y0)) / (2 * sigma * sigma));
 			if (z < 0) z = 0.0f;
-			layerData.at<float>(r,c) = z;
+			layerData.at<float>(r, c) = z;
 		}
 	}
 
@@ -223,21 +223,21 @@ void VBOTerrain::updateGaussian(float u, float v, float height, float rad_ratio)
  * @param rad_ratio		半径のサイズ（グリッドサイズに対する比）
  */
 void VBOTerrain::excavate(float u, float v, float height, float rad_ratio) {
-	float x0 = u * (_resolution + 1);
-	float y0 = v * (_resolution + 1);
-	float rad = rad_ratio * (_resolution + 1);
+	float x0 = u * _resolution;
+	float y0 = v * _resolution;
+	float rad = rad_ratio * _resolution;
 
 	for (int c = x0 - rad; c <= x0 + rad + 1; ++c) {
 		if (c < 0 || c >= layerData.cols) continue;
 		for (int r = y0 - rad; r <= y0 + rad + 1; ++r) {
 			if (r < 0 || r >= layerData.rows) continue;
 
-			float x = c + 0.5f;
-			float y = r + 0.5f;
+			float x = c;
+			float y = r;
 
 			if (SQR(x - x0) + SQR(y - y0) > SQR(rad)) continue;
 			
-			layerData.at<float>(r, c) = 0.0f;
+			layerData.at<float>(r, c) = height;
 		}
 	}
 
@@ -277,7 +277,7 @@ float VBOTerrain::getTerrainHeight(float u, float v) {
 		v12 = v1;
 		v34 = v3;
 	} else {
-		float t = v * (_resolution + 1) - r1;
+		float t = v * _resolution - r1;
 		v12 = v1 * (1-t) + v2 * t;
 		v34 = v3 * (1-t) + v4 * t;
 	}
@@ -285,7 +285,7 @@ float VBOTerrain::getTerrainHeight(float u, float v) {
 	if (c2 == c1) {
 		return v12;
 	} else {
-		float s = u * (_resolution + 1) - c1;
+		float s = u * _resolution - c1;
 		return v12 * (1-s) + v34 * s;
 	}
 }
@@ -294,6 +294,8 @@ void VBOTerrain::loadTerrain(const QString& fileName) {
 	cv::Mat loadImage = cv::imread(fileName.toUtf8().data(), CV_LOAD_IMAGE_UNCHANGED);
 	cv::Mat tmp = cv::Mat(loadImage.rows, loadImage.cols, CV_32FC1, loadImage.data);
 	tmp.copyTo(layerData);
+
+	_resolution = loadImage.rows - 1;
 
 	// update texture
 	updateTexture();

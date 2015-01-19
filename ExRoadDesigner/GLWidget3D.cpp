@@ -315,10 +315,9 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 					float radi = mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.side;
 					float xM = pos.x() / vboRenderManager.side + 0.5f;
 					float yM = pos.y() / vboRenderManager.side + 0.5f;
-					height *= 0.2f; //while moving, it is not necessary to change much
 
 					if (event->buttons() & Qt::LeftButton) {
-						vboRenderManager.vboTerrain.updateGaussian(xM, yM, height, radi);
+						vboRenderManager.vboTerrain.updateGaussian(xM, yM, height * 0.2f, radi);
 					} else if (event->buttons() & Qt::RightButton) {
 						vboRenderManager.vboTerrain.excavate(xM, yM, height, radi);
 					} else if (event->buttons() & Qt::MiddleButton) {

@@ -141,6 +141,8 @@
     <addaction name="actionTerrainGeneration"/>
     <addaction name="actionUpdateMountain"/>
     <addaction name="actionTerrainSegmentation"/>
+    <addaction name="separator"/>
+    <addaction name="actionTerrainDataConverter"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuArea"/>
@@ -743,6 +745,11 @@
   <action name="actionAreaDeleteAll">
    <property name="text">
     <string>Delete All</string>
+   </property>
+  </action>
+  <action name="actionTerrainDataConverter">
+   <property name="text">
+    <string>Terrain Data Converter</string>
    </property>
   </action>
  </widget>

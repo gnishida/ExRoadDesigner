@@ -1,4 +1,4 @@
-#include "MainWindow.h"
+﻿#include "MainWindow.h"
 #include <QFileDialog>
 #include <QShortcut>
 #include "TerrainSizeInputDialog.h"
@@ -83,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 	connect(ui.actionTerrainGeneration, SIGNAL(triggered()), this, SLOT(onTerrainGeneration()));
 	connect(ui.actionUpdateMountain, SIGNAL(triggered()), this, SLOT(onUpdateMountain()));
 	connect(ui.actionTerrainSegmentation, SIGNAL(triggered()), this, SLOT(onTerrainSegmentation()));
+	connect(ui.actionTerrainDataConverter, SIGNAL(triggered()), this, SLOT(onTerrainDataConverter()));
 	connect(ui.actionControlWidget, SIGNAL(triggered()), this, SLOT(onShowControlWidget()));
 	connect(ui.actionPropertyWidget, SIGNAL(triggered()), this, SLOT(onShowPropertyWidget()));
 	connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(onDebug()));
@@ -1225,6 +1226,30 @@ void MainWindow::onTerrainSegmentation() {
 
 	urbanGeometry->adaptToTerrain();
 	glWidget->updateGL();
+}
+
+void MainWindow::onTerrainDataConverter() {
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open Terrain file..."), "", tr("Terrain Files (*.png)"));
+	if (filename.isEmpty()) return;
+
+	QString filename2 = QFileDialog::getSaveFileName(this, tr("Save Terrain file..."), "", tr("Terrain Files (*.png)"));
+	if (filename2.isEmpty()) return;
+
+	cv::Mat oldImg = cv::imread(filename.toUtf8().data(), 0);
+	cv::Mat newImg;
+	oldImg.convertTo(newImg, CV_32FC1, 7.0);
+
+	// 山を、すべて高さ77にしちゃう
+	for (int r = 0; r < newImg.rows; ++r) {
+		for (int c = 0; c < newImg.cols; ++c) {
+			if (newImg.at<float>(r, c) >= 77.0f) {
+				newImg.at<float>(r, c) = 77.0f;
+			}
+		}
+	}
+
+	cv::Mat saveImage	= cv::Mat(newImg.rows, newImg.cols, CV_8UC4, newImg.data);
+	cv::imwrite(filename2.toUtf8().data(), saveImage);
 }
 
 void MainWindow::onShowControlWidget() {

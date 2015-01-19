@@ -35,7 +35,8 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.lineEditRoadAngleTolerance->setText("20");
 	ui.lineEditRotationForSteepSlope->setText("30");
 	ui.lineEditMaxBlockSizeForPark->setText("250000");
-
+	
+	ui.terrainPaint_changeEdit->setText("200");
 	ui.terrainPaint_changeSlider->setMinimum(0);
 	ui.terrainPaint_changeSlider->setMaximum(1000);
 	ui.terrainPaint_changeSlider->setValue(200);
@@ -60,6 +61,7 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	//connect(ui.pushButtonCamera3D, SIGNAL(clicked()), this, SLOT(camera3D()));
 	// terrain
 	connect(ui.terrainPaint_sizeSlider, SIGNAL(valueChanged(int)),this, SLOT(updateTerrainLabels(int)));
+	connect(ui.terrainPaint_changeEdit, SIGNAL(textChanged(const QString &)),this, SLOT(updateTerrainEdit(const QString &)));
 	connect(ui.terrainPaint_changeSlider, SIGNAL(valueChanged(int)),this, SLOT(updateTerrainLabels(int)));
 	connect(ui.terrain_2DShader, SIGNAL(stateChanged(int)),this, SLOT(changeTerrainShader(int)));
 	connect(ui.render_2DroadsStrokeSlider, SIGNAL(valueChanged(int)),this, SLOT(updateRender2D(int)));
@@ -318,15 +320,18 @@ void ControlWidget::planarGraph() {
 	mainWin->glWidget->updateGL();
 }
 
-void ControlWidget::updateTerrainLabels(int newValue){
-		int size=ui.terrainPaint_sizeSlider->value();
-		ui.terrainPaint_sizeLabel->setText("Size: "+QString::number(size,'f',0)+"m");
-		G::global()["2DterrainEditSize"]=size;
+void ControlWidget::updateTerrainLabels(int newValue) {
+	int size = ui.terrainPaint_sizeSlider->value();
+	ui.terrainPaint_sizeLabel->setText("Size: "+QString::number(size,'f',0)+"m");
+	G::global()["2DterrainEditSize"] = size;
 
-		float change = ui.terrainPaint_changeSlider->value();
-		ui.terrainPaint_changeLabel->setText("Ch: "+QString::number(change,'f',0)+"m");
-		G::global()["2DterrainEditChange"]=change;
-}//
+	float change = ui.terrainPaint_changeSlider->value();
+	ui.terrainPaint_changeEdit->setText(QString::number(change, 'f', 0));
+}
+
+void ControlWidget::updateTerrainEdit(const QString &text) {
+	ui.terrainPaint_changeSlider->setValue(ui.terrainPaint_changeEdit->text().toFloat());
+}
 
 void ControlWidget::updateRender2D(int newValue){
 		float stroke=ui.render_2DroadsStrokeSlider->value()*0.1f;

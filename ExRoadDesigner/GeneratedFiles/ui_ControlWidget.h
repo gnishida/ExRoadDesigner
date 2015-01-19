@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Sun Jan 18 17:09:23 2015
+** Created: Sun Jan 18 18:40:59 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -104,6 +104,8 @@ public:
     QPushButton *content_10;
     QLineEdit *lineEditMaxBlockSizeForPark;
     QLabel *label_15;
+    QLineEdit *terrainPaint_changeEdit;
+    QLabel *terrainPaint_changeLabel_2;
 
     void setupUi(QDockWidget *ControlWidget)
     {
@@ -264,13 +266,13 @@ public:
         pushButtonPlanarGraph->setGeometry(QRect(10, 110, 151, 28));
         groupBox_6 = new QGroupBox(dockWidgetContents);
         groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
-        groupBox_6->setGeometry(QRect(10, 630, 171, 251));
+        groupBox_6->setGeometry(QRect(10, 630, 181, 251));
         terrainPaint_sizeLabel = new QLabel(groupBox_6);
         terrainPaint_sizeLabel->setObjectName(QString::fromUtf8("terrainPaint_sizeLabel"));
         terrainPaint_sizeLabel->setGeometry(QRect(10, 20, 61, 16));
         terrainPaint_changeLabel = new QLabel(groupBox_6);
         terrainPaint_changeLabel->setObjectName(QString::fromUtf8("terrainPaint_changeLabel"));
-        terrainPaint_changeLabel->setGeometry(QRect(10, 40, 61, 16));
+        terrainPaint_changeLabel->setGeometry(QRect(10, 40, 41, 16));
         terrainPaint_sizeSlider = new QSlider(groupBox_6);
         terrainPaint_sizeSlider->setObjectName(QString::fromUtf8("terrainPaint_sizeSlider"));
         terrainPaint_sizeSlider->setGeometry(QRect(80, 20, 81, 15));
@@ -281,7 +283,7 @@ public:
         terrainPaint_sizeSlider->setOrientation(Qt::Horizontal);
         terrainPaint_changeSlider = new QSlider(groupBox_6);
         terrainPaint_changeSlider->setObjectName(QString::fromUtf8("terrainPaint_changeSlider"));
-        terrainPaint_changeSlider->setGeometry(QRect(80, 40, 81, 17));
+        terrainPaint_changeSlider->setGeometry(QRect(100, 40, 61, 17));
         terrainPaint_changeSlider->setMaximumSize(QSize(16777215, 17));
         terrainPaint_changeSlider->setMinimum(1);
         terrainPaint_changeSlider->setValue(10);
@@ -387,6 +389,12 @@ public:
         label_15 = new QLabel(groupBox_6);
         label_15->setObjectName(QString::fromUtf8("label_15"));
         label_15->setGeometry(QRect(50, 150, 31, 21));
+        terrainPaint_changeEdit = new QLineEdit(groupBox_6);
+        terrainPaint_changeEdit->setObjectName(QString::fromUtf8("terrainPaint_changeEdit"));
+        terrainPaint_changeEdit->setGeometry(QRect(55, 38, 31, 20));
+        terrainPaint_changeLabel_2 = new QLabel(groupBox_6);
+        terrainPaint_changeLabel_2->setObjectName(QString::fromUtf8("terrainPaint_changeLabel_2"));
+        terrainPaint_changeLabel_2->setGeometry(QRect(88, 40, 16, 16));
         ControlWidget->setWidget(dockWidgetContents);
         QWidget::setTabOrder(pushButtonGeneratePM, pushButtonClear);
         QWidget::setTabOrder(pushButtonClear, pushButtonMerge);
@@ -481,6 +489,7 @@ public:
         content_11->setText(QApplication::translate("ControlWidget", "M", 0, QApplication::UnicodeUTF8));
         content_10->setText(QApplication::translate("ControlWidget", "F", 0, QApplication::UnicodeUTF8));
         label_15->setText(QApplication::translate("ControlWidget", "Size:", 0, QApplication::UnicodeUTF8));
+        terrainPaint_changeLabel_2->setText(QApplication::translate("ControlWidget", "m", 0, QApplication::UnicodeUTF8));
         Q_UNUSED(ControlWidget);
     } // retranslateUi
 

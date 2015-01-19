@@ -18,7 +18,7 @@ private:
 	GLuint grassText;
 
 	bool initialized;			// flag to check if initialization is done
-	int _resolution;			// the number of side of the grid that stores the terrain elevation data
+	int _resolution;			// the number of side of the grid - 1
 
 public:
 	cv::Mat layerData;			// the grid that stores the terrain elevation data

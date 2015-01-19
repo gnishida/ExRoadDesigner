@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Sun Jan 18 17:09:21 2015
+** Created: Sun Jan 18 17:54:07 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -108,6 +108,7 @@ public:
     QAction *actionMountainVideo;
     QAction *actionGenerate3DRoads;
     QAction *actionAreaDeleteAll;
+    QAction *actionTerrainDataConverter;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -356,6 +357,8 @@ public:
         actionGenerate3DRoads->setObjectName(QString::fromUtf8("actionGenerate3DRoads"));
         actionAreaDeleteAll = new QAction(MainWindow);
         actionAreaDeleteAll->setObjectName(QString::fromUtf8("actionAreaDeleteAll"));
+        actionTerrainDataConverter = new QAction(MainWindow);
+        actionTerrainDataConverter->setObjectName(QString::fromUtf8("actionTerrainDataConverter"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -465,6 +468,8 @@ public:
         menuTool->addAction(actionTerrainGeneration);
         menuTool->addAction(actionUpdateMountain);
         menuTool->addAction(actionTerrainSegmentation);
+        menuTool->addSeparator();
+        menuTool->addAction(actionTerrainDataConverter);
 
         retranslateUi(MainWindow);
 
@@ -575,6 +580,7 @@ public:
         actionMountainVideo->setText(QApplication::translate("MainWindow", "Mountains Video", 0, QApplication::UnicodeUTF8));
         actionGenerate3DRoads->setText(QApplication::translate("MainWindow", "Generate 3D Roads", 0, QApplication::UnicodeUTF8));
         actionAreaDeleteAll->setText(QApplication::translate("MainWindow", "Delete All", 0, QApplication::UnicodeUTF8));
+        actionTerrainDataConverter->setText(QApplication::translate("MainWindow", "Terrain Data Converter", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuWindow->setTitle(QApplication::translate("MainWindow", "Window", 0, QApplication::UnicodeUTF8));
         menuArea->setTitle(QApplication::translate("MainWindow", "Area", 0, QApplication::UnicodeUTF8));

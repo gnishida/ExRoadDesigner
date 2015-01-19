@@ -83,6 +83,7 @@ public slots:
 	void onTerrainGeneration();
 	void onUpdateMountain();
 	void onTerrainSegmentation();
+	void onTerrainDataConverter();
 	void onShowControlWidget();
 	void onShowPropertyWidget();
 	void onDebug();
