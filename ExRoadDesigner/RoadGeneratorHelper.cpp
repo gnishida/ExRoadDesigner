@@ -645,12 +645,60 @@ void RoadGeneratorHelper::removeDeadend(RoadGraph& roads) {
 			if (roads.graph[tgt]->properties.contains("deadend") && roads.graph[tgt]->properties["deadend"] == true) continue;
 			if (roads.graph[src]->fixed || roads.graph[tgt]->fixed) continue;
 
-			if (GraphUtil::getDegree(roads, src) == 1 || GraphUtil::getDegree(roads, tgt) == 1) {
-				roads.graph[*ei]->valid = false;
+			if (GraphUtil::getDegree(roads, src) == 1) {
+				removeEdge(roads, src, *ei);
+				removed = true;
+			} else if (GraphUtil::getDegree(roads, tgt) == 1) {
+				removeEdge(roads, tgt, *ei);
 				removed = true;
 			}
 		}
 	} while (removed);
+}
+
+/**
+ * 指定された頂点から伸びるエッジを削除する。
+ * degree=2の頂点については、引き続き、その先のエッジも削除していく。
+ *
+ * @param roads			道路グラフ
+ * @param srcDesc		この頂点から削除を開始する
+ * @param start_e_desc	このエッジ方向に、削除を開始する
+ */
+void RoadGeneratorHelper::removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc, RoadEdgeDesc start_e_desc) {
+	QMap<RoadVertexDesc, bool> visited;
+	std::list<RoadVertexDesc> queue;
+
+	roads.graph[start_e_desc]->valid = false;
+	RoadVertexDesc tgt = boost::target(start_e_desc, roads.graph);
+	if (GraphUtil::getDegree(roads, tgt) == 1) {
+		queue.push_back(tgt);
+	}
+
+	if (GraphUtil::getDegree(roads, srcDesc) == 0) roads.graph[srcDesc]->valid = false;
+
+	while (!queue.empty()) {
+		RoadVertexDesc v = queue.front();
+		queue.pop_front();
+
+		RoadOutEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::out_edges(v, roads.graph); ei != eend; ++ei) {
+			if (!roads.graph[*ei]->valid) continue;
+
+			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+
+			roads.graph[*ei]->valid = false;
+			if (GraphUtil::getDegree(roads, v) == 0) roads.graph[v]->valid = false;
+			if (GraphUtil::getDegree(roads, tgt) == 0) roads.graph[tgt]->valid = false;
+
+			if (visited[tgt]) continue;
+
+			// 上で既に一本のエッジを無効にしているので、もともとdegree=2の頂点は、残り一本だけエッジが残っているはず。
+			// なので、 == 2　ではなく、 == 1　とする。
+			if (GraphUtil::getDegree(roads, tgt) == 1) {
+				queue.push_back(tgt);
+			}
+		}
+	}
 }
 
 /**

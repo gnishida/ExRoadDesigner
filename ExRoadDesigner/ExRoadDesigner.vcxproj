@@ -202,6 +202,7 @@
     <ClCompile Include="Patch.cpp" />
     <ClCompile Include="PatchRoadGenerator.cpp" />
     <ClCompile Include="PMRoadGenerator.cpp" />
+    <ClCompile Include="RoadMeshGenerator.cpp" />
     <ClCompile Include="RotationVideoSettingDialog.cpp" />
     <ClCompile Include="ShapeDetector.cpp" />
     <ClCompile Include="ColorTable.cpp" />
@@ -345,6 +346,7 @@
   <ItemGroup>
     <ClInclude Include="AliagaRoadGenerator.h" />
     <ClInclude Include="BBox.h" />
+    <ClInclude Include="RoadMeshGenerator.h" />
     <ClInclude Include="WarpRoadGenerator.h" />
     <CustomBuild Include="BlendingVideoSettingDialog.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

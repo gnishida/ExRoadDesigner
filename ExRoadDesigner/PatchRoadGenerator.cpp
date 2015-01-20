@@ -78,15 +78,14 @@ void PatchRoadGenerator::generateRoadNetwork() {
 				if (!extendRoadAcrossRiver(RoadEdge::TYPE_AVENUE, desc, seeds, 200.0f)) {
 					RoadOutEdgeIter ei, eend;
 					boost::tie(ei, eend) = boost::out_edges(desc, roads.graph);
-					removeEdge(roads, desc, *ei);
+					RoadGeneratorHelper::removeEdge(roads, desc, *ei);
 				}
 				continue;
 			}
 
 			std::cout << "attemptExpansion (avenue): " << iter << " (Seed: " << desc << ")" << std::endl;
-			//int ex_id = roads.graph[desc]->properties["ex_id"].toInt();
+			
 			int ex_id = defineExId(roads.graph[desc]->pt);
-
 			attemptConnect(RoadEdge::TYPE_AVENUE, desc, ex_id, features);
 			if (RoadGeneratorHelper::largestAngleBetweenEdges(roads, desc, RoadEdge::TYPE_AVENUE) > M_PI * 1.4f) {
 				if (!attemptExpansion(RoadEdge::TYPE_AVENUE, desc, ex_id, features[ex_id], patches[ex_id], seeds)) {
@@ -109,7 +108,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 
 	// Avenueをクリーンナップ
 	if (G::getBool("cleanAvenues")) {
-		removeDeadend(roads);
+		RoadGeneratorHelper::removeDeadend(roads);
 	}
 
 	if (G::getBool("removeSmallBlocks")) {
@@ -159,7 +158,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 			}
 
 			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
-			if (z < G::getFloat("seaLevelForStreet")) {
+			if (z < G::getFloat("seaLevel")) {
 				std::cout << "attemptExpansion (street): " << iter << " (skipped because it is under the sea or on the mountains)" << std::endl;
 				continue;
 			}
@@ -711,7 +710,7 @@ void PatchRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph 
 
 				if (Util::diffAngle(polyline[1] - polyline[0], polyline2[1] - polyline2[0]) < 0.3f) {
 					// この方向に伸びるエッジを削除する
-					removeEdge(replacementGraph, root_desc, *ei2);
+					RoadGeneratorHelper::removeEdge(replacementGraph, root_desc, *ei2);
 				}
 			}
 		}
@@ -793,7 +792,7 @@ void PatchRoadGenerator::buildReplacementGraphByExample2(int roadType, RoadGraph
 		for (boost::tie(ei, eend) = boost::out_edges(connector_desc, replacementGraph.graph); ei != eend; ++ei) {
 			if (!replacementGraph.graph[*ei]->valid) continue;
 
-			removeEdge(replacementGraph, connector_desc, *ei);
+			RoadGeneratorHelper::removeEdge(replacementGraph, connector_desc, *ei);
 			break;
 		}
 	}
@@ -814,7 +813,7 @@ void PatchRoadGenerator::buildReplacementGraphByExample2(int roadType, RoadGraph
 
 				if (Util::diffAngle(polyline[1] - polyline[0], polyline2[1] - polyline2[0]) < 0.3f) {
 					// この方向に伸びるエッジを削除する
-					removeEdge(replacementGraph, root_desc, *ei2);
+					RoadGeneratorHelper::removeEdge(replacementGraph, root_desc, *ei2);
 				}
 			}
 		}
@@ -1181,51 +1180,6 @@ void PatchRoadGenerator::synthesizeItem(int roadType, RoadVertexDesc v_desc, flo
 	}
 }
 
-/**
- * 指定された頂点から伸びるエッジを削除する。
- * degree=2の頂点については、引き続き、その先のエッジも削除していく。
- *
- * @param roads			道路グラフ
- * @param srcDesc		この頂点から削除を開始する
- * @param start_e_desc	このエッジ方向に、削除を開始する
- */
-void PatchRoadGenerator::removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc, RoadEdgeDesc start_e_desc) {
-	QMap<RoadVertexDesc, bool> visited;
-	std::list<RoadVertexDesc> queue;
-
-	roads.graph[start_e_desc]->valid = false;
-	RoadVertexDesc tgt = boost::target(start_e_desc, roads.graph);
-	if (GraphUtil::getDegree(roads, tgt) == 1) {
-		queue.push_back(tgt);
-	}
-
-	if (GraphUtil::getDegree(roads, srcDesc) == 0) roads.graph[srcDesc]->valid = false;
-
-	while (!queue.empty()) {
-		RoadVertexDesc v = queue.front();
-		queue.pop_front();
-
-		RoadOutEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::out_edges(v, roads.graph); ei != eend; ++ei) {
-			if (!roads.graph[*ei]->valid) continue;
-
-			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
-
-			roads.graph[*ei]->valid = false;
-			if (GraphUtil::getDegree(roads, v) == 0) roads.graph[v]->valid = false;
-			if (GraphUtil::getDegree(roads, tgt) == 0) roads.graph[tgt]->valid = false;
-
-			if (visited[tgt]) continue;
-
-			// 上で既に一本のエッジを無効にしているので、もともとdegree=2の頂点は、残り一本だけエッジが残っているはず。
-			// なので、 == 2　ではなく、 == 1　とする。
-			if (GraphUtil::getDegree(roads, tgt) == 1) {
-				queue.push_back(tgt);
-			}
-		}
-	}
-}
-
 int PatchRoadGenerator::defineExId(const QVector2D& pt) {
 	std::vector<float> sigma;
 	sigma.push_back(G::getDouble("interpolationSigma1"));
@@ -1269,38 +1223,6 @@ int PatchRoadGenerator::defineExId(const QVector2D& pt) {
 	}
 
 	return features.size() - 1;
-}
-
-void PatchRoadGenerator::removeDeadend(RoadGraph& roads) {
-	bool removed = false;
-
-	do {
-		removed = false;
-
-		RoadEdgeIter ei, eend;
-		for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
-			if (!roads.graph[*ei]->valid) continue;
-
-			RoadVertexDesc src = boost::source(*ei, roads.graph);
-			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
-
-			if (roads.graph[src]->onBoundary || roads.graph[tgt]->onBoundary) continue;
-			if (roads.graph[src]->deadend) continue;
-			if (roads.graph[tgt]->deadend) continue;
-			if (roads.graph[src]->fixed || roads.graph[tgt]->fixed) continue;
-
-
-			if (GraphUtil::getDegree(roads, src) == 1) {
-				removeEdge(roads, src, *ei);
-				removed = true;
-			}
-			
-			if (GraphUtil::getDegree(roads, tgt) == 1) {
-				removeEdge(roads, tgt, *ei);
-				removed = true;
-			}
-		}
-	} while (removed);
 }
 
 void PatchRoadGenerator::check() {

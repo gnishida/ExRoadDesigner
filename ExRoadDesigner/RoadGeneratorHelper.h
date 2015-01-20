@@ -42,6 +42,7 @@ public:
 	static void chooseEdgeLengthAndCurvature(RoadGraph &roads, const QVector2D &ex_pt, float distance, float direction, float &length, float &curvature);
 
 	static void removeDeadend(RoadGraph& roads);
+	static void removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc, RoadEdgeDesc start_e_desc);
 	static void extendDanglingEdges(RoadGraph &roads, float maxDistance);
 	static void connectRoads(RoadGraph& roads, float distance_threshold, float angle_threshold);
 	static void connectRoads2(RoadGraph &roads, float distance_threshold);

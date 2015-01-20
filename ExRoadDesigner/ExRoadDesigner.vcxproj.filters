@@ -340,6 +340,9 @@
     <ClCompile Include="AliagaRoadGenerator.cpp">
       <Filter>road generator</Filter>
     </ClCompile>
+    <ClCompile Include="RoadMeshGenerator.cpp">
+      <Filter>VBO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.ui">
@@ -649,6 +652,9 @@
     </ClInclude>
     <ClInclude Include="AliagaRoadGenerator.h">
       <Filter>road generator</Filter>
+    </ClInclude>
+    <ClInclude Include="RoadMeshGenerator.h">
+      <Filter>VBO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
