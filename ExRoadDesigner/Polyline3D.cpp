@@ -41,3 +41,15 @@ void Polyline3D::scale(float factor) {
 	}
 }
 
+/**
+ * return the length of this polyline
+ */
+float Polyline3D::length() const {
+	float length = 0.0f;
+
+	for (int i = 0; i < size() - 1; ++i) {
+		length += (at(i + 1) - at(i)).length();
+	}
+
+	return length;
+}

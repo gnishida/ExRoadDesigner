@@ -481,3 +481,29 @@ bool Util::getIrregularBisector(const QVector3D& p0, const QVector3D& p1, const 
 	}
 	return true;
 }
+
+bool Util::getIrregularBisector(const QVector2D& p0, const QVector2D& p1, const QVector2D& p2, float d01, float d12, QVector2D& intPt) {
+	double alpha;
+	double theta;
+	double L;
+
+	QVector2D p1_p0 = p0 - p1;
+	QVector2D p1_p2 = p2 - p1;
+
+	QVector2D p1_p2_perp(-p1_p2.y(), p1_p2.x());
+
+	alpha = diffAngle(p1_p0, p1_p2);				
+
+	theta = atan2( sin(alpha), (d01 / d12) + cos(alpha) );				
+	L = d12 / sin(theta);
+
+	//This is done to handle convex vs. concave angles in polygon
+	float crossP = p1_p2.x() * p1_p0.y() - p1_p2.y() * p1_p0.x();//QVector2D:crossProduct(p1_p2, p1_p0);
+
+	if (crossP > 0) {
+		intPt = p1 + (p1_p2.normalized())*L*cos(theta) + (p1_p2_perp.normalized())*d12;
+	} else {
+		intPt = p1 - (p1_p2.normalized()) * L * cos(theta) + (p1_p2_perp.normalized()) * d12;
+	}
+	return true;
+}

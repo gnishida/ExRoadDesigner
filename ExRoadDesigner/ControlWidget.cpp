@@ -334,7 +334,8 @@ void ControlWidget::changeTerrainShader(int){
 		terrainMode=1;
 	printf("terrainMode %d\n",terrainMode);
 	mainWin->glWidget->vboRenderManager.changeTerrainShader(terrainMode);//could have used !shader2D
-	mainWin->urbanGeometry->adaptToTerrain();
+	mainWin->urbanGeometry->update(mainWin->glWidget->vboRenderManager);
+	mainWin->glWidget->shadow.makeShadowMap(mainWin->glWidget);
 	mainWin->glWidget->updateGL();
 }//
 

@@ -71,6 +71,8 @@ public:
 
 	void clear() { contour.clear(); }
 
+	void correct();
+
 	/**
 	* Assignment operator.
 	**/
@@ -204,6 +206,8 @@ public:
 	static QVector3D getLoopAABB(Loop3D &pin, QVector3D &minCorner, QVector3D &maxCorner);
 
 	static void getLoopOBB(Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat);
+	static void getLoopOBB2(Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat);
+	static Loop3D getLoopOBB3(Loop3D &pin);
 
 	void getMyOBB(QVector3D &size, QMatrix4x4 &xformMat);
 

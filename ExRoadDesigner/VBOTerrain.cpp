@@ -113,11 +113,11 @@ void VBOTerrain::render() {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(3*sizeof(float)));
+	glVertexAttribPointer(1,4,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(4*sizeof(float)));
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(6*sizeof(float)));
+	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(8*sizeof(float)));
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(9*sizeof(float)));
+	glVertexAttribPointer(3,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(12*sizeof(float)));
 
 	// Draw the triangles 
 	glDrawElements(GL_QUADS, indicesCount, GL_UNSIGNED_INT, (void*)0);
@@ -158,7 +158,7 @@ void VBOTerrain::render() {
 			QVector3D pos(cos(degInRad)*radius,sin(degInRad)*radius,0);
 			pos+=posM;
 			pos.setZ(50.0f);
-			points[i]=Vertex(pos.x(),pos.y(),pos.z(),0,0,1.0f,0,0,0,0,0,0);
+			points[i] = Vertex(pos.x(),pos.y(),pos.z(), QColor(), 0,0,1.0f,0,0,0);
 		}
 
 
@@ -257,14 +257,18 @@ float VBOTerrain::getTerrainHeight(float u, float v) {
 	if (v < 0) v = 0.0f;
 	if (v >= 1.0f) v = 1.0f;
 
+	assert(_resolution + 1 == layerData.cols);
+	assert(_resolution + 1 == layerData.rows);
+
 	int c1 = u * _resolution;
 	int c2 = u * _resolution + 1;
 	int r1 = v * _resolution;
 	int r2 = v * _resolution + 1;
 
-	if (c1 < 0) c1 = 0;
+
+	if (c1 >= layerData.cols) c1 = layerData.cols - 1;
 	if (c2 >= layerData.cols) c2 = layerData.cols - 1;
-	if (r1 < 0) r1 = 0;
+	if (r1 >= layerData.rows) r1 = layerData.rows - 1;
 	if (r2 >= layerData.rows) r2 = layerData.rows - 1;
 
 	float v1 = layerData.at<float>(r1, c1);

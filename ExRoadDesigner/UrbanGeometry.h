@@ -19,11 +19,6 @@ public:
 	int depth;
 	MainWindow* mainWin;
 	RoadGraph roads;
-	std::vector<RoadEdgeDescs> circles;
-	std::vector<RoadEdgeDescs> shapes;
-	
-	//std::vector<Block*> blocks;
-	//Terrain* vboRenderManager;
 
 	PolygonBuilder areaBuilder;
 	PolylineBuilder hintLineBuilder;
@@ -61,6 +56,7 @@ public:
 	void generateRoadsAliaga(std::vector<ExFeature> &features);
 
 	void render(VBORenderManager &vboRenderManager);
+	void update(VBORenderManager& vboRenderManager);
 	void adaptToTerrain();
 
 	void addRoad(int roadType, Polyline2D &polyline, int lanes);

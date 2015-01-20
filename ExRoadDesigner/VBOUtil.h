@@ -3,69 +3,92 @@
 #include "glew.h"
 #include "qstring.h"
 #include "qvector3d.h"
+#include <QColor>
 #include <vector>
 
 /////////////////////////
 // Contaisn the Vertex structure to do the rendering
 struct Vertex{
-	float info[12];	
+	float info[16];	
+
 	// Contructors
-	Vertex(){
+	Vertex() {
 	}
-	Vertex(float x,float y,float z,float r,float g,float b,float nX,float nY,float nZ,float tS,float tT,float tW){
+
+	Vertex(float x,float y,float z,float r,float g,float b,float a,float nX,float nY,float nZ,float tS,float tT,float tW){
 		info[0]=x;
 		info[1]=y;
 		info[2]=z;
 
-		info[3]=r;
-		info[4]=g;
-		info[5]=b;
+		info[4]=r;
+		info[5]=g;
+		info[6]=b;
+		info[7]=a;
 
-		info[6]=nX;
-		info[7]=nY;
-		info[8]=nZ;
+		info[8]=nX;
+		info[9]=nY;
+		info[10]=nZ;
 
-		info[9]=tS;
-		info[10]=tT;
-		info[11]=tW;
-	}//
-	Vertex(QVector3D pos,QVector3D color,QVector3D normal,QVector3D tex){
+		info[12]=tS;
+		info[13]=tT;
+		info[14]=tW;
+	}
+
+	Vertex(float x, float y, float z, const QColor& color, float nX, float nY, float nZ, float tS, float tT, float tW) {
+		info[0] = x;
+		info[1] = y;
+		info[2] = z;
+		info[4] = color.redF();
+		info[5] = color.greenF();
+		info[6] = color.blueF();
+		info[7] = color.alphaF();
+		info[8] = nX;
+		info[9] = nY;
+		info[10] = nZ;
+		info[12] = tS;
+		info[13] = tT;
+		info[14] = tW;
+	}
+
+	Vertex(QVector3D pos,QColor color,QVector3D normal,QVector3D tex) {
 		info[0]=pos.x();
 		info[1]=pos.y();
 		info[2]=pos.z();
 
-		info[3]=color.x();
-		info[4]=color.y();
-		info[5]=color.z();
+		info[4]=color.redF();
+		info[5]=color.greenF();
+		info[6]=color.blueF();
+		info[7]=color.alphaF();
 
-		info[6]=normal.x();
-		info[7]=normal.y();
-		info[8]=normal.z();
+		info[8]=normal.x();
+		info[9]=normal.y();
+		info[10]=normal.z();
 
-		info[9]=tex.x();
-		info[10]=tex.y();
-		info[11]=tex.z();
+		info[12]=tex.x();
+		info[13]=tex.y();
+		info[14]=tex.z();
 	}//
-	Vertex(QVector3D* pos,QVector3D* color=0,QVector3D* normal=0,QVector3D* tex=0){
+	Vertex(QVector3D* pos,QColor* color=0,QVector3D* normal=0,QVector3D* tex=0){
 		if(pos!=0){
 			info[0]=pos->x();
 			info[1]=pos->y();
 			info[2]=pos->z();
 		}
 		if(color!=0){
-			info[3]=color->x();
-			info[4]=color->y();
-			info[5]=color->z();
+			info[4]=color->redF();
+			info[5]=color->greenF();
+			info[6]=color->blueF();
+			info[7]=color->alphaF();
 		}
 		if(normal!=0){
-			info[6]=normal->x();
-			info[7]=normal->y();
-			info[8]=normal->z();
+			info[8]=normal->x();
+			info[9]=normal->y();
+			info[10]=normal->z();
 		}
 		if(tex!=0){
-			info[9]=tex->x();
-			info[10]=tex->y();
-			info[11]=tex->z();
+			info[12]=tex->x();
+			info[13]=tex->y();
+			info[14]=tex->z();
 		}
 	}//
 	Vertex(QVector3D pos,QVector3D tex){
@@ -73,9 +96,10 @@ struct Vertex{
 		info[1]=pos.y();
 		info[2]=pos.z();
 
-		info[9]=tex.x();
-		info[10]=tex.y();
-		info[11]=tex.z();
+		info[7]=1.0f;
+		info[12]=tex.x();
+		info[13]=tex.y();
+		info[14]=tex.z();
 	}//
 	// Overload bracket operator
 	float operator [](int i) const    {return info[i];}

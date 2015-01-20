@@ -10,6 +10,7 @@
 #include "VBOTerrain.h"
 
 #include "VBOModel_StreetElements.h"
+#include "Polyline3D.h"
 
 #ifndef Q_MOC_RUN
 #include <boost/geometry/geometry.hpp>
@@ -111,9 +112,12 @@ public:
 
 	//static
 	bool addStaticGeometry(QString geoName,std::vector<Vertex>& vert,QString textureName,GLenum geometryType,int shaderMode);
-	bool addStaticGeometry2(QString geoName,std::vector<QVector3D>& pos,float zShift,bool inverseLoop,QString textureName,GLenum geometryType,int shaderMode,QVector3D texScale,QVector3D color);
+	bool addStaticGeometry2(QString geoName,std::vector<QVector3D>& pos,float zShift,bool inverseLoop,QString textureName,GLenum geometryType,int shaderMode,QVector3D texScale,QColor color);
 	bool removeStaticGeometry(QString geoName);
 	void renderStaticGeometry(QString geoName);
+
+	void addPoint(const QString &name, const QVector2D& pt, const QColor& color, float height);
+	void addPolyline(const QString &linesN, const Polyline3D& polyline, const QColor& color);
 
 	//grid
 	bool addGridGeometry(QString geoName,std::vector<Vertex>& vert,QString textureName);

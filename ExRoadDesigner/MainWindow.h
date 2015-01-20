@@ -61,17 +61,10 @@ public slots:
 	void onAvenueSketch();
 	void onStreetSketch();
 	void onControlPoints();
-	void onDetectCircle();
-	void onDetectStructure();
-	//void onConvert();
 	void onGenerate2D();
 	void onGenerate3D();
 	void onGenerate3DRoads();
 	void onDisplayRoads();
-	void onRenderingDefault();
-	void onRenderingTexture();
-	void onRenderingGroupBy();
-	void onRenderingGenerationType();
 	void onGenerateRegularGrid();
 	void onGenerateCurvyGrid();
 	void onRotationVideo();

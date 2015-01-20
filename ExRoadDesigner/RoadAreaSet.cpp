@@ -113,6 +113,8 @@ void RoadAreaSet::load(QString filename) {
 	doc.setContent(&file, true);
 	QDomElement root = doc.documentElement();
 
+	selectedIndex = areas.size();
+
 	QDomNode node = root.firstChild();
 	while (!node.isNull()) {
 		if (node.toElement().tagName() == "area") {
@@ -122,6 +124,10 @@ void RoadAreaSet::load(QString filename) {
 		}
 
 		node = node.nextSibling();
+	}
+
+	if (selectedIndex >= areas.size()) {
+		selectedIndex = -1;
 	}
 }
 

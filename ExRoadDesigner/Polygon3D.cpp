@@ -6,6 +6,20 @@
 #include "clipper.hpp"
 //#include "clipper.cpp"
 
+void Polygon3D::correct() {
+	int next;
+	float tmpSum = 0.0f;
+
+	for (int i = 0; i < contour.size(); ++i) {
+		next = (i + 1) % contour.size();
+		tmpSum = tmpSum + (contour[next].x() - contour[i].x()) * (contour[next].y() + contour[i].y());
+	}			
+
+	if (tmpSum > 0.0f) {
+		std::reverse(contour.begin(), contour.end());
+	}
+}
+
 //**** Polygon3D
 void Polygon3D::renderContour(void)
 {	
@@ -797,6 +811,120 @@ void Polygon3D::getLoopOBB(Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat){
 	xformMat.rotate(57.2957795f*(bestAlpha), 0.0f, 0.0f, 1.0f);//57.2957795 rad2degree
 	xformMat.setRow(3, QVector4D(origMidPt.x(), origMidPt.y(), origMidPt.z(), 1.0f));			
 	size = bestBoxSz;
+}//
+
+/**
+ * Get polygon oriented bounding box
+ * xformMat is a matrix that transform the original polygon to the axis aligned bounding box centered at the origin.
+ */
+void Polygon3D::getLoopOBB2(Loop3D &pin, QVector3D &size, QMatrix4x4 &xformMat){
+	float alpha = 0.0f;			
+	float deltaAlpha = 0.05*3.14159265359f;
+	float bestAlpha;
+
+	Loop3D rotLoop;
+	QMatrix4x4 rotMat;
+	QVector3D minPt, maxPt;
+	QVector3D origMidPt;
+	QVector3D boxSz;
+	QVector3D bestBoxSz;
+	float curArea;
+	float minArea = FLT_MAX;
+
+	rotLoop = pin;
+	int cSz = pin.size();
+	QVector3D difVec;
+	for(int i=0; i<pin.size(); ++i){
+		difVec = (pin.at((i+1)%cSz) - pin.at(i)).normalized();
+		alpha = atan2(difVec.y(), difVec.x());
+		rotMat.setToIdentity();				
+		rotMat.rotate(57.2957795f*(-alpha), 0.0f, 0.0f, 1.0f);//57.2957795 rad2degree				
+
+		transformLoop(pin, rotLoop, rotMat);
+		boxSz = Polygon3D::getLoopAABB(rotLoop, minPt, maxPt);
+		curArea = boxSz.x() * boxSz.y();
+		if(curArea < minArea){
+			minArea = curArea;
+			bestAlpha = alpha;
+			bestBoxSz = boxSz;
+		}
+	}
+
+	xformMat.setToIdentity();											
+	xformMat.rotate(57.2957795f*(-bestAlpha), 0.0f, 0.0f, 1.0f);//57.2957795 rad2degree
+			
+	size = bestBoxSz;
+
+	transformLoop(pin, rotLoop, xformMat);
+	Polygon3D::getLoopAABB(rotLoop, minPt, maxPt);
+	QVector3D midPt = (minPt + maxPt) * 0.5f;
+	xformMat.setColumn(3, QVector4D(-midPt.x(), -midPt.y(), -midPt.z(), 1.0f));	
+}
+
+/**
+ * Get polygon oriented bounding box
+ */
+Loop3D Polygon3D::getLoopOBB3(Loop3D &pin) {
+	float alpha = 0.0f;			
+	float deltaAlpha = 0.05*3.14159265359f;
+	float bestAlpha;
+
+	Loop3D rotLoop;
+	QMatrix4x4 rotMat;
+	QVector3D minPt, maxPt;
+	QVector3D origMidPt;
+	QVector3D boxSz;
+	QVector3D bestBoxSz;
+	float curArea;
+	float minArea = FLT_MAX;
+
+	rotLoop = pin;
+	Polygon3D::getLoopAABB(rotLoop, minPt, maxPt);
+	origMidPt = 0.5f*(minPt + maxPt);
+
+	//while(alpha < 0.5f*_PI){
+	int cSz = pin.size();
+	QVector3D difVec;
+	QVector3D leftBottom;
+	for(int i=0; i<pin.size(); ++i){
+		difVec = (pin.at((i+1)%cSz) - pin.at(i)).normalized();
+		alpha = atan2(difVec.x(), difVec.y());
+		rotMat.setToIdentity();				
+		rotMat.rotate(57.2957795f*(alpha), 0.0f, 0.0f, 1.0f);//57.2957795 rad2degree				
+
+		transformLoop(pin, rotLoop, rotMat);
+		boxSz = Polygon3D::getLoopAABB(rotLoop, minPt, maxPt);
+		curArea = boxSz.x() * boxSz.y();
+		if(curArea < minArea){
+			minArea = curArea;
+			bestAlpha = alpha;
+			bestBoxSz = boxSz;
+			leftBottom = pin[i];
+		}
+		//alpha += deltaAlpha;
+	}
+
+	QMatrix4x4 xformMat;
+	xformMat.setToIdentity();										
+	xformMat.rotate(57.2957795f*(bestAlpha), 0.0f, 0.0f, 1.0f);//57.2957795 rad2degree
+
+	transformLoop(pin, rotLoop, xformMat);
+	QVector3D minCorner, maxCorner;
+	Polygon3D::getLoopAABB(rotLoop, minCorner, maxCorner);
+
+	Loop3D box;
+	box.resize(4);
+	box[0] = minCorner;
+	box[1] = QVector3D(maxCorner.x(), minCorner.y(), minCorner.z());
+	box[2] = maxCorner;
+	box[3] = QVector3D(minCorner.x(), maxCorner.y(), minCorner.z());
+
+	Loop3D origBox;
+	xformMat.setToIdentity();
+	xformMat.rotate(57.2957795f*(-bestAlpha), 0.0f, 0.0f, 1.0f);//57.2957795 rad2degree
+	transformLoop(box, origBox, xformMat);
+
+	return origBox;
 }//
 
 void Polygon3D::getMyOBB(QVector3D &size, QMatrix4x4 &xformMat){

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Sun Jan 18 17:54:07 2015
+** Created: Tue Jan 20 17:20:20 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -117,8 +117,6 @@ public:
     QMenu *menuPM;
     QMenu *menuDisplay;
     QMenu *menuRoads;
-    QMenu *menuRendering;
-    QMenu *menuDetect;
     QMenu *menuDebug;
     QMenu *menuTool;
     QToolBar *fileToolBar;
@@ -377,10 +375,6 @@ public:
         menuDisplay->setObjectName(QString::fromUtf8("menuDisplay"));
         menuRoads = new QMenu(menuDisplay);
         menuRoads->setObjectName(QString::fromUtf8("menuRoads"));
-        menuRendering = new QMenu(menuBar);
-        menuRendering->setObjectName(QString::fromUtf8("menuRendering"));
-        menuDetect = new QMenu(menuBar);
-        menuDetect->setObjectName(QString::fromUtf8("menuDetect"));
         menuDebug = new QMenu(menuBar);
         menuDebug->setObjectName(QString::fromUtf8("menuDebug"));
         menuTool = new QMenu(menuBar);
@@ -399,9 +393,7 @@ public:
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuArea->menuAction());
         menuBar->addAction(menuPM->menuAction());
-        menuBar->addAction(menuDetect->menuAction());
         menuBar->addAction(menuDisplay->menuAction());
-        menuBar->addAction(menuRendering->menuAction());
         menuBar->addAction(menuTool->menuAction());
         menuBar->addAction(menuWindow->menuAction());
         menuBar->addAction(menuDebug->menuAction());
@@ -447,13 +439,6 @@ public:
         menuRoads->addAction(actionDisplayBoulevard);
         menuRoads->addAction(actionDisplayAvenue);
         menuRoads->addAction(actionDisplayLocalStreet);
-        menuRendering->addAction(actionRenderingDefault);
-        menuRendering->addAction(actionRenderingTexture);
-        menuRendering->addAction(actionRenderingGroupBy);
-        menuRendering->addAction(actionRenderingGenerationType);
-        menuDetect->addAction(actionDetectCircle);
-        menuDetect->addAction(actionDetectStructure);
-        menuDetect->addAction(actionConvert);
         menuDebug->addAction(actionDebug);
         menuTool->addAction(actionGenerateRegularGrid);
         menuTool->addAction(actionGenerateCurvyGrid);
@@ -587,8 +572,6 @@ public:
         menuPM->setTitle(QApplication::translate("MainWindow", "PM", 0, QApplication::UnicodeUTF8));
         menuDisplay->setTitle(QApplication::translate("MainWindow", "Display", 0, QApplication::UnicodeUTF8));
         menuRoads->setTitle(QApplication::translate("MainWindow", "Roads", 0, QApplication::UnicodeUTF8));
-        menuRendering->setTitle(QApplication::translate("MainWindow", "Rendering", 0, QApplication::UnicodeUTF8));
-        menuDetect->setTitle(QApplication::translate("MainWindow", "Detect", 0, QApplication::UnicodeUTF8));
         menuDebug->setTitle(QApplication::translate("MainWindow", "Debug", 0, QApplication::UnicodeUTF8));
         menuTool->setTitle(QApplication::translate("MainWindow", "Tool", 0, QApplication::UnicodeUTF8));
     } // retranslateUi

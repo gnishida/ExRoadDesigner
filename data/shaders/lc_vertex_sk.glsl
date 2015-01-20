@@ -1,12 +1,12 @@
 #version 420
 
 layout(location = 0)in vec3 vertex;
-layout(location = 1)in vec3 color;
+layout(location = 1)in vec4 color;
 layout(location = 2)in vec3 normal;
 layout(location = 3)in vec3 uv;
 
 
-out vec3 outColor;
+out vec4 outColor;
 out vec3 outUV;
 out vec3 origVertex;// L
 
@@ -58,7 +58,7 @@ void main(){
 	//////////////////////////////////////
 	// 1. TRANSFORM MODEL
 	if(((mode&0x0FF)==0x05)||((mode&0xFF)==0x06)){
-		outColor=justOneColor;
+		outColor=vec4(justOneColor, 1.0);
 		origVertex=origVertex.xzy;//change model Y<->Z
 		origVertex=(modelTransf*vec4(origVertex,1.0)).xyz;//note 1.0
 

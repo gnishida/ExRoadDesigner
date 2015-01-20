@@ -54,6 +54,8 @@ public:
 	static RoadEdgeDesc getEdge(RoadGraph& roads, RoadVertexDesc src, RoadVertexDesc tgt, bool onlyValidEdge = true);
 	static void getOrderedPolyLine(RoadGraph& roads, RoadEdgeDesc e, std::vector<QVector2D>& polyline);
 	static Polyline2D orderPolyLine(RoadGraph& roads, RoadEdgeDesc e, RoadVertexDesc src);
+	static Polyline2D orderPolyLine(RoadGraph& roads, RoadEdgeDesc e, RoadVertexDesc src, float angle);
+	static Polyline3D orderPolyLine3D(RoadGraph& roads, RoadEdgeDesc e, RoadVertexDesc src, float angle);
 	static void moveEdge(RoadGraph& roads, RoadEdgeDesc e, QVector2D& src_pos, QVector2D& tgt_pos);
 	static void movePolyline(RoadGraph& roads, Polyline2D &polyline, const QVector2D& src_pos, const QVector2D& tgt_pos);
 	static bool isSimilarPolyline(const Polyline2D &polyline1, const Polyline2D &polyline2);

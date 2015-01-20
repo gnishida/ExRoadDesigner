@@ -101,23 +101,6 @@
     </widget>
     <addaction name="menuRoads"/>
    </widget>
-   <widget class="QMenu" name="menuRendering">
-    <property name="title">
-     <string>Rendering</string>
-    </property>
-    <addaction name="actionRenderingDefault"/>
-    <addaction name="actionRenderingTexture"/>
-    <addaction name="actionRenderingGroupBy"/>
-    <addaction name="actionRenderingGenerationType"/>
-   </widget>
-   <widget class="QMenu" name="menuDetect">
-    <property name="title">
-     <string>Detect</string>
-    </property>
-    <addaction name="actionDetectCircle"/>
-    <addaction name="actionDetectStructure"/>
-    <addaction name="actionConvert"/>
-   </widget>
    <widget class="QMenu" name="menuDebug">
     <property name="title">
      <string>Debug</string>
@@ -147,9 +130,7 @@
    <addaction name="menuFile"/>
    <addaction name="menuArea"/>
    <addaction name="menuPM"/>
-   <addaction name="menuDetect"/>
    <addaction name="menuDisplay"/>
-   <addaction name="menuRendering"/>
    <addaction name="menuTool"/>
    <addaction name="menuWindow"/>
    <addaction name="menuDebug"/>

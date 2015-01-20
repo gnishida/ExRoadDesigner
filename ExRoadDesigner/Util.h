@@ -60,4 +60,5 @@ public:
 	static QVector2D projectTo2D(const QVector3D &pt);
 
 	static bool getIrregularBisector(const QVector3D& p0, const QVector3D& p1, const QVector3D& p2, float d01, float d12, QVector3D& intPt);
+	static bool getIrregularBisector(const QVector2D& p0, const QVector2D& p1, const QVector2D& p2, float d01, float d12, QVector2D& intPt);
 };

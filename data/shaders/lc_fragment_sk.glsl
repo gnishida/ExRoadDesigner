@@ -1,7 +1,7 @@
 #version 420
 #extension GL_EXT_gpu_shader4 : enable
 
-in vec3 outColor;
+in vec4 outColor;
 in vec3 outUV;
 in vec3 origVertex;// L
 
@@ -141,10 +141,7 @@ float facade(vec2 coordFac,vec2 maxFac,int windNumber){
 }//
 
 void main(){
-
-
-
-	outputF =vec4(outColor,1.0);
+	outputF = outColor;
 
 	// SHADOW: From light
 	if(shadowState==2){// no tex/color/shadows

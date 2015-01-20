@@ -1,11 +1,13 @@
-#include "VBORenderManager.h"
+﻿#include "VBORenderManager.h"
 #include "global.h"
 
-VBORenderManager::VBORenderManager(){
+using namespace boost::polygon::operators;
+
+VBORenderManager::VBORenderManager() {
 	editionMode=false;
 	side=5000.0f;
-	minPos=QVector3D (-side/2.0f,-side/2.0f,0);
-	maxPos=QVector3D (side/2.0f,side/2.0f,0);
+	minPos=QVector3D(-side/2.0f, -side/2.0f, 0);
+	maxPos=QVector3D(side/2.0f, side/2.0f, 0);
 	//initializedStreetElements=false;
 }
 
@@ -24,8 +26,7 @@ void VBORenderManager::init() {
 	nameToTexId[""]=0;
 
 	printf("VBORenderManager\n");
-
-}//
+}
 
 GLuint VBORenderManager::loadTexture(const QString fileName,bool mirrored){
 	GLuint texId;
@@ -71,11 +72,11 @@ bool VBORenderManager::createVAO(std::vector<Vertex>& vert,GLuint& vbo,GLuint& v
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(3*sizeof(float)));
+	glVertexAttribPointer(1,4,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(4*sizeof(float)));
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(6*sizeof(float)));
+	glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(8*sizeof(float)));
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(9*sizeof(float)));
+	glVertexAttribPointer(3,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),(void*)(12*sizeof(float)));
 	
 	// Bind back to the default state.
 	glBindVertexArray(0); 
@@ -176,6 +177,11 @@ void VBORenderManager::updateTerrain(float coordX,float coordY,float rad,float c
 float VBORenderManager::getTerrainHeight(float x, float y) {
 	float u = x / side + 0.5f;
 	float v = y / side + 0.5f;
+	if (u < 0) u = 0.0f;
+	if (u > 1.0f) u = 1.0f;
+	if (v < 0) v = 0.0f;
+	if (v > 1.0f) v = 1.0f;
+
 	return vboTerrain.getTerrainHeight(u, v);
 }
 
@@ -234,9 +240,11 @@ bool VBORenderManager::addStaticGeometry(QString geoName,std::vector<Vertex>& ve
 	return true;
 }//
 
-using namespace boost::polygon::operators;
-
-bool VBORenderManager::addStaticGeometry2(QString geoName,std::vector<QVector3D>& pos,float zShift,bool inverseLoop,QString textureName,GLenum geometryType,int shaderMode,QVector3D texScale,QVector3D color){
+/**
+	* 指定されたポリゴンに基づいて、ジオメトリを生成する。
+	* 凹型のポリゴンにも対応するよう、ポリゴンは台形にtessellateする。
+	*/
+bool VBORenderManager::addStaticGeometry2(QString geoName,std::vector<QVector3D>& pos,float zShift,bool inverseLoop,QString textureName,GLenum geometryType,int shaderMode,QVector3D texScale,QColor color){
 	if(pos.size()<3){
 		return false;
 	}
@@ -269,14 +277,16 @@ bool VBORenderManager::addStaticGeometry2(QString geoName,std::vector<QVector3D>
 	for(int pN=0;pN<allP.size();pN++){
 		//glColor3ub(qrand()%255,qrand()%255,qrand()%255);
 		boost::polygon::polygon_with_holes_data<double>::iterator_type itPoly=allP[pN].begin();
-		std::vector<QVector3D> points;
+
+		Polygon3D points;
+		//std::vector<QVector3D> points;
 		std::vector<QVector3D> texP;
 		while(itPoly!=allP[pN].end()){
 			pointP cP=*itPoly;
 			if(inverseLoop==false)
 				points.push_back(QVector3D(cP.x(),cP.y(),pos[0].z()+zShift));
 			else
-				points.insert(points.begin(),QVector3D(cP.x(),cP.y(),pos[0].z()+zShift));
+				points.contour.insert(points.contour.begin(),QVector3D(cP.x(),cP.y(),pos[0].z()+zShift));
 
 			//if(texZeroToOne==true){
 				//texP.push_back(QVector3D((cP.x()-minX)/(maxX-minX),(cP.y()-minY)/(maxY-minY),0.0f));
@@ -285,9 +295,16 @@ bool VBORenderManager::addStaticGeometry2(QString geoName,std::vector<QVector3D>
 			//}
 			itPoly++;
 		}
-		if(points.size()==0)continue;
-		while(points.size()<4)
-			points.push_back(points.back());
+		if(points.contour.size()==0)continue;
+		while(points.contour.size()<4)
+			points.push_back(points.contour.back());
+
+		// GEN 
+		// Sometimes, the polygon is formed in CW order, so we have to reorient it in CCW order.
+		if(inverseLoop==false) {
+			points.correct();
+		}
+
 		/*if(points.size()==4){//last vertex repited
 			addTexTriang(texInd,points,texP,col,norm);
 		}
@@ -340,7 +357,42 @@ void VBORenderManager::renderStaticGeometry(QString geoName){
 		//printf("ERROR: Render Geometry %s but it did not exist\n",geoName.toAscii().constData());
 		return;
 	}
-}//
+}
+
+void VBORenderManager::addPoint(const QString &name, const QVector2D& pt, const QColor& color, float height) {
+	std::vector<Vertex> vertP;
+
+	Vertex v(pt.x(), pt.y(), height, color, 0, 0, 1, 0, 0, 0);//pos color normal tex
+	vertP.push_back(v);
+
+	addStaticGeometry(name, vertP, "", GL_POINTS, 1);
+}
+
+void VBORenderManager::addPolyline(const QString &name, const Polyline3D& polyline, const QColor& color) {
+	std::vector<Vertex> vertP;
+	std::vector<Vertex> vertL;
+
+	int num = polyline.size();
+	if (num == 0) return;
+
+	std::vector<Vertex> vert(num - 1);
+
+	for (int i = 0; i < num; ++i) {
+		Vertex v = Vertex(polyline[i].x(), polyline[i].y(), polyline[i].z(), color, 0, 0, 1, 0, 0, 0);//pos color normal tex
+		vertP.push_back(v);
+	}
+
+	// add lines
+	for (int i = 0; i < num - 1; i++) {
+		Vertex v = Vertex(polyline[i].x(), polyline[i].y(), polyline[i].z(), color, 0, 0, 1, 0, 0, 0);//pos color normal tex
+		Vertex v2 = Vertex(polyline[i+1].x(), polyline[i+1].y(), polyline[i+1].z(), color, 0, 0, 1, 0, 0, 0);//pos color normal tex
+		vertL.push_back(v);
+		vertL.push_back(v2);
+	}
+
+	addStaticGeometry(name, vertL, "", GL_LINES, 1);
+	addStaticGeometry(name, vertP, "dummy", GL_POINTS, 1);
+}
 
 ///////////////////////////////////////////////////////////////////
 // GRID

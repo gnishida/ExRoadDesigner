@@ -30,6 +30,7 @@ This file is part of QtUrban.
 #include "MainWindow.h"
 #include "Util.h"
 #include "BSpline.h"
+#include "RoadMeshGenerator.h"
 
 UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
@@ -71,12 +72,11 @@ void UrbanGeometry::generateRoadsEx(std::vector<ExFeature> &features) {
 	if (G::getBool("useLayer")) {
 		PatchRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
-		areas.selectedArea()->roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 	} else {
 		PatchRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
-		roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 	}
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateRoadsWarp(std::vector<ExFeature> &features) {
@@ -86,12 +86,11 @@ void UrbanGeometry::generateRoadsWarp(std::vector<ExFeature> &features) {
 	if (G::getBool("useLayer")) {
 		WarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
-		areas.selectedArea()->roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 	} else {
 		WarpRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
-		roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 	}
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateRoadsPM(std::vector<ExFeature> &features) {
@@ -101,12 +100,11 @@ void UrbanGeometry::generateRoadsPM(std::vector<ExFeature> &features) {
 	if (G::getBool("useLayer")) {
 		PMRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
-		areas.selectedArea()->roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 	} else {
 		PMRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
-		roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 	}
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateRoadsAliaga(std::vector<ExFeature> &features) {
@@ -116,82 +114,66 @@ void UrbanGeometry::generateRoadsAliaga(std::vector<ExFeature> &features) {
 	if (G::getBool("useLayer")) {
 		AliagaRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
-		areas.selectedArea()->roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 	} else {
 		AliagaRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
-		roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 	}
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
+
 	glLineWidth(5.0f);
 	glPointSize(10.0f);
-
-	// draw the road graph
-	roads.generateMesh(vboRenderManager, "roads_lines", "roads_points");
-	vboRenderManager.renderStaticGeometry("roads_lines");
-	vboRenderManager.renderStaticGeometry("roads_points");
 
 	// draw the area which is now being defined
 	if (areaBuilder.selecting()) {
 		areaBuilder.adaptToTerrain(&vboRenderManager);
-		RendererHelper::renderPolyline(vboRenderManager, "area_builder_lines", "area_builder_points", areaBuilder.polyline3D(), QColor(0, 0, 255));
+		RendererHelper::renderPolyline(vboRenderManager, areaBuilder.polyline3D(), QColor(0, 0, 255));
 	}
 
 	// draw a hint polyline
 	if (hintLineBuilder.selecting()) {
 		hintLineBuilder.adaptToTerrain(&vboRenderManager);
-		RendererHelper::renderPolyline(vboRenderManager, "hintline_builder_lines", "hintline_builder_points", hintLineBuilder.polyline3D(), QColor(255, 0, 0));
+		RendererHelper::renderPolyline(vboRenderManager, hintLineBuilder.polyline3D(), QColor(255, 0, 0));
 	}
 
 	// draw a sketching highways
 	if (highwayBuilder.selecting()) {
 		highwayBuilder.adaptToTerrain(&vboRenderManager);
-		RendererHelper::renderPolyline(vboRenderManager, "sketch_highways_builder_lines", "sketch_highways_builder_points", highwayBuilder.polyline3D(), QColor(0, 0, 255));
+		RendererHelper::renderPolyline(vboRenderManager, highwayBuilder.polyline3D(), QColor(0, 0, 255));
 	}
 
 	// draw a sketching avenues
 	if (avenueBuilder.selecting()) {
 		avenueBuilder.adaptToTerrain(&vboRenderManager);
-		RendererHelper::renderPolyline(vboRenderManager, "sketch_avenues_builder_lines", "sketch_avenues_builder_points", avenueBuilder.polyline3D(), QColor(0, 0, 255));
+		RendererHelper::renderPolyline(vboRenderManager, avenueBuilder.polyline3D(), QColor(0, 0, 255));
 	}
 
 	// draw a sketching streets
 	if (streetBuilder.selecting()) {
 		streetBuilder.adaptToTerrain(&vboRenderManager);
-		RendererHelper::renderPolyline(vboRenderManager, "sketch_streets_builder_lines", "sketch_streets_builder_points", streetBuilder.polyline3D(), QColor(0, 0, 255));
+		RendererHelper::renderPolyline(vboRenderManager, streetBuilder.polyline3D(), QColor(0, 0, 255));
 	}
 
 	// draw a control points polyline
 	if (controlPointsBuilder.selecting()) {
 		controlPointsBuilder.adaptToTerrain(&vboRenderManager);
-		RendererHelper::renderPolyline(vboRenderManager, "controlpoints_builder_lines", "controlpoints_builder_points", controlPointsBuilder.polyline3D(), QColor(255, 255, 0));
+		vboRenderManager.addPolyline("lines", controlPointsBuilder.polyline3D(), QColor(255, 255, 0));
 	}
 
-	RendererHelper::renderPolyline(vboRenderManager, "bspline_control_lines", "bspline_control_points", controlPoints3D, QColor(255, 255, 0));
-	RendererHelper::renderPolyline(vboRenderManager, "bspline_lines", "bspline_points", BSpline::spline(controlPoints, 10), QColor(0, 255, 255), 5);
+	RendererHelper::renderPolyline(vboRenderManager, controlPoints3D, QColor(255, 255, 0));
 
-	// draw the detected circles
-	for (int i = 0; i < circles.size(); ++i) {
-		for (int j = 0; j < circles[i].size(); ++j) {
-			QString strPointsN = QString("circle_points%1_%2").arg(i + 1).arg(j + 1);
-			QString strLinesN = QString("circle_lines%1_%2").arg(i + 1).arg(j + 1);
-			RendererHelper::renderPolyline(vboRenderManager, strLinesN, strPointsN, roads.graph[circles[i][j]]->polyline, QColor(0, 0, 255), 5);
-		}
+	Polyline2D polyline = BSpline::spline(controlPoints, 10);
+	Polyline3D polyline3;
+	for (int i = 0; i < polyline.size(); ++i) {
+		polyline3.push_back(QVector3D(polyline[i].x(), polyline[i].y(), 5));
 	}
-
-	// draw the detected shapes
-	for (int i = 0; i < shapes.size(); ++i) {
-		for (int j= 0; j < shapes[i].size(); ++j) {
-			QString strPointsN = QString("shape_points%1_%2").arg(i + 1).arg(j + 1);
-			QString strLinesN = QString("shape_lines%1_%2").arg(i + 1).arg(j + 1);
-			RendererHelper::renderPolyline(vboRenderManager, strLinesN, strPointsN, roads.graph[shapes[i][j]]->polyline, QColor(0, 0, 255), 5);
-		}
-	}
+	RendererHelper::renderPolyline(vboRenderManager, polyline3, QColor(0, 255, 255));
 
 	// draw the areas
 	for (int i = 0; i < areas.size(); ++i) {
+		areas[i]->adaptToTerrain(&vboRenderManager);
 		QString strLinesN = QString("area_lines%1").arg(i + 1);
 		QString strPointsN = QString("area_points%1").arg(i + 1);
 
@@ -208,16 +190,33 @@ void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
 		}
 
 		// draw the area and the hint line
-		RendererHelper::renderPolyline(vboRenderManager, strLinesN, strPointsN, areas[i]->area3D, colorArea);
-		RendererHelper::renderPolyline(vboRenderManager, strHintLinesN, strHintPointsN, areas[i]->hintLine3D, colorHintLine);
+		RendererHelper::renderPolyline(vboRenderManager, areas[i]->area3D, colorArea);
+		RendererHelper::renderPolyline(vboRenderManager, areas[i]->hintLine3D, colorHintLine);
+	}
 
-		// draw the road graph
-		//areas[i]->roads.adaptToTerrain(vboRenderManager);
-		QString str1 = QString("roads_lines%1").arg(i + 1);
-		QString str2 = QString("roads_points%1").arg(i + 1);
-		areas[i]->roads.generateMesh(vboRenderManager, str1, str2);
-		vboRenderManager.renderStaticGeometry(str1);
-		vboRenderManager.renderStaticGeometry(str2);
+	vboRenderManager.removeStaticGeometry("lines");
+}
+
+/**
+ * ジオミトリを作成しなおす。
+ * 道路やビルなどのジオミトリを作成しなおす。従って、この関数を頻繁に呼ぶべきではない。
+ */
+void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
+	vboRenderManager.removeStaticGeometry("3d_roads");
+	vboRenderManager.removeStaticGeometry("3d_roads_inter");
+
+	if (G::getBool("shader2D")) {
+		RoadMeshGenerator::generate2DRoadMesh(vboRenderManager, roads);
+	} else {
+		RoadMeshGenerator::generateRoadMesh(vboRenderManager, roads);
+	}
+
+	for (int i = 0; i < areas.size(); ++i) {
+		if (G::getBool("shader2D")) {
+			RoadMeshGenerator::generate2DRoadMesh(vboRenderManager, areas[i]->roads);
+		} else {
+			RoadMeshGenerator::generateRoadMesh(vboRenderManager, areas[i]->roads);
+		}
 	}
 }
 
@@ -225,8 +224,6 @@ void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
  * Adapt all geometry objects to &mainWin->glWidget->vboRenderManager.
  */
 void UrbanGeometry::adaptToTerrain() {
-	roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
-
 	for (int i = 0; i < areas.size(); ++i) {
 		areas[i]->adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 	}
@@ -291,8 +288,6 @@ void UrbanGeometry::addRoad(int roadType, Polyline2D &polyline, int lanes) {
 		}
 	}
 	*/
-
-	roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::mergeRoads() {
@@ -316,8 +311,6 @@ void UrbanGeometry::connectRoads() {
 	//RoadGeneratorHelper::connectRoads(roads, 200.0f, 0.15f);
 	RoadGeneratorHelper::connectRoads2(roads, 400.0f);
 	GraphUtil::removeDeadEnd(roads);
-
-	roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::cutRoads() {
@@ -333,11 +326,9 @@ void UrbanGeometry::loadRoads(const QString &filename) {
 	}
 
 	roads.clear();
-	circles.clear();
-	shapes.clear();
 	GraphUtil::loadRoads(roads, filename);
 
-	roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::addRoads(const QString &filename) {
@@ -347,14 +338,11 @@ void UrbanGeometry::addRoads(const QString &filename) {
 		throw "The file is not accessible: " + filename;
 	}
 
-	circles.clear();
-	shapes.clear();
-
 	RoadGraph addRoads;
 	GraphUtil::loadRoads(addRoads, filename);
 	GraphUtil::mergeRoads(roads, addRoads);
 
-	roads.adaptToTerrain(&mainWin->glWidget->vboRenderManager);
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::saveRoads(const QString &filename) {
@@ -369,8 +357,7 @@ void UrbanGeometry::saveRoads(const QString &filename) {
 
 void UrbanGeometry::clearRoads() {
 	roads.clear();
-	circles.clear();
-	shapes.clear();
+
 	/*
 	for (int i = 0; i < blocks.size(); ++i) {
 		delete blocks[i];
@@ -382,9 +369,7 @@ void UrbanGeometry::clearRoads() {
 void UrbanGeometry::loadAreas(const QString &filename) {
 	areas.load(filename);
 
-	for (int i = 0; i < areas.size(); ++i) {
-		areas[i]->adaptToTerrain(&mainWin->glWidget->vboRenderManager);
-	}
+	update(mainWin->glWidget->vboRenderManager);
 
 	areas.selectedIndex = 0;
 }

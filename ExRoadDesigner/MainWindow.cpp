@@ -60,18 +60,12 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 	connect(ui.actionAvenueSketch, SIGNAL(triggered()), this, SLOT(onAvenueSketch()));
 	connect(ui.actionStreetSketch, SIGNAL(triggered()), this, SLOT(onStreetSketch()));
 	connect(ui.actionControlPoints, SIGNAL(triggered()), this, SLOT(onControlPoints()));
-	connect(ui.actionDetectCircle, SIGNAL(triggered()), this, SLOT(onDetectCircle()));
-	connect(ui.actionDetectStructure, SIGNAL(triggered()), this, SLOT(onDetectStructure()));	
 	connect(ui.actionConvert, SIGNAL(triggered()), this, SLOT(onConvert()));	
 	connect(ui.actionGenerate2D, SIGNAL(triggered()), this, SLOT(onGenerate2D()));
 	connect(ui.actionGenerate3D, SIGNAL(triggered()), this, SLOT(onGenerate3D()));
 	connect(ui.actionGenerate3DRoads, SIGNAL(triggered()), this, SLOT(onGenerate3DRoads()));
 	connect(ui.actionDisplayHighway, SIGNAL(triggered()), this, SLOT(onDisplayRoads()));
 	connect(ui.actionDisplayBoulevard, SIGNAL(triggered()), this, SLOT(onDisplayRoads()));
-	connect(ui.actionRenderingDefault, SIGNAL(triggered()), this, SLOT(onRenderingDefault()));
-	connect(ui.actionRenderingTexture, SIGNAL(triggered()), this, SLOT(onRenderingTexture()));
-	connect(ui.actionRenderingGroupBy, SIGNAL(triggered()), this, SLOT(onRenderingGroupBy()));
-	connect(ui.actionRenderingGenerationType, SIGNAL(triggered()), this, SLOT(onRenderingGenerationType()));
 	connect(ui.actionGenerateRegularGrid, SIGNAL(triggered()), this, SLOT(onGenerateRegularGrid()));
 	connect(ui.actionGenerateCurvyGrid, SIGNAL(triggered()), this, SLOT(onGenerateCurvyGrid()));
 	connect(ui.actionRotationVideo, SIGNAL(triggered()), this, SLOT(onRotationVideo()));
@@ -336,30 +330,6 @@ void MainWindow::onControlPoints() {
 	ui.actionStreetSketch->setChecked(false);
 }
 
-void MainWindow::onDetectCircle() {
-	CircleDetectionScaleInputDialog dlg(this);
-	if (dlg.exec() == QDialog::Accepted) {
-		CircleHoughTransform ht;
-		urbanGeometry->shapes = ht.detect(urbanGeometry->roads, dlg.scale, 50.0f);
-		glWidget->updateGL();
-	}
-}
-
-void MainWindow::onDetectStructure() {
-	StructureDetectionSettingDialog dlg(this);
-	if (dlg.exec() == QDialog::Accepted) {
-		urbanGeometry->shapes = ShapeDetector::detect(urbanGeometry->roads, dlg.scale, dlg.distance);
-
-		std::vector<Patch> patches;
-		patches = RoadGeneratorHelper::convertToPatch(RoadEdge::TYPE_AVENUE, urbanGeometry->roads, urbanGeometry->roads, urbanGeometry->shapes);
-
-		// save patch images
-		ExFeature::savePatchImages(RoadEdge::TYPE_AVENUE, 0, urbanGeometry->roads, patches, 10.0f, false);
-
-		glWidget->updateGL();
-	}
-}
-
 /*
 void MainWindow::onConvert() {
 	RoadEdgeIter ei, eend;
@@ -391,54 +361,6 @@ void MainWindow::onDisplayRoads() {
 	urbanGeometry->roads.showBoulevards = ui.actionDisplayBoulevard->isChecked();
 	urbanGeometry->roads.showAvenues = ui.actionDisplayAvenue->isChecked();
 	urbanGeometry->roads.showLocalStreets = ui.actionDisplayLocalStreet->isChecked();
-	urbanGeometry->roads.setModified();
-
-	glWidget->updateGL();
-}
-
-void MainWindow::onRenderingDefault() {
-	ui.actionRenderingTexture->setChecked(false);
-	ui.actionRenderingGroupBy->setChecked(false);
-	ui.actionRenderingGenerationType->setChecked(false);
-
-	urbanGeometry->roads.renderMode = RoadGraph::RENDER_DEFAULT;
-	urbanGeometry->roads.setModified();
-
-	glWidget->updateGL();
-}
-
-void MainWindow::onRenderingTexture() {
-	ui.actionRenderingDefault->setChecked(false);
-	ui.actionRenderingGroupBy->setChecked(false);
-	ui.actionRenderingGenerationType->setChecked(false);
-
-	urbanGeometry->roads.renderMode = RoadGraph::RENDER_TEXTURE;
-	urbanGeometry->roads.setModified();
-
-	glWidget->updateGL();
-}
-
-void MainWindow::onRenderingGroupBy() {
-	ui.actionRenderingDefault->setChecked(false);
-	ui.actionRenderingTexture->setChecked(false);
-	ui.actionRenderingGenerationType->setChecked(false);
-
-	urbanGeometry->roads.renderMode = RoadGraph::RENDER_GROUPBY;
-	urbanGeometry->roads.setModified();
-	for (int i = 0; i < urbanGeometry->areas.size(); ++i) {
-		urbanGeometry->areas[i]->roads.renderMode = RoadGraph::RENDER_GROUPBY;
-		urbanGeometry->areas[i]->roads.setModified();
-	}
-
-	glWidget->updateGL();
-}
-
-void MainWindow::onRenderingGenerationType() {
-	ui.actionRenderingDefault->setChecked(false);
-	ui.actionRenderingTexture->setChecked(false);
-	ui.actionRenderingGroupBy->setChecked(false);
-
-	urbanGeometry->roads.renderMode = RoadGraph::RENDER_GENERATION_TYPE;
 	urbanGeometry->roads.setModified();
 
 	glWidget->updateGL();
@@ -499,8 +421,6 @@ void MainWindow::onRotationVideo() {
 		if (filename.isEmpty()) return;
 	
 		features[i].load(filename, false);
-		//features[i].detectAvenueShapes(G::getFloat("avenuePatchDistance"));
-		//features[i].detectStreetShapes(G::getFloat("streetPatchDistance"));
 	}
 
 	// every time when rotating by 1 degree, generate roads and capture the image
