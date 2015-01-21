@@ -331,32 +331,6 @@ void MainWindow::onControlPoints() {
 	ui.actionStreetSketch->setChecked(false);
 }
 
-/*
-void MainWindow::onConvert() {
-	RoadEdgeIter ei, eend;
-	for (boost::tie(ei, eend) = boost::edges(urbanGeometry->roads.graph); ei != eend; ++ei) {
-		if (urbanGeometry->roads.graph[*ei]->type == RoadEdge::TYPE_BOULEVARD) {
-			urbanGeometry->roads.graph[*ei]->type = RoadEdge::TYPE_AVENUE;
-		}
-	}
-}
-*/
-
-void MainWindow::onGenerate3D() {
-	glWidget->generate3DGeometry();
-	glWidget->updateGL();
-}
-
-void MainWindow::onGenerate3DRoads() {
-	glWidget->generate3DGeometry(true);//true just roads
-	glWidget->updateGL();
-}//
-
-void MainWindow::onGenerate2D() {
-	glWidget->generate2DGeometry();
-	glWidget->updateGL();
-}
-
 void MainWindow::onGenerateBlocks() {
 	urbanGeometry->generateBlocks();
 	glWidget->shadow.makeShadowMap(glWidget);

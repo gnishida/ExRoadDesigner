@@ -126,35 +126,29 @@ void UrbanGeometry::generateRoadsAliaga(std::vector<ExFeature> &features) {
 
 void UrbanGeometry::generateBlocks() {
 	VBOPm::generateBlocks(mainWin->glWidget->vboRenderManager, roads, blocks);
-	if (G::getBool("shader2D")) {
-	} else {
-		BlockMeshGenerator::generateBlockMesh(mainWin->glWidget->vboRenderManager, blocks);
-	}
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateParcels() {
 	VBOPm::generateParcels(mainWin->glWidget->vboRenderManager, blocks);
-
-	if (G::getBool("shader2D")) {
-		BlockMeshGenerator::generate2DParcelMesh(mainWin->glWidget->vboRenderManager, blocks);
-	} else {
-		BlockMeshGenerator::generateParcelMesh(mainWin->glWidget->vboRenderManager, blocks);
-	}
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateBuildings() {
 	VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, blocks);
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateVegetation() {
 	VBOVegetation::generateVegetation(mainWin->glWidget->vboRenderManager, blocks.blocks);
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateAll() {
 	VBOPm::generateBlocks(mainWin->glWidget->vboRenderManager, roads, blocks);
 	VBOPm::generateParcels(mainWin->glWidget->vboRenderManager, blocks);
 
-
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
@@ -253,8 +247,13 @@ void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 
 	if (G::getBool("shader2D")) {
 		RoadMeshGenerator::generate2DRoadMesh(vboRenderManager, roads);
+		BlockMeshGenerator::generate2DParcelMesh(vboRenderManager, blocks);
 	} else {
 		RoadMeshGenerator::generateRoadMesh(vboRenderManager, roads);
+		BlockMeshGenerator::generateBlockMesh(vboRenderManager, blocks);
+		BlockMeshGenerator::generateParcelMesh(vboRenderManager, blocks);
+		VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, blocks);
+		VBOVegetation::generateVegetation(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	}
 
 	for (int i = 0; i < areas.size(); ++i) {

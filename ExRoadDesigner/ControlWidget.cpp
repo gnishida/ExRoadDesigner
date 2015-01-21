@@ -44,6 +44,11 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.terrainPaint_sizeSlider->setMaximum(1000);
 	ui.terrainPaint_sizeSlider->setValue(500);
 
+	ui.render_2DparcelLineSlider->setMinimum(0);
+	ui.render_2DparcelLineSlider->setMaximum(50);
+	ui.render_2DparcelLineSlider->setSingleStep(1);
+	ui.render_2DparcelLineSlider->setValue(5);
+
 	// register the event handlers
 	connect(ui.pushButtonGenerateEx, SIGNAL(clicked()), this, SLOT(generateRoadsEx()));
 	connect(ui.pushButtonGenerateWarp, SIGNAL(clicked()), this, SLOT(generateRoadsWarp()));
@@ -297,30 +302,30 @@ void ControlWidget::updateTerrainEdit(const QString &text) {
 	ui.terrainPaint_changeSlider->setValue(ui.terrainPaint_changeEdit->text().toFloat());
 }
 
-void ControlWidget::updateRender2D(int newValue){
-		float stroke=ui.render_2DroadsStrokeSlider->value()*0.1f;
-		ui.render_2DroadsStrokeLabel->setText("Stroke: "+QString::number(stroke,'f',1)+"");
-		G::global()["2DroadsStroke"]=stroke;
+void ControlWidget::updateRender2D(int newValue) {
+	float stroke=ui.render_2DroadsStrokeSlider->value()*0.1f;
+	ui.render_2DroadsStrokeLabel->setText("Stroke: "+QString::number(stroke,'f',1)+"");
+	G::global()["2DroadsStroke"]=stroke;
 
-		float extraWidth=ui.render_2DroadsExtraWidthSlider->value()*0.1f;
-		ui.render_2DroadsExtraWidthLabel->setText("R Width: "+QString::number(extraWidth,'f',1)+"");
-		G::global()["2DroadsExtraWidth"]=extraWidth;
+	float extraWidth=ui.render_2DroadsExtraWidthSlider->value()*0.1f;
+	ui.render_2DroadsExtraWidthLabel->setText("R Width: "+QString::number(extraWidth,'f',1)+"");
+	G::global()["2DroadsExtraWidth"]=extraWidth;
 
-		int parkPer=ui.render_2DparksSlider->value();
-		ui.render_2DparksLabel->setText("Park: "+QString::number(parkPer)+"%");
-		G::global()["2d_parkPer"]=parkPer;
+	int parkPer=ui.render_2DparksSlider->value();
+	ui.render_2DparksLabel->setText("Park: "+QString::number(parkPer)+"%");
+	G::global()["2d_parkPer"]=parkPer;
 
-		G::global()["maxBlockSizeForPark"] = ui.lineEditMaxBlockSizeForPark->text().toFloat();
+	G::global()["maxBlockSizeForPark"] = ui.lineEditMaxBlockSizeForPark->text().toFloat();
 
-		float parcelLine=ui.render_2DparcelLineSlider->value()*0.1f;
-		ui.render_2DparcelLineLabel->setText("Par. Line: "+QString::number(parcelLine,'f',1)+"");
-		G::global()["2d_parcelLine"]=parcelLine;
+	float parcelLine=ui.render_2DparcelLineSlider->value() * 0.1;
+	ui.render_2DparcelLineLabel->setText("Par. Line: "+QString::number(parcelLine,'f',1)+"");
+	G::global()["2d_parcelLine"] = parcelLine;
 
-		if(newValue!=-1){//init
-			mainWin->urbanGeometry->roads.modified=true;//force 
-			mainWin->glWidget->updateGL();
-		}
-}//
+	if(newValue!=-1){//init
+		mainWin->urbanGeometry->roads.modified=true;//force 
+		mainWin->glWidget->updateGL();
+	}
+}
 
 void ControlWidget::changeTerrainShader(int) {
 	bool shader2D = ui.terrain_2DShader->isChecked();
