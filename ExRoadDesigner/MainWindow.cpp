@@ -60,19 +60,13 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 	connect(ui.actionAvenueSketch, SIGNAL(triggered()), this, SLOT(onAvenueSketch()));
 	connect(ui.actionStreetSketch, SIGNAL(triggered()), this, SLOT(onStreetSketch()));
 	connect(ui.actionControlPoints, SIGNAL(triggered()), this, SLOT(onControlPoints()));
-	connect(ui.actionConvert, SIGNAL(triggered()), this, SLOT(onConvert()));
 
-	connect(ui.actionGenerate2D, SIGNAL(triggered()), this, SLOT(onGenerate2D()));
-	connect(ui.actionGenerate3D, SIGNAL(triggered()), this, SLOT(onGenerate3D()));
-	connect(ui.actionGenerate3DRoads, SIGNAL(triggered()), this, SLOT(onGenerate3DRoads()));
 	connect(ui.actionGenerateBlocks, SIGNAL(triggered()), this, SLOT(onGenerateBlocks()));
 	connect(ui.actionGenerateParcels, SIGNAL(triggered()), this, SLOT(onGenerateParcels()));
 	connect(ui.actionGenerateBuildings, SIGNAL(triggered()), this, SLOT(onGenerateBuildings()));
 	connect(ui.actionGenerateVegetation, SIGNAL(triggered()), this, SLOT(onGenerateVegetation()));
+	connect(ui.actionGenerateAll, SIGNAL(triggered()), this, SLOT(onGenerateAll()));
 
-
-	connect(ui.actionDisplayHighway, SIGNAL(triggered()), this, SLOT(onDisplayRoads()));
-	connect(ui.actionDisplayBoulevard, SIGNAL(triggered()), this, SLOT(onDisplayRoads()));
 	connect(ui.actionGenerateRegularGrid, SIGNAL(triggered()), this, SLOT(onGenerateRegularGrid()));
 	connect(ui.actionGenerateCurvyGrid, SIGNAL(triggered()), this, SLOT(onGenerateCurvyGrid()));
 	connect(ui.actionRotationVideo, SIGNAL(triggered()), this, SLOT(onRotationVideo()));
@@ -387,13 +381,9 @@ void MainWindow::onGenerateVegetation() {
 	glWidget->updateGL();
 }
 
-void MainWindow::onDisplayRoads() {
-	urbanGeometry->roads.showHighways = ui.actionDisplayHighway->isChecked();
-	urbanGeometry->roads.showBoulevards = ui.actionDisplayBoulevard->isChecked();
-	urbanGeometry->roads.showAvenues = ui.actionDisplayAvenue->isChecked();
-	urbanGeometry->roads.showLocalStreets = ui.actionDisplayLocalStreet->isChecked();
-	urbanGeometry->roads.setModified();
-
+void MainWindow::onGenerateAll() {
+	urbanGeometry->generateAll();
+	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
 }
 

@@ -520,8 +520,9 @@ void GLWidget3D::drawScene(int drawMode) {
 		mainWin->urbanGeometry->render(vboRenderManager);
 		
 		vboRenderManager.vboTerrain.render(true);
-		vboRenderManager.renderStaticGeometry("3d_sidewalk");
-		vboRenderManager.renderStaticGeometry("3d_parcel");
+		vboRenderManager.renderStaticGeometry("3d_blocks");
+		vboRenderManager.renderStaticGeometry("3d_parks");
+		vboRenderManager.renderStaticGeometry("3d_parcels");
 		vboRenderManager.renderStaticGeometry("3d_roads");
 		vboRenderManager.renderStaticGeometry("3d_roads_inter");
 		vboRenderManager.renderStaticGeometry("3d_roads_interCom");
@@ -546,8 +547,9 @@ void GLWidget3D::drawScene(int drawMode) {
 			
 			glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 1);
 			vboRenderManager.vboTerrain.render(true);
-			vboRenderManager.renderStaticGeometry("3d_sidewalk");
-			vboRenderManager.renderStaticGeometry("3d_parcel");
+			vboRenderManager.renderStaticGeometry("3d_blocks");
+			vboRenderManager.renderStaticGeometry("3d_parks");
+			vboRenderManager.renderStaticGeometry("3d_parcels");
 			vboRenderManager.renderStaticGeometry("3d_roads");
 			vboRenderManager.renderStaticGeometry("3d_roads_inter");
 			vboRenderManager.renderStaticGeometry("3d_roads_interCom");
@@ -565,8 +567,9 @@ void GLWidget3D::drawScene(int drawMode) {
 
 			vboRenderManager.vboTerrain.render(false);
 
-			//vboRenderManager.renderStaticGeometry("3d_sidewalk");
-			//vboRenderManager.renderStaticGeometry("3d_parcel");
+			//vboRenderManager.renderStaticGeometry("3d_blocks");
+			//vboRenderManager.renderStaticGeometry("3d_parks");
+			//vboRenderManager.renderStaticGeometry("3d_parcels");
 			//vboRenderManager.renderStaticGeometry("3d_roads");
 			//vboRenderManager.renderStaticGeometry("3d_roads_inter");
 			//vboRenderManager.renderStaticGeometry("3d_roads_interCom");
@@ -579,33 +582,6 @@ void GLWidget3D::drawScene(int drawMode) {
 			}
 		}
 	}
-
-	/*
-	///////////////////////////////////
-	// 2D WITH BLOCKS MODE
-	if(G::global().getInt("3d_render_mode")==3){
-
-		glDisable(GL_CULL_FACE);
-		mainWin->urbanGeometry->render(vboRenderManager);
-		glEnable(GL_CULL_FACE);
-		
-		vboRenderManager.vboTerrain.render();
-
-		vboRenderManager.renderStaticGeometry("2d_blocks");
-		vboRenderManager.renderStaticGeometry("2d_parks");
-
-		// draw the selected vertex and edge
-		if (vertexSelected) {
-			RendererHelper::renderPoint(vboRenderManager, selectedVertex->pt, QColor(0, 0, 255), selectedVertex->pt3D.z() + 2.0f);
-		}
-		if (edgeSelected) {
-			Polyline3D polyline(selectedEdge->polyline3D);
-			for (int i = 0; i < polyline.size(); ++i) polyline[i].setZ(polyline[i].z() + 10.0f);
-			vboRenderManager.addPolyline("selected_edge_lines", polyline, QColor(0, 0, 255));
-			vboRenderManager.renderStaticGeometry("selected_edge");
-		}
-	}
-	*/
 }
 
 /**
@@ -792,44 +768,4 @@ void GLWidget3D::updateCamera(){
 	// light poss
 	QVector3D light_dir=camera3D.light_dir.toVector3D();
 	glUniform3f(glGetUniformLocation(vboRenderManager.program, "lightDir"),light_dir.x(),light_dir.y(),light_dir.z());
-}//
-
-void GLWidget3D::generate2DGeometry(){
-	/*
-	GraphUtil::cleanEdges(mainWin->urbanGeometry->roads);
-	GraphUtil::clean(mainWin->urbanGeometry->roads);
-	printf("generate2DGeometry\n");
-	G::global()["num_place_types"]=0;
-	G::global()["3d_render_mode"]=3;//2D geometry
-	VBOPm::generate2DGeometry(vboRenderManager, mainWin->urbanGeometry->roads);
-	*/
-}//
-
-void GLWidget3D::generate3DGeometry(bool justRoads) {
-	/*
-	GraphUtil::cleanEdges(mainWin->urbanGeometry->roads);
-	GraphUtil::clean(mainWin->urbanGeometry->roads);
-
-	printf("generate3DGeometry\n");
-	G::global()["3d_render_mode"]=1;//LC
-	mainWin->controlWidget->ui.terrain_2DShader->setChecked(false);
-	//camera=&camera3D;//change camera MODE!! 
-	//camera=&flyCamera;
-
-	//1. update roadgraph geometry
-	if(justRoads){//just roads a bit higher
-		G::global()["3d_road_deltaZ"]=10.0f;
-		mainWin->controlWidget->ui.render_3DtreesCheckBox->setChecked(false);//not trees
-	}else{
-		G::global()["3d_road_deltaZ"]=1.0f;
-	}
-	VBORoadGraph::updateRoadGraph(vboRenderManager, mainWin->urbanGeometry->roads);
-	//2. generate blocks, parcels and buildings and vegetation
-	if(justRoads==false)
-		VBOPm::generateGeometry(vboRenderManager, mainWin->urbanGeometry->roads);
-
-	shadow.makeShadowMap(this);
-
-	printf("<<generate3DGeometry\n");
-	*/
-}//
+}

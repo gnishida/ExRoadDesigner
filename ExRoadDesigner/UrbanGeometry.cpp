@@ -126,12 +126,20 @@ void UrbanGeometry::generateRoadsAliaga(std::vector<ExFeature> &features) {
 
 void UrbanGeometry::generateBlocks() {
 	VBOPm::generateBlocks(mainWin->glWidget->vboRenderManager, roads, blocks);
-	BlockMeshGenerator::generateBlockMesh(mainWin->glWidget->vboRenderManager, blocks);
+	if (G::getBool("shader2D")) {
+	} else {
+		BlockMeshGenerator::generateBlockMesh(mainWin->glWidget->vboRenderManager, blocks);
+	}
 }
 
 void UrbanGeometry::generateParcels() {
 	VBOPm::generateParcels(mainWin->glWidget->vboRenderManager, blocks);
-	BlockMeshGenerator::generateParcelMesh(mainWin->glWidget->vboRenderManager, blocks);
+
+	if (G::getBool("shader2D")) {
+		BlockMeshGenerator::generate2DParcelMesh(mainWin->glWidget->vboRenderManager, blocks);
+	} else {
+		BlockMeshGenerator::generateParcelMesh(mainWin->glWidget->vboRenderManager, blocks);
+	}
 }
 
 void UrbanGeometry::generateBuildings() {
@@ -140,6 +148,13 @@ void UrbanGeometry::generateBuildings() {
 
 void UrbanGeometry::generateVegetation() {
 	VBOVegetation::generateVegetation(mainWin->glWidget->vboRenderManager, blocks.blocks);
+}
+
+void UrbanGeometry::generateAll() {
+	VBOPm::generateBlocks(mainWin->glWidget->vboRenderManager, roads, blocks);
+	VBOPm::generateParcels(mainWin->glWidget->vboRenderManager, blocks);
+
+
 }
 
 void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
@@ -223,16 +238,23 @@ void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
  * 道路やビルなどのジオミトリを作成しなおす。従って、この関数を頻繁に呼ぶべきではない。
  */
 void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
+	// 地面が変わっている可能性などがあるので、ビルなどのジオミトリも一旦削除してしまう。
+	// 道路以外のジオミトリは、別途、PMメニューから作成すること
+	vboRenderManager.removeStaticGeometry("3d_blocks");
+	vboRenderManager.removeStaticGeometry("3d_parks");
+	vboRenderManager.removeStaticGeometry("3d_parcels");
 	vboRenderManager.removeStaticGeometry("3d_roads");
 	vboRenderManager.removeStaticGeometry("3d_roads_inter");
 	vboRenderManager.removeStaticGeometry("3d_roads_interCom");
+	vboRenderManager.removeStaticGeometry("3d_building");
+	vboRenderManager.removeStaticGeometry("3d_building_fac");
+	vboRenderManager.removeStaticGeometry("tree");
+	vboRenderManager.removeStaticGeometry("streetLamp");
 
 	if (G::getBool("shader2D")) {
 		RoadMeshGenerator::generate2DRoadMesh(vboRenderManager, roads);
-		BlockMeshGenerator::generate2DBlockMesh(vboRenderManager, blocks);
 	} else {
 		RoadMeshGenerator::generateRoadMesh(vboRenderManager, roads);
-		BlockMeshGenerator::generateBlockMesh(vboRenderManager, blocks);
 	}
 
 	for (int i = 0; i < areas.size(); ++i) {

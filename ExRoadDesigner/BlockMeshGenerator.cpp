@@ -1,5 +1,6 @@
 ﻿#include "BlockMeshGenerator.h"
 #include <QDir>
+#include "global.h"
 
 bool BlockMeshGenerator::initialized = false;
 std::vector<QString> BlockMeshGenerator::sideWalkFileNames;
@@ -40,7 +41,8 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 	if (!initialized) init();
 
 	// 3Dモデルを生成する
-	rendManager.removeStaticGeometry("3d_sidewalk");
+	rendManager.removeStaticGeometry("3d_blocks");
+	rendManager.removeStaticGeometry("3d_parks");
 
 	const float deltaZ = 2.3f;
 
@@ -56,7 +58,7 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 			}
 
 			int randSidewalk=2;//qrand()%grassFileNames.size();
-			rendManager.addStaticGeometry2("3d_sidewalk", polygon, 0.0f, false, sideWalkFileNames[randSidewalk], GL_QUADS, 2|mode_AdaptTerrain, sideWalkScale[randSidewalk], QColor());
+			rendManager.addStaticGeometry2("3d_blocks", polygon, 0.0f, false, sideWalkFileNames[randSidewalk], GL_QUADS, 2|mode_AdaptTerrain, sideWalkScale[randSidewalk], QColor());
 
 			// 側面
 			std::vector<Vertex> vert;
@@ -79,14 +81,14 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p4, QColor(128, 128, 128), normal, QVector3D()));
 			}
-			rendManager.addStaticGeometry("3d_sidewalk", vert, "", GL_QUADS, 1|mode_Lighting|mode_AdaptTerrain);
+			rendManager.addStaticGeometry("3d_blocks", vert, "", GL_QUADS, 1|mode_Lighting|mode_AdaptTerrain);
 		}
 
 		// 公園の3Dモデルを生成
 		if (blocks[i].isPark) {
 			// PARK
 			int randPark=qrand()%grassFileNames.size();
-			rendManager.addStaticGeometry2("3d_sidewalk", blocks[i].blockContour.contour, 0.0f, false, grassFileNames[randPark], GL_QUADS, 2|mode_AdaptTerrain, QVector3D(0.05f,0.05f,0.05f), QColor());
+			rendManager.addStaticGeometry2("3d_parks", blocks[i].blockContour.contour, 0.0f, false, grassFileNames[randPark], GL_QUADS, 2|mode_AdaptTerrain, QVector3D(0.05f,0.05f,0.05f), QColor());
 
 			// 側面
 			std::vector<Vertex> vert;
@@ -110,7 +112,7 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p4, QColor(128, 128, 128), normal, QVector3D()));
 			}
-			rendManager.addStaticGeometry("3d_sidewalk", vert, "", GL_QUADS, 1|mode_Lighting|mode_AdaptTerrain);
+			rendManager.addStaticGeometry("3d_parks", vert, "", GL_QUADS, 1|mode_Lighting|mode_AdaptTerrain);
 		}
 	}
 }
@@ -119,7 +121,7 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
  * Parcel情報から、その3Dモデルを生成する
  */
 void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, BlockSet& blocks) {
-	rendManager.removeStaticGeometry("3d_parcel");
+	rendManager.removeStaticGeometry("3d_parcels");
 
 	const float deltaZ = 2.6f;
 
@@ -133,7 +135,7 @@ void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, Block
 
 			// 上面のモデル
 			int randPark=1;//qrand()%grassFileNames.size();
-			rendManager.addStaticGeometry2("3d_parcel", blocks[i].myParcels[*vi].parcelContour.contour, deltaZ, false, grassFileNames[randPark], GL_QUADS, 2|mode_AdaptTerrain, QVector3D(0.05f,0.05f,0.05f), QColor());
+			rendManager.addStaticGeometry2("3d_parcels", blocks[i].myParcels[*vi].parcelContour.contour, deltaZ, false, grassFileNames[randPark], GL_QUADS, 2|mode_AdaptTerrain, QVector3D(0.05f,0.05f,0.05f), QColor());
 
 			// 側面のモデル
 			for(int sN=0;sN<blocks[i].myParcels[*vi].parcelContour.contour.size();sN++){
@@ -153,11 +155,46 @@ void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, Block
 				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p2, QColor(128, 128, 128), normal, QVector3D()));
 			}
-			rendManager.addStaticGeometry("3d_parcel", vert, "", GL_QUADS, 1|mode_Lighting|mode_AdaptTerrain);
+			rendManager.addStaticGeometry("3d_parcels", vert, "", GL_QUADS, 1|mode_Lighting|mode_AdaptTerrain);
 		}
 	}
 }
 
-void BlockMeshGenerator::generate2DBlockMesh(VBORenderManager& rendManager, BlockSet& blocks) {
+void BlockMeshGenerator::generate2DParcelMesh(VBORenderManager& rendManager, BlockSet& blocks) {
+	rendManager.removeStaticGeometry("3d_blocks");
+	rendManager.removeStaticGeometry("3d_parks");
 
+	const float deltaZ = 3.0f;
+
+	QColor parkColor(0xca, 0xdf, 0xaa);
+	for (int bN = 0; bN < blocks.size(); ++bN) {
+		if (blocks[bN].isPark) {
+			Loop3D parkC = blocks[bN].blockContour.contour;
+			if (parkC.size() > 2) {
+				parkC.push_back(parkC.front());
+				rendManager.addStaticGeometry2("3d_parks", parkC, deltaZ, false, "", GL_QUADS, 1, QVector3D(), parkColor);
+			}
+		}		
+	}
+
+	// Draw parcels as lines
+	float parcelLine = G::global().getFloat("2d_parcelLine");
+	if (parcelLine > 0) {
+		glLineWidth(parcelLine);
+		std::vector<Vertex> vert;
+		for(int bN=0;bN<blocks.size();bN++){
+			if (blocks[bN].isPark) continue;
+
+			Block::parcelGraphVertexIter vi, viEnd;	
+			for (boost::tie(vi, viEnd) = boost::vertices(blocks[bN].myParcels); vi != viEnd; ++vi) {	
+				Polygon3D pol = blocks[bN].myParcels[*vi].parcelBuildableAreaContour;
+				for (int i = 0; i < pol.contour.size(); ++i) {
+					int next = (i+1) % pol.contour.size();
+					vert.push_back(Vertex(pol.contour[i]+QVector3D(0,0,deltaZ), QColor(150, 150, 150), QVector3D(0,0,1), QVector3D()));
+					vert.push_back(Vertex(pol.contour[next]+QVector3D(0,0,deltaZ), QColor(150, 150, 150), QVector3D(0,0,1), QVector3D()));
+				}
+			}
+		}
+		rendManager.addStaticGeometry("3d_blocks", vert, "", GL_LINES, 1);
+	}
 }

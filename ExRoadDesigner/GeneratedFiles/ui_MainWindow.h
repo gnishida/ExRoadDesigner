@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Wed Jan 21 17:22:16 2015
+** Created: Wed Jan 21 18:17:15 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -110,6 +110,7 @@ public:
     QAction *actionGenerateParcels;
     QAction *actionGenerateBuildings;
     QAction *actionGenerateVegetation;
+    QAction *actionGenerateAll;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -358,6 +359,8 @@ public:
         actionGenerateBuildings->setObjectName(QString::fromUtf8("actionGenerateBuildings"));
         actionGenerateVegetation = new QAction(MainWindow);
         actionGenerateVegetation->setObjectName(QString::fromUtf8("actionGenerateVegetation"));
+        actionGenerateAll = new QAction(MainWindow);
+        actionGenerateAll->setObjectName(QString::fromUtf8("actionGenerateAll"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -427,13 +430,11 @@ public:
         menuArea->addAction(actionStreetSketch);
         menuArea->addSeparator();
         menuArea->addAction(actionControlPoints);
-        menuPM->addAction(actionGenerate2D);
-        menuPM->addAction(actionGenerate3D);
-        menuPM->addAction(actionGenerate3DRoads);
         menuPM->addAction(actionGenerateBlocks);
         menuPM->addAction(actionGenerateParcels);
         menuPM->addAction(actionGenerateBuildings);
         menuPM->addAction(actionGenerateVegetation);
+        menuPM->addAction(actionGenerateAll);
         menuDebug->addAction(actionDebug);
         menuTool->addAction(actionGenerateRegularGrid);
         menuTool->addAction(actionGenerateCurvyGrid);
@@ -562,6 +563,7 @@ public:
         actionGenerateParcels->setText(QApplication::translate("MainWindow", "Generate Parcels", 0, QApplication::UnicodeUTF8));
         actionGenerateBuildings->setText(QApplication::translate("MainWindow", "Generate Buildings", 0, QApplication::UnicodeUTF8));
         actionGenerateVegetation->setText(QApplication::translate("MainWindow", "Generate Vegetation", 0, QApplication::UnicodeUTF8));
+        actionGenerateAll->setText(QApplication::translate("MainWindow", "Generate All", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuWindow->setTitle(QApplication::translate("MainWindow", "Window", 0, QApplication::UnicodeUTF8));
         menuArea->setTitle(QApplication::translate("MainWindow", "Area", 0, QApplication::UnicodeUTF8));
