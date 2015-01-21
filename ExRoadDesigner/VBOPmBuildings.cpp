@@ -1,17 +1,17 @@
-/************************************************************************************************
+﻿/************************************************************************************************
 *		Procedural City Generation: Buildings
 *		@author igarciad
 ************************************************************************************************/
 
 #include "VBOPmBuildings.h"
+#include "global.h"
 
-bool generateBlockBuildings(Block &inBlock, PlaceTypesMainClass &placeTypesIn);
+bool generateBlockBuildings(VBORenderManager& rendManager, Block &inBlock);
 
-bool VBOPmBuildings::generateBuildings(PlaceTypesMainClass &placeTypesIn,std::vector< Block > &blocks){
+bool VBOPmBuildings::generateBuildings(VBORenderManager& rendManager, std::vector< Block > &blocks){
 	//For each block
-	for(int i=0; i<blocks.size(); ++i){
-		srand(blocks[i].randSeed);
-		generateBlockBuildings(blocks[i], placeTypesIn);
+	for (int i = 0; i < blocks.size(); ++i) {
+		generateBlockBuildings(rendManager, blocks[i]);
 	}
 	return true;
 }//
@@ -70,11 +70,21 @@ bool computeBuildingFootprintPolygon(float maxFrontage, float maxDepth,
 	maxBALength = sqrt(maxBALength);
 
 	if(frontageIdx == -1){
-		return false;
+		// 一番長いエッジを、正面としちゃう
+		for (int i = 0; i < buildableAreaCont.size(); ++i) {
+			nextIdx = (i + 1) % baSz;
+
+			curLength = (buildableAreaCont[i] - buildableAreaCont[nextIdx]).lengthSquared();		
+			if(curLength > maxBALength){
+				maxBALength = curLength;
+				frontageIdx = i;
+				frontageIdxNext = nextIdx;
+			}
+		}
 	}
 
 	//std::cout << "f: " << frontageIdx << "   n: " << frontageIdxNext << "    s: " << buildableAreaCont.size() << "\n";
-	std::fflush(stdout);
+	//std::fflush(stdout);
 
 	QVector3D frontPtA, frontPtB;
 	QVector3D rearPtA,  rearPtB;
@@ -95,23 +105,22 @@ bool computeBuildingFootprintPolygon(float maxFrontage, float maxDepth,
 	buildingFootprint.push_back(rearPtA);
 	buildingFootprint.push_back(rearPtB);
 	buildingFootprint.push_back(frontPtB);
-	buildingFootprint.push_back(frontPtA);	
+	buildingFootprint.push_back(frontPtA);
 	printf("buildingFootprint %d\n",buildingFootprint.size());
+
 	return true;
 }
 
-bool generateParcelBuildings(Block &inBlock, Parcel &inParcel, PlaceTypesMainClass &placeTypesIn)
+/**
+ * 指定されたParcelの中に、ビルを建てる。
+ */
+bool generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parcel &inParcel)
 {
 	float probEmptyParcel = 0.0f;
 	Loop3D pContourCpy;
 
-	if(inParcel.getMyPlaceTypeIdx() == -1){
-		return false;
-	}
-
 	//if parcel is park, process
-	if(inParcel.parcelType==PAR_PARK){//park
-		//printf("PARK\n");
+	if (inParcel.isPark) { //park
 		return false;
 	}
 
@@ -131,58 +140,63 @@ bool generateParcelBuildings(Block &inBlock, Parcel &inParcel, PlaceTypesMainCla
 	inBlock.findParcelFrontAndBackEdges(inBlock, inParcel, frontEdges, rearEdges, sideEdges);
 
 	//Compute buildable area polygon
-	float bldgFootprintArea = inParcel.computeBuildableArea(
-		placeTypesIn.myPlaceTypes.at(inParcel.getMyPlaceTypeIdx()).getFloat("pt_parcel_setback_front"),
-		placeTypesIn.myPlaceTypes.at(inParcel.getMyPlaceTypeIdx()).getFloat("pt_parcel_setback_rear"),
-		placeTypesIn.myPlaceTypes.at(inParcel.getMyPlaceTypeIdx()).getFloat("pt_parcel_setback_sides"),
-		frontEdges, rearEdges, sideEdges,
-		inParcel.parcelBuildableAreaContour.contour);
-	//printf("parcelBuilsable %d\n",inParcel.parcelBuildableAreaContour.contour.size());
+	float bldgFootprintArea = inParcel.computeBuildableArea(G::getFloat("parcel_setback_front"), G::getFloat("parcel_setback_rear"), G::getFloat("parcel_setback_sides"), frontEdges, rearEdges, sideEdges,	inParcel.parcelBuildableAreaContour.contour);
 	if(inParcel.parcelBuildableAreaContour.isSelfIntersecting()){
 		inParcel.parcelBuildableAreaContour.contour.clear();
 		return false;
-	}		
+	}
 
 	//compute building footprint polygon
-	if(!computeBuildingFootprintPolygon(
-		placeTypesIn.myPlaceTypes.at(inParcel.getMyPlaceTypeIdx()).getFloat("pt_building_max_frontage"),
-		placeTypesIn.myPlaceTypes.at(inParcel.getMyPlaceTypeIdx()).getFloat("pt_building_max_depth"),
-		frontEdges, rearEdges, sideEdges,
-		inParcel.parcelBuildableAreaContour.contour,
-		inParcel.myBuilding.buildingFootprint.contour))
-	{
+	if(!computeBuildingFootprintPolygon(G::getFloat("building_max_frontage"), G::getFloat("building_max_depth"), frontEdges, rearEdges, sideEdges, inParcel.parcelBuildableAreaContour.contour, inParcel.myBuilding.buildingFootprint.contour))	{
 		printf("!computeBuildingFootprintPolygon\n");
+		inParcel.myBuilding.buildingFootprint.clear();
 		return false;
 	}
 
-	// stoties
-	float heightDev = 
-		(placeTypesIn.myPlaceTypes.at(inParcel.getMyPlaceTypeIdx()).getFloat("pt_building_height_deviation")/100.0f)*
-		(((float)qrand()/RAND_MAX)*2.0f-1.0f)* //LC::misctools::genRand(-1.0f,1.0f)*
-		placeTypesIn.myPlaceTypes.at(inParcel.getMyPlaceTypeIdx()).getFloat("pt_building_height_mean");
+	// もしfootprintの一辺の長さが短すぎたら、または、短い辺と長い辺の比が大きすぎたら、ビルの建設を中止する
+	QVector3D obbSize;
+	QMatrix4x4 obbMat;
+	inParcel.myBuilding.buildingFootprint.getMyOBB(obbSize, obbMat);
+	if (obbSize.x() < 5 || obbSize.y() < 5) return false;
+	if (obbSize.x() > obbSize.y() * 5 || obbSize.y() > obbSize.x() * 5) return false;
 
-	int bldgNumStories = (int)
-		placeTypesIn.myPlaceTypes.at(inParcel.getMyPlaceTypeIdx()).getFloat("pt_building_height_mean") +
-		heightDev;
+	// stoties
+	float heightDev = G::getFloat("building_stories_deviation") * (((float)qrand()/RAND_MAX)*2.0f-1.0f) * G::getFloat("building_stories_mean");
+	int bldgNumStories = G::getInt("zone.building_stories_mean") + heightDev;
+
+	// find the lowest elevation
+	float minZ = std::numeric_limits<float>::max();
+	for (int i = 0; i < inParcel.myBuilding.buildingFootprint.contour.size(); ++i) {
+		float z = rendManager.getTerrainHeight(inParcel.myBuilding.buildingFootprint[i].x(), inParcel.myBuilding.buildingFootprint[i].y());
+		if (z < minZ) {
+			minZ = z;
+		}
+	}
+
+	// set the elevation
+	for (int i = 0; i < inParcel.myBuilding.buildingFootprint.contour.size(); ++i) {
+		inParcel.myBuilding.buildingFootprint[i].setZ(minZ);
+	}
 
 	//Set building
-	inParcel.myBuilding.buildingFootprint=inParcel.myBuilding.buildingFootprint;
+	//inParcel.myBuilding.buildingFootprint=inParcel.myBuilding.buildingFootprint;
 	inParcel.myBuilding.numStories=bldgNumStories;
 	inParcel.myBuilding.bldType=BLDG_WITH_BLDG;
 
 	return true;
 }
 
-
-bool generateBlockBuildings(Block &inBlock, PlaceTypesMainClass &placeTypesIn)
+/**
+ * 指定されたブロック内に、ビルを建てる
+ */
+bool generateBlockBuildings(VBORenderManager& rendManager, Block &inBlock)
 {
 	Block::parcelGraphVertexIter vi, viEnd;	
 
-	//=== First compute parcel frontage and buildable area
 	//For each parcel
-	for(boost::tie(vi, viEnd) = boost::vertices(inBlock.myParcels); vi != viEnd; ++vi){					
-		if(!generateParcelBuildings(inBlock, inBlock.myParcels[*vi], placeTypesIn)){
-			continue;
+	for(boost::tie(vi, viEnd) = boost::vertices(inBlock.myParcels); vi != viEnd; ++vi){
+		if (!generateParcelBuildings(rendManager, inBlock, inBlock.myParcels[*vi])) {
+			inBlock.myParcels[*vi].isPark = true;
 		}
 	}
 	return true;

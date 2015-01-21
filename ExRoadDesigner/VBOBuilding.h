@@ -52,6 +52,7 @@ public:
 	**/
 	Polygon3D buildingFootprint;
 	int bldType;
+	int subType;
 	int numStories;
-
+	QColor color;
 };

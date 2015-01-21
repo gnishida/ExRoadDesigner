@@ -25,8 +25,7 @@ public:
 	Polygon3D parcelContour;
 	Polygon3D parcelBuildableAreaContour;
 
-	int parcelType;
-
+	bool isPark;
 	Building myBuilding;
 
 	/**

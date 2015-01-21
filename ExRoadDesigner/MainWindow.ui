@@ -85,21 +85,9 @@
     <addaction name="actionGenerate2D"/>
     <addaction name="actionGenerate3D"/>
     <addaction name="actionGenerate3DRoads"/>
-   </widget>
-   <widget class="QMenu" name="menuDisplay">
-    <property name="title">
-     <string>Display</string>
-    </property>
-    <widget class="QMenu" name="menuRoads">
-     <property name="title">
-      <string>Roads</string>
-     </property>
-     <addaction name="actionDisplayHighway"/>
-     <addaction name="actionDisplayBoulevard"/>
-     <addaction name="actionDisplayAvenue"/>
-     <addaction name="actionDisplayLocalStreet"/>
-    </widget>
-    <addaction name="menuRoads"/>
+    <addaction name="actionGenerateBlocks"/>
+    <addaction name="actionGenerateParcels"/>
+    <addaction name="actionGenerateBuildings"/>
    </widget>
    <widget class="QMenu" name="menuDebug">
     <property name="title">
@@ -130,7 +118,6 @@
    <addaction name="menuFile"/>
    <addaction name="menuArea"/>
    <addaction name="menuPM"/>
-   <addaction name="menuDisplay"/>
    <addaction name="menuTool"/>
    <addaction name="menuWindow"/>
    <addaction name="menuDebug"/>
@@ -431,21 +418,6 @@
     <string>Save Areas</string>
    </property>
   </action>
-  <action name="actionGenerateBlocks">
-   <property name="text">
-    <string>Generate Blocks</string>
-   </property>
-  </action>
-  <action name="actionGenerateParcels">
-   <property name="text">
-    <string>Generate Parcels</string>
-   </property>
-  </action>
-  <action name="actionGenerateBuildings">
-   <property name="text">
-    <string>Generate Buildings</string>
-   </property>
-  </action>
   <action name="actionAreaDelete">
    <property name="text">
     <string>Delete</string>
@@ -731,6 +703,21 @@
   <action name="actionTerrainDataConverter">
    <property name="text">
     <string>Terrain Data Converter</string>
+   </property>
+  </action>
+  <action name="actionGenerateBlocks">
+   <property name="text">
+    <string>Generate Blocks</string>
+   </property>
+  </action>
+  <action name="actionGenerateParcels">
+   <property name="text">
+    <string>Generate Parcels</string>
+   </property>
+  </action>
+  <action name="actionGenerateBuildings">
+   <property name="text">
+    <string>Generate Buildings</string>
    </property>
   </action>
  </widget>

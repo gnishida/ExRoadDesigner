@@ -343,6 +343,9 @@
     <ClCompile Include="RoadMeshGenerator.cpp">
       <Filter>VBO</Filter>
     </ClCompile>
+    <ClCompile Include="BlockSet.cpp">
+      <Filter>VBO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.ui">
@@ -654,6 +657,9 @@
       <Filter>road generator</Filter>
     </ClInclude>
     <ClInclude Include="RoadMeshGenerator.h">
+      <Filter>VBO</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockSet.h">
       <Filter>VBO</Filter>
     </ClInclude>
   </ItemGroup>

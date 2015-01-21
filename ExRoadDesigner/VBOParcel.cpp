@@ -7,7 +7,7 @@
 
 Parcel::Parcel(){
 	myPlaceTypeIdx = -1;
-	parcelType=PAR_WITH_BLDG;
+	isPark = false;
 }
 
 

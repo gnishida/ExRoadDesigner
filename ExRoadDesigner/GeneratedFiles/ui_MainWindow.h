@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Tue Jan 20 17:20:20 2015
+** Created: Wed Jan 21 10:44:15 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -59,9 +59,6 @@ public:
     QAction *actionLoadRoads;
     QAction *actionLoadAreas;
     QAction *actionSaveAreas;
-    QAction *actionGenerateBlocks;
-    QAction *actionGenerateParcels;
-    QAction *actionGenerateBuildings;
     QAction *actionAreaDelete;
     QAction *actionClearRoads;
     QAction *actionPMControlWidget;
@@ -109,14 +106,15 @@ public:
     QAction *actionGenerate3DRoads;
     QAction *actionAreaDeleteAll;
     QAction *actionTerrainDataConverter;
+    QAction *actionGenerateBlocks;
+    QAction *actionGenerateParcels;
+    QAction *actionGenerateBuildings;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuWindow;
     QMenu *menuArea;
     QMenu *menuPM;
-    QMenu *menuDisplay;
-    QMenu *menuRoads;
     QMenu *menuDebug;
     QMenu *menuTool;
     QToolBar *fileToolBar;
@@ -244,12 +242,6 @@ public:
         actionLoadAreas->setObjectName(QString::fromUtf8("actionLoadAreas"));
         actionSaveAreas = new QAction(MainWindow);
         actionSaveAreas->setObjectName(QString::fromUtf8("actionSaveAreas"));
-        actionGenerateBlocks = new QAction(MainWindow);
-        actionGenerateBlocks->setObjectName(QString::fromUtf8("actionGenerateBlocks"));
-        actionGenerateParcels = new QAction(MainWindow);
-        actionGenerateParcels->setObjectName(QString::fromUtf8("actionGenerateParcels"));
-        actionGenerateBuildings = new QAction(MainWindow);
-        actionGenerateBuildings->setObjectName(QString::fromUtf8("actionGenerateBuildings"));
         actionAreaDelete = new QAction(MainWindow);
         actionAreaDelete->setObjectName(QString::fromUtf8("actionAreaDelete"));
         actionClearRoads = new QAction(MainWindow);
@@ -357,6 +349,12 @@ public:
         actionAreaDeleteAll->setObjectName(QString::fromUtf8("actionAreaDeleteAll"));
         actionTerrainDataConverter = new QAction(MainWindow);
         actionTerrainDataConverter->setObjectName(QString::fromUtf8("actionTerrainDataConverter"));
+        actionGenerateBlocks = new QAction(MainWindow);
+        actionGenerateBlocks->setObjectName(QString::fromUtf8("actionGenerateBlocks"));
+        actionGenerateParcels = new QAction(MainWindow);
+        actionGenerateParcels->setObjectName(QString::fromUtf8("actionGenerateParcels"));
+        actionGenerateBuildings = new QAction(MainWindow);
+        actionGenerateBuildings->setObjectName(QString::fromUtf8("actionGenerateBuildings"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -371,10 +369,6 @@ public:
         menuArea->setObjectName(QString::fromUtf8("menuArea"));
         menuPM = new QMenu(menuBar);
         menuPM->setObjectName(QString::fromUtf8("menuPM"));
-        menuDisplay = new QMenu(menuBar);
-        menuDisplay->setObjectName(QString::fromUtf8("menuDisplay"));
-        menuRoads = new QMenu(menuDisplay);
-        menuRoads->setObjectName(QString::fromUtf8("menuRoads"));
         menuDebug = new QMenu(menuBar);
         menuDebug->setObjectName(QString::fromUtf8("menuDebug"));
         menuTool = new QMenu(menuBar);
@@ -393,7 +387,6 @@ public:
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuArea->menuAction());
         menuBar->addAction(menuPM->menuAction());
-        menuBar->addAction(menuDisplay->menuAction());
         menuBar->addAction(menuTool->menuAction());
         menuBar->addAction(menuWindow->menuAction());
         menuBar->addAction(menuDebug->menuAction());
@@ -434,11 +427,9 @@ public:
         menuPM->addAction(actionGenerate2D);
         menuPM->addAction(actionGenerate3D);
         menuPM->addAction(actionGenerate3DRoads);
-        menuDisplay->addAction(menuRoads->menuAction());
-        menuRoads->addAction(actionDisplayHighway);
-        menuRoads->addAction(actionDisplayBoulevard);
-        menuRoads->addAction(actionDisplayAvenue);
-        menuRoads->addAction(actionDisplayLocalStreet);
+        menuPM->addAction(actionGenerateBlocks);
+        menuPM->addAction(actionGenerateParcels);
+        menuPM->addAction(actionGenerateBuildings);
         menuDebug->addAction(actionDebug);
         menuTool->addAction(actionGenerateRegularGrid);
         menuTool->addAction(actionGenerateCurvyGrid);
@@ -510,9 +501,6 @@ public:
         actionLoadAreas->setText(QApplication::translate("MainWindow", "Load Areas", 0, QApplication::UnicodeUTF8));
         actionLoadAreas->setShortcut(QApplication::translate("MainWindow", "Ctrl+A", 0, QApplication::UnicodeUTF8));
         actionSaveAreas->setText(QApplication::translate("MainWindow", "Save Areas", 0, QApplication::UnicodeUTF8));
-        actionGenerateBlocks->setText(QApplication::translate("MainWindow", "Generate Blocks", 0, QApplication::UnicodeUTF8));
-        actionGenerateParcels->setText(QApplication::translate("MainWindow", "Generate Parcels", 0, QApplication::UnicodeUTF8));
-        actionGenerateBuildings->setText(QApplication::translate("MainWindow", "Generate Buildings", 0, QApplication::UnicodeUTF8));
         actionAreaDelete->setText(QApplication::translate("MainWindow", "Delete", 0, QApplication::UnicodeUTF8));
         actionClearRoads->setText(QApplication::translate("MainWindow", "Clear Roads", 0, QApplication::UnicodeUTF8));
         actionClearRoads->setShortcut(QApplication::translate("MainWindow", "Ctrl+N", 0, QApplication::UnicodeUTF8));
@@ -566,12 +554,13 @@ public:
         actionGenerate3DRoads->setText(QApplication::translate("MainWindow", "Generate 3D Roads", 0, QApplication::UnicodeUTF8));
         actionAreaDeleteAll->setText(QApplication::translate("MainWindow", "Delete All", 0, QApplication::UnicodeUTF8));
         actionTerrainDataConverter->setText(QApplication::translate("MainWindow", "Terrain Data Converter", 0, QApplication::UnicodeUTF8));
+        actionGenerateBlocks->setText(QApplication::translate("MainWindow", "Generate Blocks", 0, QApplication::UnicodeUTF8));
+        actionGenerateParcels->setText(QApplication::translate("MainWindow", "Generate Parcels", 0, QApplication::UnicodeUTF8));
+        actionGenerateBuildings->setText(QApplication::translate("MainWindow", "Generate Buildings", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuWindow->setTitle(QApplication::translate("MainWindow", "Window", 0, QApplication::UnicodeUTF8));
         menuArea->setTitle(QApplication::translate("MainWindow", "Area", 0, QApplication::UnicodeUTF8));
         menuPM->setTitle(QApplication::translate("MainWindow", "PM", 0, QApplication::UnicodeUTF8));
-        menuDisplay->setTitle(QApplication::translate("MainWindow", "Display", 0, QApplication::UnicodeUTF8));
-        menuRoads->setTitle(QApplication::translate("MainWindow", "Roads", 0, QApplication::UnicodeUTF8));
         menuDebug->setTitle(QApplication::translate("MainWindow", "Debug", 0, QApplication::UnicodeUTF8));
         menuTool->setTitle(QApplication::translate("MainWindow", "Tool", 0, QApplication::UnicodeUTF8));
     } // retranslateUi

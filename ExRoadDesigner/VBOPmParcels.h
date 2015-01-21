@@ -5,14 +5,10 @@
 
 #pragma once
 
-#include "VBOPlaceType.h"
 #include "VBOBlock.h"
 
 class VBOPmParcels{
 public:
 
-	static bool generateParcels(
-		PlaceTypesMainClass &placeTypesIn,
-		std::vector< Block > &blocks);
-
+	static bool generateParcels(VBORenderManager& rendManager, std::vector< Block > &blocks);
 };

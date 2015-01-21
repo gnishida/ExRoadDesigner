@@ -10,6 +10,7 @@
 #include "RoadAreaSet.h"
 #include "ExFeature.h"
 #include "CircleHoughTransform.h"
+#include "BlockSet.h"
 
 class MainWindow;
 
@@ -19,6 +20,7 @@ public:
 	int depth;
 	MainWindow* mainWin;
 	RoadGraph roads;
+	BlockSet blocks;
 
 	PolygonBuilder areaBuilder;
 	PolylineBuilder hintLineBuilder;

@@ -11,6 +11,7 @@
 
 #include "VBOModel_StreetElements.h"
 #include "Polyline3D.h"
+#include "VBOModel.h"
 
 #ifndef Q_MOC_RUN
 #include <boost/geometry/geometry.hpp>

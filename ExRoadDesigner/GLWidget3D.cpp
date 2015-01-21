@@ -791,16 +791,18 @@ void GLWidget3D::updateCamera(){
 }//
 
 void GLWidget3D::generate2DGeometry(){
+	/*
 	GraphUtil::cleanEdges(mainWin->urbanGeometry->roads);
 	GraphUtil::clean(mainWin->urbanGeometry->roads);
 	printf("generate2DGeometry\n");
 	G::global()["num_place_types"]=0;
 	G::global()["3d_render_mode"]=3;//2D geometry
 	VBOPm::generate2DGeometry(vboRenderManager, mainWin->urbanGeometry->roads);
-
+	*/
 }//
 
-void GLWidget3D::generate3DGeometry(bool justRoads){
+void GLWidget3D::generate3DGeometry(bool justRoads) {
+	/*
 	GraphUtil::cleanEdges(mainWin->urbanGeometry->roads);
 	GraphUtil::clean(mainWin->urbanGeometry->roads);
 
@@ -825,4 +827,10 @@ void GLWidget3D::generate3DGeometry(bool justRoads){
 	shadow.makeShadowMap(this);
 
 	printf("<<generate3DGeometry\n");
+	*/
 }//
+
+void GLWidget3D::generateBlocks() {
+	VBOPm::generateBlocks(vboRenderManager, mainWin->urbanGeometry->roads, mainWin->urbanGeometry->blocks);
+	shadow.makeShadowMap(this);
+}

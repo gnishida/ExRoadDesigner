@@ -1,10 +1,11 @@
-#include "Polygon3D.h"
+﻿#include "Polygon3D.h"
 #include <QVector2D>
 #include <QMatrix4x4>
 #include "Util.h"
+#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#include <CGAL/Boolean_set_operations_2.h>
 
 #include "clipper.hpp"
-//#include "clipper.cpp"
 
 void Polygon3D::correct() {
 	int next;
@@ -578,6 +579,107 @@ bool Polygon3D::splitMeWithPolyline(std::vector<QVector3D> &pline, Loop3D &pgon1
 	return polylineIntersectsPolygon;
 }
 
+typedef CGAL::Exact_predicates_exact_constructions_kernel Kernel;
+typedef Kernel::Point_2 Point_2;
+typedef CGAL::Polygon_2<Kernel> Polygon_2;
+typedef CGAL::Polygon_with_holes_2<Kernel> Polygon_with_holes_2;
+typedef std::list<Polygon_with_holes_2> Pwh_list_2;
+
+/**
+ * Split the polygon by a line.
+ * uses CGAL library and supports concave polygons.
+ */
+bool Polygon3D::split(std::vector<QVector3D> &pline, std::vector<Polygon3D>& pgons) {
+	bool polylineIntersectsPolygon = false;
+
+	int plineSz = pline.size();
+	int contourSz = this->contour.size();
+
+	if(plineSz < 2 || contourSz < 3){
+		//std::cout << "ERROR: Cannot split if polygon has fewer than three vertices of if polyline has fewer than two points\n.";
+		return false;
+	}
+
+	Polygon_2 P;
+	for (int i = 0; i < this->contour.size(); ++i) {
+		if (i == this->contour.size() - 1 && fabs(this->contour.back().x() - this->contour[0].x()) == 0.0f && fabs(this->contour.back().y() - this->contour[0].y()) == 0.0f) break;
+		P.push_back(Point_2(this->contour[i].x(), this->contour[i].y()));
+	}
+
+	// check if the polygon is self-intersecting.
+	if (!P.is_simple()) {
+		return false;
+	}
+
+	//if (Polygon3D::reorientFace(this->contour, true)) {
+	if (!P.is_counterclockwise_oriented()) {
+		std::reverse(P.vertices_begin(), P.vertices_end());
+	}
+
+	Polygon_2 Q1;
+	QVector3D dir1 = pline[0] - pline[1];
+	QVector3D pdir1(dir1.y(), -dir1.x(), 0);
+	QVector3D pt1 = pline[0] + pdir1.normalized() * 10000.0f;
+
+	QVector3D dir2 = pline.back() - pline[pline.size() - 2];
+	QVector3D pdir2(-dir2.y(), dir2.x(), 0);
+	QVector3D pt2 = pline.back() + pdir2.normalized() * 10000.0f;
+
+	Q1.push_back(Point_2(pt1.x(), pt1.y()));
+	for (int i = 0; i < pline.size(); ++i) {
+		Q1.push_back(Point_2(pline[i].x(), pline[i].y()));
+	}
+	Q1.push_back(Point_2(pt2.x(), pt2.y()));
+	if (!Q1.is_counterclockwise_oriented()) {
+		std::reverse(Q1.vertices_begin(), Q1.vertices_end());
+	}
+
+	Polygon_2 Q2;
+	pt1 = pline[0] - pdir1.normalized() * 10000.0f;
+	pt2 = pline.back() - pdir2.normalized() * 10000.0f;
+	Q2.push_back(Point_2(pt2.x(), pt2.y()));
+	for (int i = pline.size() - 1; i >= 0; --i) {
+		Q2.push_back(Point_2(pline[i].x(), pline[i].y()));
+	}
+	Q2.push_back(Point_2(pt1.x(), pt1.y()));
+	if (!Q2.is_counterclockwise_oriented()) {
+		std::reverse(Q2.vertices_begin(), Q2.vertices_end());
+	}
+
+	Pwh_list_2 intR1;
+	CGAL::intersection (P, Q1, std::back_inserter(intR1));
+
+	Pwh_list_2 intR2;
+	CGAL::intersection (P, Q2, std::back_inserter(intR2));
+
+	// set the resulting polygons
+	pgons.clear();
+	for (auto it = intR1.begin(); it != intR1.end(); ++it) {
+		Polygon3D loop;
+		for (auto edge = it->outer_boundary().edges_begin(); edge != it->outer_boundary().edges_end(); ++edge) {
+			auto source = edge->source();
+
+			loop.push_back(QVector3D(CGAL::to_double(source.x()), CGAL::to_double(source.y()), 0));
+		}
+		loop.push_back(loop.contour[0]);
+
+		pgons.push_back(loop);
+	}
+	for (auto it = intR2.begin(); it != intR2.end(); ++it) {
+		Polygon3D loop;
+		for (auto edge = it->outer_boundary().edges_begin(); edge != it->outer_boundary().edges_end(); ++edge) {
+			auto source = edge->source();
+
+			loop.push_back(QVector3D(CGAL::to_double(source.x()), CGAL::to_double(source.y()), 0));
+		}
+		loop.push_back(loop.contour[0]);
+
+		pgons.push_back(loop);
+	}
+
+	return true;
+}
+
 /**
 * @brief: Reorient polygon faces so that they are CCW
 * @in: If only check is true, the polygon is not modified
@@ -974,4 +1076,35 @@ bool Polygon3D::isSelfIntersecting(void){
 	return boost::geometry::intersects(bg_pgon);
 }//
 
+BBox Polygon3D::envelope() {
+	boost::geometry::ring_type<Polygon3D>::type bg_pgon;
+	boost::geometry::assign(bg_pgon, this->contour);
+	boost::geometry::correct(bg_pgon);
+
+	BBox bbox;
+	boost::geometry::envelope(bg_pgon, bbox);
+	return bbox;
+}
+
+float Polygon3D::area() {
+	boost::geometry::ring_type<Polygon3D>::type bg_pgon;
+	boost::geometry::assign(bg_pgon, this->contour);
+	boost::geometry::correct(bg_pgon);
+
+	return boost::geometry::area(bg_pgon);
+}
+
+/**
+ * GEN
+ * このポリゴンが細すぎるかどうかチェックする。
+ * OBBを計算し、縦横比がratioより大きく、且つ、最小エッジがmin_side未満なら、細すぎると判定する。
+ */
+bool Polygon3D::isTooNarrow(float ratio, float min_side) {
+	QVector3D size;
+	QMatrix4x4 xformMat;
+	getLoopOBB(contour, size, xformMat);
+	
+	if ((std::max)(size.x() / size.y(), size.y() / size.x()) > ratio && (std::min)(size.x(), size.y()) < min_side)  return true;
+	else return false;
+}
 

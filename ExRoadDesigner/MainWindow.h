@@ -61,9 +61,12 @@ public slots:
 	void onAvenueSketch();
 	void onStreetSketch();
 	void onControlPoints();
+
 	void onGenerate2D();
 	void onGenerate3D();
 	void onGenerate3DRoads();
+	void onGenerateBlocks();
+
 	void onDisplayRoads();
 	void onGenerateRegularGrid();
 	void onGenerateCurvyGrid();

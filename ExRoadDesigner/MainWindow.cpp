@@ -60,10 +60,14 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 	connect(ui.actionAvenueSketch, SIGNAL(triggered()), this, SLOT(onAvenueSketch()));
 	connect(ui.actionStreetSketch, SIGNAL(triggered()), this, SLOT(onStreetSketch()));
 	connect(ui.actionControlPoints, SIGNAL(triggered()), this, SLOT(onControlPoints()));
-	connect(ui.actionConvert, SIGNAL(triggered()), this, SLOT(onConvert()));	
+	connect(ui.actionConvert, SIGNAL(triggered()), this, SLOT(onConvert()));
+
 	connect(ui.actionGenerate2D, SIGNAL(triggered()), this, SLOT(onGenerate2D()));
 	connect(ui.actionGenerate3D, SIGNAL(triggered()), this, SLOT(onGenerate3D()));
 	connect(ui.actionGenerate3DRoads, SIGNAL(triggered()), this, SLOT(onGenerate3DRoads()));
+	connect(ui.actionGenerateBlocks, SIGNAL(triggered()), this, SLOT(onGenerateBlocks()));
+
+
 	connect(ui.actionDisplayHighway, SIGNAL(triggered()), this, SLOT(onDisplayRoads()));
 	connect(ui.actionDisplayBoulevard, SIGNAL(triggered()), this, SLOT(onDisplayRoads()));
 	connect(ui.actionGenerateRegularGrid, SIGNAL(triggered()), this, SLOT(onGenerateRegularGrid()));
@@ -353,6 +357,11 @@ void MainWindow::onGenerate3DRoads() {
 
 void MainWindow::onGenerate2D() {
 	glWidget->generate2DGeometry();
+	glWidget->updateGL();
+}
+
+void MainWindow::onGenerateBlocks() {
+	glWidget->generateBlocks();
 	glWidget->updateGL();
 }
 

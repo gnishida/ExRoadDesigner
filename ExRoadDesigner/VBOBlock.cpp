@@ -7,31 +7,11 @@
 //#include "../RoadGraph/roadGraphVertex.h"
 #include <QVector2D>
 
-
-/**
-* Constructor.
-**/
-
-Block::Block()
-{		
-	//myParcels.m_vertices[0].m_out_edges
-	myColor = QVector3D(((float)qrand()/(RAND_MAX)), 0.0f, 0.0f);
-	isPark=false;
-}
-
-/**
-* Destructor.
-**/
-
-Block::~Block()
-{
-	this->clear();
-}
-
 void Block::clear(void)
 {
 	this->blockContour.contour.clear();
-	this->blockContourRoadsWidths.clear();
+	this->sidewalkContour.contour.clear();
+	this->sidewalkContourRoadsWidths.clear();
 	this->myParcels.clear();
 }
 
@@ -182,21 +162,6 @@ float loopArea(Loop3D &loop)
 	return (area/2.0f);
 }
 
-/**
-* Adapt block to vboRenderManager
-**/
-/*void Block::adaptBlockToTerrain(MTC::geometry::ElevationGrid *elGrid)
-{
-Block::parcelGraphVertexIter vi, viEnd;
-
-for(boost::tie(vi, viEnd) = boost::vertices(myParcels);
-vi != viEnd; ++vi)
-{
-myParcels[*vi].adaptParcelToTerrain(elGrid);
-}
-computeMyBBox3D();
-}*/
-
 void getRoadSegmentGeoRightAndLeft(std::vector<QVector3D> &roadSegGeo,
 	std::vector<QVector3D> &roadSegGeoRight, std::vector<QVector3D> &roadSegGeoLeft, float width)
 {
@@ -222,8 +187,8 @@ void getRoadSegmentGeoRightAndLeft(std::vector<QVector3D> &roadSegGeo,
 }
 
 
-void Block::computeMyBBox3D(void)
-{	
+void Block::computeMyBBox3D(void) {
+	/*
 	this->bbox.resetMe();
 
 	parcelGraphVertexIter vi, viEnd;
@@ -231,5 +196,29 @@ void Block::computeMyBBox3D(void)
 	{
 		this->bbox.combineWithBBox3D(myParcels[*vi].bbox);
 	}
+	*/
+
+	bbox.resetMe();
+	for (int i = 0; i < blockContour.contour.size(); ++i) {
+		bbox.addPoint(blockContour[i]);
+	}
 }
 
+/**
+ * adapt this block to the vboRenderManager.
+ */
+void Block::adaptToTerrain(VBORenderManager* vboRenderManager) {
+	for (int i = 0; i < blockContour.contour.size(); ++i) {
+		float z = vboRenderManager->getTerrainHeight(blockContour[i].x(), blockContour[i].x());
+		sidewalkContour.contour[i].setZ(z + 1);
+		blockContour.contour[i].setZ(z + 1);
+	}
+
+	Block::parcelGraphVertexIter vi, viEnd;
+	for (boost::tie(vi, viEnd) = boost::vertices(myParcels); vi != viEnd; ++vi) {
+		for (int i = 0; i < myParcels[*vi].parcelContour.contour.size(); ++i) {
+			float z = vboRenderManager->getTerrainHeight(myParcels[*vi].parcelContour[i].x(), myParcels[*vi].parcelContour[i].x());
+			myParcels[*vi].parcelContour.contour[i].setZ(z + 1);
+		}
+	}
+}

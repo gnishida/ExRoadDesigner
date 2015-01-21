@@ -5,14 +5,12 @@
 
 #pragma once
 
-#include "VBOPlaceType.h"
 #include "VBOBlock.h"
-
 
 class VBOPmBuildings{
 public:
 
-	static bool generateBuildings(PlaceTypesMainClass &placeTypesIn,std::vector< Block > &blocks);
+	static bool generateBuildings(VBORenderManager& rendManager, std::vector< Block > &blocks);
 
 };
 

@@ -11,29 +11,23 @@
 #include "VBOBlock.h"
 #include "VBOParcel.h"
 #include "VBOBuilding.h"
-#include "VBOPlaceType.h"
 #include "RoadGraph.h"
-
+#include "BlockSet.h"
+#include "UrbanGeometry.h"
 
 class VBORenderManager;
 
-class VBOPm
-{
+class VBOPm {
 public:
-
-	static bool initialized;
-	static void init();
-
 	static bool initializedLC;
 	static void initLC();
 
-	static PlaceTypesMainClass placeTypes;
-
-	static bool generateGeometry(VBORenderManager& rendManager,RoadGraph &roadGraph);
-	static bool generate2DGeometry(VBORenderManager& rendManager,RoadGraph &roadGraph);
-
-private:
-
+	static bool generateBlocks(VBORenderManager& rendManager, RoadGraph &roadGraph, BlockSet& blocks);
+	static void generateBlockModels(VBORenderManager& rendManager,RoadGraph &roadGraph, BlockSet& blocks);
+	static bool generateParcels(VBORenderManager& rendManager, BlockSet& blocks);
+	static void generateParcelModels(VBORenderManager& rendManager, BlockSet& blocks);
+	static bool generateBuildings(VBORenderManager& rendManager, BlockSet& blocks);
+	static bool generateVegetation(VBORenderManager& rendManager, BlockSet& blocks);
 };
 
 

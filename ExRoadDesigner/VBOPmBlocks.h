@@ -11,9 +11,8 @@
 #include "VBOBlock.h"
 #include "VBOParcel.h"
 #include "VBOBuilding.h"
-#include "VBOPlaceType.h"
 #include "RoadGraph.h"
-
+#include "BlockSet.h"
 
 class VBORenderManager;
 
@@ -22,12 +21,10 @@ class VBOPmBlocks
 public:
 
 	//Generate Blocks
-	static bool generateBlocks(
-		PlaceTypesMainClass &placeTypesIn,
-		RoadGraph &roadGraph,
-		std::vector< Block > &blocks);
+	static bool generateBlocks(RoadGraph &roadGraph, BlockSet &blocks);
 
 	static void buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding);
+	static void generateSideWalk(BlockSet& blocks);
 };
 
 
