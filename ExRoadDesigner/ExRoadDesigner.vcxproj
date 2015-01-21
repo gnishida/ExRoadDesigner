@@ -132,6 +132,7 @@
     <ClCompile Include="AliagaRoadGenerator.cpp" />
     <ClCompile Include="BBox.cpp" />
     <ClCompile Include="BlendingVideoSettingDialog.cpp" />
+    <ClCompile Include="BlockMeshGenerator.cpp" />
     <ClCompile Include="BlockSet.cpp" />
     <ClCompile Include="BSpline.cpp" />
     <ClCompile Include="CameraSequence.cpp" />
@@ -347,6 +348,7 @@
   <ItemGroup>
     <ClInclude Include="AliagaRoadGenerator.h" />
     <ClInclude Include="BBox.h" />
+    <ClInclude Include="BlockMeshGenerator.h" />
     <ClInclude Include="BlockSet.h" />
     <ClInclude Include="RoadMeshGenerator.h" />
     <ClInclude Include="WarpRoadGenerator.h" />

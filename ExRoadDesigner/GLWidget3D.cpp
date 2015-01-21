@@ -24,6 +24,7 @@ This file is part of QtUrban.
 #include "VBOPm.h"
 #include "BSpline.h"
 #include "RoadGeneratorHelper.h"
+#include "BlockMeshGenerator.h"
 
 GLWidget3D::GLWidget3D(MainWindow* mainWin) : QGLWidget(QGLFormat(QGL::SampleBuffers), (QWidget*)mainWin) {
 	this->mainWin = mainWin;
@@ -832,5 +833,16 @@ void GLWidget3D::generate3DGeometry(bool justRoads) {
 
 void GLWidget3D::generateBlocks() {
 	VBOPm::generateBlocks(vboRenderManager, mainWin->urbanGeometry->roads, mainWin->urbanGeometry->blocks);
+	BlockMeshGenerator::generateBlockMesh(vboRenderManager, mainWin->urbanGeometry->blocks);
+	shadow.makeShadowMap(this);
+}
+
+void GLWidget3D::generateParcels() {
+	VBOPm::generateParcels(vboRenderManager, mainWin->urbanGeometry->blocks);
+	shadow.makeShadowMap(this);
+}
+
+void GLWidget3D::generateBuildings() {
+	VBOPm::generateBuildings(vboRenderManager, mainWin->urbanGeometry->blocks);
 	shadow.makeShadowMap(this);
 }

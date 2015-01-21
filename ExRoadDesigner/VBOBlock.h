@@ -12,6 +12,7 @@
 #include "VBOParcel.h"
 #include <QVector3D>
 #include "Polygon3D.h"
+#include "Polygon2D.h"
 
 /**
 * Block.

@@ -66,6 +66,8 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 	connect(ui.actionGenerate3D, SIGNAL(triggered()), this, SLOT(onGenerate3D()));
 	connect(ui.actionGenerate3DRoads, SIGNAL(triggered()), this, SLOT(onGenerate3DRoads()));
 	connect(ui.actionGenerateBlocks, SIGNAL(triggered()), this, SLOT(onGenerateBlocks()));
+	connect(ui.actionGenerateParcels, SIGNAL(triggered()), this, SLOT(onGenerateParcels()));
+	connect(ui.actionGenerateBuildings, SIGNAL(triggered()), this, SLOT(onGenerateBuildings()));
 
 
 	connect(ui.actionDisplayHighway, SIGNAL(triggered()), this, SLOT(onDisplayRoads()));
@@ -362,6 +364,16 @@ void MainWindow::onGenerate2D() {
 
 void MainWindow::onGenerateBlocks() {
 	glWidget->generateBlocks();
+	glWidget->updateGL();
+}
+
+void MainWindow::onGenerateParcels() {
+	glWidget->generateParcels();
+	glWidget->updateGL();
+}
+
+void MainWindow::onGenerateBuildings() {
+	glWidget->generateBuildings();
 	glWidget->updateGL();
 }
 

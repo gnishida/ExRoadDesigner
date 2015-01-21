@@ -225,6 +225,8 @@ public:
 	//Shortest distance from a point to a polygon
 	static float distanceXYToPoint(Loop3D &pin, QVector3D &pt);
 
+	static bool getIrregularBisector(QVector3D &p0, QVector3D &p1, QVector3D &p2, float d01, float d12,	QVector3D &intPt);
+
 	//minimum distance from a loop to another loop (this considers the contour only)
 	static float distanceXYfromContourAVerticesToContourB(Loop3D &pA, Loop3D &pB);
 	bool isTooNarrow(float ratio, float min_side);

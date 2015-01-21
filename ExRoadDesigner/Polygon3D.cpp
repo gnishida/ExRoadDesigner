@@ -161,10 +161,7 @@ double angleBetweenVectors(QVector3D &vec1, QVector3D &vec2)
 * Returns true if point is successfully computed
 **/
 
-bool getIrregularBisector(QVector3D &p0,
-	QVector3D &p1, QVector3D &p2, float d01, float d12,
-	QVector3D &intPt)
-{
+bool Polygon3D::getIrregularBisector(QVector3D &p0,	QVector3D &p1, QVector3D &p2, float d01, float d12,	QVector3D &intPt) {
 	double alpha;
 	double theta;
 	double L;

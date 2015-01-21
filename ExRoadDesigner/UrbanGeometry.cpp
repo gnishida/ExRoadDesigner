@@ -31,6 +31,7 @@ This file is part of QtUrban.
 #include "Util.h"
 #include "BSpline.h"
 #include "RoadMeshGenerator.h"
+#include "BlockMeshGenerator.h"
 
 UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
@@ -208,8 +209,10 @@ void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 
 	if (G::getBool("shader2D")) {
 		RoadMeshGenerator::generate2DRoadMesh(vboRenderManager, roads);
+		BlockMeshGenerator::generate2DBlockMesh(vboRenderManager, blocks);
 	} else {
 		RoadMeshGenerator::generateRoadMesh(vboRenderManager, roads);
+		BlockMeshGenerator::generateBlockMesh(vboRenderManager, blocks);
 	}
 
 	for (int i = 0; i < areas.size(); ++i) {

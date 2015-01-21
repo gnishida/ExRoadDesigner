@@ -346,6 +346,9 @@
     <ClCompile Include="BlockSet.cpp">
       <Filter>VBO</Filter>
     </ClCompile>
+    <ClCompile Include="BlockMeshGenerator.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.ui">
@@ -661,6 +664,9 @@
     </ClInclude>
     <ClInclude Include="BlockSet.h">
       <Filter>VBO</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockMeshGenerator.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

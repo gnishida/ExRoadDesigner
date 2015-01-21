@@ -10,7 +10,7 @@
 void Block::clear(void)
 {
 	this->blockContour.contour.clear();
-	this->sidewalkContour.contour.clear();
+	this->sidewalkContour.clear();
 	this->sidewalkContourRoadsWidths.clear();
 	this->myParcels.clear();
 }
@@ -210,7 +210,7 @@ void Block::computeMyBBox3D(void) {
 void Block::adaptToTerrain(VBORenderManager* vboRenderManager) {
 	for (int i = 0; i < blockContour.contour.size(); ++i) {
 		float z = vboRenderManager->getTerrainHeight(blockContour[i].x(), blockContour[i].x());
-		sidewalkContour.contour[i].setZ(z + 1);
+		//sidewalkContour[i].setZ(z + 1);
 		blockContour.contour[i].setZ(z + 1);
 	}
 

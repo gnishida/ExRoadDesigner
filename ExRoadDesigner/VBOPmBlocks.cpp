@@ -20,8 +20,8 @@ RoadGraph * roadGraphPtr;
 std::vector< Block > * blocksPtr;
 
 Polygon3D sidewalkContourTmp;
-Polygon3D sidewalkContourPoints;
-std::vector<Polyline3D> sidewalkContourLines;
+Polygon2D sidewalkContourPoints;
+std::vector<Polyline2D> sidewalkContourLines;
 
 std::vector< float > sidewalkContourWidths;
 bool isFirstVertexVisited;
@@ -56,7 +56,7 @@ struct output_visitor : public boost::planar_face_traversal_visitor
 			return;
 		}
 			
-		for (int i = 0; i < sidewalkContourPoints.contour.size(); ++i) {
+		for (int i = 0; i < sidewalkContourPoints.size(); ++i) {
 			sidewalkContourTmp.push_back(sidewalkContourPoints[i]);
 			//sidewalkContourTmp.contour.back().setZ(0);//forze height =0
 
@@ -126,9 +126,9 @@ struct vertex_output_visitor : public output_visitor
 			return;
 		}
 
-		sidewalkContourLines.push_back(roadGraphPtr->graph[e]->polyline3D);
+		sidewalkContourLines.push_back(roadGraphPtr->graph[e]->polyline);
 
-		for (int i = 0; i < roadGraphPtr->graph[e]->polyline3D.size() - 1; ++i) {
+		for (int i = 0; i < roadGraphPtr->graph[e]->polyline.size() - 1; ++i) {
 			sidewalkContourWidths.push_back(0.5f * roadGraphPtr->graph[e]->getWidth());
 		}
 
@@ -276,7 +276,7 @@ bool VBOPmBlocks::generateBlocks(RoadGraph &roadGraph, BlockSet &blocks) {
 
 		if( blocks[i].sidewalkContour.contour.size() != blocks[i].sidewalkContourRoadsWidths.size() ){
 			std::cout << "Error: contour" << blocks[i].sidewalkContour.contour.size() << " widhts " << blocks[i].sidewalkContourRoadsWidths.size() << "\n";
-			blocks[i].sidewalkContour.contour.clear();
+			blocks[i].sidewalkContour.clear();
 			blockAreas.push_back(0.0f);
 			continue;
 		}
@@ -291,7 +291,7 @@ bool VBOPmBlocks::generateBlocks(RoadGraph &roadGraph, BlockSet &blocks) {
 		float insetArea = blocks[i].sidewalkContour.computeInset(blocks[i].sidewalkContourRoadsWidths,sidewalkContourInset);
 		
 		blocks[i].sidewalkContour.contour = sidewalkContourInset;
-		blocks[i].sidewalkContour.getBBox3D(blocks[i].bbox.minPt, blocks[i].bbox.maxPt);
+		//blocks[i].sidewalkContour.getBBox3D(blocks[i].bbox.minPt, blocks[i].bbox.maxPt);
 		
 		blockAreas.push_back(insetArea);
 	}
@@ -356,23 +356,20 @@ void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadE
  * 必要なら、この関数の後で、区画生成を実行してください。
  */
 void VBOPmBlocks::generateSideWalk(BlockSet& blocks) {
+	// ブロックが細すぎる場合は、使用不可ブロックとする
 	for (int i = 0; i < blocks.size(); ++i) {
-		// assign a zone type to the block
-		{
-			BBox3D bbox;
-			blocks[i].sidewalkContour.getBBox3D(bbox.minPt, bbox.maxPt);
+		BBox3D bbox;
+		blocks[i].sidewalkContour.getBBox3D(bbox.minPt, bbox.maxPt);
 
-			// ブロックが細すぎる場合は、使用不可ブロックとする
-			if (blocks[i].sidewalkContour.isTooNarrow(8.0f, 18.0f) || blocks[i].sidewalkContour.isTooNarrow(1.0f, 3.0f)) {
-				blocks[i].valid = false;
-				continue;
-			}
+		if (blocks[i].sidewalkContour.isTooNarrow(8.0f, 18.0f) || blocks[i].sidewalkContour.isTooNarrow(1.0f, 3.0f)) {
+			blocks[i].valid = false;
+			continue;
 		}
 	}
 
 	// 歩道の分を確保するため、ブロックを縮小する。
 	for (int i = 0; i < blocks.size(); ++i) {
-		//if (blocks[i].zone.type() == ZoneType::TYPE_UNUSED) continue;
+		if (blocks[i].isPark) continue;
 
 		Loop3D blockContourInset;
 		float sidewalk_width = G::getFloat("sidewalk_width");

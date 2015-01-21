@@ -66,6 +66,8 @@ public slots:
 	void onGenerate3D();
 	void onGenerate3DRoads();
 	void onGenerateBlocks();
+	void onGenerateParcels();
+	void onGenerateBuildings();
 
 	void onDisplayRoads();
 	void onGenerateRegularGrid();
