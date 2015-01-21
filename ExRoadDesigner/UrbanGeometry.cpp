@@ -204,6 +204,7 @@ void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
 void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 	vboRenderManager.removeStaticGeometry("3d_roads");
 	vboRenderManager.removeStaticGeometry("3d_roads_inter");
+	vboRenderManager.removeStaticGeometry("3d_roads_interCom");
 
 	if (G::getBool("shader2D")) {
 		RoadMeshGenerator::generate2DRoadMesh(vboRenderManager, roads);

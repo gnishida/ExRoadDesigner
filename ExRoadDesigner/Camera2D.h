@@ -21,9 +21,6 @@ public:
 	float lookAtY;
 	float lookAtZ;
 
-
-
-
 	Camera2D() {
 		xrot = 0.0f;//-75.0;
 		yrot = 0.0;
@@ -51,16 +48,14 @@ public:
 		return ((mvMatrix.transposed()).inverted())*eye;
 	}
 
-	void updatePerspective(int width,int height){
-
-		float aspect=(float)width/(float)height;
-		float zfar=90000.0f;//90000.0f;
-		float znear=5.0f;
-
+	void updatePerspective(int width,int height) {
+		float aspect = (float)width / (float)height;
+		float zfar = 90000.0f;//90000.0f;
+		float znear = 5.0f;
 		float f = 1.0f / tan (fovy * (0.00872664625f));//PI/360
 
-		double m[16]=
-		{	 f/aspect,	0,								0,									0,
+		double m[16] = {
+			f/aspect,	0,								0,									0,
 					0,	f,								0,						 			0,
 			        0,	0,		(zfar+znear)/(znear-zfar),		(2.0f*zfar*znear)/(znear-zfar),
 			        0,	0,		    				   -1,									0
@@ -70,12 +65,6 @@ public:
 	}
 
 	void updateCamMatrix() {
-		/*glLoadIdentity();
-		glTranslatef(-dx, -dy, -dz);
-		glRotatef(xrot, 1.0, 0.0, 0.0);		
-		glRotatef(yrot, 0.0, 1.0, 0.0);
-		glRotatef(zrot, 0.0, 0.0, 1.0);
-		glTranslatef(-lookAtX, -lookAtY, -lookAtZ);*/
 		// modelview matrix
 		mvMatrix.setToIdentity();
 		mvMatrix.translate(-dx, -dy, -dz);
@@ -143,7 +132,6 @@ public:
 		dx += x;
 		dy += y;
 		dz += z;
-		//printf("dx: %f,dy: %f, dz: %f\n",dx,dy,dz);
 	}
 
 	void setLookAt(float x, float y, float z) {
@@ -158,13 +146,12 @@ public:
 		yrot = 0.0;
 		zrot = 0.0f;
 		setTranslation(0.0f, 0.0f,G::global().getFloat("MAX_Z") );//MAX_Z
-	}//
+	}
 
 	void saveCameraPose(const QString &filepath) {
-		//QFile camFile("data/camPose"+QString::number(numCam)+".cam");
 		QFile camFile(filepath);
 
-		if (!camFile.open(QIODevice::WriteOnly | QIODevice::Text)){
+		if (!camFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
 			printf("ERROR: Cannot open the file cam.txt for writing\n");
 			return;
 		}
@@ -174,18 +161,14 @@ public:
 			this->dx << " " << dy << " " << " " << dz << " " << lookAtX << " " << lookAtY << " " << lookAtZ;		
 
 		camFile.close();
-	}//
+	}
 
 	void loadCameraPose(const QString &filepath) {
-		//QFile camFile("data/camPose"+QString::number(numCam)+".cam");
 		QFile camFile(filepath);
 
-		if (!camFile.open(QIODevice::ReadOnly | QIODevice::Text)) // Open the file
-		{
+		if (!camFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
 			printf("Can't open file.\n");
-		}
-
-		else {
+		} else {
 			QTextStream stream( &camFile); // Set the stream to read from myFile
 			stream >> xrot;
 			stream >> yrot;
@@ -197,6 +180,6 @@ public:
 			stream >> lookAtY;
 			stream >> lookAtZ;
 		}
-	}//
+	}
 };
 

@@ -113,13 +113,15 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 
 					QVector3D b03 = (b0 + b3) * 0.5f;
 					QVector3D b12 = (b1 + b2) * 0.5f;
-					float z1 = rendManager.getTerrainHeight(b03.x(), b03.y()) + deltaZ;
-					float z2 = rendManager.getTerrainHeight(b12.x(), b12.y()) + deltaZ;
+					float z1 = rendManager.getTerrainHeight(b03.x(), b03.y());
+					if (z1 < 70.0f) z1 = 70.0f;
+					float z2 = rendManager.getTerrainHeight(b12.x(), b12.y());
+					if (z2 < 70.0f) z2 = 70.0f;
 
-					b0.setZ(z1);
-					b3.setZ(z1);
-					b1.setZ(z2);
-					b2.setZ(z2);
+					b0.setZ(z1 + deltaZ);
+					b3.setZ(z1 + deltaZ);
+					b1.setZ(z2 + deltaZ);
+					b2.setZ(z2 + deltaZ);
 
 					vertROAD[type].push_back(Vertex(b0,QColor(),QVector3D(0,0,1.0f),QVector3D(1,lengthMovedR / dW,0)));
 					vertROAD[type].push_back(Vertex(b1,QColor(),QVector3D(0,0,1.0f),QVector3D(1,(lengthMovedR + segmentLengR) / dW,0)));
@@ -174,59 +176,53 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				continue;
 			} else if (outDegree ==1) { // デッドエンド
 				// get the largest width of the outing edges
-				float max_r = 0;
-				int max_roadType = 0;
-				float offset = 0.3f;
+				float rad = 0.0f;
+				float angle_offset = 0.0f;
 				RoadOutEdgeIter oei, oeend;
 				for (boost::tie(oei, oeend) = boost::out_edges(*vi, roads.graph); oei != oeend; ++oei) {
 					if (!roads.graph[*oei]->valid) continue;
 
-					float r = roads.graph[*oei]->getWidth();
-					if (r > max_r) {
-						max_r = r;
-					}
-
-					if (roads.graph[*oei]->type > max_roadType) {
-						max_roadType = roads.graph[*oei]->type;
-					}
+					rad = roads.graph[*oei]->getWidth() * 0.5;
+					Polyline2D polyline = GraphUtil::orderPolyLine(roads, *oei, *vi);
+					QVector2D dir = polyline[1] - polyline[0];
+					angle_offset = atan2f(dir.x(), -dir.y());
+					break;
 				}
 
-				float z = rendManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y()) + deltaZ - 0.1f;
-				QVector3D center(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), z);
+				float z = rendManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
+				if (z < 70.0f) z = 70.0f;
+				QVector3D center(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), z + deltaZ);
 
-				float radi1 = max_r /2.0f;
+				const float numSides = 10;
+				QVector3D cc1 = QVector3D(rad * cosf(angle_offset), rad * sinf(angle_offset), 0.0f);
+				for (int i = 1; i <= numSides; ++i) {
+					float angle = angle_offset + M_PI * i / numSides;
+					QVector3D cc2 = QVector3D(rad * cosf(angle), rad * sinf(angle), 0.0f);
 
-				const float numSides=20;
-				const float deltaAngle=( 1.0f / numSides ) * 3.14159f * 2.0f;
-				float angle=0.0f;
-				QVector3D nP,oP;
-				oP=QVector3D( radi1 * cos( angle ), radi1 * sin( angle ),0.0f );//init point
-				for(int i=0;i<numSides+1;i++){
-					angle=deltaAngle*i;
-					nP=QVector3D( radi1 * cos( angle ), radi1 * sin( angle ),0.0f );
-
-					intersectCirclesV.push_back(Vertex(center,center/7.5f));
-					intersectCirclesV.push_back(Vertex(center+oP,(center+oP)/7.5f));
-					intersectCirclesV.push_back(Vertex(center+nP,(center+nP)/7.5f));
+					intersectCirclesV.push_back(Vertex(center, center/7.5f));
+					intersectCirclesV.push_back(Vertex(center + cc1, (center + cc1) / 7.5f));
+					intersectCirclesV.push_back(Vertex(center + cc2, (center + cc2) / 7.5f));
 
 					// 側面のジオメトリ
-					QVector3D side0_u = center + oP;
-					QVector3D side0_b = center + oP + QVector3D(0, 0, -deltaZ * 2.0f);
-					QVector3D side1_u = center + nP;
-					QVector3D side1_b = center + nP + QVector3D(0, 0, -deltaZ * 2.0f);
+					QVector3D side0_u = center + cc1;
+					QVector3D side0_b = center + cc1 + QVector3D(0, 0, -deltaZ * 2.0f);
+					QVector3D side1_u = center + cc2;
+					QVector3D side1_b = center + cc2 + QVector3D(0, 0, -deltaZ * 2.0f);
 
-					vertSide.push_back(Vertex(side0_b, QColor(64, 64, 64), oP, QVector3D()));
-					vertSide.push_back(Vertex(side1_b, QColor(64, 64, 64), nP, QVector3D()));
-					vertSide.push_back(Vertex(side1_u, QColor(64, 64, 64), nP, QVector3D()));
-					vertSide.push_back(Vertex(side0_u, QColor(64, 64, 64), oP, QVector3D()));
+					vertSide.push_back(Vertex(side0_b, QColor(64, 64, 64), cc1, QVector3D()));
+					vertSide.push_back(Vertex(side1_b, QColor(64, 64, 64), cc2, QVector3D()));
+					vertSide.push_back(Vertex(side1_u, QColor(64, 64, 64), cc2, QVector3D()));
+					vertSide.push_back(Vertex(side0_u, QColor(64, 64, 64), cc1, QVector3D()));
 
-					oP=nP;
+					cc1 = cc2;
 				}
 
 			}else{
 				////////////////////////
 				// 2.2 FOUR OR MORE--> COMPLEX INTERSECTION
-				float z = rendManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y()) + deltaZ + 0.1f;
+				float z = rendManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
+				if (z < 70.0f) z = 70.0f;
+				z += deltaZ + 0.1f;
 
 				////////////
 				// 2.2.1 For each vertex find edges and sort them in clockwise order
@@ -383,7 +379,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 				}*/
 								
 				if (interPoints.size() > 2) {
-					rendManager.addStaticGeometry2("3d_roads_inter",interPoints,0.0f,false,"../data/textures/roads/road_0lines.jpg",GL_QUADS,2,QVector3D(1.0f/7.5f,1.0f/7.5f,1),QColor());//0.0f (moved before)
+					rendManager.addStaticGeometry2("3d_roads_interCom",interPoints,0.0f,false,"../data/textures/roads/road_0lines.jpg",GL_QUADS,2,QVector3D(1.0f/7.5f,1.0f/7.5f,1),QColor());//0.0f (moved before)
 				}
 			}
 		}

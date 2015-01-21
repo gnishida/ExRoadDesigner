@@ -51,8 +51,6 @@ GLWidget3D::GLWidget3D(MainWindow* mainWin) : QGLWidget(QGLFormat(QGL::SampleBuf
 
 	vertexSelected = false;
 	edgeSelected = false;
-
-	shadowEnabled=true;
 }
 
 GLWidget3D::~GLWidget3D() {
@@ -421,16 +419,19 @@ void GLWidget3D::mouseDoubleClickEvent(QMouseEvent *e) {
 	case MainWindow::MODE_HIGHWAY_SKETCH:
 		mainWin->urbanGeometry->highwayBuilder.end();
 		mainWin->urbanGeometry->addRoad(RoadEdge::TYPE_HIGHWAY, mainWin->urbanGeometry->highwayBuilder.polyline(), 3);
+		mainWin->urbanGeometry->update(vboRenderManager);
 		
 		break;
 	case MainWindow::MODE_AVENUE_SKETCH:
 		mainWin->urbanGeometry->avenueBuilder.end();
 		mainWin->urbanGeometry->addRoad(RoadEdge::TYPE_AVENUE, mainWin->urbanGeometry->avenueBuilder.polyline(), 2);
-		
+		mainWin->urbanGeometry->update(vboRenderManager);
+
 		break;
 	case MainWindow::MODE_STREET_SKETCH:
 		mainWin->urbanGeometry->streetBuilder.end();
 		mainWin->urbanGeometry->addRoad(RoadEdge::TYPE_STREET, mainWin->urbanGeometry->streetBuilder.polyline(), 1);
+		mainWin->urbanGeometry->update(vboRenderManager);
 		
 		break;
 	case MainWindow::MODE_CONTROL_POINTS:
@@ -513,20 +514,17 @@ void GLWidget3D::paintGL() {
 void GLWidget3D::drawScene(int drawMode) {
 	///////////////////////////////////
 	// GEN MODE
+	//if (G::getInt("3d_render_mode") == 0) {
 	if (G::getBool("shader2D")) {
-		//vboRenderManager.renderStaticGeometry("sky");
-
-		//glDisable(GL_CULL_FACE);
 		mainWin->urbanGeometry->render(vboRenderManager);
-		//glEnable(GL_CULL_FACE);
 		
-		vboRenderManager.vboTerrain.render();
+		vboRenderManager.vboTerrain.render(true);
 		vboRenderManager.renderStaticGeometry("3d_roads");
 		vboRenderManager.renderStaticGeometry("3d_roads_inter");
+		vboRenderManager.renderStaticGeometry("3d_roads_interCom");
 
 		// draw the selected vertex and edge
 		if (vertexSelected) {
-
 			RendererHelper::renderPoint(vboRenderManager, selectedVertex->pt, QColor(0, 0, 255), selectedVertex->pt3D.z() + 2.0f);
 		}
 		if (edgeSelected) {
@@ -535,55 +533,45 @@ void GLWidget3D::drawScene(int drawMode) {
 			vboRenderManager.addPolyline("selected_edge", polyline, QColor(0, 0, 255));
 			vboRenderManager.renderStaticGeometry("selected_edge");
 		}
-
 	} else {
 		// NORMAL
-		if(drawMode==0){
-			glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 0);//SHADOW: Disable
-
-			// RENDER SKY WATER
-
+		if (drawMode == 0) {
+			glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 0);
 			vboRenderManager.renderStaticGeometry("sky");
 			vboRenderManager.vboWater.render(vboRenderManager);
-
 			mainWin->urbanGeometry->render(vboRenderManager);
 			
-
-			if(shadowEnabled)
-				glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 1);//SHADOW: Render Normal with Shadows
-
-			vboRenderManager.vboTerrain.render();
-
+			glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 1);
+			vboRenderManager.vboTerrain.render(true);
 			vboRenderManager.renderStaticGeometry("3d_sidewalk");
 			vboRenderManager.renderStaticGeometry("3d_roads");
 			vboRenderManager.renderStaticGeometry("3d_roads_inter");
-			
+			vboRenderManager.renderStaticGeometry("3d_roads_interCom");
 
 			vboRenderManager.renderStaticGeometry("3d_building");
 			vboRenderManager.renderStaticGeometry("3d_building_fac");
 
-			if(mainWin->controlWidget->ui.render_3DtreesCheckBox->isChecked()){
-				vboRenderManager.renderStaticGeometry("3d_trees");//hatch
-				vboRenderManager.renderAllStreetElementName("tree");//LC
-				vboRenderManager.renderAllStreetElementName("streetLamp");//LC
+			if (mainWin->controlWidget->ui.render_3DtreesCheckBox->isChecked()) {
+				vboRenderManager.renderAllStreetElementName("tree");
+				vboRenderManager.renderAllStreetElementName("streetLamp");
 			}
-
 		}
 		// SHADOWS
-		if(drawMode==1){
+		if (drawMode == 1) {
 			glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 2);// SHADOW: From light
 
-			vboRenderManager.vboTerrain.render();
+			vboRenderManager.vboTerrain.render(false);
 
 			//vboRenderManager.renderStaticGeometry("3d_sidewalk");
 			//vboRenderManager.renderStaticGeometry("3d_roads");
+			//vboRenderManager.renderStaticGeometry("3d_roads_inter");
+			//vboRenderManager.renderStaticGeometry("3d_roads_interCom");
 			vboRenderManager.renderStaticGeometry("3d_building");
 			vboRenderManager.renderStaticGeometry("3d_building_fac");
 
-			if(mainWin->controlWidget->ui.render_3DtreesCheckBox->isChecked()){
-				vboRenderManager.renderStaticGeometry("3d_trees");//hatch
-				vboRenderManager.renderAllStreetElementName("tree");//LC
-				vboRenderManager.renderAllStreetElementName("streetLamp");//LC
+			if (mainWin->controlWidget->ui.render_3DtreesCheckBox->isChecked()) {
+				vboRenderManager.renderAllStreetElementName("tree");
+				vboRenderManager.renderAllStreetElementName("streetLamp");
 			}
 		}
 	}

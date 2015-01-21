@@ -42,21 +42,21 @@
 
 		QVector3D light_dir=glWidget3D->camera3D.light_dir.toVector3D();
 		//////////////////////////////////////////////////////
-		float fov=45.0f;
-		float aspect=(float)shadowWidth/(float)shadowHeight;
+		float fov = 45.0f;
+		float aspect = (float)shadowWidth / (float)shadowHeight;
 
-		float zfar=15000.0f;//3800.0
-		float znear=7000.0f;//1500.0
+		float zfar = 90000.0f;//3800.0
+		float znear = 1200.0f;//1500.0
 
 		//float zfar=3800.0;
 		//float znear=1500.0;
 
-		float f = 1.0f / tan (fov * (M_PI / 360.0));
-		double m[16]=
-		{	f/aspect,	0,								0,									0,
-		0,			f,								0,						 			0,
-		0,			0,		(zfar+znear)/(znear-zfar),		(2.0f*zfar*znear)/(znear-zfar),
-		0,			0,								-1,									0
+		float f = 1.0f / tanf(fov * (M_PI / 360.0));
+		double m[16] = {
+			f/aspect,	0,								0,									0,
+			0,			f,								0,						 			0,
+			0,			0,		(zfar+znear)/(znear-zfar),		(2.0f*zfar*znear)/(znear-zfar),
+			0,			0,								-1,									0
 		};
 
 		light_pMatrix=QMatrix4x4(m);
@@ -126,27 +126,25 @@
 
 	}
 
-	void GLWidgetSimpleShadow::initShadow(int _programId,GLWidget3D* glWidget3D){
+	void GLWidgetSimpleShadow::initShadow(int _programId,GLWidget3D* glWidget3D) {
 		printf("---------- >> INIT SHADOW\n");
 		
-		programId=_programId;
+		programId = _programId;
 
 		// PROJECTION MATRIX
-		float fov=45.0f; // Think if bigger
-		float aspect=(float)shadowWidth/(float)shadowHeight;
+		float fov = 45.0f; // Think if bigger
+		float aspect = (float)shadowWidth / (float)shadowHeight;
 		
-		float zfar=3300.0f;// 
-		float znear=1200.0f;// FIX
+		float zfar = 90000.0f;// 
+		float znear = 1200.0f;// FIX
 
-		float f = 1.0f / tan (fov * (M_PI / 360.0));
-		double m[16]=
-		{	f/aspect,	0,								0,									0,
+		float f = 1.0f / tanf(fov * (M_PI / 360.0));
+		double m[16] = {
+			f/aspect,	0,								0,									0,
 			0,			f,								0,						 			0,
 			0,			0,		(zfar+znear)/(znear-zfar),		(2.0f*zfar*znear)/(znear-zfar),
 			0,			0,								-1,									0
 		};
-
-		
 
 		light_pMatrix=QMatrix4x4(m);
 		// BIAS MATRIX
@@ -181,14 +179,14 @@
 		glGenTextures(MAX_SPLITS, &shadowMap[0]);
 	
 
-			glActiveTexture(GL_TEXTURE6);
-			glBindTexture(GL_TEXTURE_2D,shadowMap[0]);
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D,shadowMap[0]);
 
-			glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT32, shadowWidth, shadowHeight, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT32, shadowWidth, shadowHeight, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		
 
 		glActiveTexture(GL_TEXTURE0);

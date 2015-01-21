@@ -58,7 +58,6 @@ public:
 
 	VBORenderManager vboRenderManager;
 	GLWidgetSimpleShadow shadow;
-	bool shadowEnabled;
 
 public:
 	GLWidget3D(MainWindow *parent);

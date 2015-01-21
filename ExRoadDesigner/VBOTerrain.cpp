@@ -78,7 +78,7 @@ void VBOTerrain::init(VBORenderManager* rendManager, int resolution) {
 	initialized = true;
 }
 
-void VBOTerrain::render() {
+void VBOTerrain::render(bool drawEditingCircle) {
 	bool editionMode = rendManager->editionMode;
 	QVector3D mousePos = rendManager->mousePos3D;
 
@@ -131,7 +131,7 @@ void VBOTerrain::render() {
 
 	//////////////////////
 	// EDITION
-	if (editionMode) {
+	if (editionMode && drawEditingCircle) {
 		glLineWidth(5.0f);
 		glPointSize(10.0f);
 

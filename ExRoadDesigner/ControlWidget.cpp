@@ -322,22 +322,23 @@ void ControlWidget::updateRender2D(int newValue){
 		}
 }//
 
-void ControlWidget::changeTerrainShader(int){
-	bool shader2D=ui.terrain_2DShader->isChecked();
+void ControlWidget::changeTerrainShader(int) {
+	bool shader2D = ui.terrain_2DShader->isChecked();
 	G::global()["shader2D"] = shader2D;
 	int terrainMode;
-	if(shader2D==true){
-		terrainMode=0;
-		if(ui.content_checkbox->isChecked()==true)
-			terrainMode=2;
-	}else 
+	if (shader2D) {
+		terrainMode = 0;
+		if (ui.content_checkbox->isChecked()) terrainMode=2;
+	} else  {
 		terrainMode=1;
+	}
+
 	printf("terrainMode %d\n",terrainMode);
-	mainWin->glWidget->vboRenderManager.changeTerrainShader(terrainMode);//could have used !shader2D
+	mainWin->glWidget->vboRenderManager.changeTerrainShader(terrainMode);
 	mainWin->urbanGeometry->update(mainWin->glWidget->vboRenderManager);
 	mainWin->glWidget->shadow.makeShadowMap(mainWin->glWidget);
 	mainWin->glWidget->updateGL();
-}//
+}
 
 void ControlWidget::contentDesign(int){
 	printf("Content design clicked\n");

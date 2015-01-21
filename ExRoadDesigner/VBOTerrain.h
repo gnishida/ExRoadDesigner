@@ -29,7 +29,7 @@ public:
 	int resolution() { return _resolution; };
 	void init(VBORenderManager* rendManager, int resolution);
 
-	void render();
+	void render(bool drawEditingCircle);
 	void updateGaussian(float u, float v, float height, float rad_ratio);
 	void excavate(float u, float v, float height, float rad_ratio);
 	float getTerrainHeight(float u, float v);
