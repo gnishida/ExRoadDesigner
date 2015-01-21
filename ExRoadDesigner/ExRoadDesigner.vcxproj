@@ -138,6 +138,7 @@
     <ClCompile Include="CameraSequence.cpp" />
     <ClCompile Include="CircleDetectionScaleInputDialog.cpp" />
     <ClCompile Include="CircleHoughTransform.cpp" />
+    <ClCompile Include="clipper.cpp" />
     <ClCompile Include="FlyThroughCamera.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_BlendingVideoSettingDialog.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -349,6 +350,7 @@
     <ClInclude Include="BBox.h" />
     <ClInclude Include="BlockMeshGenerator.h" />
     <ClInclude Include="BlockSet.h" />
+    <ClInclude Include="clipper.hpp" />
     <ClInclude Include="RoadMeshGenerator.h" />
     <ClInclude Include="WarpRoadGenerator.h" />
     <CustomBuild Include="BlendingVideoSettingDialog.h">

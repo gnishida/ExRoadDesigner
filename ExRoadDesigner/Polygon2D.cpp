@@ -2,7 +2,6 @@
 #include "Polygon2D.h"
 #include "Polyline2D.h"
 #include "Util.h"
-#include "clipper.hpp"
 
 void Polygon2D::correct() {
 	boost::geometry::correct(*this);

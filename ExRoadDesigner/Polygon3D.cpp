@@ -7,6 +7,7 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Polygon_2.h>
 #include <CGAL/create_offset_polygons_2.h>
+#include "clipper.hpp"
 
 void Polygon3D::correct() {
 	int next;
@@ -94,6 +95,8 @@ bool is2DRingWithin2DRing( boost::geometry::ring_type<Polygon3D>::type &contourA
 	return true;
 }
 
+using namespace ClipperLib;
+
 float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea)
 {
 	Loop3D cleanPgon; 
@@ -124,8 +127,8 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 	QVector3D intPt;
 
 
-	/*
 	// GEN CODE--> It leads to self-intersection very often with non-convex polygons
+	pgonInset.clear();
 	for(int cur=0; cur<cSz; ++cur){
 		//Some geometry and trigonometry
 
@@ -147,6 +150,7 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 		} else {
 			Util::getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next], offsetDistances[prev], offsetDistances[cur], intPt);
 			
+
 			// For acute angle
 			if (pgonInset.size() >= 2) {
 				if (Util::diffAngle(pgonInset[pgonInset.size() - 2] - pgonInset[pgonInset.size() - 1], intPt - pgonInset[pgonInset.size() - 1]) < 0.1f) {
@@ -156,9 +160,10 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 
 			pgonInset.push_back(intPt);
 		}
-	}*/
-	
+	}
+
 	// Old Code
+	/*
 	pgonInset.resize(cSz);
 	for(int cur=0; cur<cSz; ++cur){
 		//Some geometry and trigonometry
@@ -167,13 +172,11 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 		prev = (cur-1+cSz)%cSz; //point p0
 		next = (cur+1)%cSz;	  //point p2
 
-		getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next],
-			offsetDistances[prev], offsetDistances[cur], intPt);
+		Util::getIrregularBisector(cleanPgon[prev], cleanPgon[cur], cleanPgon[next], offsetDistances[prev], offsetDistances[cur], intPt);
 
 		pgonInset[cur] = intPt;
 	}
-
-
+	*/
 
 	//temp
 	
@@ -224,30 +227,25 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 		}
 		// IT FAILED TRY SECOND METHOD
 		{
-			typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-			typedef K::Point_2 Point;
-			typedef CGAL::Polygon_2<K> Polygon_2;
-			typedef CGAL::Straight_skeleton_2<K> Ss;
-			typedef boost::shared_ptr<Polygon_2> PolygonPtr;
-			typedef std::vector<PolygonPtr> PolygonPtrVector;
-
-			Polygon_2 poly;
-			for (int i = 0; i < cleanPgon.size(); ++i) {
-				poly.push_back(Point(cleanPgon[i].x(), cleanPgon[i].y()));
+			Path subj;
+			Paths solution;
+			for(int cur=0; cur<cSz; ++cur){
+				subj << IntPoint(cleanPgon[cur].x()*1000,cleanPgon[cur].y()*1000);
 			}
-
-			PolygonPtrVector offset_polygons = CGAL::create_interior_skeleton_and_offset_polygons_2(7.5f, poly);
-			if (offset_polygons.size() > 0) {
-				pgonInset.resize(offset_polygons[0]->size());
-				for (auto v = offset_polygons[0]->vertices_begin(); v != offset_polygons[0]->vertices_end(); ++v) {
-					pgonInset.push_back(QVector3D(v->x(), v->y(), 0));
+			/*subj << 
+				ClipperLib::IntPoint(348,257) << IntPoint(364,148) << IntPoint(362,148) << 
+				IntPoint(326,241) << IntPoint(295,219) << IntPoint(258,88) << 
+				IntPoint(440,129) << IntPoint(370,196) << IntPoint(372,275);*/
+			ClipperOffset co;
+			co.AddPath(subj, jtSquare, etClosedPolygon);
+			co.Execute(solution, -1000*7.5);
+			if (solution.size() > 0) { // GEN: we have to check whether the solution exists.
+				pgonInset.resize(solution[0].size());
+				for(int sN=0;sN<solution[0].size();sN++){
+					pgonInset[sN]=QVector3D(solution[0][sN].X/1000.0f,solution[0][sN].Y/1000.0f,0);
 				}
-
-				boost::geometry::ring_type<Polygon3D>::type bg_contour_inset;
-				boost::geometry::assign(bg_contour_inset, pgonInset);
-				boost::geometry::correct(bg_contour_inset);
-
-				return fabs(boost::geometry::area(bg_contour_inset));
+				//printf("Solutions %d\n",solution.size());
+				return Area(solution[0]);
 			}
 		}
 

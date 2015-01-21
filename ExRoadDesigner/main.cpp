@@ -38,10 +38,10 @@ int main(int argc, char *argv[]) {
 	G::global()["shader2D"] = true;
 
 	G::global()["sidewalk_width"] = 2.0f;
-	G::global()["parcel_area_mean"] = 1600.0f;
-	G::global()["parcel_area_min"] = 900.0f;
-	G::global()["parcel_area_deviation"] = 0.5f;
-	G::global()["parcel_split_deviation"] = 0.5f;
+	G::global()["parcel_area_mean"] = 2000.0f;
+	G::global()["parcel_area_min"] = 1000.0f;
+	G::global()["parcel_area_deviation"] = 1.0f;
+	G::global()["parcel_split_deviation"] = 0.2f;
 	G::global()["parcel_setback_front"] = 5.0f;
 	G::global()["parcel_setback_rear"] = 5.0f;
 	G::global()["parcel_setback_sides"] = 2.0f;

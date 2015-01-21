@@ -346,6 +346,9 @@
     <ClCompile Include="BlockMeshGenerator.cpp">
       <Filter>VBO</Filter>
     </ClCompile>
+    <ClCompile Include="clipper.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MainWindow.ui">
@@ -661,6 +664,9 @@
     </ClInclude>
     <ClInclude Include="BlockMeshGenerator.h">
       <Filter>VBO</Filter>
+    </ClInclude>
+    <ClInclude Include="clipper.hpp">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
