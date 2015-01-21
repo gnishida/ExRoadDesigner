@@ -32,6 +32,7 @@ This file is part of QtUrban.
 #include "BSpline.h"
 #include "RoadMeshGenerator.h"
 #include "BlockMeshGenerator.h"
+#include "VBOPm.h"
 
 UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
@@ -120,6 +121,19 @@ void UrbanGeometry::generateRoadsAliaga(std::vector<ExFeature> &features) {
 		generator.generateRoadNetwork();
 	}
 	update(mainWin->glWidget->vboRenderManager);
+}
+
+void UrbanGeometry::generateBlocks() {
+	VBOPm::generateBlocks(mainWin->glWidget->vboRenderManager, roads, blocks);
+	BlockMeshGenerator::generateBlockMesh(mainWin->glWidget->vboRenderManager, blocks);
+}
+
+void UrbanGeometry::generateParcels() {
+	VBOPm::generateParcels(mainWin->glWidget->vboRenderManager, blocks);
+	BlockMeshGenerator::generateParcelMesh(mainWin->glWidget->vboRenderManager, blocks);
+}
+
+void UrbanGeometry::generateBuildings() {
 }
 
 void UrbanGeometry::render(VBORenderManager& vboRenderManager) {

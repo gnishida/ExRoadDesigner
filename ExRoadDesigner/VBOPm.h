@@ -23,7 +23,6 @@ public:
 	static void initLC();
 
 	static bool generateBlocks(VBORenderManager& rendManager, RoadGraph &roadGraph, BlockSet& blocks);
-	static void generateBlockModels(VBORenderManager& rendManager,RoadGraph &roadGraph, BlockSet& blocks);
 	static bool generateParcels(VBORenderManager& rendManager, BlockSet& blocks);
 	static void generateParcelModels(VBORenderManager& rendManager, BlockSet& blocks);
 	static bool generateBuildings(VBORenderManager& rendManager, BlockSet& blocks);

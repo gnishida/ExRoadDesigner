@@ -52,12 +52,12 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 		{
 			std::vector<QVector3D> polygon;
 			for (int pi = 0; pi < blocks[i].sidewalkContour.contour.size(); ++pi) {
-				float z = rendManager.getTerrainHeight(blocks[i].sidewalkContour[pi].x(), blocks[i].sidewalkContour[pi].y()) + deltaZ;
-				polygon.push_back(QVector3D(blocks[i].sidewalkContour[pi].x(), blocks[i].sidewalkContour[pi].y(), z));
+				//float z = rendManager.getTerrainHeight(blocks[i].sidewalkContour[pi].x(), blocks[i].sidewalkContour[pi].y()) + deltaZ;
+				polygon.push_back(QVector3D(blocks[i].sidewalkContour[pi].x(), blocks[i].sidewalkContour[pi].y(), deltaZ));
 			}
 
 			int randSidewalk=2;//qrand()%grassFileNames.size();
-			rendManager.addStaticGeometry2("3d_sidewalk", polygon, 0.0f, false, sideWalkFileNames[randSidewalk], GL_QUADS, 2, sideWalkScale[randSidewalk], QColor());
+			rendManager.addStaticGeometry2("3d_sidewalk", polygon, 0.0f, false, sideWalkFileNames[randSidewalk], GL_QUADS, 2|mode_AdaptTerrain, sideWalkScale[randSidewalk], QColor());
 
 			// 側面
 			std::vector<Vertex> vert;
@@ -67,27 +67,27 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 				QVector3D dir = blocks[i].sidewalkContour[ind2] - blocks[i].sidewalkContour[ind1];
 				float length = dir.length();
 				dir /= length;
-				float z1 = rendManager.getTerrainHeight(blocks[i].sidewalkContour[ind1].x(), blocks[i].sidewalkContour[ind1].y());
-				float z2 = rendManager.getTerrainHeight(blocks[i].sidewalkContour[ind2].x(), blocks[i].sidewalkContour[ind2].y());
+				//float z1 = rendManager.getTerrainHeight(blocks[i].sidewalkContour[ind1].x(), blocks[i].sidewalkContour[ind1].y());
+				//float z2 = rendManager.getTerrainHeight(blocks[i].sidewalkContour[ind2].x(), blocks[i].sidewalkContour[ind2].y());
 
-				QVector3D p1 = QVector3D(blocks[i].sidewalkContour[ind1].x(), blocks[i].sidewalkContour[ind1].y(), z1);
-				QVector3D p2 = QVector3D(blocks[i].sidewalkContour[ind2].x(), blocks[i].sidewalkContour[ind2].y(), z2);
-				QVector3D p3 = QVector3D(blocks[i].sidewalkContour[ind2].x(), blocks[i].sidewalkContour[ind2].y(), z2 + deltaZ);
-				QVector3D p4 = QVector3D(blocks[i].sidewalkContour[ind1].x(), blocks[i].sidewalkContour[ind1].y(), z1 + deltaZ);
+				QVector3D p1 = QVector3D(blocks[i].sidewalkContour[ind1].x(), blocks[i].sidewalkContour[ind1].y(), 0);
+				QVector3D p2 = QVector3D(blocks[i].sidewalkContour[ind2].x(), blocks[i].sidewalkContour[ind2].y(), 0);
+				QVector3D p3 = QVector3D(blocks[i].sidewalkContour[ind2].x(), blocks[i].sidewalkContour[ind2].y(), deltaZ);
+				QVector3D p4 = QVector3D(blocks[i].sidewalkContour[ind1].x(), blocks[i].sidewalkContour[ind1].y(), deltaZ);
 				QVector3D normal = QVector3D::crossProduct(p2-p1,p4-p1).normalized();
 				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p2, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p4, QColor(128, 128, 128), normal, QVector3D()));
 			}
-			rendManager.addStaticGeometry("3d_sidewalk", vert, "", GL_QUADS, 1 | mode_Lighting);
+			rendManager.addStaticGeometry("3d_sidewalk", vert, "", GL_QUADS, 1|mode_Lighting|mode_AdaptTerrain);
 		}
 
 		// 公園の3Dモデルを生成
 		if (blocks[i].isPark) {
 			// PARK
 			int randPark=qrand()%grassFileNames.size();
-			rendManager.addStaticGeometry2("3d_sidewalk", blocks[i].blockContour.contour, deltaZ, false, grassFileNames[randPark], GL_QUADS, 2, QVector3D(0.05f,0.05f,0.05f), QColor());
+			rendManager.addStaticGeometry2("3d_sidewalk", blocks[i].blockContour.contour, 0.0f, false, grassFileNames[randPark], GL_QUADS, 2|mode_AdaptTerrain, QVector3D(0.05f,0.05f,0.05f), QColor());
 
 			// 側面
 			std::vector<Vertex> vert;
@@ -97,21 +97,63 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 				QVector3D dir = blocks[i].blockContour.contour[ind2] - blocks[i].blockContour.contour[ind1];
 				float length = dir.length();
 				dir /= length;
-				float z1 = rendManager.getTerrainHeight(blocks[i].blockContour[ind1].x(), blocks[i].blockContour[ind1].y());
-				float z2 = rendManager.getTerrainHeight(blocks[i].blockContour[ind2].x(), blocks[i].blockContour[ind2].y());
+				//float z1 = rendManager.getTerrainHeight(blocks[i].blockContour[ind1].x(), blocks[i].blockContour[ind1].y());
+				//float z2 = rendManager.getTerrainHeight(blocks[i].blockContour[ind2].x(), blocks[i].blockContour[ind2].y());
 
 				//printf("z %f\n",blocks[bN].blockContour.contour[ind1].z());
-				QVector3D p1 = QVector3D(blocks[i].blockContour.contour[ind1].x(), blocks[i].blockContour.contour[ind1].y(), z1);
-				QVector3D p2 = QVector3D(blocks[i].blockContour.contour[ind2].x(), blocks[i].blockContour.contour[ind2].y(), z2);
-				QVector3D p3 = QVector3D(blocks[i].blockContour.contour[ind2].x(), blocks[i].blockContour.contour[ind2].y(), z2 + deltaZ);
-				QVector3D p4 = QVector3D(blocks[i].blockContour.contour[ind1].x(), blocks[i].blockContour.contour[ind1].y(), z1 + deltaZ);
+				QVector3D p1 = QVector3D(blocks[i].blockContour.contour[ind1].x(), blocks[i].blockContour.contour[ind1].y(), 0);
+				QVector3D p2 = QVector3D(blocks[i].blockContour.contour[ind2].x(), blocks[i].blockContour.contour[ind2].y(), 0);
+				QVector3D p3 = QVector3D(blocks[i].blockContour.contour[ind2].x(), blocks[i].blockContour.contour[ind2].y(), deltaZ);
+				QVector3D p4 = QVector3D(blocks[i].blockContour.contour[ind1].x(), blocks[i].blockContour.contour[ind1].y(), deltaZ);
 				QVector3D normal = QVector3D::crossProduct(p2-p1,p4-p1).normalized();
 				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p2, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p4, QColor(128, 128, 128), normal, QVector3D()));
 			}
-			rendManager.addStaticGeometry("3d_sidewalk", vert, "", GL_QUADS, 1|mode_Lighting);
+			rendManager.addStaticGeometry("3d_sidewalk", vert, "", GL_QUADS, 1|mode_Lighting|mode_AdaptTerrain);
+		}
+	}
+}
+
+/**
+ * Parcel情報から、その3Dモデルを生成する
+ */
+void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, BlockSet& blocks) {
+	rendManager.removeStaticGeometry("3d_parcel");
+	for (int i = 0; i < blocks.size(); ++i) {
+		blocks[i].adaptToTerrain(&rendManager);
+
+		Block::parcelGraphVertexIter vi, viEnd;
+			
+		int cnt = 0;
+		for (boost::tie(vi, viEnd) = boost::vertices(blocks[i].myParcels); vi != viEnd; ++vi, ++cnt) {
+			std::vector<Vertex> vert;
+			QVector3D color;
+
+			// 上面のモデル
+			int randPark=1;//qrand()%grassFileNames.size();
+			rendManager.addStaticGeometry2("3d_parcel",blocks[i].myParcels[*vi].parcelContour.contour,0.5f,false,grassFileNames[randPark],GL_QUADS,2,QVector3D(0.05f,0.05f,0.05f),QColor());
+
+			// 側面のモデル
+			for(int sN=0;sN<blocks[i].myParcels[*vi].parcelContour.contour.size();sN++){
+				int ind1 = sN;
+				int ind2 = (sN+1) % blocks[i].myParcels[*vi].parcelContour.contour.size();
+				QVector3D dir = blocks[i].myParcels[*vi].parcelContour.contour[ind2] - blocks[i].myParcels[*vi].parcelContour.contour[ind1];
+				float length = dir.length();
+				dir /= length;
+				
+				QVector3D p1 = blocks[i].myParcels[*vi].parcelContour.contour[ind1]+QVector3D(0,0, 0.0f);//1.0f);
+				QVector3D p2 = blocks[i].myParcels[*vi].parcelContour.contour[ind2]+QVector3D(0,0, 0.0f);//1.0f);
+				QVector3D p3 = blocks[i].myParcels[*vi].parcelContour.contour[ind2]+QVector3D(0,0, 0.5f);//1.5f);
+				QVector3D p4 = blocks[i].myParcels[*vi].parcelContour.contour[ind1]+QVector3D(0,0, 0.5f);//1.5f);
+				QVector3D normal = QVector3D::crossProduct(p2-p1,p4-p1).normalized();
+				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
+				vert.push_back(Vertex(p4, QColor(128, 128, 128), normal, QVector3D()));
+				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
+				vert.push_back(Vertex(p2, QColor(128, 128, 128), normal, QVector3D()));
+			}
+			rendManager.addStaticGeometry("3d_parcel",vert,"",GL_QUADS,1|mode_Lighting);
 		}
 	}
 }

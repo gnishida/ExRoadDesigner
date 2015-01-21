@@ -830,19 +830,3 @@ void GLWidget3D::generate3DGeometry(bool justRoads) {
 	printf("<<generate3DGeometry\n");
 	*/
 }//
-
-void GLWidget3D::generateBlocks() {
-	VBOPm::generateBlocks(vboRenderManager, mainWin->urbanGeometry->roads, mainWin->urbanGeometry->blocks);
-	BlockMeshGenerator::generateBlockMesh(vboRenderManager, mainWin->urbanGeometry->blocks);
-	shadow.makeShadowMap(this);
-}
-
-void GLWidget3D::generateParcels() {
-	VBOPm::generateParcels(vboRenderManager, mainWin->urbanGeometry->blocks);
-	shadow.makeShadowMap(this);
-}
-
-void GLWidget3D::generateBuildings() {
-	VBOPm::generateBuildings(vboRenderManager, mainWin->urbanGeometry->blocks);
-	shadow.makeShadowMap(this);
-}

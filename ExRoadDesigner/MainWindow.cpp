@@ -363,17 +363,20 @@ void MainWindow::onGenerate2D() {
 }
 
 void MainWindow::onGenerateBlocks() {
-	glWidget->generateBlocks();
+	urbanGeometry->generateBlocks();
+	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
 }
 
 void MainWindow::onGenerateParcels() {
-	glWidget->generateParcels();
+	urbanGeometry->generateParcels();
+	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
 }
 
 void MainWindow::onGenerateBuildings() {
-	glWidget->generateBuildings();
+	urbanGeometry->generateBuildings();
+	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
 }
 

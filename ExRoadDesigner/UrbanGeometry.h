@@ -57,6 +57,10 @@ public:
 	void generateRoadsPM(std::vector<ExFeature> &features);
 	void generateRoadsAliaga(std::vector<ExFeature> &features);
 
+	void generateBlocks();
+	void generateParcels();
+	void generateBuildings();
+
 	void render(VBORenderManager &vboRenderManager);
 	void update(VBORenderManager& vboRenderManager);
 	void adaptToTerrain();

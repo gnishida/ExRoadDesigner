@@ -83,9 +83,6 @@ public:
 	void updateCamera();
 	void generate2DGeometry();
 	void generate3DGeometry(bool justRoads=false);
-	void generateBlocks();
-	void generateParcels();
-	void generateBuildings();
 
 protected:
 	void initializeGL();

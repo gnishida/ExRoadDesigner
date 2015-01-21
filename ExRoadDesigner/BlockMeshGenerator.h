@@ -15,6 +15,7 @@ public:
 
 	static void init();
 	static void generateBlockMesh(VBORenderManager& rendManager, BlockSet& blocks);
+	static void generateParcelMesh(VBORenderManager& rendManager, BlockSet& blocks);
 	static void generate2DBlockMesh(VBORenderManager& rendManager, BlockSet& blocks);
 };
 
