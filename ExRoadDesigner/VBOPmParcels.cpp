@@ -1,4 +1,4 @@
-/************************************************************************************************
+﻿/************************************************************************************************
  *		Procedural City Generation: Parcel
  *		@author igarciad
  ************************************************************************************************/
@@ -99,6 +99,8 @@ bool subdivideParcel(Block &block, Parcel parcel, float areaMean, float areaMin,
 	float kDistTol = 0.01f;
 
 	std::vector<Polygon3D> pgons;
+	/*
+	// CGAL版の分割（遅いが、優れている）
 	if (parcel.parcelContour.split(splitLine, pgons)) {
 		for (int i = 0; i < pgons.size(); ++i) {
 			Parcel parcel;
@@ -107,7 +109,9 @@ bool subdivideParcel(Block &block, Parcel parcel, float areaMean, float areaMin,
 			subdivideParcel(block, parcel, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
 		}
 	}
-	/*
+	*/
+
+	// 簡易版の分割（しょぼいが、速い）
 	if (parcel.parcelContour.splitMeWithPolyline(splitLine, pgon1.contour, pgon2.contour)) {
 		Parcel parcel1;
 		Parcel parcel2;
@@ -121,7 +125,6 @@ bool subdivideParcel(Block &block, Parcel parcel, float areaMean, float areaMin,
 	} else {
 		return false;
 	}
-	*/
 
 	return true;
 }
