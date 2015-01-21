@@ -88,6 +88,7 @@
     <addaction name="actionGenerateBlocks"/>
     <addaction name="actionGenerateParcels"/>
     <addaction name="actionGenerateBuildings"/>
+    <addaction name="actionGenerateVegetation"/>
    </widget>
    <widget class="QMenu" name="menuDebug">
     <property name="title">
@@ -718,6 +719,11 @@
   <action name="actionGenerateBuildings">
    <property name="text">
     <string>Generate Buildings</string>
+   </property>
+  </action>
+  <action name="actionGenerateVegetation">
+   <property name="text">
+    <string>Generate Vegetation</string>
    </property>
   </action>
  </widget>

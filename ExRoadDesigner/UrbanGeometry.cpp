@@ -33,6 +33,7 @@ This file is part of QtUrban.
 #include "RoadMeshGenerator.h"
 #include "BlockMeshGenerator.h"
 #include "VBOPm.h"
+#include "VBOVegetation.h"
 
 UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
@@ -135,6 +136,10 @@ void UrbanGeometry::generateParcels() {
 
 void UrbanGeometry::generateBuildings() {
 	VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, blocks);
+}
+
+void UrbanGeometry::generateVegetation() {
+	VBOVegetation::generateVegetation(mainWin->glWidget->vboRenderManager, blocks.blocks);
 }
 
 void UrbanGeometry::render(VBORenderManager& vboRenderManager) {

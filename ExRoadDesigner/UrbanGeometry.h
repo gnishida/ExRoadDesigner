@@ -60,6 +60,7 @@ public:
 	void generateBlocks();
 	void generateParcels();
 	void generateBuildings();
+	void generateVegetation();
 
 	void render(VBORenderManager &vboRenderManager);
 	void update(VBORenderManager& vboRenderManager);

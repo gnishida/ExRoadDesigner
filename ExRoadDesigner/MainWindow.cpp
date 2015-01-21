@@ -68,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 	connect(ui.actionGenerateBlocks, SIGNAL(triggered()), this, SLOT(onGenerateBlocks()));
 	connect(ui.actionGenerateParcels, SIGNAL(triggered()), this, SLOT(onGenerateParcels()));
 	connect(ui.actionGenerateBuildings, SIGNAL(triggered()), this, SLOT(onGenerateBuildings()));
+	connect(ui.actionGenerateVegetation, SIGNAL(triggered()), this, SLOT(onGenerateVegetation()));
 
 
 	connect(ui.actionDisplayHighway, SIGNAL(triggered()), this, SLOT(onDisplayRoads()));
@@ -376,6 +377,12 @@ void MainWindow::onGenerateParcels() {
 
 void MainWindow::onGenerateBuildings() {
 	urbanGeometry->generateBuildings();
+	glWidget->shadow.makeShadowMap(glWidget);
+	glWidget->updateGL();
+}
+
+void MainWindow::onGenerateVegetation() {
+	urbanGeometry->generateVegetation();
 	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
 }

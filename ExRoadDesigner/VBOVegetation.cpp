@@ -70,6 +70,8 @@ bool VBOVegetation::generateVegetation(VBORenderManager& rendManager, std::vecto
 
 	std::cout << "Generating vegetation...";
 
+	const float deltaZ = 2.0f;
+
 	rendManager.removeAllStreetElementName("streetLamp");
 	rendManager.removeAllStreetElementName("tree");
 
@@ -96,7 +98,7 @@ bool VBOVegetation::generateVegetation(VBORenderManager& rendManager, std::vecto
 				QVector3D pos;
 				pos.setX(Util::genRand(xmin, xmax));
 				pos.setY(Util::genRand(ymin, ymax));
-				pos.setZ(rendManager.getTerrainHeight(pos.x(), pos.y()));
+				pos.setZ(deltaZ);
 				if(blocks[bN].blockContour.isPointWithinLoop(pos)){
 					rendManager.addStreetElementModel("tree",addTree(pos));
 				}
@@ -115,7 +117,7 @@ bool VBOVegetation::generateVegetation(VBORenderManager& rendManager, std::vecto
 					QVector3D pos;
 					pos.setX(Util::genRand(minCorner.x(), maxCorner.x()));
 					pos.setY(Util::genRand(minCorner.y(), maxCorner.y()));
-					pos.setZ(rendManager.getTerrainHeight(pos.x(), pos.y()));
+					pos.setZ(deltaZ);
 					if (blocks[bN].myParcels[*vi].parcelContour.isPointWithinLoop(pos)) {
 						rendManager.addStreetElementModel("tree",addTree(pos));
 					}
@@ -132,7 +134,7 @@ bool VBOVegetation::generateVegetation(VBORenderManager& rendManager, std::vecto
 	int numTreesAlongSegment;
 	std::vector <QVector3D> *contourPtr;
 
-	for (int i = 0; i < blocks.size(); ++i) {	
+	for (int i = 0; i < blocks.size(); ++i) {
 		float tree_setback = G::getFloat("tree_setback");//placeTypesIn.myPlaceTypes.at(blocks[i].getMyPlaceTypeIdx()).getFloat("tree_setback");
 
 		contourPtr = &(blocks.at(i).sidewalkContour.contour);
@@ -165,10 +167,11 @@ bool VBOVegetation::generateVegetation(VBORenderManager& rendManager, std::vecto
 
 				if (type % 2 == 0) {
 					QVector3D pos = ptThis + segmentVector * distFromSegmentStart;
-					pos.setZ(rendManager.getTerrainHeight(pos.x(), pos.y()) + 0.5f);//pavement at 1.5f
+					pos.setZ(deltaZ);
 					rendManager.addStreetElementModel("tree", addTree(pos));
 				} else {
 					QVector3D pos = ptThis2 + segmentVector * distFromSegmentStart;
+					pos.setZ(deltaZ);
 					rendManager.addStreetElementModel("streetLamp", addStreetLap(pos, segmentVector));
 				}
 
