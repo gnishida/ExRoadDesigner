@@ -193,9 +193,6 @@
     <ClCompile Include="PMRoadGenerator.cpp">
       <Filter>road generator</Filter>
     </ClCompile>
-    <ClCompile Include="clipper.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
     <ClCompile Include="VBOGeoBuilding.cpp">
       <Filter>PM Blocks</Filter>
     </ClCompile>
@@ -347,7 +344,7 @@
       <Filter>VBO</Filter>
     </ClCompile>
     <ClCompile Include="BlockMeshGenerator.cpp">
-      <Filter>Generated Files</Filter>
+      <Filter>VBO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -551,9 +548,6 @@
     <ClInclude Include="PMRoadGenerator.h">
       <Filter>road generator</Filter>
     </ClInclude>
-    <ClInclude Include="clipper.hpp">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="VBOPmParcels.h">
       <Filter>PM Blocks</Filter>
     </ClInclude>
@@ -666,7 +660,7 @@
       <Filter>VBO</Filter>
     </ClInclude>
     <ClInclude Include="BlockMeshGenerator.h">
-      <Filter>Generated Files</Filter>
+      <Filter>VBO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

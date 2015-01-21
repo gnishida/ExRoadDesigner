@@ -40,15 +40,15 @@ int main(int argc, char *argv[]) {
 	G::global()["sidewalk_width"] = 2.0f;
 	G::global()["parcel_area_mean"] = 1600.0f;
 	G::global()["parcel_area_min"] = 900.0f;
-	G::global()["parcel_area_deviation"] = 1.5f;
-	G::global()["parcel_split_deviation"] = 1.5f;
+	G::global()["parcel_area_deviation"] = 0.5f;
+	G::global()["parcel_split_deviation"] = 0.5f;
 	G::global()["parcel_setback_front"] = 5.0f;
 	G::global()["parcel_setback_rear"] = 5.0f;
 	G::global()["parcel_setback_sides"] = 2.0f;
-	G::global()["building_max_frontage"] = 20.0f;
-	G::global()["building_max_depth"] = 100.0f;
+	G::global()["building_max_frontage"] = 0.0f;
+	G::global()["building_max_depth"] = 0.0f;
 	G::global()["building_stories_deviation"] = 0.3f;
-	G::global()["building_stories_mean"] = 2;
+	G::global()["building_stories_mean"] = 3;
 	G::global()["tree_setback"] = 1.0f;
 
 	QApplication a(argc, argv);

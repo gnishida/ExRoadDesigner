@@ -520,6 +520,8 @@ void GLWidget3D::drawScene(int drawMode) {
 		mainWin->urbanGeometry->render(vboRenderManager);
 		
 		vboRenderManager.vboTerrain.render(true);
+		vboRenderManager.renderStaticGeometry("3d_sidewalk");
+		vboRenderManager.renderStaticGeometry("3d_parcel");
 		vboRenderManager.renderStaticGeometry("3d_roads");
 		vboRenderManager.renderStaticGeometry("3d_roads_inter");
 		vboRenderManager.renderStaticGeometry("3d_roads_interCom");
@@ -545,10 +547,10 @@ void GLWidget3D::drawScene(int drawMode) {
 			glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 1);
 			vboRenderManager.vboTerrain.render(true);
 			vboRenderManager.renderStaticGeometry("3d_sidewalk");
+			vboRenderManager.renderStaticGeometry("3d_parcel");
 			vboRenderManager.renderStaticGeometry("3d_roads");
 			vboRenderManager.renderStaticGeometry("3d_roads_inter");
 			vboRenderManager.renderStaticGeometry("3d_roads_interCom");
-
 			vboRenderManager.renderStaticGeometry("3d_building");
 			vboRenderManager.renderStaticGeometry("3d_building_fac");
 
@@ -564,6 +566,7 @@ void GLWidget3D::drawScene(int drawMode) {
 			vboRenderManager.vboTerrain.render(false);
 
 			//vboRenderManager.renderStaticGeometry("3d_sidewalk");
+			//vboRenderManager.renderStaticGeometry("3d_parcel");
 			//vboRenderManager.renderStaticGeometry("3d_roads");
 			//vboRenderManager.renderStaticGeometry("3d_roads_inter");
 			//vboRenderManager.renderStaticGeometry("3d_roads_interCom");

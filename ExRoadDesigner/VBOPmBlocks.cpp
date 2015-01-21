@@ -375,6 +375,6 @@ void VBOPmBlocks::generateSideWalk(BlockSet& blocks) {
 		float sidewalk_width = G::getFloat("sidewalk_width");
 		blocks[i].sidewalkContour.computeInset(sidewalk_width, blockContourInset, false);
 		blocks[i].blockContour.contour = blockContourInset;
-		blocks[i].blockContour.getBBox3D(blocks[i].bbox.minPt, blocks[i].bbox.maxPt);
+		//blocks[i].blockContour.getBBox3D(blocks[i].bbox.minPt, blocks[i].bbox.maxPt);
 	}
 }

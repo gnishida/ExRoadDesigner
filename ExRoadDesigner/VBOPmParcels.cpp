@@ -6,6 +6,7 @@
 #include "VBOPmParcels.h"
 #include "qmatrix4x4.h"
 #include "global.h"
+#include "Util.h"
 
 void subdivideBlockIntoParcels(Block &block);
 bool subdivideParcel(Block &block, Parcel parcel, float areaMean, float areaMin, float areaVar, float splitIrregularity, std::vector<Parcel> &outParcels); 
@@ -14,8 +15,6 @@ bool VBOPmParcels::generateParcels(VBORenderManager& rendManager, std::vector< B
 	srand(0);
 	for (int i = 0; i < blocks.size(); ++i) {
 		subdivideBlockIntoParcels(blocks[i]);
-
-		blocks[i].adaptToTerrain(&rendManager);
 	}
 
 	return true;
@@ -51,17 +50,11 @@ void subdivideBlockIntoParcels(Block &block) {
 * @splitIrregularity: A normalized value 0-1 indicating how far
 *					from the middle point the split line should be
 **/
-bool subdivideParcel(Block &block, Parcel parcel, float areaMean, float areaMin, float areaStd,
-	float splitIrregularity, std::vector<Parcel> &outParcels)
-{
-	//printf("subdivideParcel\n");
-	//check if parcel is subdividable
-	float thresholdArea = areaMean + areaStd*areaMean*(((float)qrand()/RAND_MAX)*2.0f-1.0f);//LC::misctools::genRand(-1.0f, 1.0f)
+bool subdivideParcel(Block &block, Parcel parcel, float areaMean, float areaMin, float areaStd,	float splitIrregularity, std::vector<Parcel> &outParcels) {
+	float thresholdArea = areaMean + areaStd * areaMean * Util::genRand(-1, 1);
 	
-	if( (fabs(boost::geometry::area(parcel.bg_parcelContour))) <= std::max(thresholdArea, areaMin)) {
-		//printf("a: %.3f %.3f", boost::geometry::area(parcel.bg_parcelContour));
-		//boost::geometry::correct(parcel.bg_parcelContour);
-		//printf("a: %.3f %.3f", boost::geometry::area(parcel.bg_parcelContour));
+	if (parcel.parcelContour.area() <= std::max(thresholdArea, areaMin)) {
+	//if( (fabs(boost::geometry::area(parcel.bg_parcelContour))) <= std::max(thresholdArea, areaMin)) {
 		outParcels.push_back(parcel);
 		return true;
 	}
@@ -91,8 +84,8 @@ bool subdivideParcel(Block &block, Parcel parcel, float areaMean, float areaMin,
 		dirVector = dirVectorInit;
 	}
 
-	midPtNoise.setX( splitIrregularity*(((float)qrand()/RAND_MAX)*20.0f-10.0f));//LC::misctools::genRand(-10.0f, 10.0f) );
-	midPtNoise.setY( splitIrregularity*(((float)qrand()/RAND_MAX)*20.0f-10.0f));//LC::misctools::genRand(-10.0f, 10.0f) );
+	midPtNoise.setX(splitIrregularity * Util::genRand(-10, 10));
+	midPtNoise.setY(splitIrregularity * Util::genRand(-10, 10));
 	midPt = midPt + midPtNoise;
 
 	slEndPoint = midPt + 10000.0f*dirVector;

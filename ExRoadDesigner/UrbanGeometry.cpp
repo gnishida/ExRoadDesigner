@@ -134,6 +134,7 @@ void UrbanGeometry::generateParcels() {
 }
 
 void UrbanGeometry::generateBuildings() {
+	VBOPm::generateBuildings(mainWin->glWidget->vboRenderManager, blocks);
 }
 
 void UrbanGeometry::render(VBORenderManager& vboRenderManager) {

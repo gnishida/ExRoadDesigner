@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'BlendingVideoSettingDialog.ui'
 **
-** Created: Sun Jan 18 17:09:23 2015
+** Created: Wed Jan 21 14:53:56 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

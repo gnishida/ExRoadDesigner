@@ -19,12 +19,8 @@ class VBORenderManager;
 
 class VBOPm {
 public:
-	static bool initializedLC;
-	static void initLC();
-
 	static bool generateBlocks(VBORenderManager& rendManager, RoadGraph &roadGraph, BlockSet& blocks);
 	static bool generateParcels(VBORenderManager& rendManager, BlockSet& blocks);
-	static void generateParcelModels(VBORenderManager& rendManager, BlockSet& blocks);
 	static bool generateBuildings(VBORenderManager& rendManager, BlockSet& blocks);
 	static bool generateVegetation(VBORenderManager& rendManager, BlockSet& blocks);
 };

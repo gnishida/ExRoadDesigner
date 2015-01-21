@@ -157,13 +157,6 @@ public:
 		}
 	}
 
-	/**
-	* Render polygon
-	**/
-	void renderContour(void);
-	void render(void);
-	void renderNonConvex(bool reComputeNormal = true, float nx = 0.0f, float ny = 0.0f, float nz = 1.0f);
-
 	//Is self intersecting
 	bool isSelfIntersecting(void);
 

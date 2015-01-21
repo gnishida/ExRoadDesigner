@@ -8,7 +8,7 @@
 
 bool generateBlockBuildings(VBORenderManager& rendManager, Block &inBlock);
 
-bool VBOPmBuildings::generateBuildings(VBORenderManager& rendManager, std::vector< Block > &blocks){
+bool VBOPmBuildings::generateBuildings(VBORenderManager& rendManager, std::vector< Block > &blocks) {
 	//For each block
 	for (int i = 0; i < blocks.size(); ++i) {
 		generateBlockBuildings(rendManager, blocks[i]);
@@ -19,14 +19,7 @@ bool VBOPmBuildings::generateBuildings(VBORenderManager& rendManager, std::vecto
 /**
 * Compute Building Footprint Polygon
 **/
-bool computeBuildingFootprintPolygon(float maxFrontage, float maxDepth,
-	std::vector<int> &frontEdges,
-	std::vector<int> &rearEdges, 
-	std::vector<int> &sideEdges,
-	Loop3D &buildableAreaCont,
-	Loop3D &buildingFootprint)
-{
-
+bool computeBuildingFootprintPolygon(float maxFrontage, float maxDepth,	std::vector<int> &frontEdges, std::vector<int> &rearEdges, std::vector<int> &sideEdges, Loop3D &buildableAreaCont, Loop3D &buildingFootprint) {
 	if( (maxFrontage < 1.0f) || (maxDepth < 1.0f) ){
 		buildingFootprint = buildableAreaCont;
 		return true;
@@ -43,7 +36,7 @@ bool computeBuildingFootprintPolygon(float maxFrontage, float maxDepth,
 	}
 
 	float curLength;
-	float maxBALength = -FLT_MAX;
+	float maxBALength = 0;
 
 	int thisIdx;
 	int nextIdx;
@@ -67,8 +60,6 @@ bool computeBuildingFootprintPolygon(float maxFrontage, float maxDepth,
 		}
 	}
 
-	maxBALength = sqrt(maxBALength);
-
 	if(frontageIdx == -1){
 		// 一番長いエッジを、正面としちゃう
 		for (int i = 0; i < buildableAreaCont.size(); ++i) {
@@ -82,6 +73,8 @@ bool computeBuildingFootprintPolygon(float maxFrontage, float maxDepth,
 			}
 		}
 	}
+
+	maxBALength = sqrt(maxBALength);
 
 	//std::cout << "f: " << frontageIdx << "   n: " << frontageIdxNext << "    s: " << buildableAreaCont.size() << "\n";
 	//std::fflush(stdout);
@@ -114,8 +107,7 @@ bool computeBuildingFootprintPolygon(float maxFrontage, float maxDepth,
 /**
  * 指定されたParcelの中に、ビルを建てる。
  */
-bool generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parcel &inParcel)
-{
+bool generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parcel &inParcel) {
 	float probEmptyParcel = 0.0f;
 	Loop3D pContourCpy;
 
@@ -147,11 +139,14 @@ bool generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parc
 	}
 
 	//compute building footprint polygon
+	/*
 	if(!computeBuildingFootprintPolygon(G::getFloat("building_max_frontage"), G::getFloat("building_max_depth"), frontEdges, rearEdges, sideEdges, inParcel.parcelBuildableAreaContour.contour, inParcel.myBuilding.buildingFootprint.contour))	{
 		printf("!computeBuildingFootprintPolygon\n");
 		inParcel.myBuilding.buildingFootprint.clear();
 		return false;
 	}
+	*/
+	inParcel.myBuilding.buildingFootprint.contour = inParcel.parcelBuildableAreaContour.contour;
 
 	// もしfootprintの一辺の長さが短すぎたら、または、短い辺と長い辺の比が大きすぎたら、ビルの建設を中止する
 	QVector3D obbSize;
@@ -162,7 +157,7 @@ bool generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parc
 
 	// stoties
 	float heightDev = G::getFloat("building_stories_deviation") * (((float)qrand()/RAND_MAX)*2.0f-1.0f) * G::getFloat("building_stories_mean");
-	int bldgNumStories = G::getInt("zone.building_stories_mean") + heightDev;
+	int bldgNumStories = G::getInt("building_stories_mean") + heightDev;
 
 	// find the lowest elevation
 	float minZ = std::numeric_limits<float>::max();
@@ -189,12 +184,11 @@ bool generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parc
 /**
  * 指定されたブロック内に、ビルを建てる
  */
-bool generateBlockBuildings(VBORenderManager& rendManager, Block &inBlock)
-{
+bool generateBlockBuildings(VBORenderManager& rendManager, Block &inBlock) {
 	Block::parcelGraphVertexIter vi, viEnd;	
 
 	//For each parcel
-	for(boost::tie(vi, viEnd) = boost::vertices(inBlock.myParcels); vi != viEnd; ++vi){
+	for (boost::tie(vi, viEnd) = boost::vertices(inBlock.myParcels); vi != viEnd; ++vi) {
 		if (!generateParcelBuildings(rendManager, inBlock, inBlock.myParcels[*vi])) {
 			inBlock.myParcels[*vi].isPark = true;
 		}

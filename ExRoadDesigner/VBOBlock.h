@@ -1,7 +1,3 @@
-/************************************************************************************************
-*		VBO Block Class
-*		@author igarciad
-************************************************************************************************/
 #pragma once
 
 #ifndef Q_MOC_RUN
@@ -13,10 +9,6 @@
 #include <QVector3D>
 #include "Polygon3D.h"
 #include "Polygon2D.h"
-
-/**
-* Block.
-**/
 
 class Block {
 public:
@@ -32,7 +24,6 @@ public:
 
 public:
 	parcelGraph myParcels;
-	BBox3D bbox;
 	Polygon3D blockContour;
 	Polygon3D sidewalkContour;
 	std::vector<float> sidewalkContourRoadsWidths;
@@ -43,15 +34,10 @@ public:
 	Block() : isPark(false), valid(true) {}
 
 	void clear();
-	void computeMyBBox3D();
-	void computeParcelAdjacencyGraph();
 	void buildableAreaMock();
 
 	static void findParcelFrontAndBackEdges(Block &inBlock, Parcel &inParcel, std::vector<int> &frontEdges,	std::vector<int> &rearEdges, std::vector<int> &sideEdges);
 	
 	bool splitBlockParcelsWithRoadSegment(std::vector<QVector3D> &roadSegmentGeometry, float roadSegmentWidth, BBox3D roadSegmentBBox3D, std::list<Parcel> &blockParcels);
-	bool areParcelsAdjacent(parcelGraphVertexIter &p0, parcelGraphVertexIter &p1);
-	
-	void adaptToTerrain(VBORenderManager* vboRenderManager);
 };
 

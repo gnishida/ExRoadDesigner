@@ -4,8 +4,9 @@
 #include "Util.h"
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Boolean_set_operations_2.h>
-
-#include "clipper.hpp"
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Polygon_2.h>
+#include <CGAL/create_offset_polygons_2.h>
 
 void Polygon3D::correct() {
 	int next;
@@ -21,135 +22,7 @@ void Polygon3D::correct() {
 	}
 }
 
-//**** Polygon3D
-void Polygon3D::renderContour(void)
-{	
-	glBegin(GL_LINE_LOOP);
-	for(size_t i=0; i<contour.size(); ++i){
-		glVertex3f(contour[i].x(),
-			contour[i].y(),
-			contour[i].z());
-	}
-	glEnd();	
-
-
-}
-
-
-void Polygon3D::render(void)
-{		
-	glBegin(GL_POLYGON);
-	for(size_t i=0; i<contour.size(); ++i){
-		glVertex3f(contour[i].x(),
-			contour[i].y(),
-			contour[i].z());
-	}
-	glEnd();			
-}
-
-void Polygon3D::renderNonConvex(bool reComputeNormal,
-	float nx, float ny, float nz)
-{
-	QVector3D myNormal;
-	if(reComputeNormal)
-	{
-		myNormal = this->getNormalVector();
-	} else {
-		myNormal.setX(nx);
-		myNormal.setY(ny);
-		myNormal.setZ(nz);
-	}
-
-	//Render inside fill			
-	if(contour.size() == 3){
-		glBegin(GL_TRIANGLES);	
-		for(size_t i=0; i<contour.size(); i++){	
-			glNormal3f(myNormal.x(), myNormal.y(), myNormal.z());
-			glVertex3f(contour[i].x(), contour[i].y(), contour[i].z());			
-		}
-		glEnd();
-	} else if(contour.size() == 4){
-		glBegin(GL_QUADS);	
-		for(int i=0; i<contour.size(); i++){	
-			glNormal3f(myNormal.x(), myNormal.y(), myNormal.z());
-			glVertex3f(contour[i].x(), contour[i].y(), contour[i].z());			
-		}
-		glEnd();
-	} else {
-
-		// create tessellator
-		GLUtesselator *tess = gluNewTess();
-
-		double *vtxData = new double[3*contour.size()];
-		for(size_t i=0; i<contour.size(); i++){
-			vtxData[3*i]=contour[i].x();
-			vtxData[3*i+1]=contour[i].y();
-			vtxData[3*i+2]=contour[i].z();
-		}
-
-		// register callback functions
-		gluTessCallback(tess, GLU_TESS_BEGIN, 
-			(void (__stdcall *)(void))glBegin);
-		gluTessCallback(tess, GLU_TESS_VERTEX,
-			(void (__stdcall *)(void))glVertex3dv);
-		gluTessCallback(tess, GLU_TESS_END, glEnd);
-
-		// describe non-convex polygon
-		gluTessBeginPolygon(tess, NULL);
-
-
-		// contour
-		gluTessBeginContour(tess);
-
-		for(size_t i=0; i<contour.size(); i++){
-			//HACK
-			glNormal3f(myNormal.x(), myNormal.y(), fabs(myNormal.z()));
-			gluTessVertex(tess, &vtxData[3*i], &vtxData[3*i]);
-		}
-		gluTessEndContour(tess);
-
-		gluTessEndPolygon(tess);
-
-		// delete tessellator after processing
-		gluDeleteTess(tess);
-
-		delete [] vtxData;
-	}
-
-	//Render contour wire
-	/*glColor3f(0.5f, 0.5f, 1.0f);			
-	glBegin(GL_LINES);
-	for(int i=0; i<contour.size()-1; ++i){
-	if(i==contour.size()-2)//last
-	glColor3f(0.5f, 1.0f, 1.0f);
-	else
-	glColor3f(0.5f, 0.5f, 1.0f);
-	if(ClientGlobalVariable::gV()->render_adaptGeometry==false){
-	glVertex3f(contour[i].x(),contour[i].y(),contour[i].z());
-	glVertex3f(contour[i+1].x(),contour[i+1].y(),contour[i+1].z());
-	}
-	else{
-	glVertex3f(contour[i].x(),contour[i].y(),0);
-	glVertex3f(contour[i+1].x(),contour[i+1].y(),0);
-	}
-	}*/
-
-	/*
-	glColor3f(0.5f, 0.5f, 1.0f);
-	glBegin(GL_LINE_LOOP);
-	for(size_t i=0; i<contour.size(); ++i){
-
-	if(ClientGlobalVariable::gV()->render_adaptGeometry==false)
-	glVertex3f(contour[i].x(),contour[i].y(),0.0f);
-	else
-	glVertex3f(contour[i].x(),contour[i].y(),contour[i].z());
-	}
-	glEnd();
-	*/
-}
-
-double angleBetweenVectors(QVector3D &vec1, QVector3D &vec2)
-{	
+double angleBetweenVectors(QVector3D &vec1, QVector3D &vec2){	
 	return acos( 0.999*(QVector3D::dotProduct(vec1, vec2)) / ( vec1.length() * vec2.length() ) );
 }
 
@@ -220,8 +93,6 @@ bool is2DRingWithin2DRing( boost::geometry::ring_type<Polygon3D>::type &contourA
 	}
 	return true;
 }
-
-using namespace ClipperLib;
 
 float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonInset, bool computeArea)
 {
@@ -353,24 +224,31 @@ float Polygon3D::computeInset(std::vector<float> &offsetDistances, Loop3D &pgonI
 		}
 		// IT FAILED TRY SECOND METHOD
 		{
-			Path subj;
-			Paths solution;
-			for(int cur=0; cur<cSz; ++cur){
-				subj << IntPoint(cleanPgon[cur].x()*1000,cleanPgon[cur].y()*1000);
+			typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+			typedef K::Point_2 Point;
+			typedef CGAL::Polygon_2<K> Polygon_2;
+			typedef CGAL::Straight_skeleton_2<K> Ss;
+			typedef boost::shared_ptr<Polygon_2> PolygonPtr;
+			typedef std::vector<PolygonPtr> PolygonPtrVector;
+
+			Polygon_2 poly;
+			for (int i = 0; i < cleanPgon.size(); ++i) {
+				poly.push_back(Point(cleanPgon[i].x(), cleanPgon[i].y()));
 			}
-			/*subj << 
-				ClipperLib::IntPoint(348,257) << IntPoint(364,148) << IntPoint(362,148) << 
-				IntPoint(326,241) << IntPoint(295,219) << IntPoint(258,88) << 
-				IntPoint(440,129) << IntPoint(370,196) << IntPoint(372,275);*/
-			ClipperOffset co;
-			co.AddPath(subj, jtSquare, etClosedPolygon);
-			co.Execute(solution, -1000*7.5);
-			pgonInset.resize(solution[0].size());
-			for(int sN=0;sN<solution[0].size();sN++){
-				pgonInset[sN]=QVector3D(solution[0][sN].X/1000.0f,solution[0][sN].Y/1000.0f,0);
+
+			PolygonPtrVector offset_polygons = CGAL::create_interior_skeleton_and_offset_polygons_2(7.5f, poly);
+			if (offset_polygons.size() > 0) {
+				pgonInset.resize(offset_polygons[0]->size());
+				for (auto v = offset_polygons[0]->vertices_begin(); v != offset_polygons[0]->vertices_end(); ++v) {
+					pgonInset.push_back(QVector3D(v->x(), v->y(), 0));
+				}
+
+				boost::geometry::ring_type<Polygon3D>::type bg_contour_inset;
+				boost::geometry::assign(bg_contour_inset, pgonInset);
+				boost::geometry::correct(bg_contour_inset);
+
+				return fabs(boost::geometry::area(bg_contour_inset));
 			}
-			//printf("Solutions %d\n",solution.size());
-			return Area(solution[0]);
 		}
 
 	}

@@ -41,7 +41,6 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 
 	// 3Dモデルを生成する
 	rendManager.removeStaticGeometry("3d_sidewalk");
-	rendManager.removeStaticGeometry("3d_block");
 
 	const float deltaZ = 2.3f;
 
@@ -121,9 +120,10 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
  */
 void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, BlockSet& blocks) {
 	rendManager.removeStaticGeometry("3d_parcel");
-	for (int i = 0; i < blocks.size(); ++i) {
-		blocks[i].adaptToTerrain(&rendManager);
 
+	const float deltaZ = 2.6f;
+
+	for (int i = 0; i < blocks.size(); ++i) {
 		Block::parcelGraphVertexIter vi, viEnd;
 			
 		int cnt = 0;
@@ -133,7 +133,7 @@ void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, Block
 
 			// 上面のモデル
 			int randPark=1;//qrand()%grassFileNames.size();
-			rendManager.addStaticGeometry2("3d_parcel",blocks[i].myParcels[*vi].parcelContour.contour,0.5f,false,grassFileNames[randPark],GL_QUADS,2,QVector3D(0.05f,0.05f,0.05f),QColor());
+			rendManager.addStaticGeometry2("3d_parcel", blocks[i].myParcels[*vi].parcelContour.contour, deltaZ, false, grassFileNames[randPark], GL_QUADS, 2|mode_AdaptTerrain, QVector3D(0.05f,0.05f,0.05f), QColor());
 
 			// 側面のモデル
 			for(int sN=0;sN<blocks[i].myParcels[*vi].parcelContour.contour.size();sN++){
@@ -143,17 +143,17 @@ void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, Block
 				float length = dir.length();
 				dir /= length;
 				
-				QVector3D p1 = blocks[i].myParcels[*vi].parcelContour.contour[ind1]+QVector3D(0,0, 0.0f);//1.0f);
-				QVector3D p2 = blocks[i].myParcels[*vi].parcelContour.contour[ind2]+QVector3D(0,0, 0.0f);//1.0f);
-				QVector3D p3 = blocks[i].myParcels[*vi].parcelContour.contour[ind2]+QVector3D(0,0, 0.5f);//1.5f);
-				QVector3D p4 = blocks[i].myParcels[*vi].parcelContour.contour[ind1]+QVector3D(0,0, 0.5f);//1.5f);
+				QVector3D p1(blocks[i].myParcels[*vi].parcelContour.contour[ind1].x(), blocks[i].myParcels[*vi].parcelContour.contour[ind1].y(), 0);
+				QVector3D p2(blocks[i].myParcels[*vi].parcelContour.contour[ind2].x(), blocks[i].myParcels[*vi].parcelContour.contour[ind2].y(), 0);
+				QVector3D p3(blocks[i].myParcels[*vi].parcelContour.contour[ind2].x(), blocks[i].myParcels[*vi].parcelContour.contour[ind2].y(), deltaZ);
+				QVector3D p4(blocks[i].myParcels[*vi].parcelContour.contour[ind1].x(), blocks[i].myParcels[*vi].parcelContour.contour[ind1].y(), deltaZ);
 				QVector3D normal = QVector3D::crossProduct(p2-p1,p4-p1).normalized();
 				vert.push_back(Vertex(p1, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p4, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p3, QColor(128, 128, 128), normal, QVector3D()));
 				vert.push_back(Vertex(p2, QColor(128, 128, 128), normal, QVector3D()));
 			}
-			rendManager.addStaticGeometry("3d_parcel",vert,"",GL_QUADS,1|mode_Lighting);
+			rendManager.addStaticGeometry("3d_parcel", vert, "", GL_QUADS, 1|mode_Lighting|mode_AdaptTerrain);
 		}
 	}
 }
