@@ -53,9 +53,6 @@ GLWidget3D::GLWidget3D(MainWindow* mainWin) : QGLWidget(QGLFormat(QGL::SampleBuf
 	edgeSelected = false;
 }
 
-GLWidget3D::~GLWidget3D() {
-}
-
 QSize GLWidget3D::minimumSizeHint() const {
 	return QSize(200, 200);
 }
@@ -90,7 +87,6 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 					float radi = mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.side;
 
 					vboRenderManager.vboTerrain.excavate(xM, yM, newValue,radi) ;
-					mainWin->urbanGeometry->adaptToTerrain();
 					shadow.makeShadowMap(this);
 					updateGL();
 				}else{
@@ -108,7 +104,6 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 						vboRenderManager.vboTerrain.updateGaussian(xM, yM, FLT_MAX, radi);
 					}
 
-					mainWin->urbanGeometry->adaptToTerrain();/// !! GEN did not have it here (enough in move?)
 					shadow.makeShadowMap(this);
 					updateGL();
 				}
@@ -300,7 +295,6 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 					float radi=mainWin->controlWidget->ui.terrainPaint_sizeSlider->value() / vboRenderManager.side;
 
 					vboRenderManager.vboTerrain.excavate(xM, yM, newValue, radi);
-					mainWin->urbanGeometry->adaptToTerrain();
 					shadow.makeShadowMap(this);
 				} else {
 					// normal Gaussian edition
@@ -317,7 +311,6 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 						vboRenderManager.vboTerrain.updateGaussian(xM, yM, FLT_MAX, radi);
 					}
 
-					mainWin->urbanGeometry->adaptToTerrain();
 					shadow.makeShadowMap(this);
 				}
 			}
@@ -370,7 +363,6 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 		if (controlPressed) {
 			if (mainWin->urbanGeometry->controlPointSelected) {
 				mainWin->urbanGeometry->controlPoints[mainWin->urbanGeometry->controlPointSelectedIndex] = pos;
-				mainWin->urbanGeometry->adaptToTerrain();
 
 				//RoadGeneratorHelper::elasticTransform(mainWin->urbanGeometry->areas.selectedArea()->origRoads, BSpline::spline(mainWin->urbanGeometry->areas.selectedArea()->origControlPoints), BSpline::spline(mainWin->urbanGeometry->areas.selectedArea()->controlPoints), mainWin->urbanGeometry->areas.selectedArea()->roads);
 			}
@@ -432,63 +424,44 @@ void GLWidget3D::mouseDoubleClickEvent(QMouseEvent *e) {
 	case MainWindow::MODE_CONTROL_POINTS:
 		mainWin->urbanGeometry->controlPointsBuilder.end();
 		mainWin->urbanGeometry->controlPoints = mainWin->urbanGeometry->controlPointsBuilder.polyline();
-
-		mainWin->urbanGeometry->adaptToTerrain();
 		
 		break;
 	}
 }
 
 void GLWidget3D::initializeGL() {
-
 	//qglClearColor(QColor(113, 112, 117));
 	qglClearColor(QColor(0, 0, 0));
-	////////////////////////////////////////
-		//---- GLEW extensions ----
-		GLenum err = glewInit();
-		if (GLEW_OK != err){// Problem: glewInit failed, something is seriously wrong.
-			qDebug() << "Error: " << glewGetErrorString(err);
-		}
-		qDebug() << "Status: Using GLEW " << glewGetString(GLEW_VERSION);
-		if (glewIsSupported("GL_VERSION_4_2"))
-			printf("Ready for OpenGL 4.2\n");
-		else {
-			printf("OpenGL 4.2 not supported\n");
-			//exit(1);
-		}
-		const GLubyte* text=
-			glGetString(GL_VERSION);
-		printf("VERSION: %s\n",text);
 
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LEQUAL);
+	//---- GLEW extensions ----
+	GLenum err = glewInit();
+	if (GLEW_OK != err){// Problem: glewInit failed, something is seriously wrong.
+		qDebug() << "Error: " << glewGetErrorString(err);
+	}
+	qDebug() << "Status: Using GLEW " << glewGetString(GLEW_VERSION);
+	if (glewIsSupported("GL_VERSION_4_2")) {
+		printf("Ready for OpenGL 4.2\n");
+	} else {
+		printf("OpenGL 4.2 not supported\n");
+		exit(1);
+	}
+	const GLubyte* text= glGetString(GL_VERSION);
+	printf("VERSION: %s\n",text);
 
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-		glLineWidth(5.0f);
-		glPointSize(10.0f);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
 
-		////////////////////////////////
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glLineWidth(5.0f);
+	glPointSize(10.0f);
 
-		G::global()["3d_render_mode"]=0;
-		// init hatch tex
-		std::vector<QString> hatchFiles;
-		for(int i=0;i<=6;i++){//5 hatch + perlin + water normals
-			hatchFiles.push_back("../data/textures/LC/hatch/h"+QString::number(i)+"b.png");
-		}
-		for(int i=0;i<=0;i++){//1 win (3 channels)
-			hatchFiles.push_back("../data/textures/LC/hatch/win"+QString::number(i)+"b.png");//win0b
-		}
-		vboRenderManager.loadArrayTexture("hatching_array",hatchFiles);
-
-
-		///
-		vboRenderManager.init();
-		updateCamera();
-		shadow.initShadow(vboRenderManager.program,this);
-		glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 0);//SHADOW: Disable
-		glUniform1i(glGetUniformLocation(vboRenderManager.program, "terrainMode"),0);//FLAT
-		
+	///
+	vboRenderManager.init();
+	updateCamera();
+	shadow.initShadow(vboRenderManager.program,this);
+	glUniform1i(glGetUniformLocation(vboRenderManager.program,"shadowState"), 0);//SHADOW: Disable
+	glUniform1i(glGetUniformLocation(vboRenderManager.program, "terrainMode"), 0);//FLAT
 }
 
 void GLWidget3D::resizeGL(int width, int height) {
@@ -626,7 +599,7 @@ void GLWidget3D::keyPressEvent( QKeyEvent *e ){
 	case Qt::Key_Delete:
 		if (edgeSelected) {
 			selectedEdge->valid = false;
-			mainWin->urbanGeometry->adaptToTerrain();
+			mainWin->urbanGeometry->update(vboRenderManager);
 			edgeSelected = false;
 			updateGL();
 		}

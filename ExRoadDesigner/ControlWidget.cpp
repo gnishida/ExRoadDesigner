@@ -267,7 +267,7 @@ void ControlWidget::trimRoads() {
 	boost::geometry::convert(bbox, polygon);
 	GraphUtil::trim(mainWin->urbanGeometry->roads, polygon);
 
-	mainWin->urbanGeometry->adaptToTerrain();
+	mainWin->urbanGeometry->update(mainWin->glWidget->vboRenderManager);
 	mainWin->glWidget->updateGL();
 }
 
@@ -284,8 +284,7 @@ void ControlWidget::connectRoads2() {
 	G::global()["rotationForSteepSlope"] = ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
 
 	RoadGeneratorHelper::connectRoads3(mainWin->urbanGeometry->roads, &mainWin->glWidget->vboRenderManager, 1000.0f, 200.0f);
-	mainWin->urbanGeometry->adaptToTerrain();
-
+	mainWin->urbanGeometry->update(mainWin->glWidget->vboRenderManager);
 	mainWin->glWidget->updateGL();
 }
 
@@ -338,74 +337,37 @@ void ControlWidget::changeTerrainShader(int) {
 		terrainMode=1;
 	}
 
-	printf("terrainMode %d\n",terrainMode);
+	printf("terrainMode %d\n", terrainMode);
 	mainWin->glWidget->vboRenderManager.changeTerrainShader(terrainMode);
 	mainWin->urbanGeometry->update(mainWin->glWidget->vboRenderManager);
 	mainWin->glWidget->shadow.makeShadowMap(mainWin->glWidget);
 	mainWin->glWidget->updateGL();
 }
 
-void ControlWidget::contentDesign(int){
-	printf("Content design clicked\n");
-	bool contentD=ui.content_checkbox->isChecked();
-	if(contentD==true){//set content design
-		printf("Content design ENABLED\n");
-		//if(ui.terrain_2DShader->isChecked()==false)
-			ui.terrain_2DShader->setChecked(true);//check 2D
-
-			/*glActiveTexture(GL_TEXTURE7); 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-			glActiveTexture(GL_TEXTURE0);*/
-		//int terrainMode=2;
-		//mainWin->glWidget->vboRenderManager.changeTerrainShader(terrainMode);//could have used !shader2D
-		//mainWin->urbanGeometry->adaptToTerrain();
-		//mainWin->glWidget->updateGL();
-	}else{//restore normal
+void ControlWidget::contentDesign(int) {
+	if (ui.content_checkbox->isChecked()) {
+		ui.terrain_2DShader->setChecked(true);
+	} else {
 		ui.terrain_2DShader->setChecked(false);//check 2D
-
-		/*glActiveTexture(GL_TEXTURE7); 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-			glActiveTexture(GL_TEXTURE0);*/
-		/*bool shader2D=ui.terrain_2DShader->isChecked();
-		G::global()["shader2D"] = shader2D;
-		int terrainMode;
-		if(shader2D==true)
-			terrainMode=0;
-		else 
-			terrainMode=1;
-		mainWin->glWidget->vboRenderManager.changeTerrainShader(terrainMode);//could have used !shader2D
-		mainWin->urbanGeometry->adaptToTerrain();
-		mainWin->glWidget->updateGL();*/
-
 	}
 	changeTerrainShader(0);
-}//
+}
 
 void ControlWidget::contentDesignLevel(){
-	int newLevel=0;
-	/*if(ui.content_0->isChecked()){
-		newLevel=0;
-	}*/
-	if(ui.content_1->isChecked()){
+	int newLevel = 0;
+	if (ui.content_1->isChecked()) {
 		newLevel=1;
-	}
-	if(ui.content_7->isChecked()){
+	} else if (ui.content_7->isChecked()) {
 		newLevel=7;
-	}
-	if(ui.content_8->isChecked()){
+	} else if (ui.content_8->isChecked()) {
 		newLevel=8;
-	}
-	if(ui.content_9->isChecked()){
+	} else if (ui.content_9->isChecked()) {
 		newLevel=9;
-	}
-	if(ui.content_10->isChecked()){
+	} else if (ui.content_10->isChecked()) {
 		newLevel=10;
-	}
-	if(ui.content_11->isChecked()){
+	} else if (ui.content_11->isChecked()) {
 		newLevel=11;
 	}
-	G::global()["content_terrainLevel"]=newLevel;
+	G::global()["content_terrainLevel"] = newLevel * 7.0f;
 	printf("New Level %d\n",newLevel);
 }

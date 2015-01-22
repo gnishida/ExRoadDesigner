@@ -37,12 +37,9 @@ public:
 	RoadGraph origRoads;
 
 	RoadAreaSet areas;
-	
-	//int selectedAreaIndex;
 
 public:
 	UrbanGeometry(MainWindow* mainWin);
-	~UrbanGeometry();
 
 	/** getter for width */
 	int getWidth() { return width; }
@@ -65,7 +62,6 @@ public:
 
 	void render(VBORenderManager &vboRenderManager);
 	void update(VBORenderManager& vboRenderManager);
-	void adaptToTerrain();
 
 	void addRoad(int roadType, Polyline2D &polyline, int lanes);
 	void mergeRoads();

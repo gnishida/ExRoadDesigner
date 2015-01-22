@@ -363,12 +363,12 @@ void MainWindow::onGenerateAll() {
 
 void MainWindow::onGenerateRegularGrid() {
 	GraphUtil::generateRegularGrid(urbanGeometry->roads, 5000, 500, 100);
-	urbanGeometry->adaptToTerrain();
+	urbanGeometry->update(glWidget->vboRenderManager);
 }
 
 void MainWindow::onGenerateCurvyGrid() {
 	GraphUtil::generateCurvyGrid(urbanGeometry->roads, 5000, 500, 100);
-	urbanGeometry->adaptToTerrain();
+	urbanGeometry->update(glWidget->vboRenderManager);
 }
 
 void MainWindow::onRotationVideo() {
@@ -876,21 +876,21 @@ void MainWindow::onTerrainGeneration() {
 			int g = mat2.at<cv::Vec3b>(y, x)[1];
 			int r = mat2.at<cv::Vec3b>(y, x)[2];
 
-			uchar value = 0;
+			float value = 0.0f;
 			if (r == 0 && g == 0 && b == 255) {				// sea
-				value = 0;
+				value = 0.0f;
 			} else if (r == 192 && g == 192 && b == 255) {	// river
-				value = 1;
+				value = 7.0f;
 			} else if (r == 0 && g == 255 && b == 0) {		// plain
-				value = 10;
+				value = 70.0f;
 			} else if (r == 192 && g == 255 && b == 192) {	// coast
-				value = 9;
+				value = 63.0f;
 			} else if (r == 255 && g == 128 && b == 128) {	// park
-				value = 8;
+				value = 56.0f;
 			} else if (r == 128 && g == 128 && b == 255) {	// water
-				value = 7;
+				value = 49.0f;
 			} else if (r == 128 && g == 0 && b == 0) {		// mountain
-				value = 11;
+				value = 77.0f;
 			} else {
 				std::cerr << "Unknown color is found. red = " << r << ", green = " << g << ", blue = " << b << std::endl;
 			}
@@ -900,6 +900,7 @@ void MainWindow::onTerrainGeneration() {
 	}
 
 	// create the transition area from the land to the sea
+	/*
 	std::vector<QVector2D> transitionAreas;
 	for (int y = 0; y < glWidget->vboRenderManager.vboTerrain.layerData.rows; ++y) {
 		for (int x = 0; x < glWidget->vboRenderManager.vboTerrain.layerData.cols; ++x) {
@@ -928,11 +929,11 @@ void MainWindow::onTerrainGeneration() {
 	for (int i = 0; i < transitionAreas.size(); ++i) {
 		glWidget->vboRenderManager.vboTerrain.layerData.at<float>(transitionAreas[i].y(), transitionAreas[i].x()) = 5;
 	}
+	*/
 
 	glWidget->vboRenderManager.vboTerrain.layerData.copyTo(origTerrain);
-
-
-	urbanGeometry->adaptToTerrain();
+	
+	urbanGeometry->update(glWidget->vboRenderManager);
 	glWidget->updateGL();
 }
 
@@ -986,7 +987,7 @@ void MainWindow::onUpdateMountain() {
 		glWidget->vboRenderManager.vboTerrain.updateGaussian(x, y, change,radi);
 	}
 
-	urbanGeometry->adaptToTerrain();
+	urbanGeometry->update(glWidget->vboRenderManager);
 	glWidget->updateGL();
 }
 
@@ -1139,7 +1140,6 @@ void MainWindow::onTerrainSegmentation() {
 
 	std::cout << "Terrain segmentation has successfully completed" << std::endl;
 
-	urbanGeometry->adaptToTerrain();
 	glWidget->updateGL();
 }
 

@@ -190,18 +190,18 @@ void main(){
 				);
 			float height=texture(terrain_tex,terrainTexCoord.rg).r;
 
-			if(height<=6){//water
-				if(height<=0){
-					outputF=vec4(0x84/255.0,0xa9/255.0,0xe6/255.0,1.0);//water blue dark 92bbff (mine 84a9e6)
-				}else{
-					outputF=vec4(0xa0/255.0,0xc3/255.0,0xff/255.0,1.0);//water blue
+			if (height <= 42) {//water
+				if (height <= 0) {
+					outputF = vec4(0x84/255.0,0xa9/255.0,0xe6/255.0,1.0);//water blue dark 92bbff (mine 84a9e6)
+				} else {
+					outputF = vec4(0xa0/255.0,0xc3/255.0,0xff/255.0,1.0);//water blue
 				}
-			}else{
-				outputF=vec4(0xe9/255.0,0xe5/255.0,0xdc/255.0,1.0);//gray dark
-				int heighStep=int(height-7);//index 0-4 (0 mid river, 1 green, 2 coast, 3 flat, 4 mountain)
-				if(heighStep<0)heighStep=0;
-				if(heighStep>4)heighStep=4;
-				outputF=vec4(terrainMode3Colors[heighStep],1.0);
+			} else {
+				outputF = vec4(0xe9/255.0,0xe5/255.0,0xdc/255.0,1.0);//gray dark
+				int heighStep = int((height - 49) / 7);//index 0-4 (0 mid river, 1 green, 2 coast, 3 flat, 4 mountain)
+				if (heighStep < 0) heighStep = 0;
+				if (heighStep > 4) heighStep = 4;
+				outputF = vec4(terrainMode3Colors[heighStep], 1.0);
 			}
 			return;
 		}

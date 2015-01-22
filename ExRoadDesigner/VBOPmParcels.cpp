@@ -8,9 +8,6 @@
 #include "global.h"
 #include "Util.h"
 
-void subdivideBlockIntoParcels(Block &block);
-bool subdivideParcel(Block &block, Parcel parcel, float areaMean, float areaMin, float areaVar, float splitIrregularity, std::vector<Parcel> &outParcels); 
-
 bool VBOPmParcels::generateParcels(VBORenderManager& rendManager, std::vector< Block > &blocks) {
 	srand(0);
 	for (int i = 0; i < blocks.size(); ++i) {
@@ -20,7 +17,7 @@ bool VBOPmParcels::generateParcels(VBORenderManager& rendManager, std::vector< B
 	return true;
 }
 
-void subdivideBlockIntoParcels(Block &block) {
+void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
 	//srand(block.randSeed);
 	std::vector<Parcel> tmpParcels;
 
@@ -50,11 +47,10 @@ void subdivideBlockIntoParcels(Block &block) {
 * @splitIrregularity: A normalized value 0-1 indicating how far
 *					from the middle point the split line should be
 **/
-bool subdivideParcel(Block &block, Parcel parcel, float areaMean, float areaMin, float areaStd,	float splitIrregularity, std::vector<Parcel> &outParcels) {
+bool VBOPmParcels::subdivideParcel(Block &block, Parcel parcel, float areaMean, float areaMin, float areaStd,	float splitIrregularity, std::vector<Parcel> &outParcels) {
 	float thresholdArea = areaMean + areaStd * areaMean * Util::genRand(-1, 1);
 	
 	if (parcel.parcelContour.area() <= std::max(thresholdArea, areaMin)) {
-	//if( (fabs(boost::geometry::area(parcel.bg_parcelContour))) <= std::max(thresholdArea, areaMin)) {
 		outParcels.push_back(parcel);
 		return true;
 	}
@@ -77,9 +73,9 @@ bool subdivideParcel(Block &block, Parcel parcel, float areaMean, float areaMin,
 
 	dirVectorInit = (auxPt*obbMat - midPt);
 	dirVectorInit.normalize();
-	if(obbSize.x() > obbSize.y()){
-		dirVector.setX( -dirVectorInit.y() );
-		dirVector.setY(  dirVectorInit.x() );
+	if (obbSize.x() > obbSize.y()) {
+		dirVector.setX(-dirVectorInit.y());
+		dirVector.setY(dirVectorInit.x());
 	} else {
 		dirVector = dirVectorInit;
 	}
@@ -128,9 +124,3 @@ bool subdivideParcel(Block &block, Parcel parcel, float areaMean, float areaMin,
 
 	return true;
 }
-
-bool compareFirstPartTuple (const std::pair<float,Parcel*> &i, const std::pair<float,Parcel*> &j) {
-	return (i.first<j.first);
-}
-
-

@@ -50,9 +50,6 @@ UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	//selectedAreaIndex = -1;
 }
 
-UrbanGeometry::~UrbanGeometry() {
-}
-
 void UrbanGeometry::clear() {
 	clearGeometry();
 }
@@ -61,14 +58,7 @@ void UrbanGeometry::clearGeometry() {
 	//if (&mainWin->glWidget->vboRenderManager != NULL) delete &mainWin->glWidget->vboRenderManager;
 
 	roads.clear();
-
-	// clean up memory allocated for blocks
-	/*
-	for (int i = 0; i < blocks.size(); ++i) {
-		delete blocks[i];
-	}
-	blocks.clear();
-	*/
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateRoadsEx(std::vector<ExFeature> &features) {
@@ -261,21 +251,6 @@ void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 }
 
 /**
- * Adapt all geometry objects to &mainWin->glWidget->vboRenderManager.
- */
-void UrbanGeometry::adaptToTerrain() {
-	for (int i = 0; i < areas.size(); ++i) {
-		areas[i]->adaptToTerrain(&mainWin->glWidget->vboRenderManager);
-	}
-
-	controlPoints3D.clear();
-	for (int i = 0; i < controlPoints.size(); ++i) {
-		float z = mainWin->glWidget->vboRenderManager.getTerrainHeight(controlPoints[i].x(), controlPoints[i].y());
-		controlPoints3D.push_back(QVector3D(controlPoints[i].x(), controlPoints[i].y(), z + 30));
-	}
-}
-
-/**
  * add a road edge
  */
 void UrbanGeometry::addRoad(int roadType, Polyline2D &polyline, int lanes) {
@@ -345,6 +320,8 @@ void UrbanGeometry::mergeRoads() {
 	areas.roads.clear();
 	areas.selectedIndex = -1;
 	areas.clear();
+
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::connectRoads() {
@@ -356,6 +333,7 @@ void UrbanGeometry::connectRoads() {
 void UrbanGeometry::cutRoads() {
 	if (areas.selectedIndex < 0) return;
 	GraphUtil::subtractRoads(roads, areas.selectedArea()->area, false);
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::loadRoads(const QString &filename) {
@@ -397,13 +375,7 @@ void UrbanGeometry::saveRoads(const QString &filename) {
 
 void UrbanGeometry::clearRoads() {
 	roads.clear();
-
-	/*
-	for (int i = 0; i < blocks.size(); ++i) {
-		delete blocks[i];
-	}
-	blocks.clear();
-	*/
+	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::loadAreas(const QString &filename) {

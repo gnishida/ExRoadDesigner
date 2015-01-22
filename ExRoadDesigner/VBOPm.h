@@ -8,12 +8,8 @@
 #include <boost/graph/planar_face_traversal.hpp>
 #include <boost/graph/boyer_myrvold_planar_test.hpp>
 
-#include "VBOBlock.h"
-#include "VBOParcel.h"
 #include "VBOBuilding.h"
-#include "RoadGraph.h"
 #include "BlockSet.h"
-#include "UrbanGeometry.h"
 
 class VBORenderManager;
 
