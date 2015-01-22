@@ -87,10 +87,9 @@ public:
 	bool editionMode;
 	QVector3D mousePos3D;
 	VBOTerrain vboTerrain;
-	//void updateLayer(QVector3D mouse3D,float change);
-	//void updateTerrain(float coordX,float coordY,float rad,float change);
 	void changeTerrainDimensions(float terrainSide,int resolution);
 	float getTerrainHeight(float x, float y);
+	float getMinTerrainHeight(float x, float y, float radius = 20.0f);
 	void changeTerrainShader(int newMode);
 	QVector3D minPos;
 	QVector3D maxPos;
@@ -102,9 +101,6 @@ public:
 	/// water
 	VBOWater vboWater;
 	void renderWater();
-
-	/// GUI
-	//VBOGUI vboGUI;
 
 	// textures
 	QHash<QString,GLuint> nameToTexId;

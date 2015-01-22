@@ -113,6 +113,7 @@
     <addaction name="actionTerrainSegmentation"/>
     <addaction name="separator"/>
     <addaction name="actionTerrainDataConverter"/>
+    <addaction name="actionTerrainDataConverter2"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuArea"/>
@@ -727,6 +728,11 @@
   <action name="actionGenerateAll">
    <property name="text">
     <string>Generate All</string>
+   </property>
+  </action>
+  <action name="actionTerrainDataConverter2">
+   <property name="text">
+    <string>Terrain Data Converter 2</string>
    </property>
   </action>
  </widget>

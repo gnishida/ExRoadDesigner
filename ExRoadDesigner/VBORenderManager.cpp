@@ -148,28 +148,13 @@ void VBORenderManager::renderAll(bool cleanVertex){
 
 }//
 
-	
-
 void VBORenderManager::cleanVAO(GLuint vbo,GLuint vao){
 	glDeleteBuffers(1, &vbo);
 	glDeleteVertexArrays(1, &vao);
 }//
 
-/*void VBORenderManager::renderWater(){
-	vboWater.render(*this);
-}//*/
-
-/*void VBORenderManager::updateLayer(QVector3D mouse3D,float change){
-	vboTerrain.updateTerrain(mouse3D,change);
-}//
-
-void VBORenderManager::updateTerrain(float coordX,float coordY,float rad,float change){
-	printf("CHANGE %f\n",change);//coords are 0-1
-	vboTerrain.updateTerrain(coordX,coordY,change,rad);
-}
-
 /**
- * Return the terrain elevation. Always 0 is returned for 2D mode.
+ * Return the terrain elevation.
  *
  * @param x			x coordinate [-side/2, side/2]
  * @param y			y coordinate [-side/2, side/2]
@@ -183,6 +168,37 @@ float VBORenderManager::getTerrainHeight(float x, float y) {
 	if (v > 1.0f) v = 1.0f;
 
 	return vboTerrain.getTerrainHeight(u, v);
+}
+
+/**
+ * Return the minimum terrain elevation around the given poing.
+ *
+ * @param x			x coordinate [-side/2, side/2]
+ * @param y			y coordinate [-side/2, side/2]
+ * @param radius	radius
+ */
+float VBORenderManager::getMinTerrainHeight(float x, float y, float radius) {
+	float u = x / side + 0.5f;
+	float v = y / side + 0.5f;
+	float r = radius / side;
+
+	float min_z = std::numeric_limits<float>::max();
+	for (int i = -1; i <= 1; ++i) {
+		float uu = u + i * r;
+		if (uu < 0) uu = 0.0f;
+		if (uu > 1.0f) uu = 1.0f;
+
+		for (int j = -1; j <= 1; ++j) {
+			float vv = v + j * r;
+			if (vv < 0) vv = 0.0f;
+			if (vv > 1.0f) vv = 1.0f;
+
+			float z = vboTerrain.getTerrainHeight(uu, vv);
+			if (z < min_z) min_z = z;
+		}
+	}
+
+	return min_z;
 }
 
 void VBORenderManager::changeTerrainDimensions(float terrainSide,int resolution) {

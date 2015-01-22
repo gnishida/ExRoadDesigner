@@ -129,16 +129,12 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					vertROAD[type].push_back(Vertex(b3,QColor(),QVector3D(0,0,1.0f),QVector3D(0,lengthMovedL / dW,0)));
 
 					// 側面のジオメトリ
-					QVector3D b0_d = b0 + QVector3D(0, 0, -deltaL*2);
-					QVector3D b1_d = b1 + QVector3D(0, 0, -deltaL*2);
-					QVector3D b2_d = b2 + QVector3D(0, 0, -deltaL*2);
-					QVector3D b3_d = b3 + QVector3D(0, 0, -deltaL*2);
-					vertSide.push_back(Vertex(b0_d, QColor(64, 64, 64), -per, QVector3D()));
-					vertSide.push_back(Vertex(b1_d, QColor(64, 64, 64), -per, QVector3D()));
+					vertSide.push_back(Vertex(b0 + QVector3D(0, 0, -deltaZ * 2), QColor(64, 64, 64), -per, QVector3D()));
+					vertSide.push_back(Vertex(b1 + QVector3D(0, 0, -deltaZ * 2), QColor(64, 64, 64), -per, QVector3D()));
 					vertSide.push_back(Vertex(b1, QColor(64, 64, 64), -per, QVector3D()));
 					vertSide.push_back(Vertex(b0, QColor(64, 64, 64), -per, QVector3D()));
-					vertSide.push_back(Vertex(b2_d, QColor(64, 64, 64), per, QVector3D()));
-					vertSide.push_back(Vertex(b3_d, QColor(64, 64, 64), per, QVector3D()));
+					vertSide.push_back(Vertex(b2 + QVector3D(0, 0, -deltaZ * 2), QColor(64, 64, 64), per, QVector3D()));
+					vertSide.push_back(Vertex(b3 + QVector3D(0, 0, -deltaZ * 2), QColor(64, 64, 64), per, QVector3D()));
 					vertSide.push_back(Vertex(b3, QColor(64, 64, 64), per, QVector3D()));
 					vertSide.push_back(Vertex(b2, QColor(64, 64, 64), per, QVector3D()));
 
@@ -174,7 +170,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 
 			if (outDegree == 0) {
 				continue;
-			} else if (outDegree ==1) { // デッドエンド
+			} else if (outDegree == 1) { // デッドエンド
 				// get the largest width of the outing edges
 				float rad = 0.0f;
 				float angle_offset = 0.0f;
@@ -216,8 +212,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 
 					cc1 = cc2;
 				}
-
-			}else{
+			} else {
 				////////////////////////
 				// 2.2 FOUR OR MORE--> COMPLEX INTERSECTION
 				float z = rendManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
@@ -272,7 +267,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					QVector2D ed1p1 = ed1poly[1];
 					// compute right side
 					QVector2D ed1Dir = (roads.graph[*vi]->pt - ed1p1).normalized();//ends in 0
-					QVector2D ed1Per(ed1Dir.y(), -ed1Dir.x());// = (QVector3D::crossProduct(ed1Dir,QVector3D(0,0,1.0f)).normalized());//need normalized()?
+					QVector2D ed1Per(ed1Dir.y(), -ed1Dir.x());
 					QVector2D ed1p0R = roads.graph[*vi]->pt + ed1Per*ed1W/2.0f;
 					QVector2D ed1p1R = ed1p1 + ed1Per*ed1W/2.0f;
 					// compute left side
@@ -288,7 +283,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					QVector2D ed2p1L = ed2polyL[1];
 					// compute left side
 					QVector2D ed2DirL = (ed2p0L - ed2p1L).normalized();//ends in 0
-					QVector2D ed2PerL(ed2DirL.y(), -ed2DirL.x());//(QVector3D::crossProduct(ed2DirL,QVector3D(0,0,1.0f)).normalized());//need normalized()?
+					QVector2D ed2PerL(ed2DirL.y(), -ed2DirL.x());
 					ed2p0L-=ed2PerL*ed2WL/2.0f;
 					ed2p1L-=ed2PerL*ed2WL/2.0f;
 
@@ -300,7 +295,7 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					QVector2D ed2p1R = ed2polyR[1];
 					// compute left side
 					QVector2D ed2DirR = (ed2p0R - ed2p1R).normalized();//ends in 0
-					QVector2D ed2PerR(ed2DirR.y(), -ed2DirR.x());// = (QVector3D::crossProduct(ed2DirR,QVector3D(0,0,1.0f)).normalized());//need normalized()?
+					QVector2D ed2PerR(ed2DirR.y(), -ed2DirR.x());
 					ed2p0R+=ed2PerR*ed2WR/2.0f;
 					ed2p1R+=ed2PerR*ed2WR/2.0f;
 
@@ -326,9 +321,6 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 					QVector3D intPoint1(intPt1.x(), intPt1.y(), z);
 					QVector3D intPoint2(intPt2.x(), intPt2.y(), z);
 
-					//intPoint1 -= ed1Dir * deltaL;
-					//intPoint2 -= ed1Dir * deltaL;
-
 					interPoints.push_back(intPoint1);
 					// intPoint1、intPoint2を、道路の方向に直行するよう、位置をそろえる
 					if (QVector3D::dotProduct(intPoint1 - intPoint2, ed1Dir) >= 0) {
@@ -338,12 +330,10 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 						intPoint2 += ed1Dir * QVector3D::dotProduct(intPoint1 - intPoint2, ed1Dir);
 						interPoints.push_back(intPoint2);
 					}
-
-
+					
 					stopPoints.push_back(intPoint1);
 					stopPoints.push_back(intPoint2);
 
-					// create crossing and stop line only if the degree >= 3 and the edge is not self-looping and the edge length is long enough
 					if (outDegree >= 3 && roads.graph[edgeAngleOut[eN].second]->type == RoadEdge::TYPE_AVENUE && (ed1poly[0] - ed1poly.back()).length() > 10.0f && ed1poly.length() > 50.0f) {
 						// 横断歩道
 						interPedX.push_back(Vertex(intPoint1,QVector3D(0-0.07f,0,0)));
@@ -360,23 +350,6 @@ void RoadMeshGenerator::generateRoadMesh(VBORenderManager& rendManager, RoadGrap
 						interPedXLineR.push_back(Vertex(intPoint1-ed1Dir*4.25f,QVector3D(0.0f,1.0f,0)));
 					}
 				}
-
-				// interPointsに基づいて、交差点のポリゴンを生成する
-				/*std::vector<QVector3D> curvedInterPoints;
-				for (int pi = 0; pi < interPoints.size() / 3; ++pi) {
-					int next = (pi * 3 + 1) % interPoints.size();
-					int prev = (pi * 3 - 1 + interPoints.size()) % interPoints.size();
-					int nextnext = (pi * 3 + 2) % interPoints.size();
-
-					std::vector<QVector3D> curvePoints = generateCurvePoints(interPoints[pi * 3], interPoints[prev], interPoints[next]);
-					curvedInterPoints.insert(curvedInterPoints.end(), curvePoints.begin(), curvePoints.end());
-					if ((interPoints[next] - stopPoints[pi * 2]).lengthSquared() > 0.1f) {
-						curvedInterPoints.push_back(stopPoints[pi * 2]);
-					}
-					if ((interPoints[nextnext] - stopPoints[pi * 2 + 1]).lengthSquared() > 0.1f) {
-						curvedInterPoints.push_back(stopPoints[pi * 2 + 1]);
-					}
-				}*/
 								
 				if (interPoints.size() > 2) {
 					rendManager.addStaticGeometry2("3d_roads_interCom",interPoints,0.0f,false,"../data/textures/roads/road_0lines.jpg",GL_QUADS,2,QVector3D(1.0f/7.5f,1.0f/7.5f,1),QColor());//0.0f (moved before)

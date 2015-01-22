@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Wed Jan 21 18:17:15 2015
+** Created: Thu Jan 22 16:03:28 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -111,6 +111,7 @@ public:
     QAction *actionGenerateBuildings;
     QAction *actionGenerateVegetation;
     QAction *actionGenerateAll;
+    QAction *actionTerrainDataConverter2;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -361,6 +362,8 @@ public:
         actionGenerateVegetation->setObjectName(QString::fromUtf8("actionGenerateVegetation"));
         actionGenerateAll = new QAction(MainWindow);
         actionGenerateAll->setObjectName(QString::fromUtf8("actionGenerateAll"));
+        actionTerrainDataConverter2 = new QAction(MainWindow);
+        actionTerrainDataConverter2->setObjectName(QString::fromUtf8("actionTerrainDataConverter2"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -451,6 +454,7 @@ public:
         menuTool->addAction(actionTerrainSegmentation);
         menuTool->addSeparator();
         menuTool->addAction(actionTerrainDataConverter);
+        menuTool->addAction(actionTerrainDataConverter2);
 
         retranslateUi(MainWindow);
 
@@ -564,6 +568,7 @@ public:
         actionGenerateBuildings->setText(QApplication::translate("MainWindow", "Generate Buildings", 0, QApplication::UnicodeUTF8));
         actionGenerateVegetation->setText(QApplication::translate("MainWindow", "Generate Vegetation", 0, QApplication::UnicodeUTF8));
         actionGenerateAll->setText(QApplication::translate("MainWindow", "Generate All", 0, QApplication::UnicodeUTF8));
+        actionTerrainDataConverter2->setText(QApplication::translate("MainWindow", "Terrain Data Converter 2", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuWindow->setTitle(QApplication::translate("MainWindow", "Window", 0, QApplication::UnicodeUTF8));
         menuArea->setTitle(QApplication::translate("MainWindow", "Area", 0, QApplication::UnicodeUTF8));

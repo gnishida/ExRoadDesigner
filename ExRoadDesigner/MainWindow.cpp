@@ -78,7 +78,10 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 	connect(ui.actionTerrainGeneration, SIGNAL(triggered()), this, SLOT(onTerrainGeneration()));
 	connect(ui.actionUpdateMountain, SIGNAL(triggered()), this, SLOT(onUpdateMountain()));
 	connect(ui.actionTerrainSegmentation, SIGNAL(triggered()), this, SLOT(onTerrainSegmentation()));
+
 	connect(ui.actionTerrainDataConverter, SIGNAL(triggered()), this, SLOT(onTerrainDataConverter()));
+	connect(ui.actionTerrainDataConverter2, SIGNAL(triggered()), this, SLOT(onTerrainDataConverter2()));
+
 	connect(ui.actionControlWidget, SIGNAL(triggered()), this, SLOT(onShowControlWidget()));
 	connect(ui.actionPropertyWidget, SIGNAL(triggered()), this, SLOT(onShowPropertyWidget()));
 	connect(ui.actionDebug, SIGNAL(triggered()), this, SLOT(onDebug()));
@@ -1164,6 +1167,38 @@ void MainWindow::onTerrainDataConverter() {
 	}
 
 	cv::Mat saveImage	= cv::Mat(newImg.rows, newImg.cols, CV_8UC4, newImg.data);
+	cv::imwrite(filename2.toUtf8().data(), saveImage);
+}
+
+void MainWindow::onTerrainDataConverter2() {
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open Terrain file..."), "", tr("Terrain Files (*.png)"));
+	if (filename.isEmpty()) return;
+
+	QString filename2 = QFileDialog::getSaveFileName(this, tr("Save Terrain file..."), "", tr("Terrain Files (*.png)"));
+	if (filename2.isEmpty()) return;
+
+	cv::Mat oldImg = cv::imread(filename.toUtf8().data(), CV_LOAD_IMAGE_UNCHANGED);
+	cv::Mat tmp = cv::Mat(oldImg.rows, oldImg.cols, CV_32FC1, oldImg.data);
+	cv::Mat img;
+	tmp.copyTo(img);
+
+	for (int r = 0; r < img.rows; ++r) {
+		for (int c = 0; c < img.cols; ++c) {
+			if (fabs(img.at<float>(r, c) - 49) < 3.0f) {
+				img.at<float>(r, c) = 67.0f;
+			} else if (fabs(img.at<float>(r, c) - 56) < 3.0f) {
+				img.at<float>(r, c) = 68.0f;
+			} else if (fabs(img.at<float>(r, c) - 63) < 3.0f) {
+				img.at<float>(r, c) = 69.0f;
+			} else if (fabs(img.at<float>(r, c) - 70) < 3.0f) {
+				img.at<float>(r, c) = 70.0f;
+			} else if (img.at<float>(r, c) > 74.0f) {
+				img.at<float>(r, c) = 71.0f;
+			}
+		}
+	}
+
+	cv::Mat saveImage = cv::Mat(img.rows, img.cols, CV_8UC4, img.data);
 	cv::imwrite(filename2.toUtf8().data(), saveImage);
 }
 
