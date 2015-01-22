@@ -627,7 +627,7 @@ void RoadGeneratorHelper::createFourDirection(float direction, std::vector<float
  * また、deadendフラグがtrueの場合も、対象外。
  * 処理を繰り返し、deadend道路がなくなるまで、繰り返す。
  */
-void RoadGeneratorHelper::removeDeadend(RoadGraph& roads) {
+void RoadGeneratorHelper::removeAllDeadends(RoadGraph& roads) {
 	bool removed = false;
 
 	do {
@@ -1158,7 +1158,7 @@ bool RoadGeneratorHelper::growRoadOneStep(RoadGraph& roads, RoadVertexDesc srcDe
  * 海岸の手間で、エッジをカットする
  * polylineのlast()側が、カットされる側にあることを前提とする
  */
-void RoadGeneratorHelper::cutEdgeByWater(Polyline2D &polyline, VBORenderManager& vboRenderManager, float z_threshold) {
+void RoadGeneratorHelper::cutEdgeByWater(Polyline2D &polyline, VBORenderManager& vboRenderManager, float z_threshold, float step) {
 	// 点が2つ未満の場合は、処理不能
 	if (polyline.size() < 2) return;
 
@@ -1173,17 +1173,21 @@ void RoadGeneratorHelper::cutEdgeByWater(Polyline2D &polyline, VBORenderManager&
 		}
 	}
 
+	// 点が1つ、あるいは0個なら、ここで終了
+	if (polyline.size() < 2) return;
+
 	// 海岸ぎりぎりの場所を探す
-	QVector2D vec = polyline.last() - polyline.nextLast();
+	QVector2D vec = polyline.back() - polyline.nextLast();
+	float length = vec.length();
 	vec.normalize();
-	QVector2D pt = polyline.last();
-	while (true) {
-		pt -= vec;
-		float z = vboRenderManager.getTerrainHeight(pt.x(), pt.y());
+	QVector2D pt = polyline[0];
+	for (float l = step; l < length; l += step) {
+		QVector2D curPt = polyline[0] + vec * l;
+		float z = vboRenderManager.getTerrainHeight(curPt.x(), curPt.y());
 		if (z < z_threshold) {
-			continue;
-		} else {
 			break;
+		} else {
+			pt = curPt;
 		}
 	}
 

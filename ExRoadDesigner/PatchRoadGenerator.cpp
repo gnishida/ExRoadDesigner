@@ -95,7 +95,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 
 			char filename[255];
 			sprintf(filename, "road_images/avenues_%d.jpg", iter);
-			RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
+			//RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
 
 			check();
 
@@ -108,7 +108,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 
 	// Avenueをクリーンナップ
 	if (G::getBool("cleanAvenues")) {
-		RoadGeneratorHelper::removeDeadend(roads);
+		RoadGeneratorHelper::removeAllDeadends(roads);
 	}
 
 	if (G::getBool("removeSmallBlocks")) {
@@ -147,6 +147,8 @@ void PatchRoadGenerator::generateRoadNetwork() {
 			RoadVertexDesc desc = seeds.front();
 			seeds.pop_front();
 
+			std::cout << "attemptExpansion (street): " << iter << " (Seed: " << desc << ")" << std::endl;
+
 			// 既に3つ以上エッジがある場合は、スキップする
 			if (GraphUtil::getDegree(roads, desc) >= 3) {
 				continue;
@@ -159,11 +161,19 @@ void PatchRoadGenerator::generateRoadNetwork() {
 
 			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
 			if (z < G::getFloat("seaLevel")) {
-				std::cout << "attemptExpansion (street): " << iter << " (skipped because it is under the sea or on the mountains)" << std::endl;
+				// 水中の頂点は、degree=1のはず！！
+				if (GraphUtil::getDegree(roads, desc) > 1) {
+					printf("ERROR!!! the vertex %d on the river has degree > 1.\n", desc);
+				}
+				//assert(GraphUtil::getDegree(roads, desc) == 1);
+
+				RoadOutEdgeIter ei, eend;
+				boost::tie(ei, eend) = boost::out_edges(desc, roads.graph);
+				RoadGeneratorHelper::removeEdge(roads, desc, *ei);
+				
 				continue;
 			}
 
-			std::cout << "attemptExpansion (street): " << iter << " (Seed: " << desc << ")" << std::endl;
 			int ex_id = roads.graph[desc]->properties["ex_id"].toInt();
 			//attemptConnect(RoadEdge::TYPE_STREET, desc, features[ex_id], seeds);
 			if (RoadGeneratorHelper::largestAngleBetweenEdges(roads, desc, RoadEdge::TYPE_STREET) > M_PI * 1.4f) {
@@ -174,7 +184,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 
 			char filename[255];
 			sprintf(filename, "road_images/streets_%d.jpg", iter);
-			RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
+			//RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
 
 			iter++;
 		}
@@ -187,7 +197,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 	}
 
 	if (G::getBool("cleanStreets")) {
-		RoadGeneratorHelper::removeDeadend(roads);
+		RoadGeneratorHelper::removeAllDeadends(roads);
 	}
 	
 	GraphUtil::cleanEdges(roads);
@@ -254,6 +264,9 @@ void PatchRoadGenerator::generateStreetSeeds(std::list<RoadVertexDesc> &seeds) {
 
 			// エリア外なら、スキップ
 			if (!targetArea.contains(roads.graph[*vi]->pt)) continue;
+
+			// 水面下なら、スキップ
+			if (vboRenderManager->getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y()) < G::getFloat("seaLevel")) continue;
 
 			if (roads.graph[*vi]->properties.contains("example_desc")) {
 				float z = vboRenderManager->getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
@@ -561,7 +574,7 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 	}
 
 	// 山チェック
-	if (RoadGeneratorHelper::maxZ(replacementGraph, vboRenderManager) >= 70.0f && RoadGeneratorHelper::diffSlope(replacementGraph, vboRenderManager) > 0.3f) {
+	if (RoadGeneratorHelper::maxZ(replacementGraph, vboRenderManager) > 70.0f && RoadGeneratorHelper::diffSlope(replacementGraph, vboRenderManager) > 0.3f) {
 		float max_rotation = G::getFloat("rotationForSteepSlope");
 		float min_slope = std::numeric_limits<float>::max();
 		float min_rotation;
@@ -607,7 +620,7 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 	}
 
 	// 川チェック
-	if (RoadGeneratorHelper::minZ(replacementGraph, vboRenderManager, false) <= 50.0f) {
+	if (RoadGeneratorHelper::minZ(replacementGraph, vboRenderManager, true) <= G::getFloat("seaLevel")) {
 		return false;
 	}
 
@@ -1020,7 +1033,7 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 		if (roadType == RoadEdge::TYPE_STREET) {
 			float z = vboRenderManager->getTerrainHeight(roads.graph[tgtDesc]->pt.x(), roads.graph[tgtDesc]->pt.y());
 			if (z < G::getFloat("seaLevel")) {
-				RoadGeneratorHelper::cutEdgeByWater(new_edge->polyline, *vboRenderManager, G::getFloat("seaLevel"));
+				RoadGeneratorHelper::cutEdgeByWater(new_edge->polyline, *vboRenderManager, G::getFloat("seaLevel"), 5.0f);
 				roads.graph[tgtDesc]->pt = new_edge->polyline[1];
 
 				// とりあえず、ローカルストリートについては、川の手間でストップさせて、シードに入れない

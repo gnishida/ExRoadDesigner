@@ -107,7 +107,7 @@ void WarpRoadGenerator::generateRoadNetwork() {
 
 	// Avenueをクリーンナップ
 	if (G::getBool("cleanAvenues")) {
-		RoadGeneratorHelper::removeDeadend(roads);
+		RoadGeneratorHelper::removeAllDeadends(roads);
 	}
 
 	if (G::getBool("removeSmallBlocks")) {
@@ -186,7 +186,7 @@ void WarpRoadGenerator::generateRoadNetwork() {
 
 	// Local Streetsをクリーンナップ
 	if (G::getBool("cleanStreets")) {
-		RoadGeneratorHelper::removeDeadend(roads);
+		RoadGeneratorHelper::removeAllDeadends(roads);
 	}
 
 	GraphUtil::cleanEdges(roads);
@@ -1034,7 +1034,7 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, Ex
 		if (roadType == RoadEdge::TYPE_STREET) {
 			float z = vboRenderManager->getTerrainHeight(roads.graph[tgtDesc]->pt.x(), roads.graph[tgtDesc]->pt.y());
 			if (z < G::getFloat("seaLevel")) {
-				RoadGeneratorHelper::cutEdgeByWater(new_edge->polyline, *vboRenderManager, G::getFloat("seaLevel"));
+				RoadGeneratorHelper::cutEdgeByWater(new_edge->polyline, *vboRenderManager, G::getFloat("seaLevel"), 5.0f);
 				roads.graph[tgtDesc]->pt = new_edge->polyline[1];
 
 				// とりあえず、ローカルストリートについては、川の手間でストップさせて、シードに入れない
