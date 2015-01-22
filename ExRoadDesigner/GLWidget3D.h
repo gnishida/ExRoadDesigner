@@ -25,7 +25,6 @@ This file is part of QtUrban.
 #include <QKeyEvent>
 #include "Camera.h"
 #include "Camera2D.h"
-#include "Camera3D.h"
 #include "FlyThroughCamera.h"
 #include "RoadGraph.h"
 
@@ -35,7 +34,6 @@ class GLWidget3D : public QGLWidget {
 public:
 	MainWindow* mainWin;
 	Camera2D camera2D;
-	Camera3D camera3D;
 	FlyThroughCamera flyCamera;
 	Camera* camera;
 

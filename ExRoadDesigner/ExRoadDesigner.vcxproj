@@ -374,7 +374,6 @@
     <ClInclude Include="BSpline.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Camera2D.h" />
-    <ClInclude Include="Camera3D.h" />
     <ClInclude Include="CameraSequence.h" />
     <ClInclude Include="FlyThroughCamera.h" />
     <ClInclude Include="GeneratedFiles\ui_BlendingVideoSettingDialog.h" />

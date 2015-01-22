@@ -623,9 +623,6 @@
     <ClInclude Include="FlyThroughCamera.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="Camera3D.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_VideoCaptureSettingDialog.h">
       <Filter>Generated Files</Filter>
     </ClInclude>

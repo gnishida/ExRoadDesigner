@@ -19,36 +19,6 @@
 #include "Polygon3D.h"
 #include "Util.h"
 
-/**
- * 道路網から、ブロック情報を抽出する。
- */
-bool VBOPm::generateBlocks(VBORenderManager& rendManager,RoadGraph &roadGraph, BlockSet& blocks) {
-	if (!VBOPmBlocks::generateBlocks(roadGraph, blocks)) {
-		printf("ERROR: generateBlocks\n");
-		return false;
-	}
-
-	return true;
-}
-
-/**
- * Block情報から、Parcel情報を計算する。
- */
-bool VBOPm::generateParcels(VBORenderManager& rendManager, BlockSet& blocks) {
-	if (!VBOPmParcels::generateParcels(rendManager, blocks.blocks)) {
-		printf("ERROR: generateParcels\n");
-		return false;
-	}
-
-	// ビルのfootprintを計算する
-	if (!VBOPmBuildings::generateBuildings(rendManager, blocks.blocks)) {
-		printf("ERROR: generateBuildings\n");
-		return false;
-	}
-		
-	return true;
-}
-
 bool VBOPm::generateBuildings(VBORenderManager& rendManager, BlockSet& blocks) {
 	rendManager.removeStaticGeometry("3d_building");
 		

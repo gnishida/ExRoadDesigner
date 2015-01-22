@@ -60,7 +60,7 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 
 	connect(ui.pushButtonMerge, SIGNAL(clicked()), this, SLOT(mergeRoads()));
 	connect(ui.pushButtonTrim, SIGNAL(clicked()), this, SLOT(trimRoads()));
-	//connect(ui.pushButtonCamera3D, SIGNAL(clicked()), this, SLOT(camera3D()));
+
 	// terrain
 	connect(ui.terrainPaint_sizeSlider, SIGNAL(valueChanged(int)),this, SLOT(updateTerrainLabels(int)));
 	connect(ui.terrainPaint_changeEdit, SIGNAL(textChanged(const QString &)),this, SLOT(updateTerrainEdit(const QString &)));
@@ -408,14 +408,4 @@ void ControlWidget::contentDesignLevel(){
 	}
 	G::global()["content_terrainLevel"]=newLevel;
 	printf("New Level %d\n",newLevel);
-}//
-
-/*
-void ControlWidget::camera3D() {
-	mainWin->glWidget->camera=&mainWin->glWidget->camera3D;
-	G::global()["rend_mode"]=1;
-	update3D();
-
-	mainWin->glWidget->updateCamera();
 }
-*/

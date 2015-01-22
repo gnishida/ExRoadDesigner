@@ -33,6 +33,9 @@ This file is part of QtUrban.
 #include "RoadMeshGenerator.h"
 #include "BlockMeshGenerator.h"
 #include "VBOPm.h"
+#include "VBOPmBlocks.h"
+#include "VBOPmParcels.h"
+#include "VBOPmBuildings.h"
 #include "VBOVegetation.h"
 
 UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
@@ -125,12 +128,13 @@ void UrbanGeometry::generateRoadsAliaga(std::vector<ExFeature> &features) {
 }
 
 void UrbanGeometry::generateBlocks() {
-	VBOPm::generateBlocks(mainWin->glWidget->vboRenderManager, roads, blocks);
+	VBOPmBlocks::generateBlocks(roads, blocks);
 	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateParcels() {
-	VBOPm::generateParcels(mainWin->glWidget->vboRenderManager, blocks);
+	VBOPmParcels::generateParcels(mainWin->glWidget->vboRenderManager, blocks.blocks);
+	VBOPmBuildings::generateBuildings(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	update(mainWin->glWidget->vboRenderManager);
 }
 
@@ -145,14 +149,13 @@ void UrbanGeometry::generateVegetation() {
 }
 
 void UrbanGeometry::generateAll() {
-	VBOPm::generateBlocks(mainWin->glWidget->vboRenderManager, roads, blocks);
-	VBOPm::generateParcels(mainWin->glWidget->vboRenderManager, blocks);
-
+	VBOPmBlocks::generateBlocks(roads, blocks);
+	VBOPmParcels::generateParcels(mainWin->glWidget->vboRenderManager, blocks.blocks);
+	VBOPmBuildings::generateBuildings(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
-
 	glLineWidth(5.0f);
 	glPointSize(10.0f);
 
@@ -204,16 +207,8 @@ void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
 	// draw the areas
 	for (int i = 0; i < areas.size(); ++i) {
 		areas[i]->adaptToTerrain(&vboRenderManager);
-		QString strLinesN = QString("area_lines%1").arg(i + 1);
-		QString strPointsN = QString("area_points%1").arg(i + 1);
-
-		QString strHintLinesN = QString("hint_lines%1").arg(i + 1);
-		QString strHintPointsN = QString("hint_points%1").arg(i + 1);
-
 		QColor colorArea(0, 0, 255);
 		QColor colorHintLine(255, 0, 0);
-		QColor colorControlPoints(255, 255, 0);
-		QColor colorBSpline(0, 255, 255);
 		if (i != areas.selectedIndex) {
 			colorArea = QColor(196, 196, 255);
 			colorHintLine = QColor(255, 196, 196);
@@ -228,8 +223,8 @@ void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
 }
 
 /**
- * ジオミトリを作成しなおす。
- * 道路やビルなどのジオミトリを作成しなおす。従って、この関数を頻繁に呼ぶべきではない。
+ * 道路、歩道、区画、ビル、木のジオミトリを作成しなおす。
+ * この関数を頻繁に呼ぶべきではない。道路が更新/生成された時、2D/3D表示の変更、PMメニューから新規にジオミトリを生成した時だけ。
  */
 void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 	// 地面が変わっている可能性などがあるので、ビルなどのジオミトリも一旦削除してしまう。

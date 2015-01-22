@@ -81,6 +81,4 @@ public:
 	void saveAreas(const QString &filename);
 
 	void debug();
-
-private:
 };

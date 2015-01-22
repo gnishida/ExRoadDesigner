@@ -31,7 +31,6 @@ GLWidget3D::GLWidget3D(MainWindow* mainWin) : QGLWidget(QGLFormat(QGL::SampleBuf
 
 	camera2D.resetCamera();
 	flyCamera.resetCamera();
-	camera3D.resetCamera();
 	camera = &camera2D;
 	//camera = &flyCamera;
 	//G::global()["rend_mode"]=0;//2D	setRender2D_3D();
@@ -291,11 +290,6 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 
 	switch (mainWin->mode) {
 	case MainWindow::MODE_AREA_SELECT:
-		/*if(altPressed==false&&G::global()["3d_render_mode"]==1){
-			camera3D.motion(dx,dy);
-			lastPos = event->pos();
-			break;
-		}*/
 		if (altPressed) {	// editing
 			if (event->buttons() & Qt::RightButton||event->buttons() & Qt::LeftButton||event->buttons() & Qt::MiddleButton) {//make sure something is clicking
 				if(mainWin->controlWidget->ui.content_checkbox->isChecked()){
@@ -641,21 +635,6 @@ void GLWidget3D::keyPressEvent( QKeyEvent *e ){
 		printf("Reseting camera pose\n");
 		camera->resetCamera();
 		break;
-	case Qt::Key_W:
-		camera3D.moveKey(0);updateCamera();updateGL();
-		break;
-	case Qt::Key_S:
-		camera3D.moveKey(1);updateCamera();updateGL();
-		break;
-	case Qt::Key_D:
-		camera3D.moveKey(2);updateCamera();updateGL();
-		break;
-	case Qt::Key_A:
-		camera3D.moveKey(3);updateCamera();updateGL();
-		break;
-	case Qt::Key_Q:
-		camera3D.moveKey(4);updateCamera();updateGL();
-		break;
 	default:
 		;
 	}
@@ -745,8 +724,7 @@ void GLWidget3D::updateCamera(){
 	glViewport(0, 0, (GLint)this->width(), (GLint)this->height());
 	camera->updatePerspective(this->width(),height);
 	camera->updateCamMatrix();
-	if(G::global()["3d_render_mode"]==1)
-		camera3D.updateCamMatrix();
+
 	// update uniforms
 	float mvpMatrixArray[16];
 	float mvMatrixArray[16];
@@ -765,7 +743,7 @@ void GLWidget3D::updateCamera(){
 	glUniformMatrix4fv(glGetUniformLocation(vboRenderManager.program, "mvMatrix"),  1, false, mvMatrixArray);
 	glUniformMatrix3fv(glGetUniformLocation(vboRenderManager.program, "normalMatrix"),  1, false, normMatrixArray);
 
-	// light poss
-	QVector3D light_dir=camera3D.light_dir.toVector3D();
-	glUniform3f(glGetUniformLocation(vboRenderManager.program, "lightDir"),light_dir.x(),light_dir.y(),light_dir.z());
+	// light direction
+	QVector3D light_dir(-0.40f, 0.81f, -0.51f);
+	glUniform3f(glGetUniformLocation(vboRenderManager.program, "lightDir"), light_dir.x(), light_dir.y(), light_dir.z());
 }

@@ -37,19 +37,15 @@
 	GLWidgetSimpleShadow::~GLWidgetSimpleShadow(){
 	}//
 	
-
 	void GLWidgetSimpleShadow::updateShadowMatrix(GLWidget3D* glWidget3D){
+		QVector3D light_dir(-0.40f, 0.81f, -0.51f);
 
-		QVector3D light_dir=glWidget3D->camera3D.light_dir.toVector3D();
 		//////////////////////////////////////////////////////
 		float fov = 45.0f;
 		float aspect = (float)shadowWidth / (float)shadowHeight;
 
 		float zfar = 90000.0f;//3800.0
 		float znear = 1200.0f;//1500.0
-
-		//float zfar=3800.0;
-		//float znear=1500.0;
 
 		float f = 1.0f / tanf(fov * (M_PI / 360.0));
 		double m[16] = {
@@ -274,6 +270,3 @@
 
 	}//
 
-
-
-	
