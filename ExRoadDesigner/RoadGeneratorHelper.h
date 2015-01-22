@@ -27,9 +27,11 @@ public:
 	static bool canSnapToFixEdge(RoadGraph& roads, RoadVertexDesc v_desc, float threshold, RoadEdgeDesc& snapEdge, QVector2D &closestPt);
 
 	static bool getVertexForSnapping(VBORenderManager& vboRenderManager, RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float z_threshold, float angle, float angle_threshold, RoadVertexDesc& nearest_desc);
+	static bool getVertexForSnapping(VBORenderManager& vboRenderManager, RoadGraph& roads, const QVector2D& pt, float distance_threshold, float z_threshold, float angle, float angle_threshold, RoadVertexDesc& nearest_desc);
 	static bool getEdgeForSnapping(VBORenderManager& vboRenderManager, RoadGraph& roads, RoadVertexDesc srcDesc, float distance_threshold, float z_threshold, float angle, float angle_threshold, RoadEdgeDesc& nearest_desc, QVector2D& nearestPt);
 
 	static bool isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_desc, const Polyline2D &polyline, float angleTolerance);
+	static bool isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_desc, float angle, float angleTolerance);
 
 	static QVector2D modulo(const Polygon2D &targetArea, const Polygon2D &exampleArea, const QVector2D &pt, BBox &bbox);
 	static bool containsInitialSeed(const Polygon2D &targetArea, const Polygon2D &exampleArea, const QVector2D &pt);

@@ -403,6 +403,57 @@ bool RoadGeneratorHelper::getVertexForSnapping(VBORenderManager& vboRenderManage
 }
 
 /**
+ * snap先の頂点を探す。ただし、deadendの頂点は対象外。また、水面下の頂点も対象外。
+ * また、方向ベクトルがangle方向からしきい値を超えてる場合、その頂点はスキップする。
+ * さらに、距離がdistance_threshold未満であること。
+ *
+ * @param vboRenderManager		標高を取得するため
+ * @param roads					道路グラフ
+ * @param pt					snap元の点の座標
+ * @param distance_threshold	snap先との距離のしきい値（これより遠い頂点は、対象外）
+ * @param z_threshold			snap先までの間の標高のしきい値（これより低い所を通り場合は、対象外）
+ * @param angle					snap元頂点からの方向基準
+ * @param angle_threshold		方向のしきい値（方向基準からこのしきい値を超える場合は、対象外）
+ * @param nearest_desc [OUT]	snap先の頂点ID
+ * @return						snap先が見つかった場合はtrueを返却する。
+ */
+bool RoadGeneratorHelper::getVertexForSnapping(VBORenderManager& vboRenderManager, RoadGraph& roads, const QVector2D& pt, float distance_threshold, float z_threshold, float angle, float angle_threshold, RoadVertexDesc& nearest_desc) {
+	float distance_threshold2 = distance_threshold * distance_threshold;
+	float min_cost = std::numeric_limits<float>::max();
+	bool found = false;;
+
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		if (!roads.graph[*vi]->valid) continue;
+
+		if (roads.graph[*vi]->deadend) continue;
+
+		QVector2D vec = roads.graph[*vi]->pt - pt;
+		float angle2 = atan2f(vec.y(), vec.x());
+		if (Util::diffAngle(angle, angle2) > angle_threshold) continue;
+
+		float dist = vec.lengthSquared();
+		if (dist > distance_threshold2) continue;
+
+		// エッジが水面下かチェック
+		float z = vboRenderManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
+		if (z < z_threshold) continue;
+
+		// 適当なコスト関数で、最適な頂点を探す。
+		// 基本的には、距離が近く、角度の差が小さいやつ。でも、係数はむずかしい。。。
+		float cost = dist + Util::diffAngle(angle, angle2) * 1000.0;
+
+		if (cost < min_cost) {
+			min_cost = cost;
+			nearest_desc = *vi;
+			found = true;
+		}
+	}
+
+	return found;
+}
+
+/**
  * snap先のエッジを探す。ただし、水面下のエッジは対象外。
  * また、方向ベクトルがangle方向からしきい値を超えてる場合、その頂点はスキップする。
  * さらに、距離がdistance_threshold未満であること。
@@ -487,6 +538,27 @@ bool RoadGeneratorHelper::isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_des
 			return true;
 		}
 		*/
+	}
+
+	return false;
+}
+
+/**
+ * 指定された頂点について、指定されたエッジに似たエッジが既に登録済みかどうかチェックする。
+ * polylineには、各点の、頂点からのオフセット座標が入る。
+ * 登録済みのエッジに対しては、エッジの端点への方向ベクトルとpolylineの端点の方向ベクトルのなす角度が30度未満なら、trueを返却する。
+ */
+bool RoadGeneratorHelper::isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_desc, float angle, float angleTolerance) {
+	RoadOutEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = out_edges(v_desc, roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		if (roads.graph[*ei]->polyline.size() == 0) continue;
+
+		Polyline2D polyline = GraphUtil::orderPolyLine(roads, *ei, v_desc);
+		float a = atan2f((polyline[1] - polyline[0]).y(), (polyline[1] - polyline[0]).x());
+
+		if (Util::diffAngle(a, angle) < angleTolerance) return true;
 	}
 
 	return false;
