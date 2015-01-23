@@ -65,11 +65,6 @@ void PatchRoadGenerator::generateRoadNetwork() {
 				continue;
 			}
 
-			// エリアの外なら、スキップする
-			if (!targetArea.contains(roads.graph[desc]->pt)) {
-				continue;
-			}
-
 			// 水中なら、伸ばして水中から脱出できるなら伸ばす。
 			float z = vboRenderManager->getMinTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
 			if (z < G::getFloat("seaLevel")) {
@@ -78,6 +73,11 @@ void PatchRoadGenerator::generateRoadNetwork() {
 				if (!extendRoadAcrossRiver(RoadEdge::TYPE_AVENUE, desc, seeds, 0.3f, 200.0f)) {
 					RoadGeneratorHelper::removeEdge(roads, desc);
 				}
+				continue;
+			}
+
+			// エリアの外なら、スキップする
+			if (!targetArea.contains(roads.graph[desc]->pt)) {
 				continue;
 			}
 
@@ -422,8 +422,13 @@ bool PatchRoadGenerator::attemptConnectToVertex(int roadType, RoadVertexDesc src
 
 			// 自分にとってredundantなら、コネクトしない。
 			// 理由：このエッジは、角度を考慮せず、単純に距離で見つけたもの。従って、角度が鋭角すぎるケースがあり得る
-			if (RoadGeneratorHelper::isRedundantEdge(roads, srcDesc, e->polyline, roadAngleTolerance)) {
-				return false;
+			{
+				Polyline2D polyline;
+				polyline.push_back(QVector2D(0, 0));
+				polyline.push_back(roads.graph[nearestDesc]->pt - roads.graph[srcDesc]->pt);
+				if (RoadGeneratorHelper::isRedundantEdge(roads, srcDesc, polyline, roadAngleTolerance)) {
+					return false;
+				}
 			}
 
 			// スナップ先にとってredundantなら、コネクトしないで、終了。
@@ -1005,6 +1010,10 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 			RoadEdgeDesc closestEdge;
 			new_edge->polyline.push_back(roads.graph[tgtDesc]->pt);
 			if (GraphUtil::isIntersect(roads, new_edge->polyline, curDesc, closestEdge, intPoint)) {
+				// 交差するはず無い！
+				assert(false);
+
+				/*
 				// もし交点が水面下ならキャンセル
 				if (vboRenderManager->getMinTerrainHeight(intPoint.x(), intPoint.y()) < G::getFloat("seaLevel")) {
 					cancel = true;
@@ -1024,6 +1033,7 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 				roads.graph[tgtDesc]->properties["group_id"] = roads.graph[closestEdge]->properties["group_id"];
 				roads.graph[tgtDesc]->properties["ex_id"] = roads.graph[closestEdge]->properties["ex_id"];
 				roads.graph[tgtDesc]->properties.remove("example_desc");
+				*/
 			}
 
 			// エッジを生成
@@ -1037,11 +1047,11 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 			QVector2D pt = new_edge->polyline.back();
 			float z = vboRenderManager->getMinTerrainHeight(pt.x(), pt.y());
 
-			float angle1 =  angle + curvature;
+			float angle1 =  angle + curvature / (float)num_sub_steps;
 			QVector2D pt1 = pt + QVector2D(cosf(angle1), sinf(angle1)) * sub_step;
 			float z1 = vboRenderManager->getMinTerrainHeight(pt1.x(), pt1.y());
 
-			float angle2 =  angle - curvature;
+			float angle2 =  angle - curvature / (float)num_sub_steps;
 			QVector2D pt2 = pt + QVector2D(cosf(angle2), sinf(angle2)) * sub_step;
 			float z2 = vboRenderManager->getMinTerrainHeight(pt2.x(), pt2.y());
 

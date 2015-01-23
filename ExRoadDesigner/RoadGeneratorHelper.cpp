@@ -388,9 +388,15 @@ bool RoadGeneratorHelper::getVertexForSnapping(VBORenderManager& vboRenderManage
 		float z = vboRenderManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
 		if (z < z_threshold) continue;
 
+		// 既存エッジとの交差をチェック
+		Polyline2D polyline;
+		polyline.push_back(roads.graph[srcDesc]->pt);
+		polyline.push_back(roads.graph[*vi]->pt);
+		if (GraphUtil::isIntersect(roads, polyline)) continue;
+
 		// 適当なコスト関数で、最適な頂点を探す。
 		// 基本的には、距離が近く、角度の差が小さいやつ。でも、係数はむずかしい。。。
-		float cost = dist + Util::diffAngle(angle, angle2) * 1000.0;
+		float cost = dist + Util::diffAngle(angle, angle2) * 100.0; // 1000.0
 
 		if (cost < min_cost) {
 			min_cost = cost;
