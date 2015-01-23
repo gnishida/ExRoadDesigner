@@ -32,7 +32,6 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.lineEditInterpolateSigma2->setText("0.2");
 	ui.lineEditInterpolateThreshold1->setText("0.0");
 	ui.lineEditRotationAngle->setText("0.0");
-	ui.lineEditRoadSnapFactor->setText("0.7");
 	ui.lineEditRoadAngleTolerance->setText("60");
 	ui.lineEditMaxBlockSizeForPark->setText("250000");
 	ui.checkBoxSaveRoadImages->setChecked(false);
@@ -56,7 +55,6 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	connect(ui.pushButtonGeneratePM, SIGNAL(clicked()), this, SLOT(generateRoadsPM()));
 	connect(ui.pushButtonGenerateAliaga, SIGNAL(clicked()), this, SLOT(generateRoadsAliaga()));
 	connect(ui.pushButtonClear, SIGNAL(clicked()), this, SLOT(clear()));
-	//connect(ui.pushButtonConnect, SIGNAL(clicked()), this, SLOT(connectRoads()));
 	connect(ui.pushButtonConnect2, SIGNAL(clicked()), this, SLOT(connectRoads2()));
 
 	connect(ui.pushButtonMerge, SIGNAL(clicked()), this, SLOT(mergeRoads()));
@@ -115,7 +113,6 @@ void ControlWidget::generateRoadsEx() {
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
-	G::global()["roadSnapFactor"] = ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 	G::global()["saveRoadImages"] = ui.checkBoxSaveRoadImages->isChecked();
 
@@ -153,7 +150,6 @@ void ControlWidget::generateRoadsWarp() {
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
-	G::global()["roadSnapFactor"] = ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 	G::global()["saveRoadImages"] = ui.checkBoxSaveRoadImages->isChecked();
 
@@ -188,7 +184,6 @@ void ControlWidget::generateRoadsPM() {
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
-	G::global()["roadSnapFactor"] = ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 
 	std::vector<ExFeature> features;
@@ -221,7 +216,6 @@ void ControlWidget::generateRoadsAliaga() {
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
-	G::global()["roadSnapFactor"] = ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 
 	std::vector<ExFeature> features;

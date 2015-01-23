@@ -391,34 +391,11 @@
         <string>Circle Hough scale</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEditRoadSnapFactor">
-       <property name="geometry">
-        <rect>
-         <x>110</x>
-         <y>152</y>
-         <width>51</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_11">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>152</y>
-         <width>81</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>snap tolerance</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_12">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>172</y>
+         <y>150</y>
          <width>81</width>
          <height>21</height>
         </rect>
@@ -431,7 +408,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>172</y>
+         <y>152</y>
          <width>51</width>
          <height>20</height>
         </rect>
@@ -479,8 +456,8 @@
       <widget class="QCheckBox" name="checkBoxSaveRoadImages">
        <property name="geometry">
         <rect>
-         <x>11</x>
-         <y>192</y>
+         <x>22</x>
+         <y>182</y>
          <width>91</width>
          <height>17</height>
         </rect>

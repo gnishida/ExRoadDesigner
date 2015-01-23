@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Fri Jan 23 18:23:08 2015
+** Created: Fri Jan 23 18:28:36 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -62,8 +62,6 @@ public:
     QLineEdit *lineEditRotationAngle;
     QLineEdit *lineEditHoughScale;
     QLabel *label_10;
-    QLineEdit *lineEditRoadSnapFactor;
-    QLabel *label_11;
     QLabel *label_12;
     QLineEdit *lineEditRoadAngleTolerance;
     QPushButton *pushButtonGenerateEx;
@@ -214,18 +212,12 @@ public:
         label_10 = new QLabel(groupBox_8);
         label_10->setObjectName(QString::fromUtf8("label_10"));
         label_10->setGeometry(QRect(10, 12, 91, 21));
-        lineEditRoadSnapFactor = new QLineEdit(groupBox_8);
-        lineEditRoadSnapFactor->setObjectName(QString::fromUtf8("lineEditRoadSnapFactor"));
-        lineEditRoadSnapFactor->setGeometry(QRect(110, 152, 51, 20));
-        label_11 = new QLabel(groupBox_8);
-        label_11->setObjectName(QString::fromUtf8("label_11"));
-        label_11->setGeometry(QRect(10, 152, 81, 21));
         label_12 = new QLabel(groupBox_8);
         label_12->setObjectName(QString::fromUtf8("label_12"));
-        label_12->setGeometry(QRect(10, 172, 81, 21));
+        label_12->setGeometry(QRect(10, 150, 81, 21));
         lineEditRoadAngleTolerance = new QLineEdit(groupBox_8);
         lineEditRoadAngleTolerance->setObjectName(QString::fromUtf8("lineEditRoadAngleTolerance"));
-        lineEditRoadAngleTolerance->setGeometry(QRect(110, 172, 51, 20));
+        lineEditRoadAngleTolerance->setGeometry(QRect(110, 152, 51, 20));
         pushButtonGenerateEx = new QPushButton(groupBox_8);
         pushButtonGenerateEx->setObjectName(QString::fromUtf8("pushButtonGenerateEx"));
         pushButtonGenerateEx->setGeometry(QRect(10, 212, 71, 28));
@@ -237,7 +229,7 @@ public:
         pushButtonGenerateAliaga->setGeometry(QRect(60, 242, 51, 28));
         checkBoxSaveRoadImages = new QCheckBox(groupBox_8);
         checkBoxSaveRoadImages->setObjectName(QString::fromUtf8("checkBoxSaveRoadImages"));
-        checkBoxSaveRoadImages->setGeometry(QRect(11, 192, 91, 17));
+        checkBoxSaveRoadImages->setGeometry(QRect(22, 182, 91, 17));
         TabWidget->addTab(RoadGenerationTab, QString());
         CleanUpTab = new QWidget();
         CleanUpTab->setObjectName(QString::fromUtf8("CleanUpTab"));
@@ -461,7 +453,6 @@ public:
         label_9->setText(QApplication::translate("ControlWidget", "Street patch dist", 0, QApplication::UnicodeUTF8));
         label_5->setText(QApplication::translate("ControlWidget", "rotation", 0, QApplication::UnicodeUTF8));
         label_10->setText(QApplication::translate("ControlWidget", "Circle Hough scale", 0, QApplication::UnicodeUTF8));
-        label_11->setText(QApplication::translate("ControlWidget", "snap tolerance", 0, QApplication::UnicodeUTF8));
         label_12->setText(QApplication::translate("ControlWidget", "angle tolerance", 0, QApplication::UnicodeUTF8));
         pushButtonGenerateEx->setText(QApplication::translate("ControlWidget", "Example", 0, QApplication::UnicodeUTF8));
         pushButtonGenerateWarp->setText(QApplication::translate("ControlWidget", "Warp", 0, QApplication::UnicodeUTF8));

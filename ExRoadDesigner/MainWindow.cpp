@@ -395,7 +395,6 @@ void MainWindow::onRotationVideo() {
 	G::global()["interpolationSigma1"] = controlWidget->ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = controlWidget->ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["interpolationThreshold1"] = controlWidget->ui.lineEditInterpolateThreshold1->text().toFloat();
-	G::global()["roadSnapFactor"] = controlWidget->ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = controlWidget->ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 
 	// create the directory
@@ -478,7 +477,6 @@ void MainWindow::onInterpolationVideo() {
 	G::global()["streetPatchDistance"] = controlWidget->ui.lineEditPatchDistance2->text().toFloat();
 	G::global()["interpolationThreshold1"] = controlWidget->ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = controlWidget->ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
-	G::global()["roadSnapFactor"] = controlWidget->ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = controlWidget->ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 
 	// create the directory
@@ -566,7 +564,6 @@ void MainWindow::onBlendingVideo() {
 	G::global()["interpolationSigma2"] = controlWidget->ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["interpolationThreshold1"] = controlWidget->ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = controlWidget->ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
-	G::global()["roadSnapFactor"] = controlWidget->ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = controlWidget->ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 
 	// create the directory
@@ -654,7 +651,6 @@ void MainWindow::onGrowingVideo() {
 	G::global()["interpolationSigma2"] = controlWidget->ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["interpolationThreshold1"] = controlWidget->ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = controlWidget->ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
-	G::global()["roadSnapFactor"] = controlWidget->ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = controlWidget->ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 
 	// backup the roads and area
