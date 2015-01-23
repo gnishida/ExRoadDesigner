@@ -1,0 +1,14 @@
+<feature>
+    <area>
+        <point x="1439.787963867188" y="-4619.021484375"/>
+        <point x="4535.333984375" y="-4650.10107421875"/>
+        <point x="4367.50341796875" y="-7260.802734375"/>
+        <point x="1197.36572265625" y="-7105.40380859375"/>
+        <point x="1439.787963867188" y="-4619.021484375"/>
+    </area>
+    <hintLine>
+        <point x="2676.76318359375" y="-6340.84130859375"/>
+    </hintLine>
+    <avenues filename="amsterdam.xml.avenues.gsm"/>
+    <streets filename="amsterdam.xml.streets.gsm"/>
+</feature>

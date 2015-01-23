@@ -17,7 +17,7 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.lineEditNumAvenueIterations->setText("1500");
 	ui.lineEditNumStreetIterations->setText("6000");
 	ui.lineEditNumExamples->setText("1");
-	ui.checkBoxCleanAvenues->setChecked(false);
+	ui.checkBoxCleanAvenues->setChecked(true);
 	ui.checkBoxCleanStreets->setChecked(false);
 	ui.checkBoxLocalStreets->setChecked(true);
 	ui.checkBoxCropping->setChecked(false);

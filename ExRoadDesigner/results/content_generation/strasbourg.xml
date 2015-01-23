@@ -1,0 +1,15 @@
+<feature>
+    <area>
+        <point x="-201.3542938232422" y="1263.265991210938"/>
+        <point x="1068.00341796875" y="1390.640991210938"/>
+        <point x="1226.124145507813" y="468.2703247070313"/>
+        <point x="747.3698120117188" y="-98.32881164550781"/>
+        <point x="-429.7508544921875" y="503.4082641601563"/>
+        <point x="-201.3542938232422" y="1263.265991210938"/>
+    </area>
+    <hintLine>
+        <point x="325.7146606445313" y="718.6281127929688"/>
+    </hintLine>
+    <avenues filename="strasbourg.xml.avenues.gsm"/>
+    <streets filename="strasbourg.xml.streets.gsm"/>
+</feature>
