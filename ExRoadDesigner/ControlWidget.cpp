@@ -21,7 +21,7 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.checkBoxCleanStreets->setChecked(false);
 	ui.checkBoxLocalStreets->setChecked(true);
 	ui.checkBoxCropping->setChecked(false);
-	ui.checkBoxUseLayer->setChecked(true);
+	ui.checkBoxUseLayer->setChecked(false);
 	ui.checkBoxRemoveSmallBlocks->setChecked(false);
 	ui.lineEditMinBlockSize->setText("10000");
 	ui.lineEditHoughScale->setText("500.0");

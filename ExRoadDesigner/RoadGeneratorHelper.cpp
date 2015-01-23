@@ -774,6 +774,24 @@ void RoadGeneratorHelper::removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc, R
 }
 
 /**
+ * 指定された頂点から伸びるエッジを削除する。
+ * この頂点から出るエッジは1つであることを前提とする。
+ *
+ * @param roads			道路グラフ
+ * @param srcDesc		この頂点から削除を開始する
+ */
+void RoadGeneratorHelper::removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc) {
+	QMap<RoadVertexDesc, bool> visited;
+	std::list<RoadVertexDesc> queue;
+
+	RoadOutEdgeIter ei, eend;
+	boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph);
+	if (ei == eend) return;
+
+	removeEdge(roads, srcDesc, *ei);
+}
+
+/**
  * Dangling Edgeを少し伸ばして、他の頂点にsnapさせる。
  * ただし、onBoundaryフラグがtrueの場合は、対象外。
  * また、他のエッジと交差したり、角度がredundantなら、snapしないで削除する。
