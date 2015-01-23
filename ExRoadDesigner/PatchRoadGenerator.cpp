@@ -93,7 +93,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 
 			char filename[255];
 			sprintf(filename, "road_images/avenues_%d.jpg", iter);
-			RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
+			//RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
 
 			check();
 
@@ -182,7 +182,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 
 			char filename[255];
 			sprintf(filename, "road_images/streets_%d.jpg", iter);
-			RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
+			//RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
 
 			iter++;
 		}
@@ -927,7 +927,7 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 
 	int cnt = 0;
 	//for (int i = 0; i < edges.size(); ++i) {
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 4; ++i) {
 		direction += M_PI * 0.5f;
 
 		if (RoadGeneratorHelper::isRedundantEdge(roads, srcDesc, direction, roadAngleTolerance)) continue;
@@ -966,7 +966,7 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 		new_edge->polyline.push_back(roads.graph[curDesc]->pt);
 
 		bool found = false;
-		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, new_edge->polyline.back(), step * 2.0f, G::getFloat("seaLevel"), angle, 0.3f, tgtDesc)) {
+		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, curDesc, step * 2.0f, G::getFloat("seaLevel"), angle, 0.3f, tgtDesc)) {
 			found = true;
 		}
 
@@ -1024,20 +1024,24 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 		}
 
 		// snap先がなければ、polylineを１歩伸ばす
-		{
-			// まず、変更角度を決定
-			float z = vboRenderManager->getMinTerrainHeight(new_edge->polyline.back().x(), new_edge->polyline.back().y());
-			float angle_step;
-			if (Util::genRand(0, 1) < 0.5f && z >= G::getFloat("seaLevel")) {
-				angle_step = sub_step * tanf(curvature) * 0.3;
+		for (int sub_iter = 0; sub_iter < num_sub_steps; ++sub_iter) {
+			QVector2D pt = new_edge->polyline.back();
+			float z = vboRenderManager->getMinTerrainHeight(pt.x(), pt.y());
+
+			float angle1 =  angle + tanf(curvature);
+			QVector2D pt1 = pt + QVector2D(cosf(angle1), sinf(angle1)) * sub_step;
+			float z1 = vboRenderManager->getMinTerrainHeight(pt1.x(), pt1.y());
+
+			float angle2 =  angle - tanf(curvature);
+			QVector2D pt2 = pt + QVector2D(cosf(angle2), sinf(angle2)) * sub_step;
+			float z2 = vboRenderManager->getMinTerrainHeight(pt2.x(), pt2.y());
+
+			if (fabs(z - z1) < fabs(z - z2)) {
+				new_edge->polyline.push_back(pt1);
+				angle = angle1;
 			} else {
-				angle_step = -sub_step * tanf(curvature) * 0.3;
-			}
-			// そして、polylineを伸ばす
-			for (int sub_iter = 0; sub_iter < num_sub_steps; ++sub_iter) {
-				QVector2D nextPt = new_edge->polyline.back() + QVector2D(cosf(angle), sinf(angle)) * sub_step;
-				new_edge->polyline.push_back(nextPt);
-				angle += angle_step;
+				new_edge->polyline.push_back(pt2);
+				angle = angle2;
 			}
 		}
 
