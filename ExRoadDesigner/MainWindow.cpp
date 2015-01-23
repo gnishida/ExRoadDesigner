@@ -399,7 +399,6 @@ void MainWindow::onRotationVideo() {
 	G::global()["interpolationThreshold1"] = controlWidget->ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["roadSnapFactor"] = controlWidget->ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = controlWidget->ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
-	G::global()["rotationForSteepSlope"] = controlWidget->ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
 
 	// create the directory
 	if(QDir("video").exists()==false) QDir().mkdir("video");
@@ -485,7 +484,6 @@ void MainWindow::onInterpolationVideo() {
 	G::global()["rotationAngle"] = controlWidget->ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadSnapFactor"] = controlWidget->ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = controlWidget->ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
-	G::global()["rotationForSteepSlope"] = controlWidget->ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
 
 	// create the directory
 	if(QDir("video").exists()==false) QDir().mkdir("video");
@@ -576,7 +574,6 @@ void MainWindow::onBlendingVideo() {
 	G::global()["rotationAngle"] = controlWidget->ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadSnapFactor"] = controlWidget->ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = controlWidget->ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
-	G::global()["rotationForSteepSlope"] = controlWidget->ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
 
 	// create the directory
 	if(QDir("video").exists()==false) QDir().mkdir("video");
@@ -667,7 +664,6 @@ void MainWindow::onGrowingVideo() {
 	G::global()["rotationAngle"] = controlWidget->ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadSnapFactor"] = controlWidget->ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = controlWidget->ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
-	G::global()["rotationForSteepSlope"] = controlWidget->ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
 
 	// backup the roads and area
 	RoadGraph origRoads;

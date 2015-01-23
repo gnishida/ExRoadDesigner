@@ -1055,7 +1055,7 @@ void RoadGeneratorHelper::connectRoads3(RoadGraph &roads, VBORenderManager* vboR
 	float avenueThreshold2 = SQR(avenueThreshold);
 	float streetThreshold2 = SQR(streetThreshold);
 
-	float maxRotation = G::getFloat("rotationForSteepSlope");
+	float maxRotation = M_PI * 0.166f;
 
 	GraphUtil::setVertexType(roads);
 
@@ -1339,7 +1339,7 @@ void RoadGeneratorHelper::bendEdgeBySteepElevationChange(Polyline2D &polyline, f
 	float min_dz = std::numeric_limits<float>::max();
 	QVector2D min_pt;
 
-	float max_rotation = G::getFloat("rotationForSteepSlope");
+	float max_rotation = M_PI * 0.166f;
 
 	// bend the last segment until the slope is not too steep
 	{

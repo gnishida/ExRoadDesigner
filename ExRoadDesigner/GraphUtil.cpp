@@ -3767,7 +3767,7 @@ void GraphUtil::computeStatistics(RoadGraph &roads, float &avgEdgeLength, float 
 		totalLength2 += SQR(length);
 
 		float curvature = Util::curvature(roads.graph[*ei]->polyline);
-		totalCurvature += curvature;
+		totalCurvature += curvature * length;
 		totalCurvature2 += SQR(curvature);
 
 		num++;
@@ -3775,7 +3775,7 @@ void GraphUtil::computeStatistics(RoadGraph &roads, float &avgEdgeLength, float 
 
 	avgEdgeLength = totalLength / (float)num;
 	varEdgeLength = totalLength2 / (float)num - SQR(avgEdgeLength);
-	avgEdgeCurvature = totalCurvature / (float)num;
+	avgEdgeCurvature = totalCurvature / totalLength;
 	varEdgeCurvature = totalCurvature2 / (float)num - SQR(avgEdgeCurvature);
 }
 

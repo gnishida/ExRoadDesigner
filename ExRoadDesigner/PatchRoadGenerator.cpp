@@ -91,11 +91,11 @@ void PatchRoadGenerator::generateRoadNetwork() {
 				}
 			}
 
-			char filename[255];
-			sprintf(filename, "road_images/avenues_%d.jpg", iter);
-			//RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
-
-			check();
+			if (G::getBool("saveRoadImages")) {
+				char filename[255];
+				sprintf(filename, "road_images/avenues_%d.jpg", iter);
+				RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
+			}
 
 			iter++;
 		}
@@ -180,9 +180,11 @@ void PatchRoadGenerator::generateRoadNetwork() {
 				}
 			}
 
-			char filename[255];
-			sprintf(filename, "road_images/streets_%d.jpg", iter);
-			//RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
+			if (G::getBool("saveRoadImages")) {
+				char filename[255];
+				sprintf(filename, "road_images/streets_%d.jpg", iter);
+				RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
+			}
 
 			iter++;
 		}
@@ -578,7 +580,7 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 
 	// 山チェック
 	if (RoadGeneratorHelper::maxZ(replacementGraph, vboRenderManager) > 70.0f && RoadGeneratorHelper::diffSlope(replacementGraph, vboRenderManager) > 0.3f) {
-		float max_rotation = G::getFloat("rotationForSteepSlope");
+		float max_rotation = M_PI * 0.166f;
 		float min_slope = std::numeric_limits<float>::max();
 		float min_rotation;
 
@@ -935,7 +937,12 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 		// 坂が急なら、キャンセル
 		QVector2D pt2 = roads.graph[srcDesc]->pt + QVector2D(cosf(direction), sinf(direction)) * 20.0f;
 		float z2 = vboRenderManager->getTerrainHeight(pt2.x(), pt2.y());
-		if (z2 - z > 20.0f && Util::genRand(0, 1) < 0.7f) continue;
+		if (z2 - z > 10.0f) {
+			if (Util::genRand(0, 1) < 0.8f) return;
+
+			// 急勾配を上昇する場合は、直線道路にする
+			curvature = 0.0f;
+		}
 
 		growRoadSegment(roadType, srcDesc, f, length, direction, curvature, 1, roadAngleTolerance, seeds);
 	}
@@ -946,13 +953,15 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
  * この関数は、PM方式での道路生成でのみ使用される。
  * 生成された場合はtrueを返却する。
  */
-bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, ExFeature& f, float step, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
+bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, ExFeature& f, float length, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
 	int num_steps;
+	float step;
 	if (roadType == RoadEdge::TYPE_AVENUE) {
 		num_steps = 4;
 	} else {
 		num_steps = 1;
 	}
+	step = length / num_steps;
 
 	const int num_sub_steps = 5;
 	float sub_step = step / num_sub_steps;
@@ -984,7 +993,7 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 			Polyline2D snapped_polyline;
 			snapped_polyline.push_back(QVector2D(0, 0));
 			snapped_polyline.push_back(QVector2D(new_edge->polyline.back() - roads.graph[tgtDesc]->pt));
-			if (RoadGeneratorHelper::isRedundantEdge(roads, tgtDesc, snapped_polyline, 0.7f)) {
+			if (RoadGeneratorHelper::isRedundantEdge(roads, tgtDesc, snapped_polyline, 1.0f)) {
 				//（とりあえず、ものすごい鋭角の場合は、必ずキャンセル)
 				cancel = true;
 				break;
@@ -1028,11 +1037,11 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 			QVector2D pt = new_edge->polyline.back();
 			float z = vboRenderManager->getMinTerrainHeight(pt.x(), pt.y());
 
-			float angle1 =  angle + tanf(curvature);
+			float angle1 =  angle + curvature;
 			QVector2D pt1 = pt + QVector2D(cosf(angle1), sinf(angle1)) * sub_step;
 			float z1 = vboRenderManager->getMinTerrainHeight(pt1.x(), pt1.y());
 
-			float angle2 =  angle - tanf(curvature);
+			float angle2 =  angle - curvature;
 			QVector2D pt2 = pt + QVector2D(cosf(angle2), sinf(angle2)) * sub_step;
 			float z2 = vboRenderManager->getMinTerrainHeight(pt2.x(), pt2.y());
 

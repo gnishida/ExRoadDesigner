@@ -327,24 +327,35 @@ QVector2D Util::transform(const QVector2D &pt, const QVector2D &sourcePt, float 
  * 曲率を計算する
  */
 float Util::curvature(const Polyline2D &polyline) {
+	/*
 	float curvature = 0.0f;
 	float length = 0.0f;
-	//int num = 0;
 
 	for (int i = 0; i < polyline.size() - 2; ++i) {
 		QVector2D vec1 = (polyline[i + 1] - polyline[i]).normalized();
 		QVector2D vec2 = (polyline[i + 2] - polyline[i + 1]).normalized();
 
 		curvature += (vec1 - vec2).length();
-		//curvature += (vec1 - vec2).length() / (polyline[i + 1] - polyline[i]).length();
 		length += (polyline[i + 1] - polyline[i]).length();
-		//num++;
 	}
 
 	if (length == 0.0f) return 0.0f;
 	else return curvature / length;
-	//if (num == 0) return 0.0f;
-	//else return curvature / (float)num;
+	*/
+
+	float total_diff = 0.0f;
+	int num = 0;
+	for (int i = 0; i < polyline.size() - 2; ++i) {
+		QVector2D vec1 = (polyline[i + 1] - polyline[i]).normalized();
+		QVector2D vec2 = (polyline[i + 2] - polyline[i + 1]).normalized();
+
+		float diff = diffAngle(vec1, vec2);
+		total_diff += diff;
+		num++;
+	}
+
+	if (num == 0) return 0.0f;
+	else return total_diff / (float)num;
 }
 
 /**

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Wed Jan 21 16:53:23 2015
+** Created: Fri Jan 23 14:54:22 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -51,11 +51,10 @@ public:
     QLabel *label_11;
     QLabel *label_12;
     QLineEdit *lineEditRoadAngleTolerance;
-    QLabel *label_14;
-    QLineEdit *lineEditRotationForSteepSlope;
     QPushButton *pushButtonGenerateEx;
     QPushButton *pushButtonGenerateWarp;
     QPushButton *pushButtonGenerateAliaga;
+    QCheckBox *checkBoxSaveRoadImages;
     QGroupBox *groupBox;
     QLabel *label;
     QLineEdit *lineEditNumAvenueIterations;
@@ -115,7 +114,7 @@ public:
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         groupBox_8 = new QGroupBox(dockWidgetContents);
         groupBox_8->setObjectName(QString::fromUtf8("groupBox_8"));
-        groupBox_8->setGeometry(QRect(10, 210, 171, 271));
+        groupBox_8->setGeometry(QRect(10, 204, 171, 271));
         label_2 = new QLabel(groupBox_8);
         label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setGeometry(QRect(10, 92, 61, 21));
@@ -176,12 +175,6 @@ public:
         lineEditRoadAngleTolerance = new QLineEdit(groupBox_8);
         lineEditRoadAngleTolerance->setObjectName(QString::fromUtf8("lineEditRoadAngleTolerance"));
         lineEditRoadAngleTolerance->setGeometry(QRect(110, 172, 51, 20));
-        label_14 = new QLabel(groupBox_8);
-        label_14->setObjectName(QString::fromUtf8("label_14"));
-        label_14->setGeometry(QRect(10, 192, 101, 21));
-        lineEditRotationForSteepSlope = new QLineEdit(groupBox_8);
-        lineEditRotationForSteepSlope->setObjectName(QString::fromUtf8("lineEditRotationForSteepSlope"));
-        lineEditRotationForSteepSlope->setGeometry(QRect(110, 192, 51, 20));
         pushButtonGenerateEx = new QPushButton(groupBox_8);
         pushButtonGenerateEx->setObjectName(QString::fromUtf8("pushButtonGenerateEx"));
         pushButtonGenerateEx->setGeometry(QRect(10, 212, 71, 28));
@@ -191,9 +184,12 @@ public:
         pushButtonGenerateAliaga = new QPushButton(groupBox_8);
         pushButtonGenerateAliaga->setObjectName(QString::fromUtf8("pushButtonGenerateAliaga"));
         pushButtonGenerateAliaga->setGeometry(QRect(60, 242, 51, 28));
+        checkBoxSaveRoadImages = new QCheckBox(groupBox_8);
+        checkBoxSaveRoadImages->setObjectName(QString::fromUtf8("checkBoxSaveRoadImages"));
+        checkBoxSaveRoadImages->setGeometry(QRect(11, 192, 91, 17));
         groupBox = new QGroupBox(dockWidgetContents);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(10, 0, 171, 211));
+        groupBox->setGeometry(QRect(10, 0, 171, 201));
         label = new QLabel(groupBox);
         label->setObjectName(QString::fromUtf8("label"));
         label->setGeometry(QRect(10, 13, 91, 21));
@@ -203,10 +199,10 @@ public:
         lineEditNumAvenueIterations->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         checkBoxLocalStreets = new QCheckBox(groupBox);
         checkBoxLocalStreets->setObjectName(QString::fromUtf8("checkBoxLocalStreets"));
-        checkBoxLocalStreets->setGeometry(QRect(10, 123, 131, 17));
+        checkBoxLocalStreets->setGeometry(QRect(10, 113, 131, 17));
         checkBoxCropping = new QCheckBox(groupBox);
         checkBoxCropping->setObjectName(QString::fromUtf8("checkBoxCropping"));
-        checkBoxCropping->setGeometry(QRect(10, 143, 121, 17));
+        checkBoxCropping->setGeometry(QRect(10, 132, 121, 17));
         label_3 = new QLabel(groupBox);
         label_3->setObjectName(QString::fromUtf8("label_3"));
         label_3->setGeometry(QRect(10, 33, 81, 21));
@@ -216,13 +212,13 @@ public:
         lineEditNumStreetIterations->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         checkBoxCleanAvenues = new QCheckBox(groupBox);
         checkBoxCleanAvenues->setObjectName(QString::fromUtf8("checkBoxCleanAvenues"));
-        checkBoxCleanAvenues->setGeometry(QRect(10, 83, 131, 17));
+        checkBoxCleanAvenues->setGeometry(QRect(10, 76, 131, 17));
         checkBoxCleanStreets = new QCheckBox(groupBox);
         checkBoxCleanStreets->setObjectName(QString::fromUtf8("checkBoxCleanStreets"));
-        checkBoxCleanStreets->setGeometry(QRect(10, 103, 131, 17));
+        checkBoxCleanStreets->setGeometry(QRect(10, 94, 131, 17));
         checkBoxRemoveSmallBlocks = new QCheckBox(groupBox);
         checkBoxRemoveSmallBlocks->setObjectName(QString::fromUtf8("checkBoxRemoveSmallBlocks"));
-        checkBoxRemoveSmallBlocks->setGeometry(QRect(10, 183, 131, 17));
+        checkBoxRemoveSmallBlocks->setGeometry(QRect(10, 172, 131, 17));
         label_7 = new QLabel(groupBox);
         label_7->setObjectName(QString::fromUtf8("label_7"));
         label_7->setGeometry(QRect(10, 53, 81, 21));
@@ -232,14 +228,14 @@ public:
         lineEditNumExamples->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         checkBoxUseLayer = new QCheckBox(groupBox);
         checkBoxUseLayer->setObjectName(QString::fromUtf8("checkBoxUseLayer"));
-        checkBoxUseLayer->setGeometry(QRect(10, 163, 121, 17));
+        checkBoxUseLayer->setGeometry(QRect(10, 152, 121, 17));
         lineEditMinBlockSize = new QLineEdit(groupBox);
         lineEditMinBlockSize->setObjectName(QString::fromUtf8("lineEditMinBlockSize"));
-        lineEditMinBlockSize->setGeometry(QRect(120, 183, 41, 20));
+        lineEditMinBlockSize->setGeometry(QRect(120, 172, 41, 20));
         lineEditMinBlockSize->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         label_13 = new QLabel(groupBox);
         label_13->setObjectName(QString::fromUtf8("label_13"));
-        label_13->setGeometry(QRect(130, 163, 31, 21));
+        label_13->setGeometry(QRect(130, 152, 31, 21));
         groupBox_5 = new QGroupBox(dockWidgetContents);
         groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
         groupBox_5->setGeometry(QRect(10, 483, 171, 51));
@@ -431,10 +427,10 @@ public:
         label_10->setText(QApplication::translate("ControlWidget", "Circle Hough scale", 0, QApplication::UnicodeUTF8));
         label_11->setText(QApplication::translate("ControlWidget", "snap tolerance", 0, QApplication::UnicodeUTF8));
         label_12->setText(QApplication::translate("ControlWidget", "angle tolerance", 0, QApplication::UnicodeUTF8));
-        label_14->setText(QApplication::translate("ControlWidget", "rotation for slope", 0, QApplication::UnicodeUTF8));
         pushButtonGenerateEx->setText(QApplication::translate("ControlWidget", "Example", 0, QApplication::UnicodeUTF8));
         pushButtonGenerateWarp->setText(QApplication::translate("ControlWidget", "Warp", 0, QApplication::UnicodeUTF8));
         pushButtonGenerateAliaga->setText(QApplication::translate("ControlWidget", "Aliaga", 0, QApplication::UnicodeUTF8));
+        checkBoxSaveRoadImages->setText(QApplication::translate("ControlWidget", "save road images", 0, QApplication::UnicodeUTF8));
         groupBox->setTitle(QApplication::translate("ControlWidget", "Options", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("ControlWidget", "Avenue Iteration:", 0, QApplication::UnicodeUTF8));
         checkBoxLocalStreets->setText(QApplication::translate("ControlWidget", "Generate Local Streets", 0, QApplication::UnicodeUTF8));

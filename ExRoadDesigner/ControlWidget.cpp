@@ -32,9 +32,9 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.lineEditInterpolateThreshold1->setText("0.0");
 	ui.lineEditRotationAngle->setText("0.0");
 	ui.lineEditRoadSnapFactor->setText("0.7");
-	ui.lineEditRoadAngleTolerance->setText("20");
-	ui.lineEditRotationForSteepSlope->setText("30");
+	ui.lineEditRoadAngleTolerance->setText("60");
 	ui.lineEditMaxBlockSizeForPark->setText("250000");
+	ui.checkBoxSaveRoadImages->setChecked(false);
 	
 	ui.terrainPaint_changeEdit->setText("200");
 	ui.terrainPaint_changeSlider->setMinimum(0);
@@ -116,7 +116,7 @@ void ControlWidget::generateRoadsEx() {
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadSnapFactor"] = ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
-	G::global()["rotationForSteepSlope"] = ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
+	G::global()["saveRoadImages"] = ui.checkBoxSaveRoadImages->isChecked();
 
 	std::vector<ExFeature> features;
 	features.resize(numExamples);
@@ -156,7 +156,7 @@ void ControlWidget::generateRoadsWarp() {
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadSnapFactor"] = ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
-	G::global()["rotationForSteepSlope"] = ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
+	G::global()["saveRoadImages"] = ui.checkBoxSaveRoadImages->isChecked();
 
 	std::vector<ExFeature> features;
 	features.resize(numExamples);
@@ -193,7 +193,6 @@ void ControlWidget::generateRoadsPM() {
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadSnapFactor"] = ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
-	G::global()["rotationForSteepSlope"] = ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
 
 	std::vector<ExFeature> features;
 	features.resize(numExamples);
@@ -229,7 +228,6 @@ void ControlWidget::generateRoadsAliaga() {
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadSnapFactor"] = ui.lineEditRoadSnapFactor->text().toFloat();
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
-	G::global()["rotationForSteepSlope"] = ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
 
 	std::vector<ExFeature> features;
 	features.resize(numExamples);
@@ -281,8 +279,6 @@ void ControlWidget::connectRoads() {
 }
 
 void ControlWidget::connectRoads2() {
-	G::global()["rotationForSteepSlope"] = ui.lineEditRotationForSteepSlope->text().toFloat() / 180.0f * M_PI;
-
 	RoadGeneratorHelper::connectRoads3(mainWin->urbanGeometry->roads, &mainWin->glWidget->vboRenderManager, 1000.0f, 200.0f);
 	mainWin->urbanGeometry->update(mainWin->glWidget->vboRenderManager);
 	mainWin->glWidget->updateGL();
