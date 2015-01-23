@@ -65,7 +65,6 @@ public:
 
 	void addRoad(int roadType, Polyline2D &polyline, int lanes);
 	void mergeRoads();
-	void connectRoads();
 	void cutRoads();
 
 	void loadRoads(const QString &filename);

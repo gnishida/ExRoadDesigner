@@ -27,8 +27,10 @@ public slots:
 	void clear();
 	void mergeRoads();
 	void trimRoads();
-	void connectRoads();
 	void connectRoads2();
+	void clearBoundaryFlag();
+	void removeDanglingEdges();
+	void removeSmallBlocks();
 	void updateTerrainLabels(int newValue);
 	void updateTerrainEdit(const QString &text);
 	void updateRender2D(int newValue);

@@ -33,9 +33,6 @@ public:
 	static bool isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_desc, const Polyline2D &polyline, float angleTolerance);
 	static bool isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_desc, float angle, float angleTolerance);
 
-	static QVector2D modulo(const Polygon2D &targetArea, const Polygon2D &exampleArea, const QVector2D &pt, BBox &bbox);
-	static bool containsInitialSeed(const Polygon2D &targetArea, const Polygon2D &exampleArea, const QVector2D &pt);
-
 	static void createFourDirection(float direction, std::vector<float> &directions);
 	static Polyline2D createOneEdge(int roadType, float length, float curvature, float angle, float step_size);
 	static void createFourEdges(ExFeature &f, int roadType, const QVector2D &ex_pt, int lanes, float direction, float step, std::vector<RoadEdgePtr> &edges);
@@ -43,7 +40,8 @@ public:
 	static void chooseEdgeLengthAndCurvature(RoadGraph &roads, float angle, std::vector<RoadEdgeDescs> &shapes, float &length, float &curvature, int &lanes);
 	static void chooseEdgeLengthAndCurvature(RoadGraph &roads, const QVector2D &ex_pt, float distance, float direction, float &length, float &curvature);
 
-	static void removeAllDeadends(RoadGraph& roads);
+	static void clearBoundaryFlag(RoadGraph& roads);
+	static void removeDanglingEdges(RoadGraph& roads);
 	static void removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc, RoadEdgeDesc start_e_desc);
 	static void removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc);
 	static void extendDanglingEdges(RoadGraph &roads, float maxDistance);
@@ -67,8 +65,6 @@ public:
 
 	static void removeIntersectionsOnRiver(RoadGraph &roads, VBORenderManager *vboRenderManager, float seaLevel);
 	static void removeSmallBlocks(RoadGraph &roads, float minArea);
-
-	static RoadVertexDesc getClosestVertexByExample(RoadGraph &roads, RoadVertexDesc v_desc);
 	
 	static int getRelativeDirectionInArea(const BBox &bbox, const QVector2D &pt);
 

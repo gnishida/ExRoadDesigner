@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Fri Jan 23 14:54:22 2015
+** Created: Fri Jan 23 18:23:08 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -22,6 +22,7 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QPushButton>
 #include <QtGui/QSlider>
+#include <QtGui/QTabWidget>
 #include <QtGui/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -30,6 +31,20 @@ class Ui_ControlWidget
 {
 public:
     QWidget *dockWidgetContents;
+    QTabWidget *TabWidget;
+    QWidget *RoadGenerationTab;
+    QGroupBox *groupBox;
+    QLabel *label;
+    QLineEdit *lineEditNumAvenueIterations;
+    QCheckBox *checkBoxLocalStreets;
+    QCheckBox *checkBoxCropping;
+    QLabel *label_3;
+    QLineEdit *lineEditNumStreetIterations;
+    QCheckBox *checkBoxCleanAvenues;
+    QCheckBox *checkBoxCleanStreets;
+    QLabel *label_7;
+    QLineEdit *lineEditNumExamples;
+    QCheckBox *checkBoxUseLayer;
     QGroupBox *groupBox_8;
     QLabel *label_2;
     QLineEdit *lineEditInterpolateSigma2;
@@ -55,25 +70,17 @@ public:
     QPushButton *pushButtonGenerateWarp;
     QPushButton *pushButtonGenerateAliaga;
     QCheckBox *checkBoxSaveRoadImages;
-    QGroupBox *groupBox;
-    QLabel *label;
-    QLineEdit *lineEditNumAvenueIterations;
-    QCheckBox *checkBoxLocalStreets;
-    QCheckBox *checkBoxCropping;
-    QLabel *label_3;
-    QLineEdit *lineEditNumStreetIterations;
-    QCheckBox *checkBoxCleanAvenues;
-    QCheckBox *checkBoxCleanStreets;
-    QCheckBox *checkBoxRemoveSmallBlocks;
-    QLabel *label_7;
-    QLineEdit *lineEditNumExamples;
-    QCheckBox *checkBoxUseLayer;
-    QLineEdit *lineEditMinBlockSize;
-    QLabel *label_13;
+    QWidget *CleanUpTab;
     QGroupBox *groupBox_5;
     QPushButton *pushButtonMerge;
     QPushButton *pushButtonConnect2;
     QPushButton *pushButtonTrim;
+    QPushButton *pushButtonRemoveDanglingEdges;
+    QPushButton *pushButtonClearBoundaryFlag;
+    QLineEdit *lineEditMinBlockSize;
+    QLabel *label_13;
+    QPushButton *pushButtonRemoveSmallBlocks;
+    QWidget *ContentEditionTab;
     QGroupBox *groupBox_6;
     QLabel *terrainPaint_sizeLabel;
     QLabel *terrainPaint_changeLabel;
@@ -107,14 +114,58 @@ public:
     {
         if (ControlWidget->objectName().isEmpty())
             ControlWidget->setObjectName(QString::fromUtf8("ControlWidget"));
-        ControlWidget->resize(190, 833);
+        ControlWidget->resize(198, 559);
         ControlWidget->setMinimumSize(QSize(190, 240));
         ControlWidget->setStyleSheet(QString::fromUtf8("background-color: rgb(181, 181, 181);"));
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
-        groupBox_8 = new QGroupBox(dockWidgetContents);
+        TabWidget = new QTabWidget(dockWidgetContents);
+        TabWidget->setObjectName(QString::fromUtf8("TabWidget"));
+        TabWidget->setGeometry(QRect(1, 0, 196, 531));
+        RoadGenerationTab = new QWidget();
+        RoadGenerationTab->setObjectName(QString::fromUtf8("RoadGenerationTab"));
+        groupBox = new QGroupBox(RoadGenerationTab);
+        groupBox->setObjectName(QString::fromUtf8("groupBox"));
+        groupBox->setGeometry(QRect(10, 10, 171, 181));
+        label = new QLabel(groupBox);
+        label->setObjectName(QString::fromUtf8("label"));
+        label->setGeometry(QRect(10, 13, 91, 21));
+        lineEditNumAvenueIterations = new QLineEdit(groupBox);
+        lineEditNumAvenueIterations->setObjectName(QString::fromUtf8("lineEditNumAvenueIterations"));
+        lineEditNumAvenueIterations->setGeometry(QRect(100, 13, 61, 20));
+        lineEditNumAvenueIterations->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        checkBoxLocalStreets = new QCheckBox(groupBox);
+        checkBoxLocalStreets->setObjectName(QString::fromUtf8("checkBoxLocalStreets"));
+        checkBoxLocalStreets->setGeometry(QRect(10, 113, 131, 17));
+        checkBoxCropping = new QCheckBox(groupBox);
+        checkBoxCropping->setObjectName(QString::fromUtf8("checkBoxCropping"));
+        checkBoxCropping->setGeometry(QRect(10, 132, 121, 17));
+        label_3 = new QLabel(groupBox);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setGeometry(QRect(10, 33, 81, 21));
+        lineEditNumStreetIterations = new QLineEdit(groupBox);
+        lineEditNumStreetIterations->setObjectName(QString::fromUtf8("lineEditNumStreetIterations"));
+        lineEditNumStreetIterations->setGeometry(QRect(100, 33, 61, 20));
+        lineEditNumStreetIterations->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        checkBoxCleanAvenues = new QCheckBox(groupBox);
+        checkBoxCleanAvenues->setObjectName(QString::fromUtf8("checkBoxCleanAvenues"));
+        checkBoxCleanAvenues->setGeometry(QRect(10, 76, 131, 17));
+        checkBoxCleanStreets = new QCheckBox(groupBox);
+        checkBoxCleanStreets->setObjectName(QString::fromUtf8("checkBoxCleanStreets"));
+        checkBoxCleanStreets->setGeometry(QRect(10, 94, 131, 17));
+        label_7 = new QLabel(groupBox);
+        label_7->setObjectName(QString::fromUtf8("label_7"));
+        label_7->setGeometry(QRect(10, 53, 81, 21));
+        lineEditNumExamples = new QLineEdit(groupBox);
+        lineEditNumExamples->setObjectName(QString::fromUtf8("lineEditNumExamples"));
+        lineEditNumExamples->setGeometry(QRect(100, 53, 61, 20));
+        lineEditNumExamples->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        checkBoxUseLayer = new QCheckBox(groupBox);
+        checkBoxUseLayer->setObjectName(QString::fromUtf8("checkBoxUseLayer"));
+        checkBoxUseLayer->setGeometry(QRect(10, 152, 121, 17));
+        groupBox_8 = new QGroupBox(RoadGenerationTab);
         groupBox_8->setObjectName(QString::fromUtf8("groupBox_8"));
-        groupBox_8->setGeometry(QRect(10, 204, 171, 271));
+        groupBox_8->setGeometry(QRect(10, 210, 171, 281));
         label_2 = new QLabel(groupBox_8);
         label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setGeometry(QRect(10, 92, 61, 21));
@@ -187,58 +238,12 @@ public:
         checkBoxSaveRoadImages = new QCheckBox(groupBox_8);
         checkBoxSaveRoadImages->setObjectName(QString::fromUtf8("checkBoxSaveRoadImages"));
         checkBoxSaveRoadImages->setGeometry(QRect(11, 192, 91, 17));
-        groupBox = new QGroupBox(dockWidgetContents);
-        groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(10, 0, 171, 201));
-        label = new QLabel(groupBox);
-        label->setObjectName(QString::fromUtf8("label"));
-        label->setGeometry(QRect(10, 13, 91, 21));
-        lineEditNumAvenueIterations = new QLineEdit(groupBox);
-        lineEditNumAvenueIterations->setObjectName(QString::fromUtf8("lineEditNumAvenueIterations"));
-        lineEditNumAvenueIterations->setGeometry(QRect(100, 13, 61, 20));
-        lineEditNumAvenueIterations->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-        checkBoxLocalStreets = new QCheckBox(groupBox);
-        checkBoxLocalStreets->setObjectName(QString::fromUtf8("checkBoxLocalStreets"));
-        checkBoxLocalStreets->setGeometry(QRect(10, 113, 131, 17));
-        checkBoxCropping = new QCheckBox(groupBox);
-        checkBoxCropping->setObjectName(QString::fromUtf8("checkBoxCropping"));
-        checkBoxCropping->setGeometry(QRect(10, 132, 121, 17));
-        label_3 = new QLabel(groupBox);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
-        label_3->setGeometry(QRect(10, 33, 81, 21));
-        lineEditNumStreetIterations = new QLineEdit(groupBox);
-        lineEditNumStreetIterations->setObjectName(QString::fromUtf8("lineEditNumStreetIterations"));
-        lineEditNumStreetIterations->setGeometry(QRect(100, 33, 61, 20));
-        lineEditNumStreetIterations->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-        checkBoxCleanAvenues = new QCheckBox(groupBox);
-        checkBoxCleanAvenues->setObjectName(QString::fromUtf8("checkBoxCleanAvenues"));
-        checkBoxCleanAvenues->setGeometry(QRect(10, 76, 131, 17));
-        checkBoxCleanStreets = new QCheckBox(groupBox);
-        checkBoxCleanStreets->setObjectName(QString::fromUtf8("checkBoxCleanStreets"));
-        checkBoxCleanStreets->setGeometry(QRect(10, 94, 131, 17));
-        checkBoxRemoveSmallBlocks = new QCheckBox(groupBox);
-        checkBoxRemoveSmallBlocks->setObjectName(QString::fromUtf8("checkBoxRemoveSmallBlocks"));
-        checkBoxRemoveSmallBlocks->setGeometry(QRect(10, 172, 131, 17));
-        label_7 = new QLabel(groupBox);
-        label_7->setObjectName(QString::fromUtf8("label_7"));
-        label_7->setGeometry(QRect(10, 53, 81, 21));
-        lineEditNumExamples = new QLineEdit(groupBox);
-        lineEditNumExamples->setObjectName(QString::fromUtf8("lineEditNumExamples"));
-        lineEditNumExamples->setGeometry(QRect(100, 53, 61, 20));
-        lineEditNumExamples->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-        checkBoxUseLayer = new QCheckBox(groupBox);
-        checkBoxUseLayer->setObjectName(QString::fromUtf8("checkBoxUseLayer"));
-        checkBoxUseLayer->setGeometry(QRect(10, 152, 121, 17));
-        lineEditMinBlockSize = new QLineEdit(groupBox);
-        lineEditMinBlockSize->setObjectName(QString::fromUtf8("lineEditMinBlockSize"));
-        lineEditMinBlockSize->setGeometry(QRect(120, 172, 41, 20));
-        lineEditMinBlockSize->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-        label_13 = new QLabel(groupBox);
-        label_13->setObjectName(QString::fromUtf8("label_13"));
-        label_13->setGeometry(QRect(130, 152, 31, 21));
-        groupBox_5 = new QGroupBox(dockWidgetContents);
+        TabWidget->addTab(RoadGenerationTab, QString());
+        CleanUpTab = new QWidget();
+        CleanUpTab->setObjectName(QString::fromUtf8("CleanUpTab"));
+        groupBox_5 = new QGroupBox(CleanUpTab);
         groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
-        groupBox_5->setGeometry(QRect(10, 483, 171, 51));
+        groupBox_5->setGeometry(QRect(0, 270, 171, 51));
         pushButtonMerge = new QPushButton(groupBox_5);
         pushButtonMerge->setObjectName(QString::fromUtf8("pushButtonMerge"));
         pushButtonMerge->setGeometry(QRect(10, 20, 51, 28));
@@ -248,9 +253,28 @@ public:
         pushButtonTrim = new QPushButton(groupBox_5);
         pushButtonTrim->setObjectName(QString::fromUtf8("pushButtonTrim"));
         pushButtonTrim->setGeometry(QRect(60, 20, 51, 28));
-        groupBox_6 = new QGroupBox(dockWidgetContents);
+        pushButtonRemoveDanglingEdges = new QPushButton(CleanUpTab);
+        pushButtonRemoveDanglingEdges->setObjectName(QString::fromUtf8("pushButtonRemoveDanglingEdges"));
+        pushButtonRemoveDanglingEdges->setGeometry(QRect(20, 50, 141, 31));
+        pushButtonClearBoundaryFlag = new QPushButton(CleanUpTab);
+        pushButtonClearBoundaryFlag->setObjectName(QString::fromUtf8("pushButtonClearBoundaryFlag"));
+        pushButtonClearBoundaryFlag->setGeometry(QRect(20, 20, 141, 31));
+        lineEditMinBlockSize = new QLineEdit(CleanUpTab);
+        lineEditMinBlockSize->setObjectName(QString::fromUtf8("lineEditMinBlockSize"));
+        lineEditMinBlockSize->setGeometry(QRect(120, 180, 41, 20));
+        lineEditMinBlockSize->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
+        label_13 = new QLabel(CleanUpTab);
+        label_13->setObjectName(QString::fromUtf8("label_13"));
+        label_13->setGeometry(QRect(80, 180, 31, 21));
+        pushButtonRemoveSmallBlocks = new QPushButton(CleanUpTab);
+        pushButtonRemoveSmallBlocks->setObjectName(QString::fromUtf8("pushButtonRemoveSmallBlocks"));
+        pushButtonRemoveSmallBlocks->setGeometry(QRect(20, 150, 141, 31));
+        TabWidget->addTab(CleanUpTab, QString());
+        ContentEditionTab = new QWidget();
+        ContentEditionTab->setObjectName(QString::fromUtf8("ContentEditionTab"));
+        groupBox_6 = new QGroupBox(ContentEditionTab);
         groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
-        groupBox_6->setGeometry(QRect(10, 540, 171, 251));
+        groupBox_6->setGeometry(QRect(20, 30, 171, 251));
         terrainPaint_sizeLabel = new QLabel(groupBox_6);
         terrainPaint_sizeLabel->setObjectName(QString::fromUtf8("terrainPaint_sizeLabel"));
         terrainPaint_sizeLabel->setGeometry(QRect(10, 20, 61, 16));
@@ -379,6 +403,7 @@ public:
         terrainPaint_changeLabel_2 = new QLabel(groupBox_6);
         terrainPaint_changeLabel_2->setObjectName(QString::fromUtf8("terrainPaint_changeLabel_2"));
         terrainPaint_changeLabel_2->setGeometry(QRect(88, 40, 16, 16));
+        TabWidget->addTab(ContentEditionTab, QString());
         ControlWidget->setWidget(dockWidgetContents);
         QWidget::setTabOrder(pushButtonGeneratePM, pushButtonClear);
         QWidget::setTabOrder(pushButtonClear, pushButtonMerge);
@@ -399,8 +424,7 @@ public:
         QWidget::setTabOrder(checkBoxCleanStreets, checkBoxLocalStreets);
         QWidget::setTabOrder(checkBoxLocalStreets, checkBoxCropping);
         QWidget::setTabOrder(checkBoxCropping, checkBoxUseLayer);
-        QWidget::setTabOrder(checkBoxUseLayer, checkBoxRemoveSmallBlocks);
-        QWidget::setTabOrder(checkBoxRemoveSmallBlocks, lineEditHoughScale);
+        QWidget::setTabOrder(checkBoxUseLayer, lineEditHoughScale);
         QWidget::setTabOrder(lineEditHoughScale, lineEditPatchDistance1);
         QWidget::setTabOrder(lineEditPatchDistance1, lineEditPatchDistance2);
         QWidget::setTabOrder(lineEditPatchDistance2, lineEditInterpolateSigma1);
@@ -410,11 +434,23 @@ public:
 
         retranslateUi(ControlWidget);
 
+        TabWidget->setCurrentIndex(0);
+
+
         QMetaObject::connectSlotsByName(ControlWidget);
     } // setupUi
 
     void retranslateUi(QDockWidget *ControlWidget)
     {
+        groupBox->setTitle(QApplication::translate("ControlWidget", "Options", 0, QApplication::UnicodeUTF8));
+        label->setText(QApplication::translate("ControlWidget", "Avenue Iteration:", 0, QApplication::UnicodeUTF8));
+        checkBoxLocalStreets->setText(QApplication::translate("ControlWidget", "Generate Local Streets", 0, QApplication::UnicodeUTF8));
+        checkBoxCropping->setText(QApplication::translate("ControlWidget", "Cropping", 0, QApplication::UnicodeUTF8));
+        label_3->setText(QApplication::translate("ControlWidget", "Street Iteration:", 0, QApplication::UnicodeUTF8));
+        checkBoxCleanAvenues->setText(QApplication::translate("ControlWidget", "Clean Avenues", 0, QApplication::UnicodeUTF8));
+        checkBoxCleanStreets->setText(QApplication::translate("ControlWidget", "Clean Local Streets", 0, QApplication::UnicodeUTF8));
+        label_7->setText(QApplication::translate("ControlWidget", "# Examples:", 0, QApplication::UnicodeUTF8));
+        checkBoxUseLayer->setText(QApplication::translate("ControlWidget", "Use Layer", 0, QApplication::UnicodeUTF8));
         groupBox_8->setTitle(QApplication::translate("ControlWidget", "Road Generation", 0, QApplication::UnicodeUTF8));
         label_2->setText(QApplication::translate("ControlWidget", "sigma2 ^2", 0, QApplication::UnicodeUTF8));
         label_4->setText(QApplication::translate("ControlWidget", "threshold", 0, QApplication::UnicodeUTF8));
@@ -431,17 +467,7 @@ public:
         pushButtonGenerateWarp->setText(QApplication::translate("ControlWidget", "Warp", 0, QApplication::UnicodeUTF8));
         pushButtonGenerateAliaga->setText(QApplication::translate("ControlWidget", "Aliaga", 0, QApplication::UnicodeUTF8));
         checkBoxSaveRoadImages->setText(QApplication::translate("ControlWidget", "save road images", 0, QApplication::UnicodeUTF8));
-        groupBox->setTitle(QApplication::translate("ControlWidget", "Options", 0, QApplication::UnicodeUTF8));
-        label->setText(QApplication::translate("ControlWidget", "Avenue Iteration:", 0, QApplication::UnicodeUTF8));
-        checkBoxLocalStreets->setText(QApplication::translate("ControlWidget", "Generate Local Streets", 0, QApplication::UnicodeUTF8));
-        checkBoxCropping->setText(QApplication::translate("ControlWidget", "Cropping", 0, QApplication::UnicodeUTF8));
-        label_3->setText(QApplication::translate("ControlWidget", "Street Iteration:", 0, QApplication::UnicodeUTF8));
-        checkBoxCleanAvenues->setText(QApplication::translate("ControlWidget", "Clean Avenues", 0, QApplication::UnicodeUTF8));
-        checkBoxCleanStreets->setText(QApplication::translate("ControlWidget", "Clean Local Streets", 0, QApplication::UnicodeUTF8));
-        checkBoxRemoveSmallBlocks->setText(QApplication::translate("ControlWidget", "Remove Blocks", 0, QApplication::UnicodeUTF8));
-        label_7->setText(QApplication::translate("ControlWidget", "# Examples:", 0, QApplication::UnicodeUTF8));
-        checkBoxUseLayer->setText(QApplication::translate("ControlWidget", "Use Layer", 0, QApplication::UnicodeUTF8));
-        label_13->setText(QApplication::translate("ControlWidget", "Size:", 0, QApplication::UnicodeUTF8));
+        TabWidget->setTabText(TabWidget->indexOf(RoadGenerationTab), QApplication::translate("ControlWidget", "Road", 0, QApplication::UnicodeUTF8));
         groupBox_5->setTitle(QApplication::translate("ControlWidget", "Finalize", 0, QApplication::UnicodeUTF8));
         pushButtonMerge->setText(QApplication::translate("ControlWidget", "Merge", 0, QApplication::UnicodeUTF8));
         pushButtonMerge->setShortcut(QApplication::translate("ControlWidget", "Ctrl+M", 0, QApplication::UnicodeUTF8));
@@ -451,6 +477,11 @@ public:
 #endif // QT_NO_TOOLTIP
         pushButtonTrim->setText(QApplication::translate("ControlWidget", "Trim", 0, QApplication::UnicodeUTF8));
         pushButtonTrim->setShortcut(QApplication::translate("ControlWidget", "Ctrl+M", 0, QApplication::UnicodeUTF8));
+        pushButtonRemoveDanglingEdges->setText(QApplication::translate("ControlWidget", "Remove Dangling Edges", 0, QApplication::UnicodeUTF8));
+        pushButtonClearBoundaryFlag->setText(QApplication::translate("ControlWidget", "Clear Boudary Flag", 0, QApplication::UnicodeUTF8));
+        label_13->setText(QApplication::translate("ControlWidget", "Size:", 0, QApplication::UnicodeUTF8));
+        pushButtonRemoveSmallBlocks->setText(QApplication::translate("ControlWidget", "Remove Small Blocks", 0, QApplication::UnicodeUTF8));
+        TabWidget->setTabText(TabWidget->indexOf(CleanUpTab), QApplication::translate("ControlWidget", "Clean up", 0, QApplication::UnicodeUTF8));
         groupBox_6->setTitle(QApplication::translate("ControlWidget", "Terrain Controls/Render", 0, QApplication::UnicodeUTF8));
         terrainPaint_sizeLabel->setText(QApplication::translate("ControlWidget", "Size: 5%", 0, QApplication::UnicodeUTF8));
         terrainPaint_changeLabel->setText(QApplication::translate("ControlWidget", "Change", 0, QApplication::UnicodeUTF8));
@@ -471,6 +502,7 @@ public:
         content_10->setText(QApplication::translate("ControlWidget", "F", 0, QApplication::UnicodeUTF8));
         label_15->setText(QApplication::translate("ControlWidget", "Size:", 0, QApplication::UnicodeUTF8));
         terrainPaint_changeLabel_2->setText(QApplication::translate("ControlWidget", "m", 0, QApplication::UnicodeUTF8));
+        TabWidget->setTabText(TabWidget->indexOf(ContentEditionTab), QApplication::translate("ControlWidget", "Content", 0, QApplication::UnicodeUTF8));
         Q_UNUSED(ControlWidget);
     } // retranslateUi
 

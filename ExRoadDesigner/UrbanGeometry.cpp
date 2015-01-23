@@ -324,12 +324,6 @@ void UrbanGeometry::mergeRoads() {
 	update(mainWin->glWidget->vboRenderManager);
 }
 
-void UrbanGeometry::connectRoads() {
-	//RoadGeneratorHelper::connectRoads(roads, 200.0f, 0.15f);
-	RoadGeneratorHelper::connectRoads2(roads, 400.0f);
-	GraphUtil::removeDeadEnd(roads);
-}
-
 void UrbanGeometry::cutRoads() {
 	if (areas.selectedIndex < 0) return;
 	GraphUtil::subtractRoads(roads, areas.selectedArea()->area, false);

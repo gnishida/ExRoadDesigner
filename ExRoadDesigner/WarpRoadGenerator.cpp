@@ -107,12 +107,7 @@ void WarpRoadGenerator::generateRoadNetwork() {
 
 	// Avenueをクリーンナップ
 	if (G::getBool("cleanAvenues")) {
-		RoadGeneratorHelper::removeAllDeadends(roads);
-	}
-
-	if (G::getBool("removeSmallBlocks")) {
-		//SmallBlockRemover::remove(roads, 10000);
-		SmallBlockRemover::remove(roads, G::getFloat("minBlockSize"));
+		RoadGeneratorHelper::removeDanglingEdges(roads);
 	}
 
 	// recover the temporarily removed local streets if they are not intersected with other edges
@@ -186,7 +181,7 @@ void WarpRoadGenerator::generateRoadNetwork() {
 
 	// Local Streetsをクリーンナップ
 	if (G::getBool("cleanStreets")) {
-		RoadGeneratorHelper::removeAllDeadends(roads);
+		RoadGeneratorHelper::removeDanglingEdges(roads);
 	}
 
 	GraphUtil::cleanEdges(roads);

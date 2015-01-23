@@ -106,11 +106,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 
 	// Avenueをクリーンナップ
 	if (G::getBool("cleanAvenues")) {
-		RoadGeneratorHelper::removeAllDeadends(roads);
-	}
-
-	if (G::getBool("removeSmallBlocks")) {
-		SmallBlockRemover::remove(roads, G::getFloat("minBlockSize"));
+		RoadGeneratorHelper::removeDanglingEdges(roads);
 	}
 
 	// recover the temporarily removed local streets if they are not intersected with other edges
@@ -197,7 +193,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 	}
 
 	if (G::getBool("cleanStreets")) {
-		RoadGeneratorHelper::removeAllDeadends(roads);
+		RoadGeneratorHelper::removeDanglingEdges(roads);
 	}
 	
 	GraphUtil::cleanEdges(roads);

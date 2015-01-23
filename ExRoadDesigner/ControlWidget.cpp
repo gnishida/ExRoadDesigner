@@ -8,12 +8,14 @@
 #include "ExFeature.h"
 #include "RoadGeneratorHelper.h"
 #include "BBox.h"
+#include "SmallBlockRemover.h"
 
 ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget", (QWidget*)mainWin) {
 	this->mainWin = mainWin;
 
 	// set up the UI
 	ui.setupUi(this);
+
 	ui.lineEditNumAvenueIterations->setText("1500");
 	ui.lineEditNumStreetIterations->setText("6000");
 	ui.lineEditNumExamples->setText("1");
@@ -22,7 +24,6 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.checkBoxLocalStreets->setChecked(true);
 	ui.checkBoxCropping->setChecked(false);
 	ui.checkBoxUseLayer->setChecked(false);
-	ui.checkBoxRemoveSmallBlocks->setChecked(false);
 	ui.lineEditMinBlockSize->setText("10000");
 	ui.lineEditHoughScale->setText("500.0");
 	ui.lineEditPatchDistance1->setText("100");
@@ -60,6 +61,8 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 
 	connect(ui.pushButtonMerge, SIGNAL(clicked()), this, SLOT(mergeRoads()));
 	connect(ui.pushButtonTrim, SIGNAL(clicked()), this, SLOT(trimRoads()));
+	connect(ui.pushButtonClearBoundaryFlag, SIGNAL(clicked()), this, SLOT(clearBoundaryFlag()));
+	connect(ui.pushButtonRemoveDanglingEdges, SIGNAL(clicked()), this, SLOT(removeDanglingEdges()));
 
 	// terrain
 	connect(ui.terrainPaint_sizeSlider, SIGNAL(valueChanged(int)),this, SLOT(updateTerrainLabels(int)));
@@ -104,8 +107,6 @@ void ControlWidget::generateRoadsEx() {
 	G::global()["generateLocalStreets"] = ui.checkBoxLocalStreets->isChecked();
 	G::global()["cropping"] = ui.checkBoxCropping->isChecked();
 	G::global()["useLayer"] = ui.checkBoxUseLayer->isChecked();
-	G::global()["removeSmallBlocks"] = ui.checkBoxRemoveSmallBlocks->isChecked();
-	G::global()["minBlockSize"] = ui.lineEditMinBlockSize->text().toFloat();
 
 	G::global()["houghScale"] = ui.lineEditHoughScale->text().toFloat();
 	G::global()["avenuePatchDistance"] = ui.lineEditPatchDistance1->text().toFloat();
@@ -144,8 +145,6 @@ void ControlWidget::generateRoadsWarp() {
 	G::global()["generateLocalStreets"] = ui.checkBoxLocalStreets->isChecked();
 	G::global()["cropping"] = ui.checkBoxCropping->isChecked();
 	G::global()["useLayer"] = ui.checkBoxUseLayer->isChecked();
-	G::global()["removeSmallBlocks"] = ui.checkBoxRemoveSmallBlocks->isChecked();
-	G::global()["minBlockSize"] = ui.lineEditMinBlockSize->text().toFloat();
 
 	G::global()["houghScale"] = ui.lineEditHoughScale->text().toFloat();
 	G::global()["avenuePatchDistance"] = ui.lineEditPatchDistance1->text().toFloat();
@@ -184,8 +183,6 @@ void ControlWidget::generateRoadsPM() {
 	G::global()["generateLocalStreets"] = ui.checkBoxLocalStreets->isChecked();
 	G::global()["cropping"] = ui.checkBoxCropping->isChecked();
 	G::global()["useLayer"] = ui.checkBoxUseLayer->isChecked();
-	G::global()["removeSmallBlocks"] = ui.checkBoxRemoveSmallBlocks->isChecked();
-	G::global()["minBlockSize"] = ui.lineEditMinBlockSize->text().toFloat();
 
 	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
@@ -219,8 +216,6 @@ void ControlWidget::generateRoadsAliaga() {
 	G::global()["generateLocalStreets"] = ui.checkBoxLocalStreets->isChecked();
 	G::global()["cropping"] = ui.checkBoxCropping->isChecked();
 	G::global()["useLayer"] = ui.checkBoxUseLayer->isChecked();
-	G::global()["removeSmallBlocks"] = ui.checkBoxRemoveSmallBlocks->isChecked();
-	G::global()["minBlockSize"] = ui.lineEditMinBlockSize->text().toFloat();
 
 	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
@@ -272,14 +267,24 @@ void ControlWidget::trimRoads() {
 /**
  * エリア間の境界上で、エッジができる限りつながるように、微調整する。
  */
-void ControlWidget::connectRoads() {
-	mainWin->urbanGeometry->connectRoads();
-
+void ControlWidget::connectRoads2() {
+	RoadGeneratorHelper::connectRoads3(mainWin->urbanGeometry->roads, &mainWin->glWidget->vboRenderManager, 1000.0f, 200.0f);
+	mainWin->urbanGeometry->update(mainWin->glWidget->vboRenderManager);
 	mainWin->glWidget->updateGL();
 }
 
-void ControlWidget::connectRoads2() {
-	RoadGeneratorHelper::connectRoads3(mainWin->urbanGeometry->roads, &mainWin->glWidget->vboRenderManager, 1000.0f, 200.0f);
+void ControlWidget::clearBoundaryFlag() {
+	RoadGeneratorHelper::clearBoundaryFlag(mainWin->urbanGeometry->roads);
+}
+
+void ControlWidget::removeDanglingEdges() {
+	RoadGeneratorHelper::removeDanglingEdges(mainWin->urbanGeometry->roads);
+	mainWin->urbanGeometry->update(mainWin->glWidget->vboRenderManager);
+	mainWin->glWidget->updateGL();
+}
+
+void ControlWidget::removeSmallBlocks() {
+	SmallBlockRemover::remove(mainWin->urbanGeometry->roads, ui.lineEditMinBlockSize->text().toFloat());
 	mainWin->urbanGeometry->update(mainWin->glWidget->vboRenderManager);
 	mainWin->glWidget->updateGL();
 }

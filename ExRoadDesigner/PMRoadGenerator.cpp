@@ -64,7 +64,7 @@ void PMRoadGenerator::generateRoadNetwork() {
 	// Avenueをクリーンナップ
 	if (G::getBool("cleanAvenues")) {
 		RoadGeneratorHelper::extendDanglingEdges(roads, 300.0f);
-		RoadGeneratorHelper::removeAllDeadends(roads);
+		RoadGeneratorHelper::removeDanglingEdges(roads);
 		//GraphUtil::reduce(roads);
 		//GraphUtil::removeLoop(roads);
 	}
@@ -108,7 +108,7 @@ void PMRoadGenerator::generateRoadNetwork() {
 	}
 
 	if (G::getBool("cleanStreets")) {
-		RoadGeneratorHelper::removeAllDeadends(roads);
+		RoadGeneratorHelper::removeDanglingEdges(roads);
 	}
 
 	GraphUtil::cleanEdges(roads);

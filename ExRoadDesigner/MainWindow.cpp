@@ -388,8 +388,6 @@ void MainWindow::onRotationVideo() {
 	G::global()["generateLocalStreets"] = controlWidget->ui.checkBoxLocalStreets->isChecked();
 	G::global()["cropping"] = controlWidget->ui.checkBoxCropping->isChecked();
 	G::global()["useLayer"] = controlWidget->ui.checkBoxUseLayer->isChecked();
-	G::global()["removeSmallBlocks"] = controlWidget->ui.checkBoxRemoveSmallBlocks->isChecked();
-	G::global()["minBlockSize"] = controlWidget->ui.lineEditMinBlockSize->text().toFloat();
 
 	G::global()["houghScale"] = controlWidget->ui.lineEditHoughScale->text().toFloat();
 	G::global()["avenuePatchDistance"] = controlWidget->ui.lineEditPatchDistance1->text().toFloat();
@@ -474,8 +472,6 @@ void MainWindow::onInterpolationVideo() {
 	G::global()["generateLocalStreets"] = controlWidget->ui.checkBoxLocalStreets->isChecked();
 	G::global()["cropping"] = controlWidget->ui.checkBoxCropping->isChecked();
 	G::global()["useLayer"] = controlWidget->ui.checkBoxUseLayer->isChecked();
-	G::global()["removeSmallBlocks"] = controlWidget->ui.checkBoxRemoveSmallBlocks->isChecked();
-	G::global()["minBlockSize"] = controlWidget->ui.lineEditMinBlockSize->text().toFloat();
 
 	G::global()["houghScale"] = controlWidget->ui.lineEditHoughScale->text().toFloat();
 	G::global()["avenuePatchDistance"] = controlWidget->ui.lineEditPatchDistance1->text().toFloat();
@@ -562,8 +558,6 @@ void MainWindow::onBlendingVideo() {
 	G::global()["generateLocalStreets"] = controlWidget->ui.checkBoxLocalStreets->isChecked();
 	G::global()["cropping"] = controlWidget->ui.checkBoxCropping->isChecked();
 	G::global()["useLayer"] = controlWidget->ui.checkBoxUseLayer->isChecked();
-	G::global()["removeSmallBlocks"] = controlWidget->ui.checkBoxRemoveSmallBlocks->isChecked();
-	G::global()["minBlockSize"] = controlWidget->ui.lineEditMinBlockSize->text().toFloat();
 
 	G::global()["houghScale"] = controlWidget->ui.lineEditHoughScale->text().toFloat();
 	G::global()["avenuePatchDistance"] = controlWidget->ui.lineEditPatchDistance1->text().toFloat();
@@ -652,8 +646,6 @@ void MainWindow::onGrowingVideo() {
 	G::global()["cleanStreets"] = controlWidget->ui.checkBoxCleanStreets->isChecked();
 	G::global()["cropping"] = controlWidget->ui.checkBoxCropping->isChecked();
 	G::global()["useLayer"] = controlWidget->ui.checkBoxUseLayer->isChecked();
-	G::global()["removeSmallBlocks"] = controlWidget->ui.checkBoxRemoveSmallBlocks->isChecked();
-	G::global()["minBlockSize"] = controlWidget->ui.lineEditMinBlockSize->text().toFloat();
 
 	G::global()["houghScale"] = controlWidget->ui.lineEditHoughScale->text().toFloat();
 	G::global()["avenuePatchDistance"] = controlWidget->ui.lineEditPatchDistance1->text().toFloat();

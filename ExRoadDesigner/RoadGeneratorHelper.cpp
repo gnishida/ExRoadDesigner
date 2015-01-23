@@ -570,115 +570,6 @@ bool RoadGeneratorHelper::isRedundantEdge(RoadGraph& roads, RoadVertexDesc v_des
 	return false;
 }
 
-/**
- * Example領域を使って、指定された位置のモジュラ位置（Example座標系）を返却する。
- * モジュラ位置は、Example領域のBBoxの中に入る座標となる。
- * ※ 現状の実装では、Axis Aligned BBoxを使用し、Oriented BBoxなどをサポートしていない。
- *
- * @param targetArea	ターゲット領域
- * @param exampleArea	Example領域（Exampleの中心を原点とする座標系）
- * @param pt			指定された位置
- * @param bbox			指定された位置が入る、BBox（ターゲット座標系）
- * @return				指定された位置をmoduloした結果（Example座標系）
- */
-QVector2D RoadGeneratorHelper::modulo(const Polygon2D &targetArea, const Polygon2D &exampleArea, const QVector2D &pt, BBox &bbox) {
-	QVector2D ret;
-
-	QVector2D center = targetArea.envelope().midPt();
-	QVector2D offsetPt = pt - center;
-
-	BBox bboxExample = exampleArea.envelope();
-
-	if (offsetPt.x() < bboxExample.minPt.x()) {
-		ret.setX(bboxExample.maxPt.x() - (int)(bboxExample.minPt.x() - offsetPt.x()) % (int)bboxExample.dx());
-
-		int u = (bboxExample.minPt.x() - offsetPt.x()) / bboxExample.dx() + 1;
-		bbox.minPt.setX(bboxExample.minPt.x() - bboxExample.dx() * u);
-		bbox.maxPt.setX(bboxExample.maxPt.x() - bboxExample.dx() * u);
-	} else if (offsetPt.x() > bboxExample.maxPt.x()) {
-		ret.setX(bboxExample.minPt.x() + (int)(offsetPt.x() - bboxExample.maxPt.x()) % (int)bboxExample.dx());
-
-		int u = (offsetPt.x() - bboxExample.maxPt.x()) / bboxExample.dx() + 1;
-		bbox.minPt.setX(bboxExample.minPt.x() + bboxExample.dx() * u);
-		bbox.maxPt.setX(bboxExample.maxPt.x() + bboxExample.dx() * u);
-	} else {
-		ret.setX(offsetPt.x());
-		bbox.minPt.setX(bboxExample.minPt.x());
-		bbox.maxPt.setX(bboxExample.maxPt.x());
-	}
-
-	if (offsetPt.y() < bboxExample.minPt.y()) {
-		ret.setY(bboxExample.maxPt.y() - (int)(bboxExample.minPt.y() - offsetPt.y()) % (int)bboxExample.dy());
-
-		int v = (bboxExample.minPt.y() - offsetPt.y()) / bboxExample.dy() + 1;
-		bbox.minPt.setY(bboxExample.minPt.y() - bboxExample.dy() * v);
-		bbox.maxPt.setY(bboxExample.maxPt.y() - bboxExample.dy() * v);
-	} else if (offsetPt.y() > bboxExample.maxPt.y()) {
-		ret.setY(bboxExample.minPt.y() + (int)(offsetPt.y() - bboxExample.maxPt.y()) % (int)bboxExample.dy());
-
-		int v = (offsetPt.y() - bboxExample.maxPt.y()) / bboxExample.dy() + 1;
-		bbox.minPt.setY(bboxExample.minPt.y() + bboxExample.dy() * v);
-		bbox.maxPt.setY(bboxExample.maxPt.y() + bboxExample.dy() * v);
-	} else {
-		ret.setY(offsetPt.y());
-		bbox.minPt.setY(bboxExample.minPt.y());
-		bbox.maxPt.setY(bboxExample.maxPt.y());
-	}
-
-	bbox.minPt += center;
-	bbox.maxPt += center;
-
-	return ret;
-}
-
-/**
- * 指定された点を含むBBoxに、initial seedがあるかチェックする。
- */
-bool RoadGeneratorHelper::containsInitialSeed(const Polygon2D &targetArea, const Polygon2D &exampleArea, const QVector2D &pt) {
-	BBox targetBBox = targetArea.envelope();
-	BBox exampleBBox = exampleArea.envelope();
-
-	QVector2D center = targetBBox.midPt();
-
-	if (pt.x() > center.x()) {
-		int u = targetBBox.dx() / 2 - exampleBBox.dx() / 2;
-		if (u > 0) {
-			u = (int)(u / exampleBBox.dx()) + 1;
-		} else {
-			u = 0;
-		}
-		if (pt.x() - center.x() - exampleBBox.dx() / 2 > u * exampleBBox.dx()) return false;
-	} else {
-		int u = targetBBox.dx() / 2 - exampleBBox.dx() / 2;
-		if (u > 0) {
-			u = (int)(u / exampleBBox.dx()) + 1;
-		} else {
-			u = 0;
-		}
-		if (center.x() - pt.x() - exampleBBox.dx() / 2 > u * exampleBBox.dx()) return false;
-	}
-
-	if (pt.y() > center.y()) {
-		int v = targetBBox.dy() / 2 - exampleBBox.dy() / 2;
-		if (v > 0) {
-			v = (int)(v / exampleBBox.dy()) + 1;
-		} else {
-			v = 0;
-		}
-		if (pt.y() - center.y() - exampleBBox.dy() / 2 > v * exampleBBox.dy()) return false;
-	} else {
-		int v = targetBBox.dy() / 2 - exampleBBox.dy() / 2;
-		if (v > 0) {
-			v = (int)(v / exampleBBox.dy()) + 1;
-		} else {
-			v = 0;
-		}
-		if (center.y() - pt.y() - exampleBBox.dy() / 2 > v * exampleBBox.dy()) return false;
-	}
-
-	return true;
-}
-
 void RoadGeneratorHelper::createFourDirection(float direction, std::vector<float> &directions) {
 	float deltaDir;
 	float tmpDir;
@@ -699,13 +590,20 @@ void RoadGeneratorHelper::createFourDirection(float direction, std::vector<float
 	}
 }
 
+void RoadGeneratorHelper::clearBoundaryFlag(RoadGraph& roads) {
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		if (!roads.graph[*vi]->valid) continue;
+
+		roads.graph[*vi]->onBoundary = false;
+	}
+}
+
 /**
- * Deadendの道路セグメントを削除する。
- * ただし、onBoundaryフラグがtrueの場合は、対象外。
- * また、deadendフラグがtrueの場合も、対象外。
- * 処理を繰り返し、deadend道路がなくなるまで、繰り返す。
+ * Danglingな道路セグメントを全て削除する。
+ * ただし、onBoundaryフラグがtrue、または、deadendフラグがtrueの場合は、対象外。
  */
-void RoadGeneratorHelper::removeAllDeadends(RoadGraph& roads) {
+void RoadGeneratorHelper::removeDanglingEdges(RoadGraph& roads) {
 	bool removed = false;
 
 	do {
@@ -721,7 +619,6 @@ void RoadGeneratorHelper::removeAllDeadends(RoadGraph& roads) {
 			if (roads.graph[src]->onBoundary || roads.graph[tgt]->onBoundary) continue;
 			if (roads.graph[src]->properties.contains("deadend") && roads.graph[src]->properties["deadend"] == true) continue;
 			if (roads.graph[tgt]->properties.contains("deadend") && roads.graph[tgt]->properties["deadend"] == true) continue;
-			if (roads.graph[src]->fixed || roads.graph[tgt]->fixed) continue;
 
 			if (GraphUtil::getDegree(roads, src) == 1) {
 				removeEdge(roads, src, *ei);
@@ -1674,31 +1571,6 @@ void RoadGeneratorHelper::removeIntersectionsOnRiver(RoadGraph &roads, VBORender
  */
 void RoadGeneratorHelper::removeSmallBlocks(RoadGraph &roads, float minArea) {
 
-}
-
-/**
- * 指定された頂点に近くで、同じgroup_idで、example_descをプロパティに設定している頂点を探す。
- */
-RoadVertexDesc RoadGeneratorHelper::getClosestVertexByExample(RoadGraph &roads, RoadVertexDesc v_desc) {
-	float min_dist = std::numeric_limits<float>::max();
-	RoadVertexDesc nearest_v_desc;
-
-	int group_id = roads.graph[v_desc]->properties["group_id"].toInt();
-	
-	RoadVertexIter vi, vend;
-	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
-		if (!roads.graph[*vi]->valid) continue;
-
-		if (roads.graph[*vi]->properties["group_id"].toInt() == group_id && roads.graph[*vi]->properties.contains("example_desc")) {
-			float dist = (roads.graph[*vi]->pt - roads.graph[v_desc]->pt).lengthSquared();
-			if (dist < min_dist) {
-				min_dist = dist;
-				nearest_v_desc = *vi;
-			}
-		}
-	}
-
-	return nearest_v_desc;
 }
 
 /**
