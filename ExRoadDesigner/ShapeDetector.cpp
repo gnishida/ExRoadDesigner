@@ -310,7 +310,7 @@ void ShapeDetector::addVerticesToGroup(RoadGraph &roads, RoadVertexDesc srcDesc,
 	}
 }
 
-void ShapeDetector::savePatchImages(RoadGraph& roads, std::vector<RoadEdgeDescs> shapes) {
+/*void ShapeDetector::savePatchImages(RoadGraph& roads, std::vector<RoadEdgeDescs> shapes) {
 	// 画像の大きさを決定
 	BBox bbox = GraphUtil::getAABoundingBox(roads);
 
@@ -349,5 +349,5 @@ void ShapeDetector::savePatchImages(RoadGraph& roads, std::vector<RoadEdgeDescs>
 		cv::flip(img, img, 0);
 		cv::imwrite(filename, img);
 	}
-
 }
+*/
