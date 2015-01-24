@@ -384,8 +384,8 @@ bool RoadGeneratorHelper::getVertexForSnapping(VBORenderManager& vboRenderManage
 		float dist = vec.lengthSquared();
 		if (dist > distance_threshold2) continue;
 
-		// エッジが水面下かチェック
-		float z = vboRenderManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
+		// snap先が水面下かチェック
+		float z = vboRenderManager.getMinTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
 		if (z < z_threshold) continue;
 
 		// 既存エッジとの交差をチェック
@@ -441,7 +441,7 @@ bool RoadGeneratorHelper::getVertexForSnapping(VBORenderManager& vboRenderManage
 		float dist = vec.lengthSquared();
 		if (dist > distance_threshold2) continue;
 
-		// エッジが水面下かチェック
+		// snap先が水面下かチェック
 		float z = vboRenderManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
 		if (z < z_threshold) continue;
 
@@ -492,9 +492,9 @@ bool RoadGeneratorHelper::getEdgeForSnapping(VBORenderManager& vboRenderManager,
 		if (src == srcDesc || tgt == srcDesc) continue;
 
 		// エッジが水面下かチェック
-		float z1 = vboRenderManager.getTerrainHeight(roads.graph[src]->pt.x(), roads.graph[src]->pt.y());
+		float z1 = vboRenderManager.getMinTerrainHeight(roads.graph[src]->pt.x(), roads.graph[src]->pt.y());
 		if (z1 < z_threshold) continue;
-		float z2 = vboRenderManager.getTerrainHeight(roads.graph[tgt]->pt.x(), roads.graph[tgt]->pt.y());
+		float z2 = vboRenderManager.getMinTerrainHeight(roads.graph[tgt]->pt.x(), roads.graph[tgt]->pt.y());
 		if (z2 < z_threshold) continue;
 
 		QVector2D vec1 = roads.graph[src]->pt - roads.graph[srcDesc]->pt;
