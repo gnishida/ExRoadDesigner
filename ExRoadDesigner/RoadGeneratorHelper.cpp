@@ -590,6 +590,105 @@ void RoadGeneratorHelper::createFourDirection(float direction, std::vector<float
 	}
 }
 
+/**
+ * 道路を延長し、川を越えさせる。指定された長さ伸ばして、依然として川の中なら、延長をキャンセルする。
+ *
+ * @roadType		avenue / local street
+ * @v_desc			頂点ID
+ * @seeds			シード
+ * @angle_threshold この角度の範囲で、最短で渡河できる方向を探す
+ * @max_length		この距離以上なら、キャンセル
+ * @return			延長したらtrueを返却する
+ */
+bool RoadGeneratorHelper::extendRoadAcrossRiver(RoadGraph& roads, VBORenderManager* vboRenderManager, Polygon2D& targetArea, int roadType, RoadVertexDesc v_desc, std::list<RoadVertexDesc> &seeds, float angle_threshold, float max_length) {
+	// 既存のエッジから方向を決定する
+	float angle;
+	int lanes;
+	{
+		RoadOutEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::out_edges(v_desc, roads.graph); ei != eend; ++ei) {
+			if (!roads.graph[*ei]->valid) continue;
+
+			lanes = roads.graph[*ei]->lanes;
+			Polyline2D polyline  = GraphUtil::orderPolyLine(roads, *ei, v_desc);
+			QVector2D dir = polyline[0] - polyline[1];
+			angle = atan2f(dir.y(), dir.x());
+			break;
+		}
+	}
+
+	QVector2D bestPt;
+	bool found = false;
+	for (float length = max_length * 0.1f; length <= max_length && !found; length += max_length * 0.1f) {
+		for (float th = 0; th <= angle_threshold && !found; th += 0.1f) {
+			QVector2D pt = roads.graph[v_desc]->pt + QVector2D(cosf(angle + th), sinf(angle + th)) * length;
+			float z = vboRenderManager->getMinTerrainHeight(pt.x(), pt.y());
+			if (z >= G::getFloat("seaLevel")) {
+				bestPt = pt;
+				found = true;
+			}
+		}
+		for (float th = 0; th >= -angle_threshold && !found; th -= 0.1f) {
+			QVector2D pt = roads.graph[v_desc]->pt + QVector2D(cosf(angle + th), sinf(angle + th)) * length;
+			float z = vboRenderManager->getMinTerrainHeight(pt.x(), pt.y());
+			if (z >= G::getFloat("seaLevel")) {
+				bestPt = pt;
+				found = true;
+			}
+		}
+	}
+
+	if (!found) return false;
+
+	// エッジ生成
+	RoadEdgePtr e = RoadEdgePtr(new RoadEdge(roadType, lanes));
+	e->polyline.push_back(roads.graph[v_desc]->pt);
+	e->polyline.push_back(bestPt);
+
+	// もし、新規エッジが、既存グラフと交差するなら、エッジ生成をキャンセル
+	RoadVertexDesc tgtDesc;
+	QVector2D intPoint;
+	RoadEdgeDesc closestEdge;
+	if (GraphUtil::isIntersect(roads, e->polyline, v_desc, closestEdge, intPoint)) {
+		if (vboRenderManager->getMinTerrainHeight(intPoint.x(), intPoint.y()) < G::getFloat("seaLevel")) {
+			return false;
+		}
+
+		// 60%の確率でキャンセル？
+		if (Util::genRand(0, 1) < 0.6f) return false;
+
+		// 交差する箇所で中断させる
+		e->polyline[1] = intPoint;
+
+		// 他のエッジにスナップ
+		tgtDesc = GraphUtil::splitEdge(roads, closestEdge, intPoint);
+		roads.graph[tgtDesc]->generationType = "snapped";
+		roads.graph[tgtDesc]->properties["group_id"] = roads.graph[closestEdge]->properties["group_id"];
+		roads.graph[tgtDesc]->properties["ex_id"] = roads.graph[closestEdge]->properties["ex_id"];
+		roads.graph[tgtDesc]->properties.remove("example_desc");
+	} else {
+		// 頂点を追加
+		RoadVertexPtr v = RoadVertexPtr(new RoadVertex(bestPt));
+		v->generationType = "pm";
+		tgtDesc = GraphUtil::addVertex(roads, v);
+
+		// エリア外なら、onBoundaryフラグをセット
+		if (!targetArea.contains(roads.graph[tgtDesc]->pt)) {
+			roads.graph[tgtDesc]->onBoundary = true;
+		}
+
+		// シードに追加
+		// NOTE: エリア外でもとりあえずシードに追加する。
+		// 理由: シード頂点へのスナップさせたい時があるので。
+		seeds.push_back(tgtDesc);
+	}
+
+	// エッジを追加
+	GraphUtil::addEdge(roads, v_desc, tgtDesc, e);
+
+	return true;
+}
+
 void RoadGeneratorHelper::clearBoundaryFlag(RoadGraph& roads) {
 	RoadVertexIter vi, vend;
 	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
@@ -2081,7 +2180,7 @@ RoadVertexDesc RoadGeneratorHelper::createEdgesByExample2(RoadGraph &roads, floa
  * 道路網を画像として保存する。
  */
 void RoadGeneratorHelper::saveRoadImage(RoadGraph& roads, std::list<RoadVertexDesc>& seeds, const char* filename) {
-	BBox bbox = GraphUtil::getAABoundingBox(roads);
+	BBox bbox = GraphUtil::getAABoundingBox(roads, true);
 	cv::Mat img(bbox.dy() + 1, bbox.dx() + 1, CV_8UC3, cv::Scalar(0, 0, 0));
 
 	RoadEdgeIter ei, eend;

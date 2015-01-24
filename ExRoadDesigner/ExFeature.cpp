@@ -467,27 +467,27 @@ void ExFeature::init() {
 	}
 }
 
-std::vector<RoadEdgeDescs> ExFeature::shapes(int roadType, float houghScale, float patchDistance) {
+std::vector<RoadEdgeDescs> ExFeature::shapes(int roadType, float houghScale, float patchDistance, bool saveImage) {
 	if (roadType == RoadEdge::TYPE_AVENUE) {
-		if (!avenueShapesDetected) detectAvenueShapes(houghScale, patchDistance);
+		if (!avenueShapesDetected) detectAvenueShapes(houghScale, patchDistance, saveImage);
 		return avenueShapes;
 	} else {
-		if (!streetShapesDetected) detectStreetShapes(houghScale, patchDistance);
+		if (!streetShapesDetected) detectStreetShapes(houghScale, patchDistance, saveImage);
 		return streetShapes;
 	}
 }
 
-std::vector<Patch> ExFeature::patches(int roadType, float houghScale, float patchDistance) {
+std::vector<Patch> ExFeature::patches(int roadType, float houghScale, float patchDistance, bool saveImage) {
 	if (roadType == RoadEdge::TYPE_AVENUE) {
-		if (!avenueShapesDetected) detectAvenueShapes(houghScale, patchDistance);
+		if (!avenueShapesDetected) detectAvenueShapes(houghScale, patchDistance, saveImage);
 		return avenuePatches;
 	} else {
-		if (!streetShapesDetected) detectStreetShapes(houghScale, patchDistance);
+		if (!streetShapesDetected) detectStreetShapes(houghScale, patchDistance, saveImage);
 		return streetPatches;
 	}
 }
 
-void ExFeature::detectAvenueShapes(float houghScale, float patchDistance) {
+void ExFeature::detectAvenueShapes(float houghScale, float patchDistance, bool saveImage) {
 	if (avenueShapesDetected) return;
 	avenueShapesDetected = true;
 
@@ -495,10 +495,12 @@ void ExFeature::detectAvenueShapes(float houghScale, float patchDistance) {
 	avenuePatches = RoadGeneratorHelper::convertToPatch(RoadEdge::TYPE_AVENUE, avenues, avenues, avenueShapes);
 
 	// save patch images
-	//savePatchImages(RoadEdge::TYPE_AVENUE, 1, avenues, avenuePatches, 1.0f, true);
+	if (saveImage) {
+		savePatchImages(RoadEdge::TYPE_AVENUE, 1, avenues, avenuePatches, 1.0f, true);
+	}
 }
 
-void ExFeature::detectStreetShapes(float houghScale, float patchDistance) {
+void ExFeature::detectStreetShapes(float houghScale, float patchDistance, bool saveImage) {
 	if (streetShapesDetected) return;
 	streetShapesDetected = true;
 
@@ -506,5 +508,7 @@ void ExFeature::detectStreetShapes(float houghScale, float patchDistance) {
 	streetPatches = RoadGeneratorHelper::convertToPatch(RoadEdge::TYPE_STREET, streets, avenues, streetShapes);
 
 	// save patch images
-	//savePatchImages(RoadEdge::TYPE_STREET, 1, streets, streetPatches, 1.0f, true);
+	if (saveImage) {
+		savePatchImages(RoadEdge::TYPE_STREET, 1, streets, streetPatches, 1.0f, true);
+	}
 }

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Fri Jan 23 18:28:36 2015
+** Created: Sat Jan 24 10:44:34 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -68,6 +68,7 @@ public:
     QPushButton *pushButtonGenerateWarp;
     QPushButton *pushButtonGenerateAliaga;
     QCheckBox *checkBoxSaveRoadImages;
+    QCheckBox *checkBoxSavePatchImages;
     QWidget *CleanUpTab;
     QGroupBox *groupBox_5;
     QPushButton *pushButtonMerge;
@@ -112,14 +113,14 @@ public:
     {
         if (ControlWidget->objectName().isEmpty())
             ControlWidget->setObjectName(QString::fromUtf8("ControlWidget"));
-        ControlWidget->resize(198, 559);
+        ControlWidget->resize(198, 592);
         ControlWidget->setMinimumSize(QSize(190, 240));
         ControlWidget->setStyleSheet(QString::fromUtf8("background-color: rgb(181, 181, 181);"));
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         TabWidget = new QTabWidget(dockWidgetContents);
         TabWidget->setObjectName(QString::fromUtf8("TabWidget"));
-        TabWidget->setGeometry(QRect(1, 0, 196, 531));
+        TabWidget->setGeometry(QRect(1, 0, 196, 551));
         RoadGenerationTab = new QWidget();
         RoadGenerationTab->setObjectName(QString::fromUtf8("RoadGenerationTab"));
         groupBox = new QGroupBox(RoadGenerationTab);
@@ -163,7 +164,7 @@ public:
         checkBoxUseLayer->setGeometry(QRect(10, 152, 121, 17));
         groupBox_8 = new QGroupBox(RoadGenerationTab);
         groupBox_8->setObjectName(QString::fromUtf8("groupBox_8"));
-        groupBox_8->setGeometry(QRect(10, 210, 171, 281));
+        groupBox_8->setGeometry(QRect(10, 210, 171, 301));
         label_2 = new QLabel(groupBox_8);
         label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setGeometry(QRect(10, 92, 61, 21));
@@ -184,10 +185,10 @@ public:
         label_6->setGeometry(QRect(10, 72, 61, 21));
         pushButtonGeneratePM = new QPushButton(groupBox_8);
         pushButtonGeneratePM->setObjectName(QString::fromUtf8("pushButtonGeneratePM"));
-        pushButtonGeneratePM->setGeometry(QRect(10, 242, 51, 28));
+        pushButtonGeneratePM->setGeometry(QRect(10, 270, 51, 28));
         pushButtonClear = new QPushButton(groupBox_8);
         pushButtonClear->setObjectName(QString::fromUtf8("pushButtonClear"));
-        pushButtonClear->setGeometry(QRect(110, 242, 51, 28));
+        pushButtonClear->setGeometry(QRect(110, 270, 51, 28));
         label_8 = new QLabel(groupBox_8);
         label_8->setObjectName(QString::fromUtf8("label_8"));
         label_8->setGeometry(QRect(10, 32, 101, 21));
@@ -220,16 +221,19 @@ public:
         lineEditRoadAngleTolerance->setGeometry(QRect(110, 152, 51, 20));
         pushButtonGenerateEx = new QPushButton(groupBox_8);
         pushButtonGenerateEx->setObjectName(QString::fromUtf8("pushButtonGenerateEx"));
-        pushButtonGenerateEx->setGeometry(QRect(10, 212, 71, 28));
+        pushButtonGenerateEx->setGeometry(QRect(10, 240, 71, 28));
         pushButtonGenerateWarp = new QPushButton(groupBox_8);
         pushButtonGenerateWarp->setObjectName(QString::fromUtf8("pushButtonGenerateWarp"));
-        pushButtonGenerateWarp->setGeometry(QRect(90, 212, 71, 28));
+        pushButtonGenerateWarp->setGeometry(QRect(90, 240, 71, 28));
         pushButtonGenerateAliaga = new QPushButton(groupBox_8);
         pushButtonGenerateAliaga->setObjectName(QString::fromUtf8("pushButtonGenerateAliaga"));
-        pushButtonGenerateAliaga->setGeometry(QRect(60, 242, 51, 28));
+        pushButtonGenerateAliaga->setGeometry(QRect(60, 270, 51, 28));
         checkBoxSaveRoadImages = new QCheckBox(groupBox_8);
         checkBoxSaveRoadImages->setObjectName(QString::fromUtf8("checkBoxSaveRoadImages"));
-        checkBoxSaveRoadImages->setGeometry(QRect(22, 182, 91, 17));
+        checkBoxSaveRoadImages->setGeometry(QRect(20, 182, 111, 17));
+        checkBoxSavePatchImages = new QCheckBox(groupBox_8);
+        checkBoxSavePatchImages->setObjectName(QString::fromUtf8("checkBoxSavePatchImages"));
+        checkBoxSavePatchImages->setGeometry(QRect(20, 200, 131, 17));
         TabWidget->addTab(RoadGenerationTab, QString());
         CleanUpTab = new QWidget();
         CleanUpTab->setObjectName(QString::fromUtf8("CleanUpTab"));
@@ -458,6 +462,7 @@ public:
         pushButtonGenerateWarp->setText(QApplication::translate("ControlWidget", "Warp", 0, QApplication::UnicodeUTF8));
         pushButtonGenerateAliaga->setText(QApplication::translate("ControlWidget", "Aliaga", 0, QApplication::UnicodeUTF8));
         checkBoxSaveRoadImages->setText(QApplication::translate("ControlWidget", "save road images", 0, QApplication::UnicodeUTF8));
+        checkBoxSavePatchImages->setText(QApplication::translate("ControlWidget", "save patch images", 0, QApplication::UnicodeUTF8));
         TabWidget->setTabText(TabWidget->indexOf(RoadGenerationTab), QApplication::translate("ControlWidget", "Road", 0, QApplication::UnicodeUTF8));
         groupBox_5->setTitle(QApplication::translate("ControlWidget", "Finalize", 0, QApplication::UnicodeUTF8));
         pushButtonMerge->setText(QApplication::translate("ControlWidget", "Merge", 0, QApplication::UnicodeUTF8));

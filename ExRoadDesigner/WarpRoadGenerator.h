@@ -39,12 +39,8 @@ private:
 	void rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph &replacementGraph, std::list<RoadVertexDesc>& seeds);
 
 	void attemptExpansion2(int roadType, RoadVertexDesc srcDesc, ExFeature &f, std::list<RoadVertexDesc> &seeds);
-	bool growRoadSegment(int roadType, RoadVertexDesc srcDesc, ExFeature& f, const Polyline2D &polyline, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds);
-	bool extendRoadAcrossRiver(int roadType, RoadVertexDesc v_desc, std::list<RoadVertexDesc> &seeds, float max_length);
-
-	void synthesizeItem(int roadType, RoadVertexDesc v_desc, float length, std::vector<RoadEdgePtr> &edges);
+	bool growRoadSegment(int roadType, RoadVertexDesc srcDesc, ExFeature& f, float length, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds);
 
 	int defineExId(const QVector2D& pt);
-public:
 };
 

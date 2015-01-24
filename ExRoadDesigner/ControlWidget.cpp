@@ -35,6 +35,7 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.lineEditRoadAngleTolerance->setText("60");
 	ui.lineEditMaxBlockSizeForPark->setText("250000");
 	ui.checkBoxSaveRoadImages->setChecked(false);
+	ui.checkBoxSavePatchImages->setChecked(false);
 	
 	ui.terrainPaint_changeEdit->setText("200");
 	ui.terrainPaint_changeSlider->setMinimum(0);
@@ -115,6 +116,7 @@ void ControlWidget::generateRoadsEx() {
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 	G::global()["saveRoadImages"] = ui.checkBoxSaveRoadImages->isChecked();
+	G::global()["savePatchImages"] = ui.checkBoxSavePatchImages->isChecked();
 
 	std::vector<ExFeature> features;
 	features.resize(numExamples);
@@ -152,6 +154,7 @@ void ControlWidget::generateRoadsWarp() {
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 	G::global()["saveRoadImages"] = ui.checkBoxSaveRoadImages->isChecked();
+	G::global()["savePatchImages"] = ui.checkBoxSavePatchImages->isChecked();
 
 	std::vector<ExFeature> features;
 	features.resize(numExamples);

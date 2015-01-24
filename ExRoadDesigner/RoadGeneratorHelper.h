@@ -40,6 +40,7 @@ public:
 	static void chooseEdgeLengthAndCurvature(RoadGraph &roads, float angle, std::vector<RoadEdgeDescs> &shapes, float &length, float &curvature, int &lanes);
 	static void chooseEdgeLengthAndCurvature(RoadGraph &roads, const QVector2D &ex_pt, float distance, float direction, float &length, float &curvature);
 
+	static bool extendRoadAcrossRiver(RoadGraph& roads, VBORenderManager* vboRenderManager, Polygon2D& targetArea, int roadType, RoadVertexDesc v_desc, std::list<RoadVertexDesc> &seeds, float angle_threshold, float max_length);
 	static void clearBoundaryFlag(RoadGraph& roads);
 	static void removeDanglingEdges(RoadGraph& roads);
 	static void removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc, RoadEdgeDesc start_e_desc);
