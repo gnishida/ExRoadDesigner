@@ -188,6 +188,7 @@ void ControlWidget::generateRoadsPM() {
 	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
+	G::global()["saveRoadImages"] = ui.checkBoxSaveRoadImages->isChecked();
 
 	std::vector<ExFeature> features;
 	features.resize(numExamples);
@@ -220,6 +221,7 @@ void ControlWidget::generateRoadsAliaga() {
 	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
+	G::global()["saveRoadImages"] = ui.checkBoxSaveRoadImages->isChecked();
 
 	std::vector<ExFeature> features;
 	features.resize(numExamples);
