@@ -30,9 +30,6 @@ private:
 	void generateStreetSeeds2(std::list<RoadVertexDesc> &seeds);
 
 	void attemptExpansion(int roadType, RoadVertexDesc srcDesc, std::list<RoadVertexDesc> &seeds);
-	bool growRoadSegment(int roadType, RoadVertexDesc srcDesc, const Polyline2D &polyline, int lanes, float snapFactor, float angleTolerance, std::list<RoadVertexDesc> &seeds);
-
-	void synthesizeItem(int roadType, RoadVertexDesc v_desc, std::vector<RoadEdgePtr> &edges);
-public:
+	bool growRoadSegment(int roadType, RoadVertexDesc srcDesc, float step, int num_steps, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds);
 };
 

@@ -983,7 +983,7 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 
 
 
-		growRoadSegment(roadType, srcDesc, f, step, num_steps, direction, curvature, 1, roadAngleTolerance, seeds);
+		growRoadSegment(roadType, srcDesc, step, num_steps, direction, curvature, 1, roadAngleTolerance, seeds);
 	}
 }
 
@@ -992,7 +992,7 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
  * この関数は、PM方式での道路生成でのみ使用される。
  * 生成された場合はtrueを返却する。
  */
-bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, ExFeature& f, float step, int num_steps, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
+bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, float step, int num_steps, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
 	const int num_sub_steps = 5;
 	float sub_step = step / num_sub_steps;
 	

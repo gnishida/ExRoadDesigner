@@ -952,7 +952,7 @@ void WarpRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc, 
 			curvature = 0.0f;
 		}
 
-		growRoadSegment(roadType, srcDesc, f, length, direction, curvature, 1, roadAngleTolerance, seeds);
+		growRoadSegment(roadType, srcDesc, length, direction, curvature, 1, roadAngleTolerance, seeds);
 	}
 }
 
@@ -960,7 +960,7 @@ void WarpRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc, 
  * 指定されたpolylineに従って、srcDesc頂点からエッジを伸ばす。
  * エッジの端点が、srcDescとは違うセルに入る場合は、falseを返却する。
  */
-bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, ExFeature& f, float length, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
+bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, float length, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
 	int num_steps;
 	float step;
 	if (roadType == RoadEdge::TYPE_AVENUE) {
