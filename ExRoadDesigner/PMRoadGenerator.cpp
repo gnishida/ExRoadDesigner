@@ -264,17 +264,11 @@ void PMRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, std
 			float step, curvature;
 			if (roadType == RoadEdge::TYPE_AVENUE) {
 				num_steps = ceilf(features[i].avgAvenueLength / features[i].avgStreetLength);
-
-				step = Util::genRandNormal(features[i].avgStreetLength, features[i].varStreetLength);
-				if (step < features[i].avgStreetLength * 0.5f) step = features[i].avgStreetLength * 0.5f;
-
+				step = features[i].avgStreetLength;
 				curvature = features[i].avgAvenueCurvature;
 			} else {
 				num_steps = 1;
-
-				step = Util::genRandNormal(features[i].avgStreetLength, features[i].varStreetLength);
-				if (step < features[i].avgStreetLength * 0.5f) step = features[i].avgStreetLength * 0.5f;
-
+				step = features[i].avgStreetLength;
 				curvature = features[i].avgStreetCurvature;
 			}
 
@@ -286,15 +280,6 @@ void PMRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, std
 		interpolated_num_steps = (int)ceilf(interpolated_num_steps / total);
 		interpolated_step /= total;
 		interpolated_curvature /= total;
-
-
-
-
-
-
-
-
-
 	
 		// 坂が急なら、キャンセル
 		QVector2D pt2 = roads.graph[srcDesc]->pt + QVector2D(cosf(direction), sinf(direction)) * 20.0f;
@@ -304,9 +289,9 @@ void PMRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, std
 
 			// 急勾配を上昇する場合は、直線道路にする
 			interpolated_curvature = 0.0f;
+		} else if (fabs(z2 - z) > 3.0f) {
+			interpolated_curvature = 0.1f;
 		}
-
-
 
 		growRoadSegment(roadType, srcDesc, interpolated_step, interpolated_num_steps, direction, interpolated_curvature, 1, roadAngleTolerance, seeds);
 	}
