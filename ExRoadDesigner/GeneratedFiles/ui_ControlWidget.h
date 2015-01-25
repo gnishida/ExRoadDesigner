@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Sat Jan 24 10:44:34 2015
+** Created: Sun Jan 25 16:18:56 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -69,6 +69,8 @@ public:
     QPushButton *pushButtonGenerateAliaga;
     QCheckBox *checkBoxSaveRoadImages;
     QCheckBox *checkBoxSavePatchImages;
+    QLabel *label_14;
+    QLineEdit *lineEditSlopeTolerance;
     QWidget *CleanUpTab;
     QGroupBox *groupBox_5;
     QPushButton *pushButtonMerge;
@@ -230,10 +232,16 @@ public:
         pushButtonGenerateAliaga->setGeometry(QRect(60, 270, 51, 28));
         checkBoxSaveRoadImages = new QCheckBox(groupBox_8);
         checkBoxSaveRoadImages->setObjectName(QString::fromUtf8("checkBoxSaveRoadImages"));
-        checkBoxSaveRoadImages->setGeometry(QRect(20, 182, 111, 17));
+        checkBoxSaveRoadImages->setGeometry(QRect(20, 202, 111, 17));
         checkBoxSavePatchImages = new QCheckBox(groupBox_8);
         checkBoxSavePatchImages->setObjectName(QString::fromUtf8("checkBoxSavePatchImages"));
-        checkBoxSavePatchImages->setGeometry(QRect(20, 200, 131, 17));
+        checkBoxSavePatchImages->setGeometry(QRect(20, 220, 131, 17));
+        label_14 = new QLabel(groupBox_8);
+        label_14->setObjectName(QString::fromUtf8("label_14"));
+        label_14->setGeometry(QRect(10, 168, 81, 21));
+        lineEditSlopeTolerance = new QLineEdit(groupBox_8);
+        lineEditSlopeTolerance->setObjectName(QString::fromUtf8("lineEditSlopeTolerance"));
+        lineEditSlopeTolerance->setGeometry(QRect(110, 172, 51, 20));
         TabWidget->addTab(RoadGenerationTab, QString());
         CleanUpTab = new QWidget();
         CleanUpTab->setObjectName(QString::fromUtf8("CleanUpTab"));
@@ -463,6 +471,7 @@ public:
         pushButtonGenerateAliaga->setText(QApplication::translate("ControlWidget", "Aliaga", 0, QApplication::UnicodeUTF8));
         checkBoxSaveRoadImages->setText(QApplication::translate("ControlWidget", "save road images", 0, QApplication::UnicodeUTF8));
         checkBoxSavePatchImages->setText(QApplication::translate("ControlWidget", "save patch images", 0, QApplication::UnicodeUTF8));
+        label_14->setText(QApplication::translate("ControlWidget", "slope tolerance", 0, QApplication::UnicodeUTF8));
         TabWidget->setTabText(TabWidget->indexOf(RoadGenerationTab), QApplication::translate("ControlWidget", "Road", 0, QApplication::UnicodeUTF8));
         groupBox_5->setTitle(QApplication::translate("ControlWidget", "Finalize", 0, QApplication::UnicodeUTF8));
         pushButtonMerge->setText(QApplication::translate("ControlWidget", "Merge", 0, QApplication::UnicodeUTF8));

@@ -33,6 +33,7 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.lineEditInterpolateThreshold1->setText("0.0");
 	ui.lineEditRotationAngle->setText("0.0");
 	ui.lineEditRoadAngleTolerance->setText("60");
+	ui.lineEditSlopeTolerance->setText("36.4");
 	ui.lineEditMaxBlockSizeForPark->setText("250000");
 	ui.checkBoxSaveRoadImages->setChecked(false);
 	ui.checkBoxSavePatchImages->setChecked(false);
@@ -115,6 +116,7 @@ void ControlWidget::generateRoadsEx() {
 	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
+	G::global()["slopeTolerance"] = ui.lineEditSlopeTolerance->text().toFloat() / 180.0f * M_PI;
 	G::global()["saveRoadImages"] = ui.checkBoxSaveRoadImages->isChecked();
 	G::global()["savePatchImages"] = ui.checkBoxSavePatchImages->isChecked();
 
@@ -153,6 +155,7 @@ void ControlWidget::generateRoadsWarp() {
 	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
+	G::global()["slopeTolerance"] = ui.lineEditSlopeTolerance->text().toFloat() / 180.0f * M_PI;
 	G::global()["saveRoadImages"] = ui.checkBoxSaveRoadImages->isChecked();
 	G::global()["savePatchImages"] = ui.checkBoxSavePatchImages->isChecked();
 
@@ -188,6 +191,7 @@ void ControlWidget::generateRoadsPM() {
 	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
+	G::global()["slopeTolerance"] = ui.lineEditSlopeTolerance->text().toFloat() / 180.0f * M_PI;
 	G::global()["saveRoadImages"] = ui.checkBoxSaveRoadImages->isChecked();
 
 	std::vector<ExFeature> features;
