@@ -940,19 +940,6 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 		return;
 	}
 
-	float step = 0.0f;
-	float curvature = 0.0f;
-	int num_steps = 1;
-	if (roadType == RoadEdge::TYPE_AVENUE) {
-		step = f.avgStreetLength;
-		num_steps = ceilf(f.avgAvenueLength / f.avgStreetLength);
-		curvature = f.avgAvenueCurvature;
-	} else {
-		step = f.avgStreetLength;
-		num_steps = 1;
-		curvature = f.avgStreetCurvature;
-	}
-
 	float roadAngleTolerance = G::getFloat("roadAngleTolerance");
 
 	// 当該頂点から出るエッジの方向を取得する
@@ -964,6 +951,26 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 
 		if (RoadGeneratorHelper::isRedundantEdge(roads, srcDesc, direction, roadAngleTolerance)) continue;
 
+		// 統計情報から、ステップ数、長さ、曲率を決定する
+		float step = 0.0f;
+		float curvature = 0.0f;
+		int num_steps = 1;
+		if (roadType == RoadEdge::TYPE_AVENUE) {
+			num_steps = ceilf(f.avgAvenueLength / f.avgStreetLength);
+
+			step = Util::genRandNormal(f.avgStreetLength, f.varStreetLength);
+			if (step < f.avgStreetLength * 0.5f) step = f.avgStreetLength * 0.5f;
+
+			curvature = f.avgAvenueCurvature;
+		} else {
+			num_steps = 1;
+
+			step = Util::genRandNormal(f.avgStreetLength, f.varStreetLength);
+			if (step < f.avgStreetLength * 0.5f) step = f.avgStreetLength * 0.5f;
+
+			curvature = f.avgStreetCurvature;
+		}
+	
 		// 坂が急なら、キャンセル
 		QVector2D pt2 = roads.graph[srcDesc]->pt + QVector2D(cosf(direction), sinf(direction)) * 20.0f;
 		float z2 = vboRenderManager->getTerrainHeight(pt2.x(), pt2.y());
@@ -973,6 +980,8 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 			// 急勾配を上昇する場合は、直線道路にする
 			curvature = 0.0f;
 		}
+
+
 
 		growRoadSegment(roadType, srcDesc, f, step, num_steps, direction, curvature, 1, roadAngleTolerance, seeds);
 	}
