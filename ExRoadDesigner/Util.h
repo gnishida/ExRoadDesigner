@@ -52,6 +52,7 @@ public:
 	static float genRand(float a, float b);
 	static float genRandNormal(float mean, float variance);
 	static int sampleFromCdf(std::vector<float> &cdf);
+	static int sampleFromPdf(std::vector<float> &pdf);
 
 	// Barycentric interpolation
 	static float barycentricInterpolation(const QVector3D& p0, const QVector3D& p1, const QVector3D& p2, const QVector2D& p);

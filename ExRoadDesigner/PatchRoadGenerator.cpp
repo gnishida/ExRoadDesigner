@@ -533,13 +533,48 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 
 	// 次の対応パッチが決まっていない場合、
 	if (!exampleFound) {
+		// ローカルストリートで、且つ、ローカルストリートのエッジが１本もない場合は、PMを使用すること！
+		if (roadType == RoadEdge::TYPE_STREET) {
+			bool edge_found = false;
+			RoadOutEdgeIter ei, eend;
+			for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
+				if (!roads.graph[*ei]->valid) continue;
+				if (roads.graph[*ei]->type == RoadEdge::TYPE_STREET) {
+					edge_found = true;
+					break;
+				}
+			}
+			if (!edge_found) return false;
+		}
+
 		Polyline2D polyline = GraphUtil::getAdjoiningPolyline(roads, srcDesc);
 
-		float min_cost = std::numeric_limits<float>::max();
 		RoadVertexDesc root_desc;
 		RoadVertexDesc connect_desc;
 
 		std::reverse(polyline.begin(), polyline.end());
+		
+		std::vector<float> similarity_scores;
+		for (int i = 0; i < patches.size(); ++i) {
+			// 現在の頂点が属するパッチと、同じパッチは、使わない。
+			// もし使っちゃったら、同じパッチが並んでしまう。
+			if (i == roads.graph[srcDesc]->patchId) {
+				similarity_scores.push_back(0.0f);
+				continue;
+			}
+
+			float dist = patches[i].getMinHausdorffDist(polyline, connect_desc, root_desc);
+			similarity_scores.push_back(expf(-dist));
+		}
+
+		// probability distributionに従って、パッチを決定する
+		int patch_id = Util::sampleFromPdf(similarity_scores);
+
+		// コネクタ、根元を取得
+		patches[patch_id].getMinHausdorffDist(polyline, connect_desc, root_desc);
+
+		/*
+		float min_cost = std::numeric_limits<float>::max();
 		for (int i = 0; i < patches.size(); ++i) {
 			// 現在の頂点が属するパッチと、同じパッチは、使わない。
 			// もし使っちゃったら、同じパッチが並んでしまう。
@@ -555,6 +590,7 @@ bool PatchRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, 
 				root_desc = v_root;
 			}
 		}
+		*/
 
 		// streetの場合は、example_street_descにしないといけないか？
 		// いや、大丈夫。streetのパッチは、元のgraphの頂点IDを、やはりexample_descに格納しているから。
@@ -904,13 +940,16 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 		return;
 	}
 
-	float length = 0.0f;
+	float step = 0.0f;
 	float curvature = 0.0f;
+	int num_steps = 1;
 	if (roadType == RoadEdge::TYPE_AVENUE) {
-		length = f.avgAvenueLength;
+		step = f.avgStreetLength;
+		num_steps = ceilf(f.avgAvenueLength / f.avgStreetLength);
 		curvature = f.avgAvenueCurvature;
 	} else {
-		length = f.avgStreetLength;
+		step = f.avgStreetLength;
+		num_steps = 1;
 		curvature = f.avgStreetCurvature;
 	}
 
@@ -935,7 +974,7 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 			curvature = 0.0f;
 		}
 
-		growRoadSegment(roadType, srcDesc, f, length, direction, curvature, 1, roadAngleTolerance, seeds);
+		growRoadSegment(roadType, srcDesc, f, step, num_steps, direction, curvature, 1, roadAngleTolerance, seeds);
 	}
 }
 
@@ -944,16 +983,7 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
  * この関数は、PM方式での道路生成でのみ使用される。
  * 生成された場合はtrueを返却する。
  */
-bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, ExFeature& f, float length, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
-	int num_steps;
-	float step;
-	if (roadType == RoadEdge::TYPE_AVENUE) {
-		num_steps = 4;
-	} else {
-		num_steps = 1;
-	}
-	step = length / num_steps;
-
+bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, ExFeature& f, float step, int num_steps, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
 	const int num_sub_steps = 5;
 	float sub_step = step / num_sub_steps;
 	
@@ -966,7 +996,7 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, E
 		new_edge->polyline.push_back(roads.graph[curDesc]->pt);
 
 		bool found = false;
-		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, curDesc, step * 2.0f, G::getFloat("seaLevel"), angle, 0.3f, tgtDesc)) {
+		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, curDesc, step * (num_steps - iter) * 2.0f, G::getFloat("seaLevel"), angle, 0.3f, tgtDesc)) {
 			found = true;
 		}
 

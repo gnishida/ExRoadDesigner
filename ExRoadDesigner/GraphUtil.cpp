@@ -1605,6 +1605,11 @@ RoadVertexDesc GraphUtil::cutoffEdge(RoadGraph &roads, RoadEdgeDesc edge, RoadVe
 /**
  * 指定された頂点に接続されたエッジのpolylineを取得する。
  * 隣接頂点のdegreeが2の場合は、その先のエッジも含めたpolylineを取得する。
+ * 返却されるpolylineの0番目には、指定された頂点の座標が格納される。
+ *
+ * @param roads		道路網
+ * @param v_desc	頂点ID
+ * @return			指定された頂点に接続されたエッジのpolyline
  */
 Polyline2D GraphUtil::getAdjoiningPolyline(RoadGraph& roads, RoadVertexDesc v_desc) {
 	Polyline2D polyline;

@@ -413,13 +413,29 @@ float Util::genRandNormal(float mean, float variance) {
 }
 
 int Util::sampleFromCdf(std::vector<float> &cdf) {
-	float rnd = genRand(0, 1);
+	float rnd = genRand(0, cdf.back());
 
 	for (int i = 0; i < cdf.size(); ++i) {
 		if (rnd <= cdf[i]) return i;
 	}
 
 	return cdf.size() - 1;
+}
+
+int Util::sampleFromPdf(std::vector<float> &pdf) {
+	if (pdf.size() == 0) return 0;
+
+	std::vector<float> cdf(pdf.size(), 0.0f);
+	cdf[0] = pdf[0];
+	for (int i = 1; i < pdf.size(); ++i) {
+		if (pdf[i] >= 0) {
+			cdf[i] = cdf[i - 1] + pdf[i];
+		} else {
+			cdf[i] = cdf[i - 1];
+		}
+	}
+
+	return sampleFromCdf(cdf);
 }
 
 /**
