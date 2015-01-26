@@ -388,6 +388,11 @@ bool RoadGeneratorHelper::getVertexForSnapping(VBORenderManager& vboRenderManage
 		float z = vboRenderManager.getMinTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
 		if (z < z_threshold) continue;
 
+		// 共にexampleの場合、元の座標での相対位置と同じなら、スナップしない
+		if (roads.graph[srcDesc]->generationType == "example" && roads.graph[*vi]->generationType == "example") {
+			// ToDo
+		}
+
 		// 既存エッジとの交差をチェック
 		Polyline2D polyline;
 		polyline.push_back(roads.graph[srcDesc]->pt);
@@ -397,57 +402,6 @@ bool RoadGeneratorHelper::getVertexForSnapping(VBORenderManager& vboRenderManage
 		// 適当なコスト関数で、最適な頂点を探す。
 		// 基本的には、距離が近く、角度の差が小さいやつ。でも、係数はむずかしい。。。
 		float cost = dist + Util::diffAngle(angle, angle2) * 100.0; // 1000.0
-
-		if (cost < min_cost) {
-			min_cost = cost;
-			nearest_desc = *vi;
-			found = true;
-		}
-	}
-
-	return found;
-}
-
-/**
- * snap先の頂点を探す。ただし、deadendの頂点は対象外。また、水面下の頂点も対象外。
- * また、方向ベクトルがangle方向からしきい値を超えてる場合、その頂点はスキップする。
- * さらに、距離がdistance_threshold未満であること。
- *
- * @param vboRenderManager		標高を取得するため
- * @param roads					道路グラフ
- * @param pt					snap元の点の座標
- * @param distance_threshold	snap先との距離のしきい値（これより遠い頂点は、対象外）
- * @param z_threshold			snap先までの間の標高のしきい値（これより低い所を通り場合は、対象外）
- * @param angle					snap元頂点からの方向基準
- * @param angle_threshold		方向のしきい値（方向基準からこのしきい値を超える場合は、対象外）
- * @param nearest_desc [OUT]	snap先の頂点ID
- * @return						snap先が見つかった場合はtrueを返却する。
- */
-bool RoadGeneratorHelper::getVertexForSnapping(VBORenderManager& vboRenderManager, RoadGraph& roads, const QVector2D& pt, float distance_threshold, float z_threshold, float angle, float angle_threshold, RoadVertexDesc& nearest_desc) {
-	float distance_threshold2 = distance_threshold * distance_threshold;
-	float min_cost = std::numeric_limits<float>::max();
-	bool found = false;;
-
-	RoadVertexIter vi, vend;
-	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
-		if (!roads.graph[*vi]->valid) continue;
-
-		if (roads.graph[*vi]->deadend) continue;
-
-		QVector2D vec = roads.graph[*vi]->pt - pt;
-		float angle2 = atan2f(vec.y(), vec.x());
-		if (Util::diffAngle(angle, angle2) > angle_threshold) continue;
-
-		float dist = vec.lengthSquared();
-		if (dist > distance_threshold2) continue;
-
-		// snap先が水面下かチェック
-		float z = vboRenderManager.getTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y());
-		if (z < z_threshold) continue;
-
-		// 適当なコスト関数で、最適な頂点を探す。
-		// 基本的には、距離が近く、角度の差が小さいやつ。でも、係数はむずかしい。。。
-		float cost = dist + Util::diffAngle(angle, angle2) * 1000.0;
 
 		if (cost < min_cost) {
 			min_cost = cost;
@@ -496,6 +450,11 @@ bool RoadGeneratorHelper::getEdgeForSnapping(VBORenderManager& vboRenderManager,
 		if (z1 < z_threshold) continue;
 		float z2 = vboRenderManager.getMinTerrainHeight(roads.graph[tgt]->pt.x(), roads.graph[tgt]->pt.y());
 		if (z2 < z_threshold) continue;
+
+		// 共にexampleの場合、元の座標での相対位置と同じなら、スナップしない
+		if (roads.graph[srcDesc]->generationType == "example" && roads.graph[src]->generationType == "example" && roads.graph[tgt]->generationType == "example") {
+			// ToDo
+		}
 
 		QVector2D vec1 = roads.graph[src]->pt - roads.graph[srcDesc]->pt;
 		QVector2D vec2 = roads.graph[tgt]->pt - roads.graph[srcDesc]->pt;
@@ -764,6 +723,7 @@ void RoadGeneratorHelper::removeEdge(RoadGraph& roads, RoadVertexDesc srcDesc, R
 			if (GraphUtil::getDegree(roads, v) == 0) roads.graph[v]->valid = false;
 			if (GraphUtil::getDegree(roads, tgt) == 0) roads.graph[tgt]->valid = false;
 
+			if (tgt == srcDesc) continue;
 			if (visited[tgt]) continue;
 
 			// 上で既に一本のエッジを無効にしているので、もともとdegree=2の頂点は、残り一本だけエッジが残っているはず。
@@ -1393,6 +1353,16 @@ bool RoadGeneratorHelper::submerged(int roadType, const Polyline2D &polyline, VB
 	for (int i = 0; i < polyline.size(); ++i) {
 		float z = vboRenderManager->getTerrainHeight(polyline[i].x(), polyline[i].y());
 		if ((roadType == RoadEdge::TYPE_AVENUE && z < G::getFloat("seaLevelForAvenue")) || (roadType == RoadEdge::TYPE_STREET && z < G::getFloat("seaLevelForStreet"))) return true;		
+	}
+
+	return false;
+}
+
+bool RoadGeneratorHelper::submerged(VBORenderManager* vboRenderManager, Polyline2D& polyline, float seaLevel) {
+	Polyline2D finerPolyline = GraphUtil::finerEdge(polyline, 5.0f);
+	for (int i = 0; i < finerPolyline.size(); ++i) {
+		float z = vboRenderManager->getTerrainHeight(finerPolyline[i].x(), finerPolyline[i].y());
+		if (z < seaLevel) return true;
 	}
 
 	return false;

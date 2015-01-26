@@ -57,7 +57,7 @@ void WarpRoadGenerator::generateRoadNetwork() {
 		}
 
 		int iter;
-		for (iter = 0; !seeds.empty() && iter < G::getInt("numAvenueIterations"); ++iter) {
+		for (iter = 0; !seeds.empty() && iter < G::getInt("numAvenueIterations");) {
 			RoadVertexDesc desc = seeds.front();
 			seeds.pop_front();
 
@@ -66,21 +66,19 @@ void WarpRoadGenerator::generateRoadNetwork() {
 				continue;
 			}
 
-			// エリアの外なら、スキップする
-			if (!targetArea.contains(roads.graph[desc]->pt)) {
-				continue;
-			}
-
 			// 水中なら、伸ばして水中から脱出できるなら伸ばす。
-			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
+			float z = vboRenderManager->getMinTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
 			if (z < G::getFloat("seaLevel")) {
 				// 水中の頂点は、degree=1のはず！！
 				assert(GraphUtil::getDegree(roads, desc) == 1);
 				if (!RoadGeneratorHelper::extendRoadAcrossRiver(roads, vboRenderManager, targetArea, RoadEdge::TYPE_AVENUE, desc, seeds, 0.3f, 200.0f)) {
-					RoadOutEdgeIter ei, eend;
-					boost::tie(ei, eend) = boost::out_edges(desc, roads.graph);
-					RoadGeneratorHelper::removeEdge(roads, desc, *ei);
+					RoadGeneratorHelper::removeEdge(roads, desc);
 				}
+				continue;
+			}
+
+			// エリアの外なら、スキップする
+			if (!targetArea.contains(roads.graph[desc]->pt)) {
 				continue;
 			}
 
@@ -88,15 +86,19 @@ void WarpRoadGenerator::generateRoadNetwork() {
 			
 			int ex_id = defineExId(roads.graph[desc]->pt);
 			attemptConnect(RoadEdge::TYPE_AVENUE, desc, ex_id, features);
-			if (RoadGeneratorHelper::largestAngleBetweenEdges(roads, desc, RoadEdge::TYPE_AVENUE) > M_PI * 1.4f) {
-				if (!attemptExpansion(RoadEdge::TYPE_AVENUE, desc, ex_id, features[ex_id], patches[ex_id], seeds)) {
-					attemptExpansion2(RoadEdge::TYPE_AVENUE, desc, features[ex_id], seeds);
+			if (roads.graph[desc]->valid && GraphUtil::getDegree(roads, desc) < 3) { // 上のコネクトで、現在頂点が消える可能性があるので、このチェックが必要
+				if (RoadGeneratorHelper::largestAngleBetweenEdges(roads, desc, RoadEdge::TYPE_AVENUE) > M_PI * 1.4f) {
+					if (!attemptExpansion(RoadEdge::TYPE_AVENUE, desc, ex_id, features[ex_id], patches[ex_id], seeds)) {
+						attemptExpansion2(RoadEdge::TYPE_AVENUE, desc, ex_id, features[ex_id], seeds);
+					}
 				}
 			}
 
-			char filename[255];
-			sprintf(filename, "road_images/avenues_%d.jpg", iter);
-			RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
+			if (G::getBool("saveRoadImages")) {
+				char filename[255];
+				sprintf(filename, "road_images/avenues_%d.jpg", iter);
+				RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
+			}
 
 			iter++;
 		}
@@ -134,12 +136,16 @@ void WarpRoadGenerator::generateRoadNetwork() {
 				patches[i] = RoadGeneratorHelper::convertToPatch(RoadEdge::TYPE_STREET, features[i].roads(RoadEdge::TYPE_STREET), features[i].roads(RoadEdge::TYPE_AVENUE), shapes[i]);
 			}
 		}
+
+		std::cout << "Local street generation started." << std::endl;
 		
 		int iter;
-		for (iter = 0; !seeds.empty() && iter < G::getInt("numStreetIterations"); ++iter) {
+		for (iter = 0; !seeds.empty() && iter < G::getInt("numStreetIterations");) {
 			RoadVertexDesc desc = seeds.front();
 			seeds.pop_front();
 
+			std::cout << "attemptExpansion (street): " << iter << " (Seed: " << desc << ")" << std::endl;
+			
 			// 既に3つ以上エッジがある場合は、スキップする
 			if (GraphUtil::getDegree(roads, desc) >= 3) {
 				continue;
@@ -147,28 +153,34 @@ void WarpRoadGenerator::generateRoadNetwork() {
 
 			// エリアの外なら、スキップする
 			if (!targetArea.contains(roads.graph[desc]->pt)) {
-				printf("ERROR: this check should have been done before.\n");
 				continue;
 			}
 
-			float z = vboRenderManager->getTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
+			float z = vboRenderManager->getMinTerrainHeight(roads.graph[desc]->pt.x(), roads.graph[desc]->pt.y());
 			if (z < G::getFloat("seaLevel")) {
-				std::cout << "attemptExpansion (street): " << iter << " (skipped because it is under the sea or on the mountains)" << std::endl;
+				// 水中の頂点は、degree=1のはず！！
+				if (GraphUtil::getDegree(roads, desc) > 1) {
+					printf("ERROR!!! the vertex %d on the river has degree > 1.\n", desc);
+				}
+				RoadGeneratorHelper::removeEdge(roads, desc);
 				continue;
 			}
 
-			std::cout << "attemptExpansion (street): " << iter << " (Seed: " << desc << ")" << std::endl;
 			int ex_id = roads.graph[desc]->properties["ex_id"].toInt();
-			//attemptConnect(RoadEdge::TYPE_STREET, desc, features[ex_id], seeds);
-			if (RoadGeneratorHelper::largestAngleBetweenEdges(roads, desc, RoadEdge::TYPE_STREET) > M_PI * 1.4f) {
-				if (!attemptExpansion(RoadEdge::TYPE_STREET, desc, ex_id, features[ex_id], patches[ex_id], seeds)) {
-					attemptExpansion2(RoadEdge::TYPE_STREET, desc, features[ex_id], seeds);
+			attemptConnect(RoadEdge::TYPE_STREET, desc, ex_id, features);
+			if (roads.graph[desc]->valid && GraphUtil::getDegree(roads, desc) < 3) { // 上のコネクトで、現在頂点が消える可能性があるので、このチェックが必要
+				if (RoadGeneratorHelper::largestAngleBetweenEdges(roads, desc, RoadEdge::TYPE_STREET) > M_PI * 0.9f) {
+					if (!attemptExpansion(RoadEdge::TYPE_STREET, desc, ex_id, features[ex_id], patches[ex_id], seeds)) {
+						attemptExpansion2(RoadEdge::TYPE_STREET, desc, ex_id, features[ex_id], seeds);
+					}
 				}
 			}
 
-			char filename[255];
-			sprintf(filename, "road_images/streets_%d.jpg", iter);
-			RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
+			if (G::getBool("saveRoadImages")) {
+				char filename[255];
+				sprintf(filename, "road_images/streets_%d.jpg", iter);
+				RoadGeneratorHelper::saveRoadImage(roads, seeds, filename);
+			}
 
 			iter++;
 		}
@@ -179,7 +191,6 @@ void WarpRoadGenerator::generateRoadNetwork() {
 		GraphUtil::extractRoads2(roads, targetArea);
 	}
 
-	// Local Streetsをクリーンナップ
 	if (G::getBool("cleanStreets")) {
 		RoadGeneratorHelper::removeDanglingEdges(roads);
 	}
@@ -247,7 +258,7 @@ bool WarpRoadGenerator::addAvenueSeed(ExFeature &f, const QVector2D &pt, const Q
 	if (!targetArea.contains(pt)) return false;
 
 	// Avenueカーネルの中で、offsetの位置に最も近いものを探す
-	RoadVertexDesc seedDesc = GraphUtil::getVertex(f.reducedRoads(RoadEdge::TYPE_AVENUE), ex_pt);
+	RoadVertexDesc seedDesc = GraphUtil::getVertex(f.roads(RoadEdge::TYPE_AVENUE), ex_pt);
 
 	// 頂点を追加し、シードとする
 	RoadVertexPtr v = RoadVertexPtr(new RoadVertex(pt));
@@ -258,6 +269,11 @@ bool WarpRoadGenerator::addAvenueSeed(ExFeature &f, const QVector2D &pt, const Q
 	roads.graph[desc]->properties["example_desc"] = seedDesc;
 	roads.graph[desc]->rotationAngle = angle;
 	seeds.push_back(desc);
+
+	float z = vboRenderManager->getTerrainHeight(pt.x(), pt.y());
+	if (z < G::getFloat("seaLevel")) {
+		G::global()["seaLevel"] = z - 0.1f;
+	}
 
 	return true;
 }
@@ -289,7 +305,7 @@ void WarpRoadGenerator::generateStreetSeeds(std::list<RoadVertexDesc> &seeds) {
 				RoadVertexDesc ex_v_desc = roads.graph[*vi]->properties["example_desc"].toUInt();
 
 				RoadVertexDesc seedDesc;
-				if (GraphUtil::getVertex(features[ex_id].reducedRoads(RoadEdge::TYPE_STREET), features[ex_id].reducedRoads(RoadEdge::TYPE_AVENUE).graph[ex_v_desc]->pt, 1.0f, seedDesc)) {
+				if (GraphUtil::getVertex(features[ex_id].roads(RoadEdge::TYPE_STREET), features[ex_id].roads(RoadEdge::TYPE_AVENUE).graph[ex_v_desc]->pt, 1.0f, seedDesc)) {
 					seeds.push_back(*vi);
 					roads.graph[*vi]->properties["example_street_desc"] = seedDesc;
 				}
@@ -309,7 +325,6 @@ void WarpRoadGenerator::generateStreetSeeds(std::list<RoadVertexDesc> &seeds) {
 /**
  * 近くに頂点またはエッジがあるなら、コネクトしちゃう。
  * コネクトできた場合は、trueを返却する。
- * コネクトできなかった場合は、falseを返却する。
  */
 bool WarpRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int ex_id, std::vector<ExFeature>& features) {
 	float length = 0.0f;
@@ -320,6 +335,7 @@ bool WarpRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int
 		length = features[ex_id].avgStreetLength;
 	}
 
+	// スナップする際、許容できる角度
 	float roadAngleTolerance = G::getFloat("roadAngleTolerance");
 
 	std::vector<RoadEdgePtr> edges;
@@ -333,7 +349,7 @@ bool WarpRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int
 		float direction = atan2f((polyline[1] - polyline[0]).y(), (polyline[1] - polyline[0]).x());
 		direction += M_PI;
 
-		if (attemptConnectToVertex(roadType, srcDesc, features, length, G::getFloat("seaLevel"), direction, 0.3f, roadAngleTolerance)) return true;
+		if (attemptConnectToVertex(roadType, srcDesc, features, length, G::getFloat("seaLevel"), direction, 0.78f, roadAngleTolerance)) return true;
 	}
 
 	// 近接エッジを探し、あればコネクトする
@@ -441,24 +457,19 @@ bool WarpRoadGenerator::attemptConnectToVertex(int roadType, RoadVertexDesc srcD
 
 			// スナップ先にとってredundantなら、コネクトしないで、終了。
 			// つまり、trueを返却して、終わったことにしちゃう。
-			/*
-			if (roadType == RoadEdge::TYPE_AVENUE) {
+			{
 				Polyline2D e2;
 				e2.push_back(QVector2D(0, 0));
 				e2.push_back(roads.graph[srcDesc]->pt - roads.graph[nearestDesc]->pt);
 				if (RoadGeneratorHelper::isRedundantEdge(roads, nearestDesc, e2, roadAngleTolerance)) {
 					// もしdegree=1なら、連なるエッジをごっそり削除
-					if (roadType == RoadEdge::TYPE_AVENUE && GraphUtil::getDegree(roads, srcDesc) == 1) {
-						RoadOutEdgeIter ei, eend;
-						for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
-							removeEdge(roads, srcDesc, *ei);
-						}
+					if (GraphUtil::getDegree(roads, srcDesc) == 1) {
+						RoadGeneratorHelper::removeEdge(roads, srcDesc);
 					}
 
 					return true;
 				}
 			}
-			*/
 
 			// コネクトしてtrueを返却する
 			if (!GraphUtil::isIntersect(roads, e->polyline)) {
@@ -533,7 +544,6 @@ bool WarpRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, i
 	}
 	float angle = roads.graph[srcDesc]->rotationAngle;
 
-	//int shape_index;
 	int patch_id;
 
 	RoadGraph replacementGraph;
@@ -548,36 +558,45 @@ bool WarpRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, i
 
 	// 次の対応パッチが決まっていない場合、
 	if (!exampleFound) {
+		// ローカルストリートで、且つ、ローカルストリートのエッジが１本もない場合は、PMを使用すること！
+		if (roadType == RoadEdge::TYPE_STREET) {
+			bool edge_found = false;
+			RoadOutEdgeIter ei, eend;
+			for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
+				if (!roads.graph[*ei]->valid) continue;
+				if (roads.graph[*ei]->type == RoadEdge::TYPE_STREET) {
+					edge_found = true;
+					break;
+				}
+			}
+			if (!edge_found) return false;
+		}
+
 		Polyline2D polyline = GraphUtil::getAdjoiningPolyline(roads, srcDesc);
 
-		float min_cost = std::numeric_limits<float>::max();
 		RoadVertexDesc root_desc;
 		RoadVertexDesc connect_desc;
 
 		std::reverse(polyline.begin(), polyline.end());
 
-		// パッチはangle度回転させられるので、
-		// 事前に、polylineを-angle回転させて、一致するパッチを探す。
-		polyline.translate(-polyline[0]);
-		polyline.rotate(Util::rad2deg(-angle));
-		polyline.translate(polyline[0]);
-
-
+		std::vector<float> similarity_scores;
 		for (int i = 0; i < patches.size(); ++i) {
 			// 現在の頂点が属するパッチと、同じパッチは、使わない。
 			// もし使っちゃったら、同じパッチが並んでしまう。
-			if (i == roads.graph[srcDesc]->patchId) continue;
-
-			RoadVertexDesc v_connector;
-			RoadVertexDesc v_root;
-			float cost = patches[i].getMinCost(polyline, v_connector, v_root);
-			if (cost < min_cost) {
-				min_cost = cost;
-				patch_id = i;
-				connect_desc = v_connector;
-				root_desc = v_root;
+			if (i == roads.graph[srcDesc]->patchId) {
+				similarity_scores.push_back(0.0f);
+				continue;
 			}
+
+			float dist = patches[i].getMinHausdorffDist(polyline, connect_desc, root_desc);
+			similarity_scores.push_back(expf(-dist));
 		}
+
+		// probability distributionに従って、パッチを決定する
+		int patch_id = Util::sampleFromPdf(similarity_scores);
+
+		// コネクタ、根元を取得
+		patches[patch_id].getMinHausdorffDist(polyline, connect_desc, root_desc);
 
 		// streetの場合は、example_street_descにしないといけないか？
 		// いや、大丈夫。streetのパッチは、元のgraphの頂点IDを、やはりexample_descに格納しているから。
@@ -594,61 +613,6 @@ bool WarpRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, i
 		}
 
 		buildReplacementGraphByExample(roadType, replacementGraph, srcDesc, ex_id, f.roads(roadType), ex_v_desc, angle, patches[patch_id], patch_id);
-
-		if (RoadGeneratorHelper::submerged(roadType, replacementGraph, vboRenderManager)) {
-			/*
-			for (int i = 0; i < 32; ++i) {
-				// try the right turn
-				{
-					float angle2 = angle - (float)i * 0.1f;
-					buildReplacementGraphByExample(roadType, replacementGraph, srcDesc, f.reducedRoads(roadType), ex_v_desc, angle2, shapes[shape_index]);
-					if (RoadGeneratorHelper::submerged(roadType, replacementGraph, vboRenderManager)) {
-						break;
-					}
-				}
-
-				// try the left turn
-				{
-					float angle2 = angle + (float)i * 0.1f;
-					buildReplacementGraphByExample(roadType, replacementGraph, srcDesc, f.reducedRoads(roadType), ex_v_desc, angle2, shapes[shape_index]);
-					if (RoadGeneratorHelper::submerged(roadType, replacementGraph, vboRenderManager)) {
-						break;
-					}
-				}
-			}
-			*/
-		}
-
-		if (RoadGeneratorHelper::maxZ(replacementGraph, vboRenderManager) >= 70.0f && RoadGeneratorHelper::diffZ(replacementGraph, vboRenderManager) > 7.0f) {
-			/*
-			float max_rotation = G::getFloat("rotationForSteepSlope");
-			float min_dz = std::numeric_limits<float>::max();
-			float min_angle;
-
-			// try the right turn
-			for (float th = angle; th <= angle + max_rotation; th += 0.1f) {
-				buildReplacementGraphByExample(roadType, replacementGraph, srcDesc, f.reducedRoads(roadType), ex_v_desc, th, shapes[shape_index]);
-				float dz = RoadGeneratorHelper::diffZ(replacementGraph, vboRenderManager);
-				if (dz < min_dz) {
-					min_dz = dz;
-					min_angle = th;
-				}
-			}
-
-			// try the left turn
-			for (float th = angle; th >= angle - max_rotation; th -= 0.1f) {
-				buildReplacementGraphByExample(roadType, replacementGraph, srcDesc, f.reducedRoads(roadType), ex_v_desc, th, shapes[shape_index]);
-				float dz = RoadGeneratorHelper::diffZ(replacementGraph, vboRenderManager);
-				if (dz < min_dz) {
-					min_dz = dz;
-					min_angle = th;
-				}
-			}
-
-			buildReplacementGraphByExample(roadType, replacementGraph, srcDesc, f.reducedRoads(roadType), ex_v_desc, min_angle, shapes[shape_index]);
-			*/
-			return false;
-		}
 	}
 
 	// もしreplacemeng graph が空なら、キャンセル
@@ -664,11 +628,25 @@ bool WarpRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, i
 		return false;
 	}
 		
-	rewrite(roadType, srcDesc, replacementGraph, seeds);
+	rewrite(roadType, srcDesc, replacementGraph, ex_id, seeds);
 
 	return true;
 }
 
+/**
+ * replacement グラフを構築する。ただし、現在頂点srcDescから伸びる既存エッジと重複するエッジは削除しておく。
+ * 生成されたreplacement グラフの座標は、ターゲットグラフのそれに合わせてある。
+ *
+ * @param roadType					道路タイプ (Avenue / local street)
+ * @param replacementGraph [OUT]	構築されたreplacementグラフ
+ * @param srcDesc					ターゲットグラフにおける現在頂点ID
+ * @param ex_id						使用するexampleのID
+ * @param exRoads					example道路グラフ
+ * @param ex_srcDesc				srcDescに対応する、exampleグラフの頂点ID
+ * @param angle						回転させるべき角度
+ * @param patch						使用するパッチ
+ * @param patchId					使用するパッチのID
+ */
 void WarpRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph &replacementGraph, RoadVertexDesc srcDesc, int ex_id, RoadGraph &exRoads, RoadVertexDesc ex_srcDesc, float angle, Patch &patch, int patchId) {
 	replacementGraph.clear();
 
@@ -753,8 +731,8 @@ void WarpRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph &
 }
 
 /**
- * replacement graphを生成する。
- * ただし、既存グラフと接続するコネクタ部分を削除する。
+ * replacement graphを生成する。ただし、既存グラフと接続するコネクタ部分を削除する。
+ * 生成されたreplacement グラフの座標は、ターゲットグラフのそれに合わせてある。
  */
 void WarpRoadGenerator::buildReplacementGraphByExample2(int roadType, RoadGraph &replacementGraph, RoadVertexDesc srcDesc, int ex_id, RoadGraph &exRoads, RoadVertexDesc ex_srcDesc, float angle, Patch &patch, int patchId, RoadVertexDesc v_connect, RoadVertexDesc v_root) {
 	replacementGraph.clear();
@@ -855,7 +833,7 @@ void WarpRoadGenerator::buildReplacementGraphByExample2(int roadType, RoadGraph 
 	GraphUtil::clean(replacementGraph);
 }
 
-void WarpRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph &replacementGraph, std::list<RoadVertexDesc>& seeds) {
+void WarpRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph &replacementGraph, int ex_id, std::list<RoadVertexDesc>& seeds) {
 	QMap<RoadVertexDesc, RoadVertexDesc> conv;
 
 	// add vertices
@@ -865,6 +843,7 @@ void WarpRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph 
 			if (!replacementGraph.graph[*vi]->valid) continue;
 
 			RoadVertexPtr v = RoadVertexPtr(new RoadVertex(*replacementGraph.graph[*vi]));
+			v->generationType = "example";
 			RoadVertexDesc v_desc;
 			if (!GraphUtil::getVertex(roads, replacementGraph.graph[*vi]->pt, 1.0f, v_desc)) {
 				// 頂点を新規追加
@@ -874,15 +853,21 @@ void WarpRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph 
 				if (!targetArea.contains(roads.graph[v_desc]->pt)) {
 					roads.graph[v_desc]->onBoundary = true;
 				} else {
-					roads.graph[v_desc]->onBoundary = true;
+					roads.graph[v_desc]->onBoundary = false;
 				}
 
 				// 新規追加された頂点について、もとのreplacementGraphでconnectorなら、シードに追加
-				if (replacementGraph.graph[*vi]->connector && !roads.graph[v_desc]->onBoundary) {
+				if (replacementGraph.graph[*vi]->connector) {
 					seeds.push_back(v_desc);
 				}
 			} else {
 				roads.graph[v_desc]->properties = replacementGraph.graph[*vi]->properties;
+			}
+
+			roads.graph[v_desc]->properties["ex_id"] = ex_id;
+			roads.graph[v_desc]->properties["group_id"] = roads.graph[srcDesc]->properties["group_id"];
+			if (roadType == RoadEdge::TYPE_STREET) {
+				roads.graph[v_desc]->properties["example_street_desc"] = roads.graph[v_desc]->properties["example_desc"];
 			}
 
 			conv[*vi] = v_desc;
@@ -898,7 +883,7 @@ void WarpRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph 
 			RoadVertexDesc src = boost::source(*ei, replacementGraph.graph);
 			RoadVertexDesc tgt = boost::target(*ei, replacementGraph.graph);
 
-			if (!GraphUtil::hasEdge(roads, conv[src], conv[tgt])) {
+			if (!GraphUtil::hasSimilarEdge(roads, conv[src], conv[tgt], replacementGraph.graph[*ei]->polyline)) {
 				RoadEdgePtr e = RoadEdgePtr(new RoadEdge(*replacementGraph.graph[*ei]));
 				GraphUtil::addEdge(roads, conv[src], conv[tgt], e);
 			}
@@ -911,7 +896,7 @@ void WarpRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph 
  * パッチが使えないケースに使用される。
  * 通常、パッチ間の接着剤として使いたいなぁ。。。
  */
-void WarpRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc, ExFeature& f, std::list<RoadVertexDesc> &seeds) {
+void WarpRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc, int ex_id, ExFeature& f, std::list<RoadVertexDesc> &seeds) {
 	// 要注意！！
 	// 既に標高はチェック済みなので、このチェックは不要のはず！！！
 	float z = vboRenderManager->getMinTerrainHeight(roads.graph[srcDesc]->pt.x(), roads.graph[srcDesc]->pt.y());
@@ -921,19 +906,9 @@ void WarpRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc, 
 		return;
 	}
 
-	float length = 0.0f;
-	float curvature = 0.0f;
-	if (roadType == RoadEdge::TYPE_AVENUE) {
-		length = f.avgAvenueLength;
-		curvature = f.avgAvenueCurvature;
-	} else {
-		length = f.avgStreetLength;
-		curvature = f.avgStreetCurvature;
-	}
-
 	float roadAngleTolerance = G::getFloat("roadAngleTolerance");
 
-	// 当該頂点から出るエッジの方向を決定する
+	// 当該頂点から出るエッジの方向を取得する
 	float direction = RoadGeneratorHelper::getFirstEdgeAngle(roads, srcDesc);
 
 	int cnt = 0;
@@ -941,6 +916,26 @@ void WarpRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc, 
 		direction += M_PI * 0.5f;
 
 		if (RoadGeneratorHelper::isRedundantEdge(roads, srcDesc, direction, roadAngleTolerance)) continue;
+
+		// 統計情報から、ステップ数、長さ、曲率を決定する
+		float step = 0.0f;
+		float curvature = 0.0f;
+		int num_steps = 1;
+		if (roadType == RoadEdge::TYPE_AVENUE) {
+			num_steps = ceilf(f.avgAvenueLength / f.avgStreetLength);
+
+			step = Util::genRandNormal(f.avgStreetLength, f.varStreetLength);
+			if (step < f.avgStreetLength * 0.5f) step = f.avgStreetLength * 0.5f;
+
+			curvature = f.avgAvenueCurvature;
+		} else {
+			num_steps = 1;
+
+			step = Util::genRandNormal(f.avgStreetLength, f.varStreetLength);
+			if (step < f.avgStreetLength * 0.5f) step = f.avgStreetLength * 0.5f;
+
+			curvature = f.avgStreetCurvature;
+		}
 
 		// 坂が急なら、キャンセル
 		QVector2D pt2 = roads.graph[srcDesc]->pt + QVector2D(cosf(direction), sinf(direction)) * 20.0f;
@@ -952,24 +947,16 @@ void WarpRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc, 
 			curvature = 0.0f;
 		}
 
-		growRoadSegment(roadType, srcDesc, length, direction, curvature, 1, roadAngleTolerance, seeds);
+		growRoadSegment(roadType, srcDesc, step, num_steps, direction, curvature, 1, roadAngleTolerance, ex_id, seeds);
 	}
 }
 
 /**
- * 指定されたpolylineに従って、srcDesc頂点からエッジを伸ばす。
- * エッジの端点が、srcDescとは違うセルに入る場合は、falseを返却する。
+ * 指定された方向、ステップ、曲率で、srcDesc頂点からエッジを伸ばす。
+ * この関数は、PM方式での道路生成でのみ使用される。
+ * 生成された場合はtrueを返却する。
  */
-bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, float length, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
-	int num_steps;
-	float step;
-	if (roadType == RoadEdge::TYPE_AVENUE) {
-		num_steps = 4;
-	} else {
-		num_steps = 1;
-	}
-	step = length / num_steps;
-
+bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, float step, int num_steps, float angle, float curvature, int lanes, float angleTolerance, int ex_id, std::list<RoadVertexDesc> &seeds) {
 	const int num_sub_steps = 5;
 	float sub_step = step / num_sub_steps;
 
@@ -982,7 +969,7 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, fl
 		new_edge->polyline.push_back(roads.graph[curDesc]->pt);
 
 		bool found = false;
-		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, curDesc, step * 2.0f, G::getFloat("seaLevel"), angle, 0.3f, tgtDesc)) {
+		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, curDesc, step * (num_steps - iter) * 2.0f, G::getFloat("seaLevel"), angle, 0.3f, tgtDesc)) {
 			found = true;
 		}
 
@@ -1000,7 +987,7 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, fl
 			Polyline2D snapped_polyline;
 			snapped_polyline.push_back(QVector2D(0, 0));
 			snapped_polyline.push_back(QVector2D(new_edge->polyline.back() - roads.graph[tgtDesc]->pt));
-			if (RoadGeneratorHelper::isRedundantEdge(roads, tgtDesc, snapped_polyline, 1.0f)) {
+			if (RoadGeneratorHelper::isRedundantEdge(roads, tgtDesc, snapped_polyline, angleTolerance)) {
 				//（とりあえず、ものすごい鋭角の場合は、必ずキャンセル)
 				cancel = true;
 				break;
@@ -1016,6 +1003,14 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, fl
 				assert(false);
 			}
 
+			// エッジに沿って、水没チェック
+			if (roadType == RoadEdge::TYPE_STREET) {
+				if (RoadGeneratorHelper::submerged(vboRenderManager, new_edge->polyline, G::getFloat("seaLevel"))) {
+					cancel = true;
+					break;
+				}
+			}
+
 			// エッジを生成
 			GraphUtil::addEdge(roads, curDesc, tgtDesc, new_edge);
 
@@ -1023,19 +1018,33 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, fl
 		}
 
 		// snap先がなければ、polylineを１歩伸ばす
+		bool turnLeftByDefault = true;
+		if (Util::genRand(0, 1) < 0.5f) {
+			turnLeftByDefault = false;
+		}
 		for (int sub_iter = 0; sub_iter < num_sub_steps; ++sub_iter) {
 			QVector2D pt = new_edge->polyline.back();
 			float z = vboRenderManager->getMinTerrainHeight(pt.x(), pt.y());
 
-			float angle1 =  angle + curvature / (float)num_sub_steps;
+			//float angle1 =  angle + curvature / (float)num_sub_steps;
+			float angle1 = angle + tanf(curvature) / num_sub_steps;
 			QVector2D pt1 = pt + QVector2D(cosf(angle1), sinf(angle1)) * sub_step;
 			float z1 = vboRenderManager->getMinTerrainHeight(pt1.x(), pt1.y());
 
-			float angle2 =  angle - curvature / (float)num_sub_steps;
+			//float angle2 =  angle - curvature / (float)num_sub_steps;
+			float angle2 = angle - tanf(curvature) / num_sub_steps;
 			QVector2D pt2 = pt + QVector2D(cosf(angle2), sinf(angle2)) * sub_step;
 			float z2 = vboRenderManager->getMinTerrainHeight(pt2.x(), pt2.y());
 
-			if (fabs(z - z1) < fabs(z - z2)) {
+			if (fabs(z - z1) == fabs(z - z2)) {
+				if (turnLeftByDefault) {
+					new_edge->polyline.push_back(pt1);
+					angle = angle1;
+				} else {
+					new_edge->polyline.push_back(pt2);
+					angle = angle2;
+				}
+			} else if (fabs(z - z1) < fabs(z - z2)) {
 				new_edge->polyline.push_back(pt1);
 				angle = angle1;
 			} else {
@@ -1070,7 +1079,7 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, fl
 			tgtDesc = GraphUtil::splitEdge(roads, closestEdge, intPoint);
 			roads.graph[tgtDesc]->generationType = "snapped";
 			roads.graph[tgtDesc]->properties["group_id"] = roads.graph[closestEdge]->properties["group_id"];
-			roads.graph[tgtDesc]->properties["ex_id"] = roads.graph[closestEdge]->properties["ex_id"];
+			roads.graph[tgtDesc]->properties["ex_id"] = ex_id;
 			roads.graph[tgtDesc]->properties.remove("example_desc");
 
 			// エッジを生成
@@ -1092,6 +1101,8 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, fl
 			// 頂点を追加
 			RoadVertexPtr v = RoadVertexPtr(new RoadVertex(new_edge->polyline.back()));
 			v->generationType = "pm";
+			v->properties["ex_id"] = ex_id;
+			v->properties["group_id"] = roads.graph[srcDesc]->properties["group_id"];
 			tgtDesc = GraphUtil::addVertex(roads, v);
 
 			// エリア外なら、onBoundaryフラグをセット

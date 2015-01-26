@@ -325,9 +325,9 @@ QVector2D Util::transform(const QVector2D &pt, const QVector2D &sourcePt, float 
 
 /**
  * 曲率を計算する
+ * 各セグメント間で曲率を計算し、その加重平均を返す。
  */
 float Util::curvature(const Polyline2D &polyline) {
-	/*
 	float curvature = 0.0f;
 	float length = 0.0f;
 
@@ -335,14 +335,15 @@ float Util::curvature(const Polyline2D &polyline) {
 		QVector2D vec1 = (polyline[i + 1] - polyline[i]).normalized();
 		QVector2D vec2 = (polyline[i + 2] - polyline[i + 1]).normalized();
 
-		curvature += (vec1 - vec2).length();
-		length += (polyline[i + 1] - polyline[i]).length();
+		float l = (polyline[i + 1] - polyline[i]).length();
+		curvature += (vec1 - vec2).length() * l;
+		length += l;
 	}
 
 	if (length == 0.0f) return 0.0f;
 	else return curvature / length;
-	*/
 
+	/*
 	float total_diff = 0.0f;
 	int num = 0;
 	for (int i = 0; i < polyline.size() - 2; ++i) {
@@ -356,6 +357,7 @@ float Util::curvature(const Polyline2D &polyline) {
 
 	if (num == 0) return 0.0f;
 	else return total_diff / (float)num;
+	*/
 }
 
 /**

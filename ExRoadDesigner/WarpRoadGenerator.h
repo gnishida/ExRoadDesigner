@@ -36,10 +36,10 @@ private:
 
 	void buildReplacementGraphByExample(int roadType, RoadGraph &replacementGraph, RoadVertexDesc srcDesc, int ex_id, RoadGraph &exRoads, RoadVertexDesc ex_srcDesc, float angle, Patch &patch, int patchId);
 	void buildReplacementGraphByExample2(int roadType, RoadGraph &replacementGraph, RoadVertexDesc srcDesc, int ex_id, RoadGraph &exRoads, RoadVertexDesc ex_srcDesc, float angle, Patch &patch, int patchId, RoadVertexDesc v_connect, RoadVertexDesc v_root);
-	void rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph &replacementGraph, std::list<RoadVertexDesc>& seeds);
+	void rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph &replacementGraph, int ex_id, std::list<RoadVertexDesc>& seeds);
 
-	void attemptExpansion2(int roadType, RoadVertexDesc srcDesc, ExFeature &f, std::list<RoadVertexDesc> &seeds);
-	bool growRoadSegment(int roadType, RoadVertexDesc srcDesc, float length, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds);
+	void attemptExpansion2(int roadType, RoadVertexDesc srcDesc, int ex_id, ExFeature &f, std::list<RoadVertexDesc> &seeds);
+	bool growRoadSegment(int roadType, RoadVertexDesc srcDesc, float step, int num_steps, float angle, float curvature, int lanes, float angleTolerance, int ex_id, std::list<RoadVertexDesc> &seeds);
 
 	int defineExId(const QVector2D& pt);
 };

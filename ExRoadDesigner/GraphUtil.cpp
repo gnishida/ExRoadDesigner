@@ -969,18 +969,21 @@ bool GraphUtil::isSimilarPolyline(const Polyline2D &polyline1, const Polyline2D 
 	if (polyline1.length() - polyline2.length() > 100.0f) return false;
 
 	Polyline2D polyline2b = polyline2;
-	if (Util::rad2deg(Util::diffAngle(polyline1.last() - polyline1[0], polyline2.last() - polyline2[0])) > 90.0f) {
+	if (QVector2D::dotProduct((polyline1.back() - polyline1[0]).normalized(), (polyline2.back() - polyline2[0]).normalized()) < 0.0f) {
+	//if (Util::rad2deg(Util::diffAngle(polyline1.last() - polyline1[0], polyline2.last() - polyline2[0])) > 90.0f) {
 		std::reverse(polyline2b.begin(), polyline2b.end());
 	}
 
 	// 端点の方向ベクトルをチェック
-	if (Util::rad2deg(Util::diffAngle(polyline1.last() - polyline1[0], polyline2b.last() - polyline2b[0])) > 10.0f) return false;
+	//if (Util::rad2deg(Util::diffAngle(polyline1.last() - polyline1[0], polyline2b.last() - polyline2b[0])) > 10.0f) return false;
 
 	// 最初の方向ベクトルをチェック
-	if (Util::rad2deg(Util::diffAngle(polyline1[1] - polyline1[0], polyline2b[1] - polyline2b[0])) > 10.0f) return false;
+	if (QVector2D::dotProduct((polyline1[1] - polyline1[0]).normalized(), (polyline2b[1] - polyline2b[0]).normalized()) < 0.8f) return false;
+	//if (Util::rad2deg(Util::diffAngle(polyline1[1] - polyline1[0], polyline2b[1] - polyline2b[0])) > 10.0f) return false;
 
 	// 最後の方向ベクトルをチェック
-	if (Util::rad2deg(Util::diffAngle(polyline1.last() - polyline1.nextLast(), polyline2b.last() - polyline2b.nextLast())) > 10.0f) return false;
+	if (QVector2D::dotProduct((polyline1.back() - polyline1.nextLast()).normalized(), (polyline2b.back() - polyline2b.nextLast()).normalized()) < 0.8f) return false;
+	//if (Util::rad2deg(Util::diffAngle(polyline1.last() - polyline1.nextLast(), polyline2b.last() - polyline2b.nextLast())) > 10.0f) return false;
 
 	return true;
 }
