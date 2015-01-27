@@ -99,9 +99,9 @@ void GLWidget3D::mousePressEvent(QMouseEvent *event) {
 					if (event->buttons() & Qt::LeftButton) {
 						vboRenderManager.vboTerrain.updateGaussian(xM, yM, height, radi);
 					} else if (event->buttons() & Qt::RightButton) {
-						vboRenderManager.vboTerrain.excavate(xM, yM, height, radi);
+						vboRenderManager.vboTerrain.updateGaussian(xM, yM, -height, radi);
 					} else if (event->buttons() & Qt::MiddleButton) {
-						vboRenderManager.vboTerrain.updateGaussian(xM, yM, FLT_MAX, radi);
+						vboRenderManager.vboTerrain.excavate(xM, yM, height, radi);
 					}
 
 					shadow.makeShadowMap(this);
@@ -306,9 +306,9 @@ void GLWidget3D::mouseMoveEvent(QMouseEvent *event) {
 					if (event->buttons() & Qt::LeftButton) {
 						vboRenderManager.vboTerrain.updateGaussian(xM, yM, height * 0.2f, radi);
 					} else if (event->buttons() & Qt::RightButton) {
-						vboRenderManager.vboTerrain.excavate(xM, yM, height, radi);
+						vboRenderManager.vboTerrain.updateGaussian(xM, yM, -height * 0.2f, radi);
 					} else if (event->buttons() & Qt::MiddleButton) {
-						vboRenderManager.vboTerrain.updateGaussian(xM, yM, FLT_MAX, radi);
+						vboRenderManager.vboTerrain.excavate(xM, yM, height, radi);
 					}
 
 					shadow.makeShadowMap(this);
