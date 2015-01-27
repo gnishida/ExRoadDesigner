@@ -14,13 +14,13 @@ Area:    segments.area
 
 3) Amsterdam
    Clean Avenues [ON]
-   Avenue patch dist: 100
+   Avenue patch dist: 80
    
 4) Barcelona
    Clean Avenues [ON]
-   Avenue patch dist: 100
+   Avenue patch dist: 80
  
-5) Holywood
+5) Canberra //Holywood
    Clean Avenues [ON]
    Avenue patch dist: 100
  
@@ -42,7 +42,7 @@ Area:    segments_updated.area
 
 3) Amsterdam
    Clean Avenues [ON]
-   Avenue patch dist: 100
+   Avenue patch dist: 80
    
 4) Quito
    Clean Avenues [ON]
@@ -50,9 +50,9 @@ Area:    segments_updated.area
 
 5) Barcelona
    Clean Avenues [ON]
-   Avenue patch dist: 100
+   Avenue patch dist: 80
  
-6) Holywood
+6) Canberra //Holywood
    Clean Avenues [ON]
    Avenue patch dist: 100
  

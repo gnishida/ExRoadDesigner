@@ -34,10 +34,6 @@ public:
 
 	static void createFourDirection(float direction, std::vector<float> &directions);
 	static Polyline2D createOneEdge(int roadType, float length, float curvature, float angle, float step_size);
-	static void createFourEdges(ExFeature &f, int roadType, const QVector2D &ex_pt, int lanes, float direction, float step, std::vector<RoadEdgePtr> &edges);
-
-	static void chooseEdgeLengthAndCurvature(RoadGraph &roads, float angle, std::vector<RoadEdgeDescs> &shapes, float &length, float &curvature, int &lanes);
-	static void chooseEdgeLengthAndCurvature(RoadGraph &roads, const QVector2D &ex_pt, float distance, float direction, float &length, float &curvature);
 
 	static bool extendRoadAcrossRiver(RoadGraph& roads, VBORenderManager* vboRenderManager, Polygon2D& targetArea, int roadType, RoadVertexDesc v_desc, std::list<RoadVertexDesc> &seeds, float angle_threshold, float max_length);
 	static void clearBoundaryFlag(RoadGraph& roads);
@@ -67,10 +63,6 @@ public:
 	static void removeIntersectionsOnRiver(RoadGraph &roads, VBORenderManager *vboRenderManager, float seaLevel);
 	static void removeSmallBlocks(RoadGraph &roads, float minArea);
 	
-	static int getRelativeDirectionInArea(const BBox &bbox, const QVector2D &pt);
-
-	static bool isWithinScaledArea(const Polygon2D &area, float factor, const QVector2D &pt);
-
 	static bool isShape(RoadGraph &roads, RoadVertexDesc desc, std::vector<RoadEdgeDescs> &shapes, int &shape_index);
 	static std::vector<Patch> convertToPatch(int roadType, RoadGraph& roads, RoadGraph& avenues, std::vector<RoadEdgeDescs> &shapes);
 	static void markConnectorToEdge(RoadGraph &roads, RoadVertexDesc srcDesc);

@@ -30,7 +30,6 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.lineEditPatchDistance2->setText("20");
 	ui.lineEditInterpolateSigma1->setText("0.2");
 	ui.lineEditInterpolateSigma2->setText("0.2");
-	ui.lineEditInterpolateThreshold1->setText("0.0");
 	ui.lineEditRotationAngle->setText("0.0");
 	ui.lineEditRoadAngleTolerance->setText("60");
 	ui.lineEditSlopeTolerance->setText("36.4");
@@ -113,7 +112,6 @@ void ControlWidget::generateRoadsEx() {
 	G::global()["streetPatchDistance"] = ui.lineEditPatchDistance2->text().toFloat();
 	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
-	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 	G::global()["slopeTolerance"] = ui.lineEditSlopeTolerance->text().toFloat() / 180.0f * M_PI;
@@ -152,7 +150,6 @@ void ControlWidget::generateRoadsWarp() {
 	G::global()["streetPatchDistance"] = ui.lineEditPatchDistance2->text().toFloat();
 	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
-	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 	G::global()["slopeTolerance"] = ui.lineEditSlopeTolerance->text().toFloat() / 180.0f * M_PI;
@@ -188,7 +185,6 @@ void ControlWidget::generateRoadsPM() {
 
 	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
-	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 	G::global()["slopeTolerance"] = ui.lineEditSlopeTolerance->text().toFloat() / 180.0f * M_PI;
@@ -222,7 +218,6 @@ void ControlWidget::generateRoadsAliaga() {
 
 	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
-	G::global()["interpolationThreshold1"] = ui.lineEditInterpolateThreshold1->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadAngleTolerance"] = ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 	G::global()["saveRoadImages"] = ui.checkBoxSaveRoadImages->isChecked();
