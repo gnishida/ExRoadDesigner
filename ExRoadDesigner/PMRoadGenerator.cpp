@@ -9,6 +9,7 @@
 #include "RoadGeneratorHelper.h"
 #include "SmallBlockRemover.h"
 #include "ShapeDetector.h"
+#include <assert.h>
 
 void PMRoadGenerator::generateRoadNetwork() {
 	srand(12345);
@@ -36,12 +37,11 @@ void PMRoadGenerator::generateRoadNetwork() {
 
 	std::list<RoadVertexDesc> seeds;
 
-	int video_frame_id = 0;
-
 	// Avenueのシードを生成
 	generateAvenueSeeds(seeds);
 
 	// Avenueを生成
+	std::cout << "Avenue generation started." << std::endl;
 	{
 		int iter;
 		for (iter = 0; !seeds.empty() && iter < G::getInt("numAvenueIterations"); ) {
@@ -53,7 +53,7 @@ void PMRoadGenerator::generateRoadNetwork() {
 			if (z < G::getFloat("seaLevel")) {
 				// 水中の頂点は、degree=1のはず！！
 				assert(GraphUtil::getDegree(roads, desc) == 1);
-				if (!RoadGeneratorHelper::extendRoadAcrossRiver(roads, vboRenderManager, targetArea, RoadEdge::TYPE_AVENUE, desc, seeds, 0.3f, 200.0f)) {
+				if (!RoadGeneratorHelper::extendRoadAcrossRiver(roads, vboRenderManager, targetArea, RoadEdge::TYPE_AVENUE, desc, seeds, 0.3f, G::getFloat("acrossRiverTolerance"))) {
 					RoadGeneratorHelper::removeEdge(roads, desc);
 				}
 				continue;
@@ -76,6 +76,7 @@ void PMRoadGenerator::generateRoadNetwork() {
 			iter++;
 		}
 	}
+	std::cout << "Avenue generation completed." << std::endl;
 
 	seeds.clear();
 
@@ -102,6 +103,8 @@ void PMRoadGenerator::generateRoadNetwork() {
 			RoadVertexDesc desc = seeds.front();
 			seeds.pop_front();
 
+			std::cout << "attemptExpansion (street): " << iter << " (Seed: " << desc << ")" << std::endl;
+
 			// エリアの外なら、スキップする
 			if (!targetArea.contains(roads.graph[desc]->pt)) {
 				continue;
@@ -113,16 +116,10 @@ void PMRoadGenerator::generateRoadNetwork() {
 				if (GraphUtil::getDegree(roads, desc) > 1) {
 					printf("ERROR!!! the vertex %d on the river has degree > 1.\n", desc);
 				}
-				//assert(GraphUtil::getDegree(roads, desc) == 1);
-
-				RoadOutEdgeIter ei, eend;
-				boost::tie(ei, eend) = boost::out_edges(desc, roads.graph);
-				RoadGeneratorHelper::removeEdge(roads, desc, *ei);
-				
+				RoadGeneratorHelper::removeEdge(roads, desc);
 				continue;
 			}
 
-			std::cout << "attemptExpansion (street): " << iter << " (Seed: " << desc << ")" << std::endl;
 			attemptExpansion(RoadEdge::TYPE_STREET, desc, seeds);
 
 			if (G::getBool("saveRoadImages")) {
@@ -207,9 +204,6 @@ void PMRoadGenerator::generateStreetSeeds(std::list<RoadVertexDesc> &seeds) {
 			if (vboRenderManager->getMinTerrainHeight(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y()) < G::getFloat("seaLevel")) continue;
 
 			if (GraphUtil::getDegree(roads, *vi) == 2) {
-				//int ex_id = defineExId(roads.graph[*vi]->pt);
-				//roads.graph[*vi]->properties["ex_id"] = ex_id;
-
 				seeds.push_back(*vi);
 			}
 		}
@@ -251,7 +245,6 @@ void PMRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, std
 		}
 
 		// 統計情報から、ステップ数、長さ、曲率を決定する
-		bool uphill = false;
 		float interpolated_num_steps = 0.0f;
 		float interpolated_step = 0.0f;
 		float interpolated_curvature = 0.0f;
@@ -288,7 +281,7 @@ void PMRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, std
 			//uphill = true;
 		}
 
-		growRoadSegment(roadType, srcDesc, interpolated_step, interpolated_num_steps, direction, interpolated_curvature, uphill, 1, roadAngleTolerance, seeds);
+		growRoadSegment(roadType, srcDesc, interpolated_step, interpolated_num_steps, direction, interpolated_curvature, 1, roadAngleTolerance, seeds);
 	}
 }
 
@@ -296,7 +289,7 @@ void PMRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, std
  * 指定されたpolylineに従って、srcDesc頂点からエッジを伸ばす。
  * エッジの端点が、srcDescとは違うセルに入る場合は、falseを返却する。
  */
-bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, float step, int num_steps, float angle, float curvature, bool uphill, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
+bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, float step, int num_steps, float angle, float curvature, int lanes, float angleTolerance, std::list<RoadVertexDesc> &seeds) {
 	const int num_sub_steps = 5;
 	float sub_step = step / num_sub_steps;
 	
@@ -327,7 +320,7 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, floa
 			Polyline2D snapped_polyline;
 			snapped_polyline.push_back(QVector2D(0, 0));
 			snapped_polyline.push_back(QVector2D(new_edge->polyline.back() - roads.graph[tgtDesc]->pt));
-			if (RoadGeneratorHelper::isRedundantEdge(roads, tgtDesc, snapped_polyline, 1.0f)) {
+			if (RoadGeneratorHelper::isRedundantEdge(roads, tgtDesc, snapped_polyline, angleTolerance)) {
 				//（とりあえず、ものすごい鋭角の場合は、必ずキャンセル)
 				cancel = true;
 				break;
@@ -357,13 +350,11 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, floa
 			QVector2D pt2 = pt + QVector2D(cosf(angle), sinf(angle)) * sub_step;
 			float z2 = vboRenderManager->getMinTerrainHeight(pt2.x(), pt2.y());
 
-			if (uphill) {
-				new_edge->polyline.push_back(pt2);
-			} else {
-				if (fabs(z - z2) > 2.5f) {
-					curvature = 0.3f;
-				}
+			if (fabs(z - z2) > 2.5f) {
+				curvature = 0.3f;
+			}
 
+			{
 				float angle1 =  angle + curvature / (float)num_sub_steps;
 				QVector2D pt1 = pt + QVector2D(cosf(angle1), sinf(angle1)) * sub_step;
 				float z1 = vboRenderManager->getMinTerrainHeight(pt1.x(), pt1.y());
@@ -408,7 +399,6 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, floa
 			tgtDesc = GraphUtil::splitEdge(roads, closestEdge, intPoint);
 			roads.graph[tgtDesc]->generationType = "snapped";
 			roads.graph[tgtDesc]->properties["group_id"] = roads.graph[closestEdge]->properties["group_id"];
-			roads.graph[tgtDesc]->properties["ex_id"] = roads.graph[closestEdge]->properties["ex_id"];
 			roads.graph[tgtDesc]->properties.remove("example_desc");
 
 			// エッジを生成
@@ -430,6 +420,7 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, floa
 			// 頂点を追加
 			RoadVertexPtr v = RoadVertexPtr(new RoadVertex(new_edge->polyline.back()));
 			v->generationType = "pm";
+			v->properties["group_id"] = roads.graph[srcDesc]->properties["group_id"];
 			tgtDesc = GraphUtil::addVertex(roads, v);
 
 			// エリア外なら、onBoundaryフラグをセット

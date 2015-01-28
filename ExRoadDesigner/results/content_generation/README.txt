@@ -4,6 +4,8 @@
 Terrain: content.png
 Area:    segments.area
 
+Set "Across River" 300, instead of 200!
+
 1) Strasbourg
    Clean Avenues [ON]
    Avenue patch dist: 80

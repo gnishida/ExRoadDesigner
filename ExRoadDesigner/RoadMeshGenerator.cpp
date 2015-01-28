@@ -518,6 +518,7 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 		RoadVertexIter vi, vend;
 		for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
 			if (!roads.graph[*vi]->valid) continue;
+			if (GraphUtil::getDegree(roads, *vi) == 0) continue;
 
 			// get the largest width of the outing edges
 			QColor color;// = graph[*ei]->color;

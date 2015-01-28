@@ -19,6 +19,13 @@ void WarpRoadGenerator::generateRoadNetwork() {
 		RoadVertexIter vi, vend;
 		for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
 			roads.graph[*vi]->fixed = true;
+
+			// 既存頂点のexample_descを削除する。
+			// だって、今使っているexampleとは違うから、もはや意味が無い。
+			roads.graph[*vi]->generationType = "pm";
+			roads.graph[*vi]->properties.remove("ex_id");
+			roads.graph[*vi]->properties.remove("example_desc");
+			roads.graph[*vi]->properties.remove("example_street_desc");
 		}
 	}
 
@@ -71,7 +78,7 @@ void WarpRoadGenerator::generateRoadNetwork() {
 			if (z < G::getFloat("seaLevel")) {
 				// 水中の頂点は、degree=1のはず！！
 				assert(GraphUtil::getDegree(roads, desc) == 1);
-				if (!RoadGeneratorHelper::extendRoadAcrossRiver(roads, vboRenderManager, targetArea, RoadEdge::TYPE_AVENUE, desc, seeds, 0.3f, 200.0f)) {
+				if (!RoadGeneratorHelper::extendRoadAcrossRiver(roads, vboRenderManager, targetArea, RoadEdge::TYPE_AVENUE, desc, seeds, 0.3f, G::getFloat("acrossRiverTolerance"))) {
 					RoadGeneratorHelper::removeEdge(roads, desc);
 				}
 				continue;
@@ -249,9 +256,12 @@ void WarpRoadGenerator::generateAvenueSeeds(std::list<RoadVertexDesc>& seeds) {
  * Avenue用のシードを座標pt付近に追加する。
  * 座標pt付近の、該当するカーネルを捜し、そのカーネルを使ってシードを追加する。
  *
- * @param area			ターゲット領域
  * @param f				特徴量
- * @param pt			シード座標
+ * @param pt			ターゲット領域におけるシード座標
+ * @param ex_pt			Exampleでの初期点座標
+ * @param group_id		group ID
+ * @param ex_id			example ID
+ * @param angle			回転角度 [rad]
  * @param seeds			追加されたシードは、seedsに追加される。
  */
 bool WarpRoadGenerator::addAvenueSeed(ExFeature &f, const QVector2D &pt, const QVector2D &ex_pt, int group_id, int ex_id, float angle, std::list<RoadVertexDesc>& seeds) {
@@ -401,7 +411,7 @@ bool WarpRoadGenerator::attemptConnectToVertex(int roadType, RoadVertexDesc srcD
 
 			// その頂点のexample_descと、この頂点のexample_descの位置関係と、実際の位置関係が同じ場合、
 			// patch適用でピッタリはまるはずなので、connectしない。
-			{
+			if (roads.graph[srcDesc]->properties.contains("ex_id")) {
 				RoadVertexDesc ex_v1_desc;
 				RoadVertexDesc ex_v2_desc;
 				int pre_ex_id = roads.graph[srcDesc]->properties["ex_id"].toInt();
@@ -412,7 +422,7 @@ bool WarpRoadGenerator::attemptConnectToVertex(int roadType, RoadVertexDesc srcD
 						has_ex_v1 = true;
 						ex_v1_desc = roads.graph[srcDesc]->properties["example_desc"].toUInt();
 					}
-					if (roads.graph[nearestDesc]->properties["ex_id"].toInt() == pre_ex_id) {
+					if (roads.graph[nearestDesc]->properties.contains("ex_id") && roads.graph[nearestDesc]->properties["ex_id"].toInt() == pre_ex_id) {
 						if (roads.graph[nearestDesc]->properties.contains("example_desc")) {
 							has_ex_v2 = true;
 							ex_v2_desc = roads.graph[nearestDesc]->properties["example_desc"].toUInt();
@@ -423,7 +433,7 @@ bool WarpRoadGenerator::attemptConnectToVertex(int roadType, RoadVertexDesc srcD
 						has_ex_v1 = true;
 						ex_v1_desc = roads.graph[srcDesc]->properties["example_street_desc"].toUInt();
 					}
-					if (roads.graph[nearestDesc]->properties["ex_id"].toInt() == pre_ex_id) {
+					if (roads.graph[nearestDesc]->properties.contains("ex_id") && roads.graph[nearestDesc]->properties["ex_id"].toInt() == pre_ex_id) {
 						if (roads.graph[nearestDesc]->properties.contains("example_street_desc")) {
 							has_ex_v2 = true;
 							ex_v2_desc = roads.graph[nearestDesc]->properties["example_street_desc"].toUInt();
@@ -501,11 +511,13 @@ bool WarpRoadGenerator::attemptConnectToEdge(int roadType, RoadVertexDesc srcDes
 		RoadEdgeDesc nearestEdgeDesc;
 		QVector2D intPoint;
 		if (RoadGeneratorHelper::getEdgeForSnapping(*vboRenderManager, roads, srcDesc, dist_threshold, G::getFloat("seaLevel"), direction, angle_threshold, nearestEdgeDesc, intPoint)) {
+			RoadVertexDesc nearestVertexDesc = boost::source(nearestEdgeDesc, roads.graph);
+
 			// エッジにスナップ
 			nearestDesc = GraphUtil::splitEdge(roads, nearestEdgeDesc, intPoint);
 			roads.graph[nearestDesc]->generationType = "snapped";
-			roads.graph[nearestDesc]->properties["group_id"] = roads.graph[nearestEdgeDesc]->properties["group_id"];
-			roads.graph[nearestDesc]->properties["ex_id"] = roads.graph[nearestEdgeDesc]->properties["ex_id"];
+			roads.graph[nearestDesc]->properties["group_id"] = roads.graph[nearestVertexDesc]->properties["group_id"];
+			roads.graph[nearestDesc]->properties["ex_id"] = roads.graph[nearestVertexDesc]->properties["ex_id"];
 			roads.graph[nearestDesc]->properties.remove("example_desc");
 
 			RoadEdgePtr e = RoadEdgePtr(new RoadEdge(roadType, 1));
@@ -617,6 +629,52 @@ bool WarpRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, i
 
 	// もしreplacemeng graph が空なら、キャンセル
 	if (boost::num_edges(replacementGraph.graph) == 0) return false;
+
+	// 山チェック
+	if (RoadGeneratorHelper::maxZ(replacementGraph, vboRenderManager) > 70.0f && RoadGeneratorHelper::diffSlope(replacementGraph, vboRenderManager) > 0.3f) {
+		float max_rotation = M_PI * 0.166f;
+		float min_slope = std::numeric_limits<float>::max();
+		float min_rotation;
+
+		RoadGraph backup;
+		GraphUtil::copyRoads(replacementGraph, backup);
+
+		// try the turn in CCW direction
+		// Note: th is the rotation angle in addition to the current rotaion angle "angle"
+		for (float th = 0; th <= max_rotation; th += 0.1f) {
+			GraphUtil::copyRoads(backup, replacementGraph);
+			GraphUtil::rotate(replacementGraph, th, roads.graph[srcDesc]->pt);
+			float diffSlope = RoadGeneratorHelper::diffSlope(replacementGraph, vboRenderManager);
+			if (diffSlope < min_slope) {
+				min_slope = diffSlope;
+				min_rotation = th;
+			}
+		}
+
+		// try the turn in CW direction
+		// Note: th is the rotation angle in addition to the current rotaion angle "angle"
+		for (float th = 0; th >= -max_rotation; th -= 0.1f) {
+			GraphUtil::copyRoads(backup, replacementGraph);
+			GraphUtil::rotate(replacementGraph, th, roads.graph[srcDesc]->pt);
+			float diffSlope = RoadGeneratorHelper::diffSlope(replacementGraph, vboRenderManager);
+			if (diffSlope < min_slope) {
+				min_slope = diffSlope;
+				min_rotation = th;
+			}
+		}
+
+		// 回転しても駄目なら、exampleを使用しない
+		if (min_slope > 0.3f) return false;
+
+		GraphUtil::copyRoads(backup, replacementGraph);
+		GraphUtil::rotate(replacementGraph, min_rotation, roads.graph[srcDesc]->pt);
+
+		// rotationAngleを設定
+		RoadVertexIter vi, vend;
+		for (boost::tie(vi, vend) = boost::vertices(replacementGraph.graph); vi != vend; ++vi) {
+			replacementGraph.graph[*vi]->rotationAngle = angle + min_rotation;
+		}
+	}
 
 	// 川チェック
 	if (RoadGeneratorHelper::minZ(replacementGraph, vboRenderManager, true) < G::getFloat("seaLevel")) {
@@ -911,7 +969,6 @@ void WarpRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc, 
 	// 当該頂点から出るエッジの方向を取得する
 	float direction = RoadGeneratorHelper::getFirstEdgeAngle(roads, srcDesc);
 
-	int cnt = 0;
 	for (int i = 0; i < 4; ++i) {
 		direction += M_PI * 0.5f;
 
@@ -940,7 +997,7 @@ void WarpRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc, 
 		// 坂が急なら、キャンセル
 		QVector2D pt2 = roads.graph[srcDesc]->pt + QVector2D(cosf(direction), sinf(direction)) * 20.0f;
 		float z2 = vboRenderManager->getTerrainHeight(pt2.x(), pt2.y());
-		if (z2 - z > 10.0f) {
+		if (z2 - z > tanf(G::getFloat("slopeTolerance")) * 20.0f) {
 			if (Util::genRand(0, 1) < 0.8f) return;
 
 			// 急勾配を上昇する場合は、直線道路にする
@@ -1143,7 +1200,17 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, fl
 	}
 }
 
+/**
+ * 指定した点に基づき、どのexampleを使用するか、各exampleのシード点からの距離に基づいて、
+ * ガウス分布の乱数を使って、決定する。
+ *
+ * @param pt		指定した点
+ * @return			example ID
+ */
 int WarpRoadGenerator::defineExId(const QVector2D& pt) {
+	// ターゲットエリアの長さを、距離のcanonical formの計算に使用する
+	float D = targetArea.envelope().dx();
+
 	std::vector<float> sigma;
 	sigma.push_back(G::getDouble("interpolationSigma1"));
 	sigma.push_back(G::getDouble("interpolationSigma2"));
@@ -1153,37 +1220,17 @@ int WarpRoadGenerator::defineExId(const QVector2D& pt) {
 
 	int numSeedsPerEx = hintLine.size() / features.size();
 
-	float* pdf = new float[hintLine.size()];
+	std::vector<float> pdf;
 	for (int i = 0; i < features.size(); ++i) {
 		for (int j = 0; j < numSeedsPerEx; ++j) {
 			int index = i * numSeedsPerEx + j;
-
-			//float dist = (hintLine[index] - pt).length();
 			
 			// とりあえずblending用に、X軸方向での距離だけを使用してみよう
-			float dist = fabs((hintLine[index] - pt).x());
-
-			if (dist == 0.0f) dist = 0.01f;
-			float cdf = sigma[i] / dist;
-
-			if (index == 0) {
-				pdf[index] = cdf;
-			} else {
-				pdf[index] = pdf[index - 1] + cdf;
-			}
+			float dist = (hintLine[index] - pt).x() / D;
+			
+			pdf.push_back(expf(-SQR(dist) / SQR(sigma[i]) * 2.0f));
 		}
 	}
 
-	float rand = Util::genRand(0.0f, pdf[hintLine.size() - 1]);
-	for (int i = 0; i < features.size(); ++i) {
-		for (int j = 0; j < numSeedsPerEx; ++j) {
-			int index = i * numSeedsPerEx + j;
-
-			if (rand < pdf[index]) {
-				return i;
-			}
-		}
-	}
-
-	return features.size() - 1;
+	return Util::sampleFromPdf(pdf) / numSeedsPerEx;
 }

@@ -2003,7 +2003,7 @@ void RoadGeneratorHelper::saveRoadImage(RoadGraph& roads, std::list<RoadVertexDe
 		}
 
 		// 頂点IDを描画
-		QString str = QString::number(*vi);
+		QString str = QString::number(*vi) + "/" + roads.graph[*vi]->properties["ex_id"].toString();
 		cv::putText(img, str.toUtf8().data(), cv::Point(x, y), cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1);
 	}
 

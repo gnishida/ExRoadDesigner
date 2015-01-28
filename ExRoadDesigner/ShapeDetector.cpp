@@ -201,8 +201,10 @@ void ShapeDetector::addVerticesToCircle(RoadGraph &roads, RoadEdgeDescs& shape, 
 			//if (usedEdges.contains(*ei)) continue;
 
 			if (!usedEdges.contains(*ei)) {
-				shape.push_back(*ei);
 				usedEdges[*ei] = 1;
+			}
+			if (std::find(shape.begin(), shape.end(), *ei) == shape.end()) {
+				shape.push_back(*ei);
 			}
 			edge_descs[*ei] = true;
 			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
@@ -214,7 +216,18 @@ void ShapeDetector::addVerticesToCircle(RoadGraph &roads, RoadEdgeDescs& shape, 
 			if (roads.graph[desc]->properties.contains("length")) {
 				length = roads.graph[desc]->properties["length"].toFloat();
 			}
-			if (GraphUtil::getDegree(roads, tgt) <= 2 || length + roads.graph[*ei]->polyline.length() <= threshold) {
+
+			// 頂点tgtのdegreeを計算する。ただし、edge_descsがtrueになっているエッジの数はカウントに入れない。
+			int degree = 0;
+			RoadOutEdgeIter ei2, eend2;
+			for (boost::tie(ei2, eend2) = boost::out_edges(tgt, roads.graph); ei2 != eend2; ++ei2) {
+				if (!roads.graph[*ei2]->valid) continue;
+				if (edge_descs.contains(*ei2)) continue;
+				degree++;
+			}
+
+			// 頂点tgtのdegree==1、または、現在の頂点から頂点tgtまでの距離が近いなら、その先に延ばしていく
+			if (degree == 1 || length + roads.graph[*ei]->polyline.length() <= threshold) {
 				queue.push_back(tgt);
 				visited[tgt] = true;
 

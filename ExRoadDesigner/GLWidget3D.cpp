@@ -499,10 +499,12 @@ void GLWidget3D::drawScene(int drawMode) {
 			RendererHelper::renderPoint(vboRenderManager, selectedVertex->pt, QColor(0, 0, 255), selectedVertex->pt3D.z() + 2.0f);
 		}
 		if (edgeSelected) {
-			Polyline3D polyline(selectedEdge->polyline3D);
-			for (int i = 0; i < polyline.size(); ++i) polyline[i].setZ(polyline[i].z() + 10.0f);
-			vboRenderManager.addPolyline("selected_edge", polyline, QColor(0, 0, 255));
-			vboRenderManager.renderStaticGeometry("selected_edge");
+			Polyline3D polyline;
+			for (int i = 0; i < selectedEdge->polyline.size(); ++i) {
+				float z = vboRenderManager.getTerrainHeight(selectedEdge->polyline[i].x(), selectedEdge->polyline[i].y());
+				polyline.push_back(QVector3D(selectedEdge->polyline[i].x(), selectedEdge->polyline[i].y(), z + 10.0f));
+			}
+			RendererHelper::renderPolyline(vboRenderManager, polyline, QColor(0, 0, 255));
 		}
 	} else {
 		// NORMAL
