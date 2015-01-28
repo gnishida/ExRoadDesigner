@@ -1083,12 +1083,10 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, fl
 			QVector2D pt = new_edge->polyline.back();
 			float z = vboRenderManager->getMinTerrainHeight(pt.x(), pt.y());
 
-			//float angle1 =  angle + curvature / (float)num_sub_steps;
 			float angle1 = angle + tanf(curvature) / num_sub_steps;
 			QVector2D pt1 = pt + QVector2D(cosf(angle1), sinf(angle1)) * sub_step;
 			float z1 = vboRenderManager->getMinTerrainHeight(pt1.x(), pt1.y());
 
-			//float angle2 =  angle - curvature / (float)num_sub_steps;
 			float angle2 = angle - tanf(curvature) / num_sub_steps;
 			QVector2D pt2 = pt + QVector2D(cosf(angle2), sinf(angle2)) * sub_step;
 			float z2 = vboRenderManager->getMinTerrainHeight(pt2.x(), pt2.y());

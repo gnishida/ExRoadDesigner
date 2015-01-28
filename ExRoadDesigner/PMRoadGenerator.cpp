@@ -326,15 +326,22 @@ bool PMRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, floa
 				break;
 			}
 
-			new_edge->polyline.push_back(roads.graph[tgtDesc]->pt);
-
 			// もし他のエッジに交差するなら、エッジ生成をキャンセル
 			// （キャンセルせずに、交差させるべき？）
 			QVector2D intPoint;
 			RoadEdgeDesc closestEdge;
+			new_edge->polyline.push_back(roads.graph[tgtDesc]->pt);
 			if (GraphUtil::isIntersect(roads, new_edge->polyline, curDesc, closestEdge, intPoint)) {
 				cancel = true;
 				break;
+			}
+
+			// エッジに沿って、水没チェック
+			if (roadType == RoadEdge::TYPE_STREET) {
+				if (RoadGeneratorHelper::submerged(vboRenderManager, new_edge->polyline, G::getFloat("seaLevel"))) {
+					cancel = true;
+					break;
+				}
 			}
 
 			// エッジを生成
