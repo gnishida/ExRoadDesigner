@@ -21,10 +21,10 @@ class VBOPmBlocks
 public:
 
 	//Generate Blocks
-	static bool generateBlocks(RoadGraph &roadGraph, BlockSet &blocks);
+	static bool generateBlocks(VBORenderManager* renderManager, RoadGraph &roadGraph, BlockSet &blocks);
 
 	static void buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding);
-	static void generateSideWalk(BlockSet& blocks);
+	static void generateSideWalk(VBORenderManager* renderManager, BlockSet& blocks);
 };
 
 

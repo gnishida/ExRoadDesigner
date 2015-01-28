@@ -11,7 +11,9 @@
 bool VBOPmParcels::generateParcels(VBORenderManager& rendManager, std::vector< Block > &blocks) {
 	srand(0);
 	for (int i = 0; i < blocks.size(); ++i) {
-		subdivideBlockIntoParcels(blocks[i]);
+		if (blocks[i].valid && !blocks[i].isPark) {
+			subdivideBlockIntoParcels(blocks[i]);
+		}
 	}
 
 	return true;

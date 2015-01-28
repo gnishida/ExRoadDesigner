@@ -118,7 +118,7 @@ void UrbanGeometry::generateRoadsAliaga(std::vector<ExFeature> &features) {
 }
 
 void UrbanGeometry::generateBlocks() {
-	VBOPmBlocks::generateBlocks(roads, blocks);
+	VBOPmBlocks::generateBlocks(&mainWin->glWidget->vboRenderManager, roads, blocks);
 	update(mainWin->glWidget->vboRenderManager);
 }
 
@@ -139,7 +139,7 @@ void UrbanGeometry::generateVegetation() {
 }
 
 void UrbanGeometry::generateAll() {
-	VBOPmBlocks::generateBlocks(roads, blocks);
+	VBOPmBlocks::generateBlocks(&mainWin->glWidget->vboRenderManager, roads, blocks);
 	VBOPmParcels::generateParcels(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	VBOPmBuildings::generateBuildings(mainWin->glWidget->vboRenderManager, blocks.blocks);
 	update(mainWin->glWidget->vboRenderManager);
@@ -217,6 +217,8 @@ void UrbanGeometry::render(VBORenderManager& vboRenderManager) {
  * この関数を頻繁に呼ぶべきではない。道路が更新/生成された時、2D/3D表示の変更、PMメニューから新規にジオミトリを生成した時だけ。
  */
 void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
+	printf("updating geometry.\n");
+
 	// 地面が変わっている可能性などがあるので、ビルなどのジオミトリも一旦削除してしまう。
 	// 道路以外のジオミトリは、別途、PMメニューから作成すること
 	vboRenderManager.removeStaticGeometry("3d_blocks");

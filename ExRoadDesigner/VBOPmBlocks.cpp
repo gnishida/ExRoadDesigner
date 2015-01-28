@@ -204,7 +204,7 @@ bool removeIntersectingEdges(RoadGraph &roadGraph)
 /**
  * 道路網から、Block情報を抽出する。
  */
-bool VBOPmBlocks::generateBlocks(RoadGraph &roadGraph, BlockSet &blocks) {
+bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph &roadGraph, BlockSet &blocks) {
 	GraphUtil::normalizeLoop(roadGraph);
 
 	roadGraphPtr = &roadGraph;
@@ -261,6 +261,8 @@ bool VBOPmBlocks::generateBlocks(RoadGraph &roadGraph, BlockSet &blocks) {
 	//Extract blocks from road graph using boost graph planar_face_traversal
 	vertex_output_visitor v_vis;	
 	boost::planar_face_traversal(roadGraph.graph, &embedding[0], v_vis, pmEdgeIndex);
+
+	printf("roads graph was traversed. %d blocks were extracted.\n", blocks.size());
 
 	//Misc postprocessing operations on blocks =======
 	int maxVtxCount = 0;
@@ -324,7 +326,7 @@ bool VBOPmBlocks::generateBlocks(RoadGraph &roadGraph, BlockSet &blocks) {
 	}
 
 	// assign a zone to each block
-	generateSideWalk(blocks);
+	generateSideWalk(renderManager, blocks);
 
 	return true;
 }
@@ -355,20 +357,35 @@ void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadE
  * （現状、区画をクリアはしていない。クリアした方がよいか？）
  * 必要なら、この関数の後で、区画生成を実行してください。
  */
-void VBOPmBlocks::generateSideWalk(BlockSet& blocks) {
-	// ブロックが細すぎる場合は、使用不可ブロックとする
+void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& blocks) {
 	for (int i = 0; i < blocks.size(); ++i) {
 		BBox3D bbox;
 		blocks[i].sidewalkContour.getBBox3D(bbox.minPt, bbox.maxPt);
 
+		// ブロックが細すぎる場合は、使用不可ブロックとする
 		if (blocks[i].sidewalkContour.isTooNarrow(8.0f, 18.0f) || blocks[i].sidewalkContour.isTooNarrow(1.0f, 3.0f)) {
 			blocks[i].valid = false;
+			blocks[i].isPark = true;
 			continue;
+		}
+
+		// 高さが40m以下、または、高さの差が10m以上なら、使用不可ブロックとする
+		float min_z = std::numeric_limits<float>::max();
+		float max_z = 0.0f;
+		for (int pi = 0; pi < blocks[i].sidewalkContour.contour.size(); ++pi) {
+			float z = renderManager->getTerrainHeight(blocks[i].sidewalkContour.contour[pi].x(), blocks[i].sidewalkContour.contour[pi].y());
+			min_z = std::min(min_z, z);
+			max_z = std::max(max_z, z);
+		}
+		if (min_z < 40.0f || max_z - min_z > 10.0f) {
+			blocks[i].valid = false;
+			blocks[i].isPark = true;
 		}
 	}
 
 	// 歩道の分を確保するため、ブロックを縮小する。
 	for (int i = 0; i < blocks.size(); ++i) {
+		if (!blocks[i].valid) continue;
 		if (blocks[i].isPark) continue;
 
 		Loop3D blockContourInset;
