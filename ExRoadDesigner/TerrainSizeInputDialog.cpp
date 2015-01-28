@@ -7,7 +7,7 @@ TerrainSizeInputDialog::TerrainSizeInputDialog(MainWindow* mainWin) : QDialog((Q
 
 	// set up the UI
 	ui.setupUi(this);
-	ui.lineEditSide->setText("6000");
+	ui.lineEditSide->setText("5000");
 	ui.lineEditCellResolution->setText("200");
 
 	// register the event handlers

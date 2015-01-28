@@ -26,6 +26,12 @@ void WarpRoadGenerator::generateRoadNetwork() {
 			roads.graph[*vi]->properties.remove("ex_id");
 			roads.graph[*vi]->properties.remove("example_desc");
 			roads.graph[*vi]->properties.remove("example_street_desc");
+
+			// ターゲットエリア内の全ての頂点のonBoundaryフラグをfalseにする
+			// これにより、dangling edgeは、もしこのエリアで生成された道路と接続されなかったら、clear処理の中で削除される
+			if (targetArea.contains(roads.graph[*vi]->pt)) {
+				roads.graph[*vi]->onBoundary = false;
+			}
 		}
 	}
 
@@ -685,6 +691,25 @@ bool WarpRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, i
 	if (GraphUtil::isIntersect(replacementGraph, roads)) {
 		return false;
 	}
+
+	// replacementGraphのほとんどが、ターゲットエリア内に入っているかチェック
+	// Hack:
+	// このチェックはなくても良いのだが、New-Yorkのlocal streetのパッチ抽出バグのせいで、めちゃ長い道路がパッチとして抽出されてしまい、
+	// これをしないと、ターゲットエリアからめちゃはみ出た道路が生成されてしまう。
+	{
+		int cnt = 0;
+		int total_cnt = 0;
+		RoadVertexIter vi, vend;
+		for (boost::tie(vi, vend) = boost::vertices(replacementGraph.graph); vi != vend; ++vi) {
+			if (!replacementGraph.graph[*vi]->valid) continue;
+			if (targetArea.contains(replacementGraph.graph[*vi]->pt)) {
+				cnt++;
+			}
+			total_cnt++;
+		}
+
+		if ((float)cnt / (float)total_cnt < 0.5f) return false;
+	}
 		
 	rewrite(roadType, srcDesc, replacementGraph, ex_id, seeds);
 
@@ -1160,13 +1185,14 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, fl
 			v->properties["group_id"] = roads.graph[srcDesc]->properties["group_id"];
 			tgtDesc = GraphUtil::addVertex(roads, v);
 
+			// エッジを作成
+			GraphUtil::addEdge(roads, curDesc, tgtDesc, new_edge);
+
 			// エリア外なら、onBoundaryフラグをセット
 			if (!targetArea.contains(roads.graph[tgtDesc]->pt)) {
 				roads.graph[tgtDesc]->onBoundary = true;
+				break;
 			}
-
-			// エッジを作成
-			GraphUtil::addEdge(roads, curDesc, tgtDesc, new_edge);
 
 			curDesc = tgtDesc;
 			curPt = new_edge->polyline.back();

@@ -26,14 +26,14 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.checkBoxUseLayer->setChecked(false);
 	ui.lineEditMinBlockSize->setText("10000");
 	ui.lineEditHoughScale->setText("500.0");
-	ui.lineEditPatchDistance1->setText("100");
+	ui.lineEditPatchDistance1->setText("80");
 	ui.lineEditPatchDistance2->setText("20");
 	ui.lineEditInterpolateSigma1->setText("0.2");
 	ui.lineEditInterpolateSigma2->setText("0.2");
 	ui.lineEditRotationAngle->setText("0.0");
 	ui.lineEditRoadAngleTolerance->setText("60");
 	ui.lineEditSlopeTolerance->setText("36.4");
-	ui.lineEditAcrossRiverTolerance->setText("200");
+	ui.lineEditAcrossRiverTolerance->setText("300");
 	ui.lineEditMaxBlockSizeForPark->setText("250000");
 	ui.checkBoxSaveRoadImages->setChecked(false);
 	ui.checkBoxSavePatchImages->setChecked(false);
