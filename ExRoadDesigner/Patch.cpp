@@ -81,6 +81,15 @@ float Patch::getHausdorffDist(const Polyline2D& polyline, RoadVertexDesc connect
 
 		if (min_d > max_d) max_d = min_d;
 	}
+	for (int i = 0; i < polyline.size(); ++i) {
+		float min_d = std::numeric_limits<float>::max();
+		for (int j = 0; j < p.size(); ++j) {
+			float d = (p[j] - polyline[i] - offset).length();
+			if (d < min_d) min_d = d;
+		}
+
+		if (min_d > max_d) max_d = min_d;
+	}
 
 	return max_d;
 }
