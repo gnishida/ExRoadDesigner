@@ -1956,6 +1956,199 @@ RoadVertexDesc RoadGeneratorHelper::createEdgesByExample2(RoadGraph &roads, floa
 }
 
 /**
+ * この頂点から伸びるエッジのpolylineを返却する。
+ * 次の頂点のdegree=2なら、その先に再帰的に延ばす
+ */
+Polyline2D RoadGeneratorHelper::getTotalEdgePolyline(RoadGraph& roads, RoadVertexDesc srcDesc) {
+	Polyline2D polyline;
+
+	std::list<RoadVertexDesc> queue;
+	QMap<RoadEdgeDesc, bool> edge_used;
+
+	RoadOutEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::out_edges(srcDesc, roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		polyline = GraphUtil::orderPolyLine(roads, *ei, srcDesc);
+		edge_used[*ei] = true;
+
+		RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+		queue.push_back(tgt);
+	}
+
+	if (queue.size() != 1) {
+		polyline.clear();
+		polyline.push_back(roads.graph[srcDesc]->pt);
+		return polyline;
+	}
+
+	while (!queue.empty()) {
+		RoadVertexDesc v = queue.front();
+		queue.pop_front();
+
+		if (GraphUtil::getDegree(roads, v) != 2) continue;
+
+		RoadOutEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::out_edges(v, roads.graph); ei != eend; ++ei) {
+			if (!roads.graph[*ei]->valid) continue;
+			if (edge_used.contains(*ei)) continue;
+
+			Polyline2D next_polyline = GraphUtil::orderPolyLine(roads, *ei, v);
+			next_polyline.erase(next_polyline.begin());
+			polyline.insert(polyline.end(), next_polyline.begin(), next_polyline.end());
+			edge_used[*ei] = true;
+
+			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+			queue.push_back(tgt);
+			break;
+		}
+	}
+
+	return polyline;
+}
+
+void RoadGeneratorHelper::computeAvenueStatistics(ExFeature& feature, std::vector<Patch>& patches) {
+	float totalLength = 0.0f;
+	float totalLength2 = 0.0f;
+	float totalStep = 0.0f;
+	float totalStep2 = 0.0f;
+	float totalCurvature = 0.0f;
+	float totalCurvature2 = 0.0f;
+	float totalNumSegments = 0.0f;
+	int numLength = 0;
+	float denomCurvature = 0.0f;
+	int num = 0;
+
+	for (int i = 0; i < patches.size(); ++i) {
+		RoadEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::edges(patches[i].roads.graph); ei != eend; ++ei) {
+			if (!patches[i].roads.graph[*ei]->valid) continue;
+
+			if (!patches[i].roads.graph[*ei]->connector) continue;
+
+			RoadVertexDesc src = boost::source(*ei, patches[i].roads.graph);
+			RoadVertexDesc tgt = boost::target(*ei, patches[i].roads.graph);
+
+			if (GraphUtil::getDegree(patches[i].roads, src) == 1) {
+				Polyline2D polyline = getTotalEdgePolyline(patches[i].roads, src);
+				float length = polyline.length();
+				totalLength += length;
+				totalLength2 += SQR(length);
+				numLength++;
+				if (polyline.size() > 2) {
+					float curvature = Util::curvature(polyline);
+					totalCurvature += curvature * length;
+					totalCurvature2 += SQR(curvature);
+					denomCurvature += length;
+				}
+			} else if (GraphUtil::getDegree(patches[i].roads, tgt) == 1) {
+				Polyline2D polyline = getTotalEdgePolyline(patches[i].roads, tgt);
+				float length = polyline.length();
+				totalLength += length;
+				totalLength2 += SQR(length);
+				numLength++;
+				if (polyline.size() > 2) {
+					float curvature = Util::curvature(polyline);
+					totalCurvature += curvature * length;
+					totalCurvature2 += SQR(curvature) * length;
+					denomCurvature += length;
+				}
+			}
+
+			float step = patches[i].roads.graph[*ei]->polyline.length();
+			totalStep += step;
+			totalStep2 += SQR(step);
+
+			totalNumSegments += patches[i].roads.graph[*ei]->polyline.size() - 1;
+
+			num++;
+		}
+	}
+
+	if (numLength > 0) {
+		feature.avgAvenueLength = totalLength / (float)numLength;
+		feature.varAvenueLength = totalLength2 / (float)numLength - SQR(feature.avgAvenueLength);
+	} else {
+		feature.avgAvenueLength = 100.0f;
+		feature.varAvenueLength = 0.0f;
+	}
+
+	if (num > 0) {
+		feature.avgAvenueStep = totalStep / (float)num;
+		feature.varAvenueStep = totalStep2 / (float)num - SQR(feature.avgAvenueStep);
+		feature.avgAvenueNumSegments = totalNumSegments / (float)num;
+	} else {
+		feature.avgAvenueStep = 20.0f;
+		feature.varAvenueStep = 0.0f;
+		feature.avgAvenueNumSegments = 2;
+	}
+	
+	if (denomCurvature > 0) {
+		feature.avgAvenueCurvature = totalCurvature / denomCurvature;
+		feature.varAvenueCurvature = totalCurvature2 / denomCurvature - SQR(feature.avgAvenueCurvature);
+	} else {
+		feature.avgAvenueCurvature = 0.0f;
+		feature.varAvenueCurvature = 0.0f;
+	}
+}
+
+void RoadGeneratorHelper::computeStreetStatistics(ExFeature& feature, std::vector<Patch>& patches) {
+	float totalLength = 0.0f;
+	float totalLength2 = 0.0f;
+	float totalCurvature = 0.0f;
+	float totalCurvature2 = 0.0f;
+	float totalNumSegments = 0.0f;
+	int denomCurvature = 0;
+	int num = 0;
+
+	for (int i = 0; i < patches.size(); ++i) {
+		RoadEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::edges(patches[i].roads.graph); ei != eend; ++ei) {
+			if (!patches[i].roads.graph[*ei]->valid) continue;
+
+			if (!patches[i].roads.graph[*ei]->connector) continue;
+
+			RoadVertexDesc src = boost::source(*ei, patches[i].roads.graph);
+			RoadVertexDesc tgt = boost::target(*ei, patches[i].roads.graph);
+
+			float length = patches[i].roads.graph[*ei]->polyline.length();
+			totalLength += length;
+			totalLength2 += SQR(length);
+
+			if (patches[i].roads.graph[*ei]->polyline.size() > 2) {
+				float curvature = Util::curvature(patches[i].roads.graph[*ei]->polyline);
+				totalCurvature += curvature * length;
+				totalCurvature2 += SQR(curvature) * length;
+				denomCurvature += length;
+			}
+
+			totalNumSegments += patches[i].roads.graph[*ei]->polyline.size() - 1;
+
+			num++;
+		}
+	}
+
+	if (num > 0) {
+		feature.avgStreetLength = totalLength / (float)num;
+		feature.varStreetLength = totalLength2 / (float)num - SQR(feature.avgStreetLength);
+		feature.avgStreetNumSegments = totalNumSegments / (float)num;
+	} else {
+		feature.avgStreetLength = 20.0f;
+		feature.varStreetLength = 0.0f;
+		feature.avgStreetNumSegments = 2;
+	}
+
+	if (denomCurvature > 0) {
+		feature.avgStreetCurvature = totalCurvature / denomCurvature;
+		feature.varStreetCurvature = totalCurvature2 / denomCurvature - SQR(feature.avgAvenueCurvature);
+	} else {
+		feature.avgStreetCurvature = 0.0f;
+		feature.varStreetCurvature = 0.0f;
+	}
+
+}
+
+/**
  * 道路網を画像として保存する。
  */
 void RoadGeneratorHelper::saveRoadImage(RoadGraph& roads, std::list<RoadVertexDesc>& seeds, const char* filename) {
