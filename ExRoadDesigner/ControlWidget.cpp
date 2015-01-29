@@ -186,6 +186,9 @@ void ControlWidget::generateRoadsPM() {
 	G::global()["cropping"] = ui.checkBoxCropping->isChecked();
 	G::global()["useLayer"] = ui.checkBoxUseLayer->isChecked();
 
+	G::global()["houghScale"] = ui.lineEditHoughScale->text().toFloat();
+	G::global()["avenuePatchDistance"] = ui.lineEditPatchDistance1->text().toFloat();
+	G::global()["streetPatchDistance"] = ui.lineEditPatchDistance2->text().toFloat();
 	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
@@ -193,6 +196,7 @@ void ControlWidget::generateRoadsPM() {
 	G::global()["acrossRiverTolerance"] = ui.lineEditAcrossRiverTolerance->text().toFloat();
 	G::global()["slopeTolerance"] = ui.lineEditSlopeTolerance->text().toFloat() / 180.0f * M_PI;
 	G::global()["saveRoadImages"] = ui.checkBoxSaveRoadImages->isChecked();
+	G::global()["savePatchImages"] = ui.checkBoxSavePatchImages->isChecked();
 
 	std::vector<ExFeature> features;
 	features.resize(numExamples);
