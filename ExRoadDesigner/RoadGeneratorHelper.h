@@ -70,10 +70,6 @@ public:
 	static RoadVertexDesc createEdgesByExample(RoadGraph &roads, float angle, std::vector<RoadEdgeDescs> &shapes, std::vector<RoadEdgePtr> &edges, float &rotation_angle);
 	static RoadVertexDesc createEdgesByExample2(RoadGraph &roads, float angle, std::vector<RoadEdgeDescs> &shapes, std::vector<RoadEdgePtr> &edges);
 
-	static Polyline2D getTotalEdgePolyline(RoadGraph& roads, RoadVertexDesc srcDesc);
-	static void computeAvenueStatistics(ExFeature& feature, std::vector<Patch>& patches);
-	static void computeStreetStatistics(ExFeature& feature, std::vector<Patch>& patches);
-
 	static void saveRoadImage(RoadGraph& roads, std::list<RoadVertexDesc>& seeds, const char* filename);
 };
 
