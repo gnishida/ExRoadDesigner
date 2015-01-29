@@ -675,8 +675,8 @@ void RoadGeneratorHelper::removeDanglingEdges(RoadGraph& roads) {
 			RoadVertexDesc tgt = boost::target(*ei, roads.graph);
 
 			if (roads.graph[src]->onBoundary || roads.graph[tgt]->onBoundary) continue;
-			if (roads.graph[src]->properties.contains("deadend") && roads.graph[src]->properties["deadend"] == true) continue;
-			if (roads.graph[tgt]->properties.contains("deadend") && roads.graph[tgt]->properties["deadend"] == true) continue;
+			if (roads.graph[src]->deadend) continue;
+			if (roads.graph[tgt]->deadend) continue;
 
 			if (GraphUtil::getDegree(roads, src) == 1) {
 				removeEdge(roads, src, *ei);
