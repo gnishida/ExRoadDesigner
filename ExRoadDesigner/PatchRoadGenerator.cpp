@@ -345,7 +345,7 @@ bool PatchRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, in
 		Polyline2D polyline = GraphUtil::orderPolyLine(roads, *ei, srcDesc);
 		float direction = atan2f((polyline[1] - polyline[0]).y(), (polyline[1] - polyline[0]).x());
 		direction += M_PI;
-		if (attemptConnectToEdge(roadType, srcDesc, length, G::getFloat("seaLevel"), direction, 0.3f)) return true;
+		if (attemptConnectToEdge(roadType, srcDesc, length, G::getFloat("seaLevel"), direction, 0.3f, roadAngleTolerance)) return true;
 	}
 
 	// 中距離の頂点を探し、あればコネクトする
@@ -480,7 +480,7 @@ bool PatchRoadGenerator::attemptConnectToVertex(int roadType, RoadVertexDesc src
  * @param angle_threshold	方向基準からしきい値以上ずれる頂点は対象外
  * @return					コネクトしたらtrue、コネクトしなかったらfalseを返却する。
  */
-bool PatchRoadGenerator::attemptConnectToEdge(int roadType, RoadVertexDesc srcDesc, float dist_threshold, float z_threshold, float direction, float angle_threshold) {
+bool PatchRoadGenerator::attemptConnectToEdge(int roadType, RoadVertexDesc srcDesc, float dist_threshold, float z_threshold, float direction, float angle_threshold, float roadAngleTolerance) {
 	// 近くにエッジがあれば、コネクト
 	{
 		RoadVertexDesc nearestDesc;
@@ -488,6 +488,16 @@ bool PatchRoadGenerator::attemptConnectToEdge(int roadType, RoadVertexDesc srcDe
 		QVector2D intPoint;
 		if (RoadGeneratorHelper::getEdgeForSnapping(*vboRenderManager, roads, srcDesc, dist_threshold, G::getFloat("seaLevel"), direction, angle_threshold, nearestEdgeDesc, intPoint)) {
 			RoadVertexDesc nearestVertexDesc = boost::source(nearestEdgeDesc, roads.graph);
+
+			// 自分にとってredundantなら、コネクトしない。
+			{
+				Polyline2D polyline;
+				polyline.push_back(QVector2D(0, 0));
+				polyline.push_back(intPoint - roads.graph[srcDesc]->pt);
+				if (RoadGeneratorHelper::isRedundantEdge(roads, srcDesc, polyline, roadAngleTolerance)) {
+					return false;
+				}
+			}
 
 			// エッジにスナップ
 			nearestDesc = GraphUtil::splitEdge(roads, nearestEdgeDesc, intPoint);
@@ -1000,7 +1010,10 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 			curvature = 0.0f;
 		}
 
-
+		// もし斜面なら、曲率を強制的に上げる
+		if (fabs(z2 - z) > 1.0f) {
+			if (curvature < 0.2f) curvature = 0.2f;
+		}
 
 		growRoadSegment(roadType, srcDesc, step, num_steps, direction, curvature, 1, roadAngleTolerance, ex_id, seeds);
 	}
@@ -1012,7 +1025,7 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
  * 生成された場合はtrueを返却する。
  */
 bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, float step, int num_steps, float angle, float curvature, int lanes, float angleTolerance, int ex_id, std::list<RoadVertexDesc> &seeds) {
-	const int num_sub_steps = 5;
+	int num_sub_steps = 5;
 	float sub_step = step / num_sub_steps;
 	
 	RoadVertexDesc curDesc = srcDesc;
@@ -1048,14 +1061,29 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, f
 				break;
 			}
 
+			// polylineを生成
+			{
+				float d = (roads.graph[tgtDesc]->pt - curPt).length();
+				num_sub_steps = d / sub_step;
+				for (int sub_iter = 0; sub_iter < num_sub_steps; ++sub_iter) {
+					curPt += QVector2D(cosf(angle), sinf(angle)) * sub_step;
+					new_edge->polyline.push_back(curPt);
+
+					QVector2D v = roads.graph[tgtDesc]->pt - curPt;
+					float a = atan2f(v.y(), v.x());
+					angle += Util::diffAngle(a, angle, false) / num_sub_steps;
+				}
+
+				new_edge->polyline.push_back(roads.graph[tgtDesc]->pt);
+			}
+
 			// もし他のエッジに交差するなら、エッジ生成をキャンセル
 			// （キャンセルせずに、交差させるべき？）
 			QVector2D intPoint;
 			RoadEdgeDesc closestEdge;
-			new_edge->polyline.push_back(roads.graph[tgtDesc]->pt);
 			if (GraphUtil::isIntersect(roads, new_edge->polyline, curDesc, closestEdge, intPoint)) {
-				// 交差するはず無い！
-				assert(false);
+				cancel = true;
+				break;
 			}
 
 			// エッジに沿って、水没チェック

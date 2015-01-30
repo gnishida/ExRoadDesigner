@@ -16,6 +16,7 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	// set up the UI
 	ui.setupUi(this);
 
+	ui.TabWidget->setCurrentIndex(0);
 	ui.lineEditNumAvenueIterations->setText("1500");
 	ui.lineEditNumStreetIterations->setText("6000");
 	ui.lineEditNumExamples->setText("1");
@@ -100,6 +101,7 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 void ControlWidget::generateRoadsEx() {
 	if (mainWin->urbanGeometry->areas.selectedIndex == -1) return;
 
+	G::global()["seaLevel"] = 60.0f;
 	G::global()["numAvenueIterations"] = ui.lineEditNumAvenueIterations->text().toInt();
 	G::global()["numStreetIterations"] = ui.lineEditNumStreetIterations->text().toInt();
 	int numExamples = ui.lineEditNumExamples->text().toInt();
@@ -139,6 +141,7 @@ void ControlWidget::generateRoadsEx() {
 void ControlWidget::generateRoadsWarp() {
 	if (mainWin->urbanGeometry->areas.selectedIndex == -1) return;
 
+	G::global()["seaLevel"] = 60.0f;
 	G::global()["numAvenueIterations"] = ui.lineEditNumAvenueIterations->text().toInt();
 	G::global()["numStreetIterations"] = ui.lineEditNumStreetIterations->text().toInt();
 	int numExamples = ui.lineEditNumExamples->text().toInt();
@@ -178,6 +181,7 @@ void ControlWidget::generateRoadsWarp() {
 void ControlWidget::generateRoadsPM() {
 	if (mainWin->urbanGeometry->areas.selectedIndex == -1) return;
 
+	G::global()["seaLevel"] = 60.0f;
 	G::global()["numAvenueIterations"] = ui.lineEditNumAvenueIterations->text().toInt();
 	G::global()["numStreetIterations"] = ui.lineEditNumStreetIterations->text().toInt();
 	int numExamples = ui.lineEditNumExamples->text().toInt();
