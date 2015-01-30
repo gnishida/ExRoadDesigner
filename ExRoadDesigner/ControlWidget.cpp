@@ -63,6 +63,7 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	connect(ui.pushButtonTrim, SIGNAL(clicked()), this, SLOT(trimRoads()));
 	connect(ui.pushButtonClearBoundaryFlag, SIGNAL(clicked()), this, SLOT(clearBoundaryFlag()));
 	connect(ui.pushButtonRemoveDanglingEdges, SIGNAL(clicked()), this, SLOT(removeDanglingEdges()));
+	connect(ui.pushButtonRemoveCloseEdges, SIGNAL(clicked()), this, SLOT(removeCloseEdges()));
 
 	// terrain
 	connect(ui.terrainPaint_sizeSlider, SIGNAL(valueChanged(int)),this, SLOT(updateTerrainLabels(int)));
@@ -285,6 +286,12 @@ void ControlWidget::clearBoundaryFlag() {
 
 void ControlWidget::removeDanglingEdges() {
 	RoadGeneratorHelper::removeDanglingEdges(mainWin->urbanGeometry->roads);
+	mainWin->urbanGeometry->update(mainWin->glWidget->vboRenderManager);
+	mainWin->glWidget->updateGL();
+}
+
+void ControlWidget::removeCloseEdges() {
+	RoadGeneratorHelper::removeCloseEdges(mainWin->urbanGeometry->roads, 0.6f);
 	mainWin->urbanGeometry->update(mainWin->glWidget->vboRenderManager);
 	mainWin->glWidget->updateGL();
 }

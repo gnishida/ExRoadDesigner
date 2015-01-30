@@ -1636,6 +1636,59 @@ void RoadGeneratorHelper::removeIntersectionsOnRiver(RoadGraph &roads, VBORender
 }
 
 /**
+ * １つの頂点から出る２つの道路の間の角度が鋭角すぎる場合、もし一方がPM道路なら、それを削除する。
+ */
+void RoadGeneratorHelper::removeCloseEdges(RoadGraph &roads, float angleTolerance) {
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		if (!roads.graph[*vi]->valid) continue;
+		if (GraphUtil::getDegree(roads, *vi) <= 2) continue;
+
+		QMap<float, RoadEdgeDesc> edges;
+
+		RoadOutEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::out_edges(*vi, roads.graph); ei != eend; ++ei) {
+			if (!roads.graph[*ei]->valid) continue;
+
+			Polyline2D polyline = GraphUtil::orderPolyLine(roads, *ei, *vi);
+			edges[atan2f((polyline[1] - polyline[0]).y(), (polyline[1] - polyline[0]).x())] = *ei;
+		}
+
+		QMap<float, RoadEdgeDesc>::iterator it = edges.begin();
+		float prev_angle = it.key();
+		RoadEdgeDesc prev_edge = it.value();
+		for (++it; it != edges.end(); ++it) {
+			float next_angle = it.key();
+			RoadEdgeDesc next_edge = it.value();
+
+			if (Util::diffAngle(next_angle, prev_angle) < angleTolerance) {
+				if (roads.graph[prev_edge]->generationType != "example") {
+					removeEdge(roads, *vi, prev_edge);
+					break;
+				} else if (roads.graph[next_edge]->generationType != "example") {
+					removeEdge(roads, *vi, next_edge);
+					break;
+				}
+			}
+
+			prev_edge = next_edge;
+			prev_angle = next_angle;
+		}
+
+		float next_angle = edges.begin().key();
+		RoadEdgeDesc next_edge = edges.begin().value();
+
+		if (Util::diffAngle(next_angle, prev_angle) < angleTolerance) {
+			if (roads.graph[prev_edge]->generationType != "example") {
+				removeEdge(roads, *vi, prev_edge);
+			} else if (roads.graph[next_edge]->generationType != "example") {
+				removeEdge(roads, *vi, next_edge);
+			}
+		}
+	}
+}
+
+/**
  * 小さすぎるブロックを削除する。
  */
 void RoadGeneratorHelper::removeSmallBlocks(RoadGraph &roads, float minArea) {

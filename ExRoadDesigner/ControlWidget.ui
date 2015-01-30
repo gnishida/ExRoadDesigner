@@ -30,7 +30,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="RoadGenerationTab">
      <attribute name="title">
@@ -646,6 +646,19 @@
         <string>Remove Small Blocks</string>
        </property>
       </widget>
+     </widget>
+     <widget class="QPushButton" name="pushButtonRemoveCloseEdges">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>120</y>
+        <width>141</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remove Close Edges</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="ContentEditionTab">

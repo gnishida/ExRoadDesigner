@@ -24,6 +24,7 @@ public:
 	Polyline3D polyline3D;
 	QColor color;
 	QColor bgColor;
+	QString generationType;
 
 	bool valid;			// if this edge is valid
 	bool connector;		// if this edge is a connector or not

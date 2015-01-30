@@ -13,6 +13,8 @@ RoadEdge::RoadEdge(unsigned int type, unsigned int lanes, bool oneWay, bool link
 	// initialize other members
 	this->valid = true;
 	this->connector = false;
+	this->generationType = "";
+
 	this->properties["seed"] = false;
 	this->properties["shapeType"] = SHAPE_DEFAULT;
 	this->properties["group"] = -1;
@@ -35,7 +37,7 @@ RoadEdge::RoadEdge(unsigned int type, unsigned int lanes, bool oneWay, bool link
 		color = QColor(255, 255, 255);
 		bgColor = QColor(222, 217, 207);
 		break;
-	} 
+	}
 }
 
 RoadEdge::~RoadEdge() {

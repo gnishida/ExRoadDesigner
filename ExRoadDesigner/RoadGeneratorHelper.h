@@ -61,6 +61,7 @@ public:
 	static QVector2D getFirstEdgeDir(RoadGraph& roads, RoadVertexDesc srcDesc);
 
 	static void removeIntersectionsOnRiver(RoadGraph &roads, VBORenderManager *vboRenderManager, float seaLevel);
+	static void removeCloseEdges(RoadGraph &roads, float angleTolerance);
 	static void removeSmallBlocks(RoadGraph &roads, float minArea);
 	
 	static bool isShape(RoadGraph &roads, RoadVertexDesc desc, std::vector<RoadEdgeDescs> &shapes, int &shape_index);

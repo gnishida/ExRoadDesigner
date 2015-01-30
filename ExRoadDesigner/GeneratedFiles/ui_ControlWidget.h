@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Tue Jan 27 18:16:28 2015
+** Created: Fri Jan 30 09:59:23 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -82,6 +82,7 @@ public:
     QLabel *label_13;
     QLineEdit *lineEditMinBlockSize;
     QPushButton *pushButtonRemoveSmallBlocks;
+    QPushButton *pushButtonRemoveCloseEdges;
     QWidget *ContentEditionTab;
     QGroupBox *groupBox_6;
     QLabel *terrainPaint_sizeLabel;
@@ -277,6 +278,9 @@ public:
         pushButtonRemoveSmallBlocks = new QPushButton(groupBox_3);
         pushButtonRemoveSmallBlocks->setObjectName(QString::fromUtf8("pushButtonRemoveSmallBlocks"));
         pushButtonRemoveSmallBlocks->setGeometry(QRect(30, 40, 121, 31));
+        pushButtonRemoveCloseEdges = new QPushButton(CleanUpTab);
+        pushButtonRemoveCloseEdges->setObjectName(QString::fromUtf8("pushButtonRemoveCloseEdges"));
+        pushButtonRemoveCloseEdges->setGeometry(QRect(20, 120, 141, 31));
         TabWidget->addTab(CleanUpTab, QString());
         ContentEditionTab = new QWidget();
         ContentEditionTab->setObjectName(QString::fromUtf8("ContentEditionTab"));
@@ -441,7 +445,7 @@ public:
 
         retranslateUi(ControlWidget);
 
-        TabWidget->setCurrentIndex(0);
+        TabWidget->setCurrentIndex(1);
 
 
         QMetaObject::connectSlotsByName(ControlWidget);
@@ -490,6 +494,7 @@ public:
         groupBox_3->setTitle(QApplication::translate("ControlWidget", "Remove Small Blocks", 0, QApplication::UnicodeUTF8));
         label_13->setText(QApplication::translate("ControlWidget", "Size:", 0, QApplication::UnicodeUTF8));
         pushButtonRemoveSmallBlocks->setText(QApplication::translate("ControlWidget", "Remove Small Blocks", 0, QApplication::UnicodeUTF8));
+        pushButtonRemoveCloseEdges->setText(QApplication::translate("ControlWidget", "Remove Close Edges", 0, QApplication::UnicodeUTF8));
         TabWidget->setTabText(TabWidget->indexOf(CleanUpTab), QApplication::translate("ControlWidget", "Clean up", 0, QApplication::UnicodeUTF8));
         groupBox_6->setTitle(QApplication::translate("ControlWidget", "Terrain Controls/Render", 0, QApplication::UnicodeUTF8));
         terrainPaint_sizeLabel->setText(QApplication::translate("ControlWidget", "Size: 5%", 0, QApplication::UnicodeUTF8));

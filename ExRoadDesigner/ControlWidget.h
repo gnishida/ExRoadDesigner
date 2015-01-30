@@ -30,6 +30,7 @@ public slots:
 	void connectRoads2();
 	void clearBoundaryFlag();
 	void removeDanglingEdges();
+	void removeCloseEdges();
 	void removeSmallBlocks();
 	void updateTerrainLabels(int newValue);
 	void updateTerrainEdit(const QString &text);
