@@ -968,6 +968,7 @@ void WarpRoadGenerator::rewrite(int roadType, RoadVertexDesc srcDesc, RoadGraph 
 
 			if (!GraphUtil::hasSimilarEdge(roads, conv[src], conv[tgt], replacementGraph.graph[*ei]->polyline)) {
 				RoadEdgePtr e = RoadEdgePtr(new RoadEdge(*replacementGraph.graph[*ei]));
+				e->generationType = "example";
 				GraphUtil::addEdge(roads, conv[src], conv[tgt], e);
 			}
 		}
