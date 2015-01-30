@@ -365,7 +365,7 @@ bool WarpRoadGenerator::attemptConnect(int roadType, RoadVertexDesc srcDesc, int
 		float direction = atan2f((polyline[1] - polyline[0]).y(), (polyline[1] - polyline[0]).x());
 		direction += M_PI;
 
-		if (attemptConnectToVertex(roadType, srcDesc, features, length, G::getFloat("seaLevel"), direction, 0.78f, roadAngleTolerance)) return true;
+		if (attemptConnectToVertex(roadType, srcDesc, features, length, G::getFloat("seaLevel"), direction, 0.7f, roadAngleTolerance)) return true;
 	}
 
 	// 近接エッジを探し、あればコネクトする
@@ -648,48 +648,7 @@ bool WarpRoadGenerator::attemptExpansion(int roadType, RoadVertexDesc srcDesc, i
 
 	// 山チェック
 	if (RoadGeneratorHelper::maxZ(replacementGraph, vboRenderManager) > 70.0f && RoadGeneratorHelper::diffSlope(replacementGraph, vboRenderManager) > 0.3f) {
-		float max_rotation = M_PI * 0.166f;
-		float min_slope = std::numeric_limits<float>::max();
-		float min_rotation;
-
-		RoadGraph backup;
-		GraphUtil::copyRoads(replacementGraph, backup);
-
-		// try the turn in CCW direction
-		// Note: th is the rotation angle in addition to the current rotaion angle "angle"
-		for (float th = 0; th <= max_rotation; th += 0.1f) {
-			GraphUtil::copyRoads(backup, replacementGraph);
-			GraphUtil::rotate(replacementGraph, th, roads.graph[srcDesc]->pt);
-			float diffSlope = RoadGeneratorHelper::diffSlope(replacementGraph, vboRenderManager);
-			if (diffSlope < min_slope) {
-				min_slope = diffSlope;
-				min_rotation = th;
-			}
-		}
-
-		// try the turn in CW direction
-		// Note: th is the rotation angle in addition to the current rotaion angle "angle"
-		for (float th = 0; th >= -max_rotation; th -= 0.1f) {
-			GraphUtil::copyRoads(backup, replacementGraph);
-			GraphUtil::rotate(replacementGraph, th, roads.graph[srcDesc]->pt);
-			float diffSlope = RoadGeneratorHelper::diffSlope(replacementGraph, vboRenderManager);
-			if (diffSlope < min_slope) {
-				min_slope = diffSlope;
-				min_rotation = th;
-			}
-		}
-
-		// 回転しても駄目なら、exampleを使用しない
-		if (min_slope > 0.3f) return false;
-
-		GraphUtil::copyRoads(backup, replacementGraph);
-		GraphUtil::rotate(replacementGraph, min_rotation, roads.graph[srcDesc]->pt);
-
-		// rotationAngleを設定
-		RoadVertexIter vi, vend;
-		for (boost::tie(vi, vend) = boost::vertices(replacementGraph.graph); vi != vend; ++vi) {
-			replacementGraph.graph[*vi]->rotationAngle = angle + min_rotation;
-		}
+		return false;
 	}
 
 	// 川チェック
@@ -1101,7 +1060,7 @@ bool WarpRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, fl
 
 					QVector2D v = roads.graph[tgtDesc]->pt - curPt;
 					float a = atan2f(v.y(), v.x());
-					angle += Util::diffAngle(a, angle, false) / num_sub_steps;
+					angle += Util::diffAngle(a, angle, false) * 0.5f;
 				}
 
 				new_edge->polyline.push_back(roads.graph[tgtDesc]->pt);
