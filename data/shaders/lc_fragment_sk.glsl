@@ -170,7 +170,7 @@ void main(){
 						vec4(190/255.0, 225/255.0, 255/255.0, 1.0),
 						vec4(154/255.0, 197/255.0, 255/255.0, 1.0),
 						height/40);
-			} else if (height < 77) {
+			} else if (height < 71) {
 				outputF=vec4(242/255.0, 239/255.0, 233/255.0, 1.0);
 			} else if (height < 200) {
 				//outputF=vec4(232/255.0, 230/255.0, 221/255.0, 1.0);
@@ -199,7 +199,7 @@ void main(){
 				}
 			} else {
 				outputF = vec4(0xe9/255.0,0xe5/255.0,0xdc/255.0,1.0);//gray dark
-				int heighStep = int((height - 49) / 7);//index 0-4 (0 mid river, 1 green, 2 coast, 3 flat, 4 mountain)
+				int heighStep = int((height - 64) / 2);//index 0-4 (0 mid river, 1 green, 2 coast, 3 flat, 4 mountain)
 				if (heighStep < 0) heighStep = 0;
 				if (heighStep > 4) heighStep = 4;
 				outputF = vec4(terrainMode3Colors[heighStep], 1.0);

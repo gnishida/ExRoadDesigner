@@ -10,13 +10,13 @@ Set "Across River" 300.
    Clean Avenues [ON]
    Avenue patch dist: 80
 
-2) Canberra //Holywood
+2) Canberra
    Clean Avenues [ON]
-   Avenue patch dist: 100
+   Avenue patch dist: 80
 
 3) New York
    Clean Avenues [ON]
-   Avenue patch dist: 100
+   Avenue patch dist: 80
 
 4) Amsterdam
    Clean Avenues [ON]
@@ -40,25 +40,29 @@ Area:    segments_updated.area
    Clean Avenues [ON]
    Avenue patch dist: 80
 
-2) New York
+2) Canberra
    Clean Avenues [ON]
-   Avenue patch dist: 100
+   Avenue patch dist: 80
 
-3) Amsterdam
+3) New York
+   Clean Avenues [ON]
+   Avenue patch dist: 80
+
+4) Amsterdam
    Clean Avenues [ON]
    Avenue patch dist: 80
    
-4) Quito
-   Clean Avenues [ON]
-   Avenue patch dist: 100
-
 5) Barcelona
    Clean Avenues [ON]
    Avenue patch dist: 80
- 
-6) Canberra //Holywood
+
+6) Quito
    Clean Avenues [ON]
-   Avenue patch dist: 100
+   Avenue patch dist: 80
+
+
+ 
+
  
 7) click [Clear Boundary Flag] and [Remove Dangling Edges]
    

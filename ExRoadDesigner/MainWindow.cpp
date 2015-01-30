@@ -986,6 +986,8 @@ void MainWindow::onUpdateMountain() {
  * 11~ -- mountains
  */
 void MainWindow::onTerrainSegmentation() {
+	//urbanGeometry->segmentTerrain(glWidget->vboRenderManager.vboTerrain);
+
 	std::vector<std::vector<Polygon2D> > polygonsSet;
 	polygonsSet.resize(5);	// 0 -- flat / 1 -- coast / 2 -- park / 3 -- water / 4 -- mountains
 
@@ -998,7 +1000,7 @@ void MainWindow::onTerrainSegmentation() {
 		for (int c = 0; c < glWidget->vboRenderManager.vboTerrain.resolution() - 1; ++c) {
 			uchar value0 = glWidget->vboRenderManager.vboTerrain.layerData.at<float>(r, c);
 
-			if (value0 <= 1) {
+			if (value0 <= 20) {
 				// try to find the closest area type
 				bool done = false;
 				for (int d = 1; d <= 10 && !done; ++d) {
@@ -1006,7 +1008,7 @@ void MainWindow::onTerrainSegmentation() {
 						int cc = c - d;
 						if (rr < 0 || rr >= glWidget->vboRenderManager.vboTerrain.resolution() || cc < 0 || cc >= glWidget->vboRenderManager.vboTerrain.resolution()) continue;
 						float v = glWidget->vboRenderManager.vboTerrain.layerData.at<float>(rr, cc);
-						if (v > 1) {
+						if (v > 50) {
 							value0 = v;
 							done = true;
 							break;
@@ -1015,7 +1017,7 @@ void MainWindow::onTerrainSegmentation() {
 						cc = c + d;
 						if (rr < 0 || rr >= glWidget->vboRenderManager.vboTerrain.layerData.rows || cc < 0 || cc >= glWidget->vboRenderManager.vboTerrain.layerData.cols) continue;
 						v = glWidget->vboRenderManager.vboTerrain.layerData.at<float>(rr, cc);
-						if (v > 1) {
+						if (v > 50) {
 							value0 = v;
 							done = true;
 						}
@@ -1025,7 +1027,7 @@ void MainWindow::onTerrainSegmentation() {
 						int rr = r - d;
 						if (rr < 0 || rr >= glWidget->vboRenderManager.vboTerrain.layerData.rows || cc < 0 || cc >= glWidget->vboRenderManager.vboTerrain.layerData.cols) continue;
 						float v = glWidget->vboRenderManager.vboTerrain.layerData.at<float>(rr, cc);
-						if (v > 1) {
+						if (v > 50) {
 							value0 = v;
 							done = true;
 							break;
@@ -1034,7 +1036,7 @@ void MainWindow::onTerrainSegmentation() {
 						rr = r + d;
 						if (rr < 0 || rr >= glWidget->vboRenderManager.vboTerrain.layerData.rows || cc < 0 || cc >= glWidget->vboRenderManager.vboTerrain.layerData.cols) continue;
 						v = glWidget->vboRenderManager.vboTerrain.layerData.at<float>(rr, cc);
-						if (v > 1) {
+						if (v > 50) {
 							value0 = v;
 							done = true;
 						}
@@ -1046,15 +1048,15 @@ void MainWindow::onTerrainSegmentation() {
 			float value2 = glWidget->vboRenderManager.vboTerrain.layerData.at<float>(r + 1, c + 1);
 			float value3 = glWidget->vboRenderManager.vboTerrain.layerData.at<float>(r, c + 1);
 			
-			if (value0 <= 10 && value0 >= 7) {
-				if (value1 < 8) value1 = value0;
-				if (value2 < 8) value2 = value0;
-				if (value3 < 8) value3 = value0;
+			if (value0 <= 71 && value0 >= 63) {
+				if (value1 < 65) value1 = value0;
+				if (value2 < 65) value2 = value0;
+				if (value3 < 65) value3 = value0;
 			}
-			if (value0 > 10) {
-				if (value1 > 10) value1 = value0;
-				if (value2 > 10) value2 = value0;
-				if (value3 > 10) value3 = value0;
+			if (value0 > 71) {
+				if (value1 > 71) value1 = value0;
+				if (value2 > 71) value2 = value0;
+				if (value3 > 71) value3 = value0;
 			}
 
 			if (value1 == value0 && value2 == value0 && value3 == value0) {
@@ -1069,15 +1071,15 @@ void MainWindow::onTerrainSegmentation() {
 				polygon.push_back(pt2);
 				polygon.push_back(pt3);
 
-				if (value0 == 10) {			// flat area
+				if (value0 >= 69 && value0 < 71) {			// flat area
 					polygonsSet[0].push_back(polygon);
-				} else if (value0 == 9) {	// coast area
+				} else if (value0 >= 67 && value0 < 69) {	// coast area
 					polygonsSet[1].push_back(polygon);
-				} else if (value0 == 8) {	// park
+				} else if (value0 >= 65 && value0 < 67) {	// park
 					polygonsSet[2].push_back(polygon);
-				} else if (value0 == 7) {	// water area
+				} else if (value0 >= 63 && value0 < 65) {	// water area
 					polygonsSet[3].push_back(polygon);
-				} else if (value0 > 10) {	// mountains
+				} else if (value0 > 71) {					// mountains
 					polygonsSet[4].push_back(polygon);
 				}
 			}
@@ -1150,6 +1152,14 @@ void MainWindow::onTerrainDataConverter() {
 	cv::imwrite(filename2.toUtf8().data(), saveImage);
 }
 
+/**
+ * 古い高さ設定のterrainを、新しい高さ設定に変換する。
+ * water front	49 -> 64
+ * park			56 -> 66
+ * coast		63 -> 68
+ * flat			70 -> 70
+ * mountains	77 -> keep as it is
+ */
 void MainWindow::onTerrainDataConverter2() {
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open Terrain file..."), "", tr("Terrain Files (*.png)"));
 	if (filename.isEmpty()) return;
@@ -1164,16 +1174,16 @@ void MainWindow::onTerrainDataConverter2() {
 
 	for (int r = 0; r < img.rows; ++r) {
 		for (int c = 0; c < img.cols; ++c) {
-			if (fabs(img.at<float>(r, c) - 49) < 3.0f) {
-				img.at<float>(r, c) = 67.0f;
-			} else if (fabs(img.at<float>(r, c) - 56) < 3.0f) {
+			if (fabs(img.at<float>(r, c) - 49) < 3.0f) {		// water front
+				img.at<float>(r, c) = 64.0f;
+			} else if (fabs(img.at<float>(r, c) - 56) < 3.0f) {	// park
+				img.at<float>(r, c) = 66.0f;
+			} else if (fabs(img.at<float>(r, c) - 63) < 3.0f) {	// coast
 				img.at<float>(r, c) = 68.0f;
-			} else if (fabs(img.at<float>(r, c) - 63) < 3.0f) {
-				img.at<float>(r, c) = 69.0f;
-			} else if (fabs(img.at<float>(r, c) - 70) < 3.0f) {
+			} else if (fabs(img.at<float>(r, c) - 70) < 3.0f) { // flat
 				img.at<float>(r, c) = 70.0f;
-			} else if (img.at<float>(r, c) > 74.0f) {
-				img.at<float>(r, c) = 71.0f;
+			} else if (img.at<float>(r, c) > 74.0f) {			// mountains
+				//img.at<float>(r, c) = 72.0f;
 			}
 		}
 	}

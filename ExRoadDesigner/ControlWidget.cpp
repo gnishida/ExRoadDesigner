@@ -101,7 +101,7 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 void ControlWidget::generateRoadsEx() {
 	if (mainWin->urbanGeometry->areas.selectedIndex == -1) return;
 
-	G::global()["seaLevel"] = 60.0f;
+	G::global()["seaLevel"] = 40.0f;
 	G::global()["numAvenueIterations"] = ui.lineEditNumAvenueIterations->text().toInt();
 	G::global()["numStreetIterations"] = ui.lineEditNumStreetIterations->text().toInt();
 	int numExamples = ui.lineEditNumExamples->text().toInt();
@@ -371,21 +371,20 @@ void ControlWidget::contentDesign(int) {
 	changeTerrainShader(0);
 }
 
-void ControlWidget::contentDesignLevel(){
-	int newLevel = 0;
-	if (ui.content_1->isChecked()) {
-		newLevel=1;
-	} else if (ui.content_7->isChecked()) {
-		newLevel=7;
-	} else if (ui.content_8->isChecked()) {
-		newLevel=8;
-	} else if (ui.content_9->isChecked()) {
-		newLevel=9;
-	} else if (ui.content_10->isChecked()) {
-		newLevel=10;
-	} else if (ui.content_11->isChecked()) {
-		newLevel=11;
+void ControlWidget::contentDesignLevel() {
+	if (ui.content_0->isChecked()) { // Sea
+		G::global()["content_terrainLevel"] = 0.0f;
+	} else if (ui.content_1->isChecked()) { // River
+		G::global()["content_terrainLevel"] = 5.0f;
+	} else if (ui.content_7->isChecked()) { // water front
+		G::global()["content_terrainLevel"] = 64.0f;
+	} else if (ui.content_8->isChecked()) { // park
+		G::global()["content_terrainLevel"] = 66.0f;
+	} else if (ui.content_9->isChecked()) { // coast
+		G::global()["content_terrainLevel"] = 68.0f;
+	} else if (ui.content_10->isChecked()) { // flat
+		G::global()["content_terrainLevel"] = 70.0f;
+	} else if (ui.content_11->isChecked()) { // mountain
+		G::global()["content_terrainLevel"] = 72.0f;
 	}
-	G::global()["content_terrainLevel"] = newLevel * 7.0f;
-	printf("New Level %d\n",newLevel);
 }
