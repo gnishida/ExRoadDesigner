@@ -35,9 +35,7 @@ bool vertex_output_visitor_invalid = false;
 struct output_visitor : public boost::planar_face_traversal_visitor
 {
 	void begin_face()
-	{
-		//std::cout << "face: " << face_index++ << std::endl;
-		
+	{		
 		sidewalkContourTmp.clear();
 		sidewalkContourWidths.clear();
 
@@ -373,9 +371,16 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 		float min_z = std::numeric_limits<float>::max();
 		float max_z = 0.0f;
 		for (int pi = 0; pi < blocks[i].sidewalkContour.contour.size(); ++pi) {
-			float z = renderManager->getTerrainHeight(blocks[i].sidewalkContour.contour[pi].x(), blocks[i].sidewalkContour.contour[pi].y());
-			min_z = std::min(min_z, z);
-			max_z = std::max(max_z, z);
+			int next_pi = (pi + 1) % blocks[i].sidewalkContour.contour.size();
+			for (int k = 0; k <= 10; ++k) {
+				QVector3D pt = blocks[i].sidewalkContour.contour[pi] * (float)(10 - k) * 0.1 + blocks[i].sidewalkContour.contour[next_pi] * (float)k * 0.1;
+				float z = renderManager->getTerrainHeight(pt.x(), pt.y());
+				min_z = std::min(min_z, z);
+				max_z = std::max(max_z, z);
+			}
+			//float z = renderManager->getTerrainHeight(blocks[i].sidewalkContour.contour[pi].x(), blocks[i].sidewalkContour.contour[pi].y());
+			//min_z = std::min(min_z, z);
+			//max_z = std::max(max_z, z);
 		}
 		if (min_z < 40.0f || max_z - min_z > 10.0f) {
 			blocks[i].valid = false;
