@@ -1024,7 +1024,7 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, f
 		new_edge->polyline.push_back(roads.graph[curDesc]->pt);
 
 		bool found = false;
-		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, curDesc, step * (num_steps - iter) * 2.0f, G::getFloat("seaLevel"), angle, 0.3f, tgtDesc)) {
+		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, curDesc, step * 2.0f, G::getFloat("seaLevel"), angle, 0.3f, tgtDesc)) {
 			found = true;
 		}
 
@@ -1177,6 +1177,13 @@ bool PatchRoadGenerator::growRoadSegment(int roadType, RoadVertexDesc srcDesc, f
 			if (z < G::getFloat("seaLevel")) {
 				break;
 			}
+		}
+
+		// 遠くにある、近接頂点に向かうよう、方向を変える
+		if (RoadGeneratorHelper::getVertexForSnapping(*vboRenderManager, roads, curDesc, step * (num_steps - iter) * 2.0f, G::getFloat("seaLevel"), angle, 0.3f, tgtDesc)) {
+			QVector2D dir = roads.graph[tgtDesc]->pt - curPt;
+			float a = atan2f(dir.y(), dir.x());
+			angle += Util::diffAngle(a, angle, false) * 0.5f;
 		}
 	}
 

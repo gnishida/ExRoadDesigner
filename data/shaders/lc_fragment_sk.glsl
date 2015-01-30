@@ -165,18 +165,17 @@ void main(){
 		// 0 FLAT (Maps)
 		if(terrainMode==0){
 			float height=outColor.r;///COMPUTED IN VERTEX
-			if(height<=15){//water
-				if(height<=13){
-					outputF=vec4(0xa0/255.0,0xc3/255.0,0xff/255.0,1.0);//water blue
-				}else{
-					outputF=mix(
-						vec4(0x84/255.0,0xa9/255.0,0xe6/255.0,1.0),//water blue dark 92bbff (mine 84a9e6)
-						vec4(0xa0/255.0,0xc3/255.0,0xff/255.0,1.0),//water blue
-						(15.0f-height)*0.5f);
-				}
-			}else{
-				//outputF=vec4(0xf0/255.0,0xed/255.0,0xe5/255.0,1.0);//grey brighter
-				outputF=vec4(0xe9/255.0,0xe5/255.0,0xdc/255.0,1.0);//gray dark
+			if (height < 40){ //water
+				outputF=mix(
+						vec4(190/255.0, 225/255.0, 255/255.0, 1.0),
+						vec4(168/255.0, 209/255.0, 255/255.0, 1.0),
+						height/40);
+			} else if (height < 80) {
+				outputF=vec4(242/255.0, 239/255.0, 233/255.0, 1.0);
+			} else if (height < 200) {
+				outputF=vec4(232/255.0, 230/255.0, 221/255.0, 1.0);
+			} else {
+				outputF=vec4(212/255.0, 230/255.0, 183/255.0, 1.0);
 			}
 			return;
 		}
@@ -211,7 +210,7 @@ void main(){
 			vec4 terrainColor=vec4(0,0,0,1.0);
 			float factor;
 			const float maxHeight=9.0;//7=255*7 1500m (change in vertex shader as well) HERE IS 9 TO ALLOW LESS HIGH MOUNTAINS
-			float height=100.0f*(origVertex.z/maxHeight)/255.0;//0-100
+			float height=origVertex.z*0.15;//100.0f*(origVertex.z/maxHeight)/255.0;//0-100
 			height=clamp(height,0.0,99.999999);//0-99.99
 
 			int texInd=int(height/25);
