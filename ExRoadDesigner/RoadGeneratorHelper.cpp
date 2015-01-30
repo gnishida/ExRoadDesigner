@@ -464,6 +464,18 @@ bool RoadGeneratorHelper::getEdgeForSnapping(VBORenderManager& vboRenderManager,
 		if (Util::withinAngle(angle, angle1, angle2) || Util::diffAngle(angle, angle1) < angle_threshold || Util::diffAngle(angle, angle2) < angle_threshold) {
 			QVector2D pt;
 			float dist = GraphUtil::distance(roads, roads.graph[srcDesc]->pt, *ei, pt);
+
+			// 再度、角度のチェック
+			QVector2D vec3 = pt - roads.graph[srcDesc]->pt;
+			float angle3 = atan2f(vec3.y(), vec3.x());
+			if (Util::diffAngle(angle, angle3) > angle_threshold) continue;
+
+			// 既存エッジとの交差をチェック
+			Polyline2D polyline;
+			polyline.push_back(roads.graph[srcDesc]->pt);
+			polyline.push_back(pt);
+			if (GraphUtil::isIntersect(roads, polyline)) continue;
+
 			if (dist < min_dist) {
 				min_dist = dist;
 				found = true;

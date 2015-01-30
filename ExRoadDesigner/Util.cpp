@@ -9,7 +9,7 @@ QVector3D Util::calculateNormal(const QVector3D& p0, const QVector3D& p1, const 
 }
 
 /**
- * Return the sistance from segment ab to point c.
+ * Return the distance from segment ab to point c.
  * If the 
  */
 float Util::pointSegmentDistanceXY(const QVector3D &a, const QVector3D &b, const QVector3D &c, bool segmentOnly) {
@@ -177,8 +177,10 @@ float Util::pointSegmentDistanceXY(const QVector2D& a, const QVector2D& b, const
 		float dist2 = (c.x()-b.x())*(c.x()-b.x()) + (c.y()-b.y())*(c.y()-b.y());
 		if (dist1 < dist2) {	
 			dist = sqrt(dist1);
+			closestPtInAB = a;
 		} else {
 			dist = sqrt(dist2);
+			closestPtInAB = b;
 		}
 	}
 
