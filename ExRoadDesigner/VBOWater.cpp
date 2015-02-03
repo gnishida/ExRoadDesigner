@@ -188,7 +188,7 @@
 		const float yy = y2 * y2;
 		float tmpZ = ((2 * sinf(20 * sqrtf (xx + yy) - 4 * t) + Noise(10 * x, 10 * y, t, 0)) / 4);
 
-		return tmpZ + elevation; //tmpZ - 0.0f;
+		return tmpZ + 60; //tmpZ - 0.0f;
 	}
 
 	/*

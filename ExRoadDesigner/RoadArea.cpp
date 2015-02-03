@@ -92,6 +92,7 @@ void RoadArea::adaptToTerrain(VBORenderManager* vboRenderManager) {
 		float z = 0.0f;
 		if (!G::getBool("shader2D")) {
 			z = vboRenderManager->getTerrainHeight(area[i].x(), area[i].y());
+			if (z < G::getFloat("seaLevel")) z = G::getFloat("seaLevel");
 		}
 		area3D.push_back(QVector3D(area[i].x(), area[i].y(), z + 30));
 	}
@@ -100,6 +101,7 @@ void RoadArea::adaptToTerrain(VBORenderManager* vboRenderManager) {
 		float z = 0.0f;
 		if (!G::getBool("shader2D")) {
 			z = vboRenderManager->getTerrainHeight(hintLine[i].x(), hintLine[i].y());
+			if (z < G::getFloat("seaLevel")) z = G::getFloat("seaLevel");
 		}
 		hintLine3D.push_back(QVector3D(hintLine[i].x(), hintLine[i].y(), z + 30));
 	}
@@ -108,6 +110,7 @@ void RoadArea::adaptToTerrain(VBORenderManager* vboRenderManager) {
 		float z = 0.0f;
 		if (!G::getBool("shader2D")) {
 			z = vboRenderManager->getTerrainHeight(controlPoints[i].x(), controlPoints[i].y());
+			if (z < G::getFloat("seaLevel")) z = G::getFloat("seaLevel");
 		}
 		controlPoints3D.push_back(QVector3D(controlPoints[i].x(), controlPoints[i].y(), z + 30));
 	}
