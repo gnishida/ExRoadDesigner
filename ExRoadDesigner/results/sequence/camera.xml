@@ -1,5 +1,5 @@
 <cameras>
-  <camera xrot="318" yrot="0" zrot="50.8" dx="-2625.56" dy="-349.442" dz="750.95" lookAtX="0" lookAtY="0" lookAtZ="0" />
-  <camera xrot="299.6" yrot="0" zrot="84.8" dx="-999.837" dy="340.362" dz="750.95" lookAtX="0" lookAtY="0" lookAtZ="0" />
-  <camera xrot="298.4" yrot="0" zrot="95.6" dx="668.86" dy="329.3" dz="750.95" lookAtX="0" lookAtY="0" lookAtZ="0" />
+  <camera xrot="318" yrot="0" zrot="50.8" dx="-2625.56" dy="-349.442" dz="550.95" lookAtX="0" lookAtY="0" lookAtZ="0" />
+  <camera xrot="299.6" yrot="0" zrot="84.8" dx="-999.837" dy="340.362" dz="550.95" lookAtX="0" lookAtY="0" lookAtZ="0" />
+  <camera xrot="298.4" yrot="0" zrot="95.6" dx="668.86" dy="329.3" dz="550.95" lookAtX="0" lookAtY="0" lookAtZ="0" />
 </cameras>
