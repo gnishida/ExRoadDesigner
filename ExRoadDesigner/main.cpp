@@ -43,10 +43,10 @@ int main(int argc, char *argv[]) {
 	G::global()["parcel_split_deviation"] = 0.2f;
 	G::global()["parcel_setback_front"] = 5.0f;
 	G::global()["parcel_setback_rear"] = 5.0f;
-	G::global()["parcel_setback_sides"] = 2.0f;
+	G::global()["parcel_setback_sides"] = 5.0f;
 	G::global()["building_max_frontage"] = 0.0f;
 	G::global()["building_max_depth"] = 0.0f;
-	G::global()["building_stories_deviation"] = 0.3f;
+	G::global()["building_stories_deviation"] = 2.0f;
 	G::global()["building_stories_mean"] = 3;
 	G::global()["tree_setback"] = 1.0f;
 
