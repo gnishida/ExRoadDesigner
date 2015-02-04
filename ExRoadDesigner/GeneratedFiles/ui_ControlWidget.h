@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Fri Jan 30 18:13:31 2015
+** Created: Wed Feb 4 11:17:04 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -45,6 +45,8 @@ public:
     QLabel *label_7;
     QLineEdit *lineEditNumExamples;
     QCheckBox *checkBoxUseLayer;
+    QLabel *label_11;
+    QLineEdit *lineEditRandomSeed;
     QGroupBox *groupBox_8;
     QLabel *label_2;
     QLineEdit *lineEditInterpolateSigma2;
@@ -124,12 +126,12 @@ public:
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         TabWidget = new QTabWidget(dockWidgetContents);
         TabWidget->setObjectName(QString::fromUtf8("TabWidget"));
-        TabWidget->setGeometry(QRect(1, 0, 196, 561));
+        TabWidget->setGeometry(QRect(1, 0, 196, 581));
         RoadGenerationTab = new QWidget();
         RoadGenerationTab->setObjectName(QString::fromUtf8("RoadGenerationTab"));
         groupBox = new QGroupBox(RoadGenerationTab);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(10, 10, 171, 181));
+        groupBox->setGeometry(QRect(10, 10, 171, 201));
         label = new QLabel(groupBox);
         label->setObjectName(QString::fromUtf8("label"));
         label->setGeometry(QRect(10, 13, 91, 21));
@@ -139,10 +141,10 @@ public:
         lineEditNumAvenueIterations->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         checkBoxLocalStreets = new QCheckBox(groupBox);
         checkBoxLocalStreets->setObjectName(QString::fromUtf8("checkBoxLocalStreets"));
-        checkBoxLocalStreets->setGeometry(QRect(10, 113, 131, 17));
+        checkBoxLocalStreets->setGeometry(QRect(10, 137, 131, 17));
         checkBoxCropping = new QCheckBox(groupBox);
         checkBoxCropping->setObjectName(QString::fromUtf8("checkBoxCropping"));
-        checkBoxCropping->setGeometry(QRect(10, 132, 121, 17));
+        checkBoxCropping->setGeometry(QRect(10, 156, 121, 17));
         label_3 = new QLabel(groupBox);
         label_3->setObjectName(QString::fromUtf8("label_3"));
         label_3->setGeometry(QRect(10, 33, 81, 21));
@@ -152,10 +154,10 @@ public:
         lineEditNumStreetIterations->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         checkBoxCleanAvenues = new QCheckBox(groupBox);
         checkBoxCleanAvenues->setObjectName(QString::fromUtf8("checkBoxCleanAvenues"));
-        checkBoxCleanAvenues->setGeometry(QRect(10, 76, 131, 17));
+        checkBoxCleanAvenues->setGeometry(QRect(10, 100, 131, 17));
         checkBoxCleanStreets = new QCheckBox(groupBox);
         checkBoxCleanStreets->setObjectName(QString::fromUtf8("checkBoxCleanStreets"));
-        checkBoxCleanStreets->setGeometry(QRect(10, 94, 131, 17));
+        checkBoxCleanStreets->setGeometry(QRect(10, 118, 131, 17));
         label_7 = new QLabel(groupBox);
         label_7->setObjectName(QString::fromUtf8("label_7"));
         label_7->setGeometry(QRect(10, 53, 81, 21));
@@ -165,10 +167,17 @@ public:
         lineEditNumExamples->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         checkBoxUseLayer = new QCheckBox(groupBox);
         checkBoxUseLayer->setObjectName(QString::fromUtf8("checkBoxUseLayer"));
-        checkBoxUseLayer->setGeometry(QRect(10, 152, 121, 17));
+        checkBoxUseLayer->setGeometry(QRect(10, 176, 121, 17));
+        label_11 = new QLabel(groupBox);
+        label_11->setObjectName(QString::fromUtf8("label_11"));
+        label_11->setGeometry(QRect(10, 73, 81, 21));
+        lineEditRandomSeed = new QLineEdit(groupBox);
+        lineEditRandomSeed->setObjectName(QString::fromUtf8("lineEditRandomSeed"));
+        lineEditRandomSeed->setGeometry(QRect(100, 73, 61, 20));
+        lineEditRandomSeed->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         groupBox_8 = new QGroupBox(RoadGenerationTab);
         groupBox_8->setObjectName(QString::fromUtf8("groupBox_8"));
-        groupBox_8->setGeometry(QRect(10, 210, 171, 311));
+        groupBox_8->setGeometry(QRect(10, 230, 171, 311));
         label_2 = new QLabel(groupBox_8);
         label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setGeometry(QRect(10, 92, 61, 21));
@@ -445,7 +454,7 @@ public:
 
         retranslateUi(ControlWidget);
 
-        TabWidget->setCurrentIndex(1);
+        TabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(ControlWidget);
@@ -462,6 +471,7 @@ public:
         checkBoxCleanStreets->setText(QApplication::translate("ControlWidget", "Clean Local Streets", 0, QApplication::UnicodeUTF8));
         label_7->setText(QApplication::translate("ControlWidget", "# Examples:", 0, QApplication::UnicodeUTF8));
         checkBoxUseLayer->setText(QApplication::translate("ControlWidget", "Use Layer", 0, QApplication::UnicodeUTF8));
+        label_11->setText(QApplication::translate("ControlWidget", "Random seed:", 0, QApplication::UnicodeUTF8));
         groupBox_8->setTitle(QApplication::translate("ControlWidget", "Road Generation", 0, QApplication::UnicodeUTF8));
         label_2->setText(QApplication::translate("ControlWidget", "sigma2 ^2", 0, QApplication::UnicodeUTF8));
         label_6->setText(QApplication::translate("ControlWidget", "sigma1 ^2", 0, QApplication::UnicodeUTF8));

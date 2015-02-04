@@ -10,6 +10,7 @@
 #include "SmallBlockRemover.h"
 #include "ShapeDetector.h"
 #include <assert.h>
+#include <QtTest/qtest.h>
 
 void WarpRoadGenerator::generateRoadNetwork() {
 	srand(12345);
@@ -52,7 +53,7 @@ void WarpRoadGenerator::generateRoadNetwork() {
 
 	// Avenueのシードを生成
 	generateAvenueSeeds(seeds);
-
+	
 	// Avenueを生成
 	std::cout << "Avenue generation started." << std::endl;
 	{
@@ -68,6 +69,8 @@ void WarpRoadGenerator::generateRoadNetwork() {
 
 			}
 		}
+
+		srand(G::getFloat("randomSeed"));
 
 		int iter;
 		for (iter = 0; !seeds.empty() && iter < G::getInt("numAvenueIterations");) {
@@ -136,6 +139,8 @@ void WarpRoadGenerator::generateRoadNetwork() {
 
 	// Local streetを生成
 	if (G::getBool("generateLocalStreets")) {
+		std::cout << "Local street generation started." << std::endl;
+
 		generateStreetSeeds(seeds);
 
 		// detect interesting shapes
@@ -150,7 +155,7 @@ void WarpRoadGenerator::generateRoadNetwork() {
 			}
 		}
 
-		std::cout << "Local street generation started." << std::endl;
+		srand(G::getFloat("randomSeed"));
 		
 		int iter;
 		for (iter = 0; !seeds.empty() && iter < G::getInt("numStreetIterations");) {
@@ -976,14 +981,16 @@ void WarpRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc, 
 		if (roadType == RoadEdge::TYPE_AVENUE) {
 			num_steps = ceilf(f.avgAvenueLength / f.avgStreetLength);
 
-			step = Util::genRandNormal(f.avgStreetLength, f.varStreetLength);
+			step = Util::genRand(f.avgStreetLength * 0.5, f.avgStreetLength * 1.5);
+			//step = Util::genRandNormal(f.avgStreetLength, f.varStreetLength);
 			if (step < f.avgStreetLength * 0.5f) step = f.avgStreetLength * 0.5f;
 
 			curvature = f.avgAvenueCurvature;
 		} else {
 			num_steps = 1;
 
-			step = Util::genRandNormal(f.avgStreetLength, f.varStreetLength);
+			step = Util::genRand(f.avgStreetLength * 0.5, f.avgStreetLength * 1.5);
+			//step = Util::genRandNormal(f.avgStreetLength, f.varStreetLength);
 			if (step < f.avgStreetLength * 0.5f) step = f.avgStreetLength * 0.5f;
 
 			curvature = f.avgStreetCurvature;

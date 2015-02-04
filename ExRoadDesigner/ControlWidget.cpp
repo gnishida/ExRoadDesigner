@@ -20,6 +20,7 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.lineEditNumAvenueIterations->setText("1500");
 	ui.lineEditNumStreetIterations->setText("6000");
 	ui.lineEditNumExamples->setText("1");
+	ui.lineEditRandomSeed->setText("12345");
 	ui.checkBoxCleanAvenues->setChecked(true);
 	ui.checkBoxCleanStreets->setChecked(false);
 	ui.checkBoxLocalStreets->setChecked(true);
@@ -145,6 +146,7 @@ void ControlWidget::generateRoadsWarp() {
 	G::global()["numAvenueIterations"] = ui.lineEditNumAvenueIterations->text().toInt();
 	G::global()["numStreetIterations"] = ui.lineEditNumStreetIterations->text().toInt();
 	int numExamples = ui.lineEditNumExamples->text().toInt();
+	G::global()["randomSeed"] = ui.lineEditRandomSeed->text().toInt();
 	G::global()["cleanAvenues"] = ui.checkBoxCleanAvenues->isChecked();
 	G::global()["cleanStreets"] = ui.checkBoxCleanStreets->isChecked();
 	G::global()["generateLocalStreets"] = ui.checkBoxLocalStreets->isChecked();

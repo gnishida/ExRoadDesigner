@@ -68,6 +68,8 @@ void PatchRoadGenerator::generateRoadNetwork() {
 			}
 		}
 
+		srand(G::getFloat("randomSeed"));
+
 		int iter;
 		for (iter = 0; !seeds.empty() && iter < G::getInt("numAvenueIterations"); ) {
 			RoadVertexDesc desc = seeds.front();
@@ -135,6 +137,8 @@ void PatchRoadGenerator::generateRoadNetwork() {
 
 	// Local streetを生成
 	if (G::getBool("generateLocalStreets")) {
+		std::cout << "Local street generation started." << std::endl;
+
 		generateStreetSeeds(seeds);
 		
 		// detect interesting shapes
@@ -149,7 +153,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 			}
 		}
 		
-		std::cout << "Local street generation started." << std::endl;
+		srand(G::getFloat("randomSeed"));
 
 		int iter;
 		for (iter = 0; !seeds.empty() && iter < G::getInt("numStreetIterations");) {
@@ -946,14 +950,16 @@ void PatchRoadGenerator::attemptExpansion2(int roadType, RoadVertexDesc srcDesc,
 		if (roadType == RoadEdge::TYPE_AVENUE) {
 			num_steps = ceilf(f.avgAvenueLength / f.avgStreetLength);
 
-			step = Util::genRandNormal(f.avgStreetLength, f.varStreetLength);
+			step = Util::genRand(f.avgStreetLength * 0.5, f.avgStreetLength * 1.5);
+			//step = Util::genRandNormal(f.avgStreetLength, f.varStreetLength);
 			if (step < f.avgStreetLength * 0.5f) step = f.avgStreetLength * 0.5f;
 
 			curvature = f.avgAvenueCurvature;
 		} else {
 			num_steps = 1;
 
-			step = Util::genRandNormal(f.avgStreetLength, f.varStreetLength);
+			step = Util::genRand(f.avgStreetLength * 0.5, f.avgStreetLength * 1.5);
+			//step = Util::genRandNormal(f.avgStreetLength, f.varStreetLength);
 			if (step < f.avgStreetLength * 0.5f) step = f.avgStreetLength * 0.5f;
 
 			curvature = f.avgStreetCurvature;

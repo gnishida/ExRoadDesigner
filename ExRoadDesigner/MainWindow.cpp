@@ -639,7 +639,6 @@ void MainWindow::onGrowingVideo() {
 
 	G::global()["seaLevel"] = 60.0f;
 	int numExamples = controlWidget->ui.lineEditNumExamples->text().toInt();
-	G::global()["cleanAvenues"] = controlWidget->ui.checkBoxCleanAvenues->isChecked();
 	G::global()["cleanStreets"] = controlWidget->ui.checkBoxCleanStreets->isChecked();
 	G::global()["cropping"] = controlWidget->ui.checkBoxCropping->isChecked();
 	G::global()["useLayer"] = controlWidget->ui.checkBoxUseLayer->isChecked();
@@ -681,13 +680,14 @@ void MainWindow::onGrowingVideo() {
 		features[i].ex_id = i;
 	}
 
+	G::global()["cleanAvenues"] = false;
 	int frame_no = 0;
 	for (int i = 0; i < dlg.numAvenueIterations; i+=dlg.frequency) {
 		G::global()["numAvenueIterations"] = i;
 		G::global()["numStreetIterations"] = 0;
 		G::global()["generateLocalStreets"] = false;
 
-		urbanGeometry->clear();
+		urbanGeometry->clearRoads();
 
 		// recover the original roads
 		GraphUtil::copyRoads(origRoads, urbanGeometry->roads);
@@ -697,7 +697,7 @@ void MainWindow::onGrowingVideo() {
 		urbanGeometry->areas.selectedIndex = urbanGeometry->areas.size() - 1;
 
 		// cut the roads within the area
-		//GraphUtil::subtractRoads(urbanGeometry->roads, area.area, false);
+		GraphUtil::subtractRoads(urbanGeometry->roads, area.area, false);
 
 		if (dlg.generationMethod == "Multi Examples") {
 			urbanGeometry->generateRoadsEx(features);
@@ -726,6 +726,7 @@ void MainWindow::onGrowingVideo() {
 		}
 	}
 
+	G::global()["cleanAvenues"] = controlWidget->ui.checkBoxCleanAvenues->isChecked();
 	for (int i = 0; i < dlg.numStreetIterations; i+=dlg.frequency) {
 		G::global()["numAvenueIterations"] = controlWidget->ui.lineEditNumAvenueIterations->text().toInt();
 		G::global()["numStreetIterations"] = i;
@@ -741,7 +742,7 @@ void MainWindow::onGrowingVideo() {
 		urbanGeometry->areas.selectedIndex = urbanGeometry->areas.size() - 1;
 
 		// cut the roads within the area
-		//GraphUtil::subtractRoads(urbanGeometry->roads, area.area, false);
+		GraphUtil::subtractRoads(urbanGeometry->roads, area.area, false);
 
 		if (dlg.generationMethod == "Multi Examples") {
 			urbanGeometry->generateRoadsEx(features);
