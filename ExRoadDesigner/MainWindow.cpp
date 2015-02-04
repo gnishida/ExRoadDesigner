@@ -635,6 +635,9 @@ void MainWindow::onGrowingVideo() {
 	GrowingVideoSettingDialog dlg(this);
 	if (dlg.exec() != QDialog::Accepted) return;
 
+
+
+	G::global()["seaLevel"] = 60.0f;
 	int numExamples = controlWidget->ui.lineEditNumExamples->text().toInt();
 	G::global()["cleanAvenues"] = controlWidget->ui.checkBoxCleanAvenues->isChecked();
 	G::global()["cleanStreets"] = controlWidget->ui.checkBoxCleanStreets->isChecked();
@@ -648,6 +651,8 @@ void MainWindow::onGrowingVideo() {
 	G::global()["interpolationSigma2"] = controlWidget->ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["rotationAngle"] = controlWidget->ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadAngleTolerance"] = controlWidget->ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
+	G::global()["slopeTolerance"] = controlWidget->ui.lineEditSlopeTolerance->text().toFloat() / 180.0f * M_PI;
+	G::global()["acrossRiverTolerance"] = controlWidget->ui.lineEditAcrossRiverTolerance->text().toFloat();
 
 	// backup the roads and area
 	RoadGraph origRoads;
@@ -673,6 +678,7 @@ void MainWindow::onGrowingVideo() {
 		} else {
 			features[i].load(filename, true);
 		}
+		features[i].ex_id = i;
 	}
 
 	int frame_no = 0;
@@ -691,7 +697,7 @@ void MainWindow::onGrowingVideo() {
 		urbanGeometry->areas.selectedIndex = urbanGeometry->areas.size() - 1;
 
 		// cut the roads within the area
-		GraphUtil::subtractRoads(urbanGeometry->roads, area.area, false);
+		//GraphUtil::subtractRoads(urbanGeometry->roads, area.area, false);
 
 		if (dlg.generationMethod == "Multi Examples") {
 			urbanGeometry->generateRoadsEx(features);
@@ -735,7 +741,7 @@ void MainWindow::onGrowingVideo() {
 		urbanGeometry->areas.selectedIndex = urbanGeometry->areas.size() - 1;
 
 		// cut the roads within the area
-		GraphUtil::subtractRoads(urbanGeometry->roads, area.area, false);
+		//GraphUtil::subtractRoads(urbanGeometry->roads, area.area, false);
 
 		if (dlg.generationMethod == "Multi Examples") {
 			urbanGeometry->generateRoadsEx(features);
