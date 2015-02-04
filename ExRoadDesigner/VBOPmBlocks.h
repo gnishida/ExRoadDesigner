@@ -25,6 +25,7 @@ public:
 
 	static void buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding);
 	static void generateSideWalk(VBORenderManager* renderManager, BlockSet& blocks);
+	static void saveBlockImage(RoadGraph& roads, Polygon3D& contour, const char* filename);
 };
 
 

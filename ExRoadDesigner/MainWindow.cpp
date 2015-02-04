@@ -787,6 +787,7 @@ void MainWindow::on3DVideo() {
 
 	for (int i = 0; i < cs.cameras.size(); ++i) {
 		glWidget->flyCamera = cs.cameras[i];
+		glWidget->camera = &(glWidget->flyCamera);
 		glWidget->updateCamera();
 		glWidget->updateGL();
 

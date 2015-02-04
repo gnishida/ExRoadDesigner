@@ -5,7 +5,7 @@
 
 #include "VBORenderManager.h"
 #include "VBOGeoBuilding.h"
-
+#include "Util.h"
 #include "qdir.h"
 const float storyHeight=4.2f;
 
@@ -516,7 +516,7 @@ void VBOGeoBuilding::generateBuilding(VBORenderManager& rendManager,Building& bu
 
 		////////////////////////////
 		// FLOORS
-		float randC=(0.8*qrand())/RAND_MAX;
+		int randC = Util::genRand(0, 255 * 0.8);
 		QColor bldgColor(randC,randC,randC);
 		///////////////////////////
 		// First floor

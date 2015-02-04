@@ -133,6 +133,8 @@ void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, Block
 			std::vector<Vertex> vert;
 			QVector3D color;
 
+			if (blocks[i].myParcels[*vi].parcelContour.isSelfIntersecting()) continue;
+
 			// 上面のモデル
 			int randPark=1;//qrand()%grassFileNames.size();
 			rendManager.addStaticGeometry2("3d_parcels", blocks[i].myParcels[*vi].parcelContour.contour, deltaZ, false, grassFileNames[randPark], GL_QUADS, 2|mode_AdaptTerrain, QVector3D(0.05f,0.05f,0.05f), QColor());
@@ -186,7 +188,9 @@ void BlockMeshGenerator::generate2DParcelMesh(VBORenderManager& rendManager, Blo
 			if (blocks[bN].isPark) continue;
 
 			Block::parcelGraphVertexIter vi, viEnd;	
-			for (boost::tie(vi, viEnd) = boost::vertices(blocks[bN].myParcels); vi != viEnd; ++vi) {	
+			for (boost::tie(vi, viEnd) = boost::vertices(blocks[bN].myParcels); vi != viEnd; ++vi) {
+				if (blocks[bN].myParcels[*vi].parcelContour.isSelfIntersecting()) continue;
+
 				Polygon3D pol = blocks[bN].myParcels[*vi].parcelBuildableAreaContour;
 				for (int i = 0; i < pol.contour.size(); ++i) {
 					int next = (i+1) % pol.contour.size();

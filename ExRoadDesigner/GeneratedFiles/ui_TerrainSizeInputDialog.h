@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'TerrainSizeInputDialog.ui'
 **
-** Created: Fri Jan 30 18:13:31 2015
+** Created: Wed Feb 4 12:25:34 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

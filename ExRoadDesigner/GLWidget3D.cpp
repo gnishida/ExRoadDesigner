@@ -487,6 +487,7 @@ void GLWidget3D::drawScene(int drawMode) {
 		mainWin->urbanGeometry->render(vboRenderManager);
 		
 		vboRenderManager.vboTerrain.render(true);
+		glLineWidth(G::global().getFloat("2d_parcelLine"));
 		vboRenderManager.renderStaticGeometry("3d_blocks");
 		vboRenderManager.renderStaticGeometry("3d_parks");
 		vboRenderManager.renderStaticGeometry("3d_parcels");

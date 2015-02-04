@@ -11,7 +11,7 @@
 bool VBOPmParcels::generateParcels(VBORenderManager& rendManager, std::vector< Block > &blocks) {
 	srand(0);
 	for (int i = 0; i < blocks.size(); ++i) {
-		if (blocks[i].valid && !blocks[i].isPark) {
+		if (blocks[i].valid) {
 			subdivideBlockIntoParcels(blocks[i]);
 		}
 	}
@@ -30,13 +30,22 @@ void VBOPmParcels::subdivideBlockIntoParcels(Block &block) {
 	Parcel tmpParcel;
 	tmpParcel.setContour(block.blockContour);
 
-	subdivideParcel(block, tmpParcel, G::getFloat("parcel_area_mean"), G::getFloat("parcel_area_min"), G::getFloat("parcel_area_deviation"), G::getFloat("parcel_split_deviation"), tmpParcels);
+	if (block.isPark) {
+		tmpParcel.isPark = true;
+		tmpParcels.push_back(tmpParcel);
+	} else {
+		subdivideParcel(block, tmpParcel, G::getFloat("parcel_area_mean"), G::getFloat("parcel_area_min"), G::getFloat("parcel_area_deviation"), G::getFloat("parcel_split_deviation"), tmpParcels);
+	}
 
 	Block::parcelGraphVertexDesc tmpPGVD;
 	for(int i=0; i<tmpParcels.size(); ++i){
 		//add parcel to block parcels graph
 		tmpPGVD = boost::add_vertex(block.myParcels);
 		block.myParcels[tmpPGVD] = tmpParcels[i];
+
+		if (Util::genRand() < 0.05) {
+			block.myParcels[tmpPGVD].isPark = true;
+		}
 	}
 }
 
@@ -118,9 +127,11 @@ bool VBOPmParcels::subdivideParcel(Block &block, Parcel parcel, float areaMean, 
 		parcel2.setContour(pgon2);
 
 		//call recursive function for both parcels
-		subdivideParcel(block, parcel1, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
-		subdivideParcel(block, parcel2, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
+		if (!subdivideParcel(block, parcel1, areaMean, areaMin, areaStd, splitIrregularity, outParcels)) return false;
+		if (!subdivideParcel(block, parcel2, areaMean, areaMin, areaStd, splitIrregularity, outParcels)) return false;
 	} else {
+		parcel.isPark = true;
+		outParcels.push_back(parcel);
 		return false;
 	}
 

@@ -29,13 +29,19 @@ bool isFirstVertexVisited;
 int curRandSeed;
 int curPlaceTypeIdx;
 
+int prevV;
+
 int face_index = 0;
 bool vertex_output_visitor_invalid = false;
 
 struct output_visitor : public boost::planar_face_traversal_visitor
 {
 	void begin_face()
-	{		
+	{
+		face_index++;
+		if (face_index == 700 || face_index == 818) {
+			int xxx = 0;
+		}
 		sidewalkContourTmp.clear();
 		sidewalkContourWidths.clear();
 
@@ -43,6 +49,7 @@ struct output_visitor : public boost::planar_face_traversal_visitor
 		sidewalkContourLines.clear();
 
 		vertex_output_visitor_invalid = false;
+		prevV = -1;
 	}
 
 	void end_face()
@@ -51,6 +58,10 @@ struct output_visitor : public boost::planar_face_traversal_visitor
 
 		if (vertex_output_visitor_invalid){ 
 			printf("INVALID end face\n");
+			return;
+		}
+
+		if (sidewalkContourPoints.size() <= 2) {
 			return;
 		}
 			
@@ -68,6 +79,16 @@ struct output_visitor : public boost::planar_face_traversal_visitor
 					sidewalkContourTmp.push_back(sidewalkContourLines[i][j]);
 					//blockContourTmp.contour.back().setZ(0);//forze height =0
 				}
+			}
+		}
+
+		{
+			BBox3D bbox;
+			sidewalkContourTmp.getBBox3D(bbox.minPt, bbox.maxPt);
+			if (bbox.maxPt.x() - bbox.minPt.x() > 800) {
+				char filename[255];
+				sprintf(filename, "block_images/block_%d.jpg", face_index);
+				VBOPmBlocks::saveBlockImage(*roadGraphPtr, sidewalkContourTmp, filename);
 			}
 		}
 
@@ -93,13 +114,14 @@ struct vertex_output_visitor : public output_visitor
 {
 	template <typename Vertex> 
 	void next_vertex(Vertex v) 
-	{ 	
+	{
+		prevV = v;
 		if (v >= boost::num_vertices(roadGraphPtr->graph)) {
 			vertex_output_visitor_invalid = true;
 			printf("INVALID vertex\n");
 			return;
 		}
-		//std::cout << v << " 
+		//std::cout << v << std::endl;
 		/*
 		if(  v >= 0 && v < boost::num_vertices(roadGraphPtr->graph) ){
 			blockContourTmp.push_back( (roadGraphPtr->graph)[v]->pt );
@@ -118,6 +140,12 @@ struct vertex_output_visitor : public output_visitor
 	{ 
 		RoadVertexDesc src = boost::source(e, roadGraphPtr->graph);
 		RoadVertexDesc tgt = boost::target(e, roadGraphPtr->graph);
+		if (prevV >= 0) {
+			if (src != prevV && tgt != prevV) {
+				vertex_output_visitor_invalid = true;
+				return;
+			}
+		}
 		if (src >= boost::num_vertices(roadGraphPtr->graph) || tgt >= boost::num_vertices(roadGraphPtr->graph)) {
 			vertex_output_visitor_invalid = true;
 			printf("INVALID edge\n");
@@ -245,6 +273,7 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph &roa
 	//embedding.clear();
 	//embedding.resize(boost::num_vertices(roadGraph.graph));
 	buildEmbedding(roadGraph, embedding);
+	printf("embedding was built.\n");
 
 	//Create edge index property map?	
 	typedef std::map<RoadEdgeDesc, size_t> EdgeIndexMap;
@@ -367,6 +396,13 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 			continue;
 		}
 
+		// Hack:
+		// 円を公園にする
+		if (SQR(bbox.midPt().x() + 1370) + SQR(bbox.midPt().y() - 700) < 2500) {
+			blocks[i].isPark = true;
+			continue;
+		}
+
 		// 高さが40m以下、または、高さの差が10m以上なら、使用不可ブロックとする
 		float min_z = std::numeric_limits<float>::max();
 		float max_z = 0.0f;
@@ -391,7 +427,7 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 	// 歩道の分を確保するため、ブロックを縮小する。
 	for (int i = 0; i < blocks.size(); ++i) {
 		if (!blocks[i].valid) continue;
-		if (blocks[i].isPark) continue;
+		//if (blocks[i].isPark) continue;
 
 		Loop3D blockContourInset;
 		float sidewalk_width = G::getFloat("sidewalk_width");
@@ -399,4 +435,33 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 		blocks[i].blockContour.contour = blockContourInset;
 		//blocks[i].blockContour.getBBox3D(blocks[i].bbox.minPt, blocks[i].bbox.maxPt);
 	}
+}
+
+void VBOPmBlocks::saveBlockImage(RoadGraph& roads, Polygon3D& contour, const char* filename) {
+	BBox bbox = GraphUtil::getAABoundingBox(roads, true);
+	cv::Mat img(bbox.dy() + 1, bbox.dx() + 1, CV_8UC3, cv::Scalar(255, 255, 255));
+
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		for (int pl = 0; pl < roads.graph[*ei]->polyline.size() - 1; ++pl) {
+			int x1 = roads.graph[*ei]->polyline[pl].x() - bbox.minPt.x();
+			int y1 = img.rows - (roads.graph[*ei]->polyline[pl].y() - bbox.minPt.y());
+			int x2 = roads.graph[*ei]->polyline[pl + 1].x() - bbox.minPt.x();
+			int y2 = img.rows - (roads.graph[*ei]->polyline[pl + 1].y() - bbox.minPt.y());
+			cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(224, 224, 224), 3);
+		}
+	}
+
+	for (int i = 0; i < contour.contour.size(); ++i) {
+		int next = (i + 1) % contour.contour.size();
+		int x1 = contour.contour[i].x() - bbox.minPt.x();
+		int y1 = img.rows - (contour.contour[i].y() - bbox.minPt.y());
+		int x2 = contour.contour[next].x() - bbox.minPt.x();
+		int y2 = img.rows - (contour.contour[next].y() - bbox.minPt.y());
+		cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(0, 0, 0), 3);
+	}
+
+	cv::imwrite(filename, img);
 }
