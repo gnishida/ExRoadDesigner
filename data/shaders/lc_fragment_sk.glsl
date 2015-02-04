@@ -165,7 +165,7 @@ void main(){
 		// 0 FLAT (Maps)
 		if(terrainMode==0){
 			float height=outColor.r;///COMPUTED IN VERTEX
-			if (height < 40){ //water
+			if (height < 50){ //water
 				outputF=mix(
 						vec4(190/255.0, 225/255.0, 255/255.0, 1.0),
 						vec4(154/255.0, 197/255.0, 255/255.0, 1.0),

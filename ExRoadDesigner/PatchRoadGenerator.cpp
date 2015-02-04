@@ -85,7 +85,7 @@ void PatchRoadGenerator::generateRoadNetwork() {
 			if (z < G::getFloat("seaLevel")) {
 				// 水中の頂点は、degree=1のはず！！
 				assert(GraphUtil::getDegree(roads, desc) == 1);
-				if (!RoadGeneratorHelper::extendRoadAcrossRiver(roads, vboRenderManager, targetArea, RoadEdge::TYPE_AVENUE, desc, seeds, 0.3f, G::getFloat("acrossRiverTolerance"))) {
+				if (!RoadGeneratorHelper::extendRoadAcrossRiver(roads, vboRenderManager, targetArea, RoadEdge::TYPE_AVENUE, desc, seeds, 0.5f, G::getFloat("acrossRiverTolerance"))) {
 					RoadGeneratorHelper::removeEdge(roads, desc);
 				}
 				continue;
