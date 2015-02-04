@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Wed Feb 4 12:25:34 2015
+** Created: Wed Feb 4 16:25:29 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -114,6 +114,7 @@ public:
     QLabel *label_15;
     QLineEdit *terrainPaint_changeEdit;
     QLabel *terrainPaint_changeLabel_2;
+    QPushButton *pushButtonSmoothTerrain;
 
     void setupUi(QDockWidget *ControlWidget)
     {
@@ -295,7 +296,7 @@ public:
         ContentEditionTab->setObjectName(QString::fromUtf8("ContentEditionTab"));
         groupBox_6 = new QGroupBox(ContentEditionTab);
         groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
-        groupBox_6->setGeometry(QRect(10, 20, 171, 251));
+        groupBox_6->setGeometry(QRect(10, 20, 171, 311));
         terrainPaint_sizeLabel = new QLabel(groupBox_6);
         terrainPaint_sizeLabel->setObjectName(QString::fromUtf8("terrainPaint_sizeLabel"));
         terrainPaint_sizeLabel->setGeometry(QRect(10, 20, 61, 16));
@@ -368,7 +369,7 @@ public:
         content_checkbox->setGeometry(QRect(10, 190, 121, 17));
         groupBox_2 = new QGroupBox(groupBox_6);
         groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
-        groupBox_2->setGeometry(QRect(10, 210, 151, 31));
+        groupBox_2->setGeometry(QRect(10, 270, 151, 31));
         content_0 = new QPushButton(groupBox_2);
         content_0->setObjectName(QString::fromUtf8("content_0"));
         content_0->setGeometry(QRect(10, 10, 19, 19));
@@ -424,6 +425,9 @@ public:
         terrainPaint_changeLabel_2 = new QLabel(groupBox_6);
         terrainPaint_changeLabel_2->setObjectName(QString::fromUtf8("terrainPaint_changeLabel_2"));
         terrainPaint_changeLabel_2->setGeometry(QRect(88, 40, 16, 16));
+        pushButtonSmoothTerrain = new QPushButton(groupBox_6);
+        pushButtonSmoothTerrain->setObjectName(QString::fromUtf8("pushButtonSmoothTerrain"));
+        pushButtonSmoothTerrain->setGeometry(QRect(20, 220, 131, 31));
         TabWidget->addTab(ContentEditionTab, QString());
         ControlWidget->setWidget(dockWidgetContents);
         QWidget::setTabOrder(pushButtonGeneratePM, pushButtonClear);
@@ -454,7 +458,7 @@ public:
 
         retranslateUi(ControlWidget);
 
-        TabWidget->setCurrentIndex(0);
+        TabWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(ControlWidget);
@@ -526,6 +530,7 @@ public:
         content_10->setText(QApplication::translate("ControlWidget", "F", 0, QApplication::UnicodeUTF8));
         label_15->setText(QApplication::translate("ControlWidget", "Size:", 0, QApplication::UnicodeUTF8));
         terrainPaint_changeLabel_2->setText(QApplication::translate("ControlWidget", "m", 0, QApplication::UnicodeUTF8));
+        pushButtonSmoothTerrain->setText(QApplication::translate("ControlWidget", "Smooth Terrain", 0, QApplication::UnicodeUTF8));
         TabWidget->setTabText(TabWidget->indexOf(ContentEditionTab), QApplication::translate("ControlWidget", "Content", 0, QApplication::UnicodeUTF8));
         Q_UNUSED(ControlWidget);
     } // retranslateUi

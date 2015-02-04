@@ -30,7 +30,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="RoadGenerationTab">
      <attribute name="title">
@@ -697,7 +697,7 @@
         <x>10</x>
         <y>20</y>
         <width>171</width>
-        <height>251</height>
+        <height>311</height>
        </rect>
       </property>
       <property name="title">
@@ -977,7 +977,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>210</y>
+         <y>270</y>
          <width>151</width>
          <height>31</height>
         </rect>
@@ -1208,6 +1208,19 @@
        </property>
        <property name="text">
         <string>m</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButtonSmoothTerrain">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>220</y>
+         <width>131</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Smooth Terrain</string>
        </property>
       </widget>
      </widget>

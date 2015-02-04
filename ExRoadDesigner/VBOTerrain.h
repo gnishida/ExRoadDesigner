@@ -32,6 +32,7 @@ public:
 	void render(bool drawEditingCircle);
 	void updateGaussian(float u, float v, float height, float rad_ratio);
 	void excavate(float u, float v, float height, float rad_ratio);
+	void smoothTerrain();
 	float getTerrainHeight(float u, float v);
 	void loadTerrain(const QString& fileName);
 	void saveTerrain(const QString& fileName);

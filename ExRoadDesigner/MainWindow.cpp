@@ -96,7 +96,6 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 	urbanGeometry = new UrbanGeometry(this);
 
 	mode = MODE_AREA_SELECT;
-	//imgCount=0;
 }
 
 MainWindow::~MainWindow() {
@@ -113,8 +112,8 @@ void MainWindow::keyReleaseEvent(QKeyEvent* e) {
 void MainWindow::onNewTerrain() {
 	TerrainSizeInputDialog dlg(this);
 	if (dlg.exec() == QDialog::Accepted) {
-		//urbanGeometry->newTerrain(dlg.width, dlg.depth, dlg.cellLength);
 		glWidget->vboRenderManager.changeTerrainDimensions(dlg.side,dlg.cellResolution);
+		glWidget->shadow.makeShadowMap(glWidget);
 		glWidget->updateGL();
 	}
 }
@@ -123,8 +122,7 @@ void MainWindow::onLoadTerrain() {
 	QString filename = QFileDialog::getOpenFileName(this, tr("Load Terrain file..."), "", tr("Terrain Files (*.png *.jpg)"));
 	if (filename.isEmpty()) return;
 	glWidget->vboRenderManager.vboTerrain.loadTerrain(filename);
-	//urbanGeometry->loadTerrain(filename);
-
+	glWidget->shadow.makeShadowMap(glWidget);
 	glWidget->updateGL();
 }
 
@@ -132,7 +130,6 @@ void MainWindow::onSaveTerrain() {
 	QString filename = QFileDialog::getSaveFileName(this, tr("Save Terrain file..."), "", tr("Terrain Files (*.png)"));
 	if (filename.isEmpty()) return;
 	glWidget->vboRenderManager.vboTerrain.saveTerrain(filename);
-	//urbanGeometry->saveTerrain(filename);
 }
 
 void MainWindow::onLoadRoads() {

@@ -36,7 +36,7 @@ public slots:
 	void updateTerrainEdit(const QString &text);
 	void updateRender2D(int newValue);
 	void changeTerrainShader(int);
-
+	void smoothTerrain();
 	void contentDesign(int);
 	void contentDesignLevel();
 

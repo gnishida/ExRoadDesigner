@@ -245,6 +245,13 @@ void VBOTerrain::excavate(float u, float v, float height, float rad_ratio) {
 	updateTexture();
 }
 
+void VBOTerrain::smoothTerrain() {
+	cv::blur(layerData,layerData,cv::Size(3, 3));
+
+	// update texture
+	updateTexture();
+}
+
 /**
  * Return the terrain elevation.
  *
