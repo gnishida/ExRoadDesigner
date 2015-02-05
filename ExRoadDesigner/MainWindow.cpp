@@ -1145,13 +1145,13 @@ void MainWindow::onTerrainDataConverter() {
 	oldImg.convertTo(newImg, CV_32FC1, 7.0);
 
 	// 山を、すべて高さ77にしちゃう
-	for (int r = 0; r < newImg.rows; ++r) {
+	/*for (int r = 0; r < newImg.rows; ++r) {
 		for (int c = 0; c < newImg.cols; ++c) {
 			if (newImg.at<float>(r, c) >= 77.0f) {
 				newImg.at<float>(r, c) = 77.0f;
 			}
 		}
-	}
+	}*/
 
 	cv::Mat saveImage	= cv::Mat(newImg.rows, newImg.cols, CV_8UC4, newImg.data);
 	cv::imwrite(filename2.toUtf8().data(), saveImage);
