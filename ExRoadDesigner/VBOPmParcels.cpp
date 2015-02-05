@@ -127,12 +127,21 @@ bool VBOPmParcels::subdivideParcel(Block &block, Parcel parcel, float areaMean, 
 		parcel2.setContour(pgon2);
 
 		//call recursive function for both parcels
-		if (!subdivideParcel(block, parcel1, areaMean, areaMin, areaStd, splitIrregularity, outParcels)) return false;
-		if (!subdivideParcel(block, parcel2, areaMean, areaMin, areaStd, splitIrregularity, outParcels)) return false;
+		subdivideParcel(block, parcel1, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
+		subdivideParcel(block, parcel2, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
 	} else {
-		parcel.isPark = true;
-		outParcels.push_back(parcel);
-		return false;
+		// CGAL版の分割（遅いが、優れている）
+		if (parcel.parcelContour.split(splitLine, pgons)) {
+			for (int i = 0; i < pgons.size(); ++i) {
+				Parcel parcel;
+				parcel.setContour(pgons[i]);
+
+				subdivideParcel(block, parcel, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
+			}
+		} else {
+			parcel.isPark = true;
+			outParcels.push_back(parcel);
+		}
 	}
 
 	return true;

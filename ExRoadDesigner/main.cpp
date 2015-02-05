@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 	G::global()["building_max_frontage"] = 0.0f;
 	G::global()["building_max_depth"] = 0.0f;
 	G::global()["building_stories_deviation"] = 2.0f;
-	G::global()["building_stories_mean"] = 3;
+	G::global()["building_stories_mean"] = 4;
 	G::global()["tree_setback"] = 1.0f;
 
 	QApplication a(argc, argv);

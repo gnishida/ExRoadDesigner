@@ -171,13 +171,21 @@ void BlockMeshGenerator::generate2DParcelMesh(VBORenderManager& rendManager, Blo
 
 	QColor parkColor(0xca, 0xdf, 0xaa);
 	for (int bN = 0; bN < blocks.size(); ++bN) {
+		if (!blocks[bN].valid) continue;
 		if (blocks[bN].isPark) {
 			Loop3D parkC = blocks[bN].blockContour.contour;
 			if (parkC.size() > 2) {
 				parkC.push_back(parkC.front());
 				rendManager.addStaticGeometry2("3d_parks", parkC, deltaZ, false, "", GL_QUADS, 1, QVector3D(), parkColor);
 			}
-		}		
+		}/* else {
+			Block::parcelGraphVertexIter vi, vend;
+			for (boost::tie(vi, vend) = boost::vertices(blocks[bN].myParcels); vi != vend; ++vi) {
+				if (blocks[bN].myParcels[*vi].isPark && blocks[bN].myParcels[*vi].parcelContour.contour.size() > 2) {
+					rendManager.addStaticGeometry2("3d_parks", blocks[bN].myParcels[*vi].parcelContour.contour, deltaZ, false, "", GL_QUADS, 1, QVector3D(), parkColor);
+				}
+			}
+		}*/
 	}
 
 	// Draw parcels as lines
