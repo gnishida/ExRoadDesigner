@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Wed Feb 4 12:25:31 2015
+** Created: Thu Feb 5 23:34:37 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -112,6 +112,8 @@ public:
     QAction *actionGenerateVegetation;
     QAction *actionGenerateAll;
     QAction *actionTerrainDataConverter2;
+    QAction *actionCamera3D;
+    QAction *actionCameraFlyOver;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -120,6 +122,7 @@ public:
     QMenu *menuPM;
     QMenu *menuDebug;
     QMenu *menuTool;
+    QMenu *menuCamera;
     QToolBar *fileToolBar;
     QToolBar *areaToolBar;
     QStatusBar *statusBar;
@@ -364,6 +367,10 @@ public:
         actionGenerateAll->setObjectName(QString::fromUtf8("actionGenerateAll"));
         actionTerrainDataConverter2 = new QAction(MainWindow);
         actionTerrainDataConverter2->setObjectName(QString::fromUtf8("actionTerrainDataConverter2"));
+        actionCamera3D = new QAction(MainWindow);
+        actionCamera3D->setObjectName(QString::fromUtf8("actionCamera3D"));
+        actionCameraFlyOver = new QAction(MainWindow);
+        actionCameraFlyOver->setObjectName(QString::fromUtf8("actionCameraFlyOver"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -382,6 +389,8 @@ public:
         menuDebug->setObjectName(QString::fromUtf8("menuDebug"));
         menuTool = new QMenu(menuBar);
         menuTool->setObjectName(QString::fromUtf8("menuTool"));
+        menuCamera = new QMenu(menuBar);
+        menuCamera->setObjectName(QString::fromUtf8("menuCamera"));
         MainWindow->setMenuBar(menuBar);
         fileToolBar = new QToolBar(MainWindow);
         fileToolBar->setObjectName(QString::fromUtf8("fileToolBar"));
@@ -397,6 +406,7 @@ public:
         menuBar->addAction(menuArea->menuAction());
         menuBar->addAction(menuPM->menuAction());
         menuBar->addAction(menuTool->menuAction());
+        menuBar->addAction(menuCamera->menuAction());
         menuBar->addAction(menuWindow->menuAction());
         menuBar->addAction(menuDebug->menuAction());
         menuFile->addAction(actionNewTerrain);
@@ -455,6 +465,8 @@ public:
         menuTool->addSeparator();
         menuTool->addAction(actionTerrainDataConverter);
         menuTool->addAction(actionTerrainDataConverter2);
+        menuCamera->addAction(actionCamera3D);
+        menuCamera->addAction(actionCameraFlyOver);
 
         retranslateUi(MainWindow);
 
@@ -569,12 +581,15 @@ public:
         actionGenerateVegetation->setText(QApplication::translate("MainWindow", "Generate Vegetation", 0, QApplication::UnicodeUTF8));
         actionGenerateAll->setText(QApplication::translate("MainWindow", "Generate All", 0, QApplication::UnicodeUTF8));
         actionTerrainDataConverter2->setText(QApplication::translate("MainWindow", "Terrain Data Converter 2", 0, QApplication::UnicodeUTF8));
+        actionCamera3D->setText(QApplication::translate("MainWindow", "3D Camera", 0, QApplication::UnicodeUTF8));
+        actionCameraFlyOver->setText(QApplication::translate("MainWindow", "Fly Over", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuWindow->setTitle(QApplication::translate("MainWindow", "Window", 0, QApplication::UnicodeUTF8));
         menuArea->setTitle(QApplication::translate("MainWindow", "Area", 0, QApplication::UnicodeUTF8));
         menuPM->setTitle(QApplication::translate("MainWindow", "PM", 0, QApplication::UnicodeUTF8));
         menuDebug->setTitle(QApplication::translate("MainWindow", "Debug", 0, QApplication::UnicodeUTF8));
         menuTool->setTitle(QApplication::translate("MainWindow", "Tool", 0, QApplication::UnicodeUTF8));
+        menuCamera->setTitle(QApplication::translate("MainWindow", "Camera", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

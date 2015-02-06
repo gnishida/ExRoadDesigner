@@ -55,6 +55,7 @@ ModelSpec addStreetLap( QVector3D pos,QVector3D contourDir){
 
 	float rotAngle=atan2(perP.y(),perP.x())*57.2957795f;//rad to degrees (angle to rotate will be the tan since we compare respect 1,0,0)
 	stEl.transMatrix.rotate(rotAngle,0.0f,0.0f,1.0f);
+	stEl.transMatrix.scale(0.6f);
 
 	stEl.colors.resize(1);
 	//body xolor

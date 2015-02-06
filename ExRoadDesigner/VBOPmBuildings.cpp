@@ -157,7 +157,7 @@ bool generateParcelBuildings(VBORenderManager& rendManager, Block &inBlock, Parc
 
 	// stoties
 	float heightDev = G::getFloat("building_stories_deviation") * (((float)qrand()/RAND_MAX)*2.0f-1.0f) * G::getFloat("building_stories_mean");
-	int bldgNumStories = G::getInt("building_stories_mean") + heightDev;
+	int bldgNumStories = std::max(2.0f, G::getInt("building_stories_mean") + heightDev);
 
 	// find the lowest elevation
 	float minZ = std::numeric_limits<float>::max();

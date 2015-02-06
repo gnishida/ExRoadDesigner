@@ -33,7 +33,6 @@ GLWidget3D::GLWidget3D(MainWindow* mainWin) : QGLWidget(QGLFormat(QGL::SampleBuf
 	flyCamera.resetCamera();
 	camera = &camera2D;
 	//camera = &flyCamera;
-	//G::global()["rend_mode"]=0;//2D	setRender2D_3D();
 
 	spaceRadius=30000.0;
 	farPlaneToSpaceRadiusFactor=5.0f;//N 5.0f
@@ -44,7 +43,6 @@ GLWidget3D::GLWidget3D(MainWindow* mainWin) : QGLWidget(QGLFormat(QGL::SampleBuf
 	controlPressed=false;
 	shiftPressed=false;
 	altPressed=false;
-	keyMPressed=false;
 
 	camera->setRotation(0, 0, 0);
 	camera->setTranslation(0, 0, G::getFloat("MAX_Z"));//6000);
@@ -526,10 +524,8 @@ void GLWidget3D::drawScene(int drawMode) {
 			vboRenderManager.renderStaticGeometry("3d_building");
 			vboRenderManager.renderStaticGeometry("3d_building_fac");
 
-			if (mainWin->controlWidget->ui.render_3DtreesCheckBox->isChecked()) {
-				vboRenderManager.renderAllStreetElementName("tree");
-				vboRenderManager.renderAllStreetElementName("streetLamp");
-			}
+			vboRenderManager.renderAllStreetElementName("tree");
+			vboRenderManager.renderAllStreetElementName("streetLamp");
 		}
 		// SHADOWS
 		if (drawMode == 1) {
@@ -546,10 +542,8 @@ void GLWidget3D::drawScene(int drawMode) {
 			vboRenderManager.renderStaticGeometry("3d_building");
 			vboRenderManager.renderStaticGeometry("3d_building_fac");
 
-			if (mainWin->controlWidget->ui.render_3DtreesCheckBox->isChecked()) {
-				vboRenderManager.renderAllStreetElementName("tree");
-				vboRenderManager.renderAllStreetElementName("streetLamp");
-			}
+			vboRenderManager.renderAllStreetElementName("tree");
+			vboRenderManager.renderAllStreetElementName("streetLamp");
 		}
 	}
 }
@@ -579,7 +573,6 @@ void GLWidget3D::keyPressEvent( QKeyEvent *e ){
 	shiftPressed=false;
 	controlPressed=false;
 	altPressed=false;
-	keyMPressed=false;
 
 	switch( e->key() ){
 	case Qt::Key_Shift:

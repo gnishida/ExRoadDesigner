@@ -379,12 +379,12 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 
 		// Hack:
 		// 円を公園にする
-		if (SQR(bbox.midPt().x() + 1370) + SQR(bbox.midPt().y() - 700) < 2500) {
+		if (SQR(bbox.midPt().x() + 968) + SQR(bbox.midPt().y() - 210) < 1000) {
 			blocks[i].isPark = true;
 			continue;
 		}
 
-		// 高さが40m以下、または、高さの差が10m以上なら、使用不可ブロックとする
+		// 高さが40m以下、または、高さの差が20m以上なら、使用不可ブロックとする
 		float min_z = std::numeric_limits<float>::max();
 		float max_z = 0.0f;
 		for (int pi = 0; pi < blocks[i].sidewalkContour.contour.size(); ++pi) {
@@ -401,7 +401,7 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 		}
 		if (min_z < 40.0f) {
 			blocks[i].valid = false;
-		} else if (max_z - min_z > 10.0f) {
+		} else if (max_z - min_z > 20.0f) {
 			blocks[i].isPark = true;
 		}
 	}

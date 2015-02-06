@@ -40,7 +40,6 @@ public:
 	bool shiftPressed;
 	bool controlPressed;
 	bool altPressed;
-	bool keyMPressed;
 	QPoint lastPos;
 	float farPlaneToSpaceRadiusFactor;
 	float spaceRadius;

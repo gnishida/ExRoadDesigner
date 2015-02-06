@@ -8,11 +8,9 @@
 #include "GLWidget3D.h"
 #include "VBOUtil.h"
 
-#define FAR_DIST 3000.0f//2500.0f
 
-
-	int shadowWidth=4096;//2048;
-	int shadowHeight=4096;//2048;
+	int shadowWidth=8192;//4096;//2048;
+	int shadowHeight=8192;//4096;//2048;
 
 	GLuint light_mvpMatrixLoc,light_dirLoc;
 	GLuint light_biasMatrixLoc;
@@ -44,8 +42,8 @@
 		float fov = 45.0f;
 		float aspect = (float)shadowWidth / (float)shadowHeight;
 
-		float zfar = 90000.0f;//3800.0
-		float znear = 1200.0f;//1500.0
+		float zfar = 15000.0f;//3800.0
+		float znear = 7000.0f;//1500.0
 
 		float f = 1.0f / tanf(fov * (M_PI / 360.0));
 		double m[16] = {
@@ -125,14 +123,15 @@
 	void GLWidgetSimpleShadow::initShadow(int _programId,GLWidget3D* glWidget3D) {
 		printf("---------- >> INIT SHADOW\n");
 		
+		QVector3D light_dir(-0.40f, 0.81f, -0.51f);
 		programId = _programId;
 
 		// PROJECTION MATRIX
-		float fov = 45.0f; // Think if bigger
+		float fov = 60.0f;//45.0f; // Think if bigger
 		float aspect = (float)shadowWidth / (float)shadowHeight;
 		
-		float zfar = 90000.0f;// 
-		float znear = 1200.0f;// FIX
+		float zfar = 15000.0f;// 
+		float znear = 1000.0f;// FIX
 
 		float f = 1.0f / tanf(fov * (M_PI / 360.0));
 		double m[16] = {
@@ -159,8 +158,11 @@
 		
 		// FIX
 
-		light_mvMatrix.lookAt(QVector3D(1365.0,-1200.0f,1245.0),
+		/*light_mvMatrix.lookAt(QVector3D(1365.0,-1200.0f,1245.0),
 			QVector3D(-0.60f,0.55,-0.6),
+			QVector3D(0.0f, 0.0f, 1.0f));*/
+		light_mvMatrix.lookAt(-light_dir*10000,//2500
+			light_dir.normalized(),//QVector3D(-0.60f,0.55,-0.6),
 			QVector3D(0.0f, 0.0f, 1.0f));
 		light_mvpMatrix=light_pMatrix*light_mvMatrix;
 		

@@ -81,6 +81,8 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 
 	connect(ui.actionTerrainDataConverter, SIGNAL(triggered()), this, SLOT(onTerrainDataConverter()));
 	connect(ui.actionTerrainDataConverter2, SIGNAL(triggered()), this, SLOT(onTerrainDataConverter2()));
+	connect(ui.actionCamera3D, SIGNAL(triggered()), this, SLOT(onCamera3D()));
+	connect(ui.actionCameraFlyOver, SIGNAL(triggered()), this, SLOT(onCameraFlyOver()));
 
 	connect(ui.actionControlWidget, SIGNAL(triggered()), this, SLOT(onShowControlWidget()));
 	connect(ui.actionPropertyWidget, SIGNAL(triggered()), this, SLOT(onShowPropertyWidget()));
@@ -1195,6 +1197,20 @@ void MainWindow::onTerrainDataConverter2() {
 
 	cv::Mat saveImage = cv::Mat(img.rows, img.cols, CV_8UC4, img.data);
 	cv::imwrite(filename2.toUtf8().data(), saveImage);
+}
+
+void MainWindow::onCamera3D() {
+	glWidget->camera = &glWidget->camera2D;
+	glWidget->camera->resetCamera();
+	glWidget->updateCamera();
+	glWidget->updateGL();
+}
+
+void MainWindow::onCameraFlyOver() {
+	glWidget->camera = &glWidget->flyCamera;
+	glWidget->camera->resetCamera();
+	glWidget->updateCamera();
+	glWidget->updateGL();
 }
 
 void MainWindow::onShowControlWidget() {

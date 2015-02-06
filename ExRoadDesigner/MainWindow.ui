@@ -111,14 +111,23 @@
     <addaction name="actionTerrainGeneration"/>
     <addaction name="actionUpdateMountain"/>
     <addaction name="actionTerrainSegmentation"/>
+    <addaction name="actionExtractContour"/>
     <addaction name="separator"/>
     <addaction name="actionTerrainDataConverter"/>
     <addaction name="actionTerrainDataConverter2"/>
+   </widget>
+   <widget class="QMenu" name="menuCamera">
+    <property name="title">
+     <string>Camera</string>
+    </property>
+    <addaction name="actionCamera3D"/>
+    <addaction name="actionCameraFlyOver"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuArea"/>
    <addaction name="menuPM"/>
    <addaction name="menuTool"/>
+   <addaction name="menuCamera"/>
    <addaction name="menuWindow"/>
    <addaction name="menuDebug"/>
   </widget>
@@ -733,6 +742,21 @@
   <action name="actionTerrainDataConverter2">
    <property name="text">
     <string>Terrain Data Converter 2</string>
+   </property>
+  </action>
+  <action name="actionCamera3D">
+   <property name="text">
+    <string>3D Camera</string>
+   </property>
+  </action>
+  <action name="actionCameraFlyOver">
+   <property name="text">
+    <string>Fly Over</string>
+   </property>
+  </action>
+  <action name="actionExtractContour">
+   <property name="text">
+    <string>Extract Contour</string>
    </property>
   </action>
  </widget>

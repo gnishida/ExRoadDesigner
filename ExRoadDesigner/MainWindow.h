@@ -81,6 +81,8 @@ public slots:
 	void onTerrainSegmentation();
 	void onTerrainDataConverter();
 	void onTerrainDataConverter2();
+	void onCamera3D();
+	void onCameraFlyOver();
 	void onShowControlWidget();
 	void onShowPropertyWidget();
 	void onDebug();

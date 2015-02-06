@@ -44,8 +44,9 @@ void CameraSequence::load(const QString &filename, float step) {
 		if (dist > 0.0f) {
 			num = dist / step;
 		} else {
-			num = 100;
+			num = 200;
 		}
+		num = 100;
 
 		cameras.push_back(controlCameras[i]);
 		
