@@ -177,6 +177,10 @@ bool removeIntersectingEdges(RoadGraph &roadGraph) {
 				if (GraphUtil::isIntersect(roadGraph, roadGraph.graph[*ei]->polyline, roadGraph.graph[*ei2]->polyline)) {
 					if (std::find(edgesToRemove.begin(), edgesToRemove.end(), ei2) == edgesToRemove.end()) {
 						edgesToRemove.push_back(ei2);
+
+						RoadVertexDesc src = boost::source(*ei2, roadGraph.graph);
+						RoadVertexDesc tgt = boost::target(*ei2, roadGraph.graph);
+						printf("remove edge: (%lf, %lf) - (%lf, %lf)\n", roadGraph.graph[src]->pt.x(), roadGraph.graph[src]->pt.y(), roadGraph.graph[tgt]->pt.x(), roadGraph.graph[tgt]->pt.y());
 					}
 				}
 			}
@@ -218,6 +222,7 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph &roa
 
 	int cont=0;
 
+	/*
 	// Test for planarity
 	while (cont<2) {
 		if (boost::boyer_myrvold_planarity_test(boost::boyer_myrvold_params::graph =roadGraph.graph,
@@ -237,6 +242,7 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph &roa
 		std::cout << "ERROR: Graph could not be planarized: (generateBlocks)\n";
 		return false;
 	}
+	*/
 	
 	// build embedding manually
 	//embedding.clear();
@@ -329,7 +335,7 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph &roa
 	return true;
 }
 
-void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding) {
+/*void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding) {
 	for (int i = 0; i < embedding.size(); ++i) {
 		QMap<float, RoadEdgeDesc> edges;
 
@@ -355,6 +361,32 @@ void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadE
 
 		embedding[i] = edge_descs;
 	}
+}*/
+
+void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding) {
+	embedding.clear();
+
+	RoadVertexIter vi, vend;
+	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+		QMap<float, RoadEdgeDesc> edges;
+
+		RoadOutEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::out_edges(*vi, roads.graph); ei != eend; ++ei) {
+			Polyline2D polyline = GraphUtil::orderPolyLine(roads, *ei, *vi);
+			QVector2D vec = polyline[1] - polyline[0];
+			edges[-atan2f(vec.y(), vec.x())] = *ei;
+		}
+
+		std::vector<RoadEdgeDesc> edge_descs;
+		for (QMap<float, RoadEdgeDesc>::iterator it = edges.begin(); it != edges.end(); ++it) {
+			edge_descs.push_back(it.value());
+
+			RoadEdgePtr e = roads.graph[it.value()];
+			Polyline2D pl = e->polyline;
+		}
+
+		embedding.push_back(edge_descs);
+	}
 }
 
 /**
@@ -379,7 +411,15 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 
 		// Hack:
 		// 円を公園にする
-		if (SQR(bbox.midPt().x() + 968) + SQR(bbox.midPt().y() - 210) < 1000) {
+		/*if (SQR(bbox.midPt().x() + 968) + SQR(bbox.midPt().y() - 210) < 1000) {
+			blocks[i].isPark = true;
+			continue;
+		}*/
+		if (SQR(bbox.midPt().x() - 920) + SQR(bbox.midPt().y() + 500) < 1000) {
+			blocks[i].isPark = true;
+			continue;
+		}
+		if (SQR(bbox.midPt().x() - 1907) + SQR(bbox.midPt().y() + 506) < 1000) {
 			blocks[i].isPark = true;
 			continue;
 		}
@@ -401,9 +441,18 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 		}
 		if (min_z < 40.0f) {
 			blocks[i].valid = false;
+			continue;
 		} else if (max_z - min_z > 20.0f) {
 			blocks[i].isPark = true;
+			continue;
 		}
+
+		// 面積が大きすぎる場合は公園にする
+		if (blocks[i].sidewalkContour.area() > 120000) {
+			blocks[i].isPark = true;
+			continue;
+		}
+
 	}
 
 	// 歩道の分を確保するため、ブロックを縮小する。
