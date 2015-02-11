@@ -78,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, 
 	connect(ui.actionTerrainGeneration, SIGNAL(triggered()), this, SLOT(onTerrainGeneration()));
 	connect(ui.actionUpdateMountain, SIGNAL(triggered()), this, SLOT(onUpdateMountain()));
 	connect(ui.actionTerrainSegmentation, SIGNAL(triggered()), this, SLOT(onTerrainSegmentation()));
+	connect(ui.actionExtractContour, SIGNAL(triggered()), this, SLOT(onExtractContour()));
 
 	connect(ui.actionTerrainDataConverter, SIGNAL(triggered()), this, SLOT(onTerrainDataConverter()));
 	connect(ui.actionTerrainDataConverter2, SIGNAL(triggered()), this, SLOT(onTerrainDataConverter2()));
@@ -1132,6 +1133,12 @@ void MainWindow::onTerrainSegmentation() {
 
 	std::cout << "Terrain segmentation has successfully completed" << std::endl;
 
+	glWidget->updateGL();
+}
+
+void MainWindow::onExtractContour() {
+	urbanGeometry->generateContourRoads();
+	urbanGeometry->update(glWidget->vboRenderManager);
 	glWidget->updateGL();
 }
 

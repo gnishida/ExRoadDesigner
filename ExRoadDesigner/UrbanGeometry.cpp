@@ -117,6 +117,90 @@ void UrbanGeometry::generateRoadsAliaga(std::vector<ExFeature> &features) {
 	update(mainWin->glWidget->vboRenderManager);
 }
 
+void UrbanGeometry::generateContourRoads() {
+	cv::Mat grayImg;
+	mainWin->glWidget->vboRenderManager.vboTerrain.layerData.convertTo(grayImg, CV_8UC1);
+	cv::threshold(grayImg, grayImg, 60, 255, 0);
+
+	cv::Mat element = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(9, 9), cv::Point(7, 7));
+	cv::erode(grayImg, grayImg, element);
+
+	std::vector<std::vector<cv::Point> > contours;
+	cv::imwrite("test.png", grayImg);
+	cv::vector<cv::Vec4i> hierarchy;
+	cv::findContours(grayImg, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0) );
+
+	std::vector<RoadVertexDesc> newVertices;
+
+	for (int i = 0; i< contours.size(); ++i) {
+		Polyline2D polyline;
+		for (int j = 0; j < contours[i].size(); ++j) {
+			float x = contours[i][j].x * mainWin->glWidget->vboRenderManager.side / mainWin->glWidget->vboRenderManager.vboTerrain.layerData.cols - mainWin->glWidget->vboRenderManager.side * 0.5;
+			float y = contours[i][j].y * mainWin->glWidget->vboRenderManager.side / mainWin->glWidget->vboRenderManager.vboTerrain.layerData.rows - mainWin->glWidget->vboRenderManager.side * 0.5;
+
+			polyline.push_back(QVector2D(x, y));
+		}
+		polyline.push_back(polyline[0]);
+
+		Polyline2D polyline2;
+		boost::geometry::simplify(polyline, polyline2, 20);
+		polyline2 = GraphUtil::finerEdge(polyline2, 30);
+
+		RoadVertexDesc prevDesc;
+		for (int j = 0; j <= polyline2.size(); ++j) {
+			int index = j;
+			if (j == polyline2.size()) index = 0;
+
+			RoadVertexDesc desc;
+			if (!GraphUtil::getVertex(roads, QVector2D(polyline2[index].x(), polyline2[index].y()), 1.0f, desc)) {
+				RoadVertexPtr v = RoadVertexPtr(new RoadVertex(QVector2D(polyline2[index].x(), polyline2[index].y())));
+				v->type = RoadVertex::TYPE_CONTOUR;
+				desc = GraphUtil::addVertex(roads, v);
+				newVertices.push_back(desc);
+			}
+
+			if (j > 0) {
+				if (((roads.graph[prevDesc]->pt.x() > -mainWin->glWidget->vboRenderManager.side * 0.5 + 40 && roads.graph[prevDesc]->pt.x() < mainWin->glWidget->vboRenderManager.side * 0.5 - 40) ||
+					(roads.graph[desc]->pt.x() > -mainWin->glWidget->vboRenderManager.side * 0.5 + 40 && roads.graph[desc]->pt.x() < mainWin->glWidget->vboRenderManager.side * 0.5 - 40)) &&
+					((roads.graph[prevDesc]->pt.y() > -mainWin->glWidget->vboRenderManager.side * 0.5 + 40 && roads.graph[prevDesc]->pt.y() < mainWin->glWidget->vboRenderManager.side * 0.5 - 40) ||
+					(roads.graph[desc]->pt.y() > -mainWin->glWidget->vboRenderManager.side * 0.5 + 40 && roads.graph[desc]->pt.y() < mainWin->glWidget->vboRenderManager.side * 0.5 - 40))) {
+
+					RoadEdgePtr e = RoadEdgePtr(new RoadEdge(RoadEdge::TYPE_AVENUE, 1));
+					e->polyline.push_back(roads.graph[prevDesc]->pt);
+					e->polyline.push_back(roads.graph[desc]->pt);
+					GraphUtil::addEdge(roads, prevDesc, desc, e);
+				}
+			}
+
+			prevDesc = desc;
+		}
+	}
+
+	for (int i = 0; i < newVertices.size(); ++i) {
+		int d = GraphUtil::getDegree(roads, newVertices[i]);
+		if (d == 0) {
+			roads.graph[newVertices[i]]->valid = false;
+		} else if (d == 2) {
+			std::vector<QVector2D> neighbor_points;
+			RoadOutEdgeIter ei, eend;
+			for (boost::tie(ei, eend) = boost::out_edges(newVertices[i], roads.graph); ei != eend; ++ei) {
+				if (!roads.graph[*ei]->valid) continue;
+
+				RoadVertexDesc tgt = boost::target(*ei, roads.graph);
+				neighbor_points.push_back(roads.graph[tgt]->pt);
+			}
+			roads.graph[newVertices[i]]->pt = roads.graph[newVertices[i]]->pt * 6 / 8 + neighbor_points[0] / 8 + neighbor_points[1] / 8;
+			for (boost::tie(ei, eend) = boost::out_edges(newVertices[i], roads.graph); ei != eend; ++ei) {
+				if (!roads.graph[*ei]->valid) continue;
+
+				Polyline2D polyline = GraphUtil::orderPolyLine(roads, *ei, newVertices[i]);
+				polyline[0] = roads.graph[newVertices[i]]->pt;
+				roads.graph[*ei]->polyline = polyline;
+			}
+		}
+	}
+}
+
 void UrbanGeometry::generateBlocks() {
 	VBOPmBlocks::generateBlocks(&mainWin->glWidget->vboRenderManager, roads, blocks);
 	update(mainWin->glWidget->vboRenderManager);

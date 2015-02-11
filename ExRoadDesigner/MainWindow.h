@@ -79,6 +79,7 @@ public slots:
 	void onTerrainGeneration();
 	void onUpdateMountain();
 	void onTerrainSegmentation();
+	void onExtractContour();
 	void onTerrainDataConverter();
 	void onTerrainDataConverter2();
 	void onCamera3D();

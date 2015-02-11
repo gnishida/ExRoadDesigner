@@ -54,6 +54,8 @@ public:
 	void generateRoadsPM(std::vector<ExFeature> &features);
 	void generateRoadsAliaga(std::vector<ExFeature> &features);
 
+	void generateContourRoads();
+
 	void generateBlocks();
 	void generateParcels();
 	void generateBuildings();
