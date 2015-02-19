@@ -57,10 +57,6 @@ struct output_visitor : public boost::planar_face_traversal_visitor
 		}
 
 		sidewalkContourTmp.clear();
-
-		if (sidewalkContourPoints.size() <= 2) {
-			return;
-		}
 			
 		for (int i = 0; i < sidewalkContourPoints.size(); ++i) {
 			if (i >= sidewalkContourLines.size()) break;
