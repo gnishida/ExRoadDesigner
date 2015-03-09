@@ -118,6 +118,7 @@ void UrbanGeometry::generateRoadsAliaga(std::vector<ExFeature> &features) {
 }
 
 void UrbanGeometry::generateContourRoads() {
+	/*
 	cv::Mat grayImg;
 	mainWin->glWidget->vboRenderManager.vboTerrain.layerData.convertTo(grayImg, CV_8UC1);
 	cv::threshold(grayImg, grayImg, 60, 255, 0);
@@ -199,6 +200,7 @@ void UrbanGeometry::generateContourRoads() {
 			}
 		}
 	}
+	*/
 }
 
 void UrbanGeometry::generateBlocks() {

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'MainWindow.ui'
 **
-** Created: Thu Feb 5 23:34:37 2015
+** Created: Mon Mar 9 18:19:29 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -114,6 +114,7 @@ public:
     QAction *actionTerrainDataConverter2;
     QAction *actionCamera3D;
     QAction *actionCameraFlyOver;
+    QAction *actionExtractContour;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -371,6 +372,8 @@ public:
         actionCamera3D->setObjectName(QString::fromUtf8("actionCamera3D"));
         actionCameraFlyOver = new QAction(MainWindow);
         actionCameraFlyOver->setObjectName(QString::fromUtf8("actionCameraFlyOver"));
+        actionExtractContour = new QAction(MainWindow);
+        actionExtractContour->setObjectName(QString::fromUtf8("actionExtractContour"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -462,6 +465,7 @@ public:
         menuTool->addAction(actionTerrainGeneration);
         menuTool->addAction(actionUpdateMountain);
         menuTool->addAction(actionTerrainSegmentation);
+        menuTool->addAction(actionExtractContour);
         menuTool->addSeparator();
         menuTool->addAction(actionTerrainDataConverter);
         menuTool->addAction(actionTerrainDataConverter2);
@@ -583,6 +587,7 @@ public:
         actionTerrainDataConverter2->setText(QApplication::translate("MainWindow", "Terrain Data Converter 2", 0, QApplication::UnicodeUTF8));
         actionCamera3D->setText(QApplication::translate("MainWindow", "3D Camera", 0, QApplication::UnicodeUTF8));
         actionCameraFlyOver->setText(QApplication::translate("MainWindow", "Fly Over", 0, QApplication::UnicodeUTF8));
+        actionExtractContour->setText(QApplication::translate("MainWindow", "Extract Contour", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuWindow->setTitle(QApplication::translate("MainWindow", "Window", 0, QApplication::UnicodeUTF8));
         menuArea->setTitle(QApplication::translate("MainWindow", "Area", 0, QApplication::UnicodeUTF8));
