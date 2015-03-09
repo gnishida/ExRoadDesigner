@@ -26,9 +26,6 @@ std::vector<Polyline2D> sidewalkContourLines;
 std::vector< float > sidewalkContourWidths;
 bool isFirstVertexVisited;
 
-int curRandSeed;
-int curPlaceTypeIdx;
-
 std::vector<RoadVertexDesc> visitedVs;
 
 int face_index = 0;
@@ -197,7 +194,7 @@ bool removeIntersectingEdges(RoadGraph &roadGraph) {
 
 
 /**
- * 道路網から、Block情報を抽出する。
+ * Generate blocks from the road network
  */
 bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph &roadGraph, BlockSet &blocks) {
 	GraphUtil::normalizeLoop(roadGraph);
@@ -218,6 +215,7 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph &roa
 
 	int cont=0;
 
+	removeIntersectingEdges(roadGraph);
 	/*
 	// Test for planarity
 	while (cont<2) {
@@ -331,34 +329,6 @@ bool VBOPmBlocks::generateBlocks(VBORenderManager* renderManager, RoadGraph &roa
 	return true;
 }
 
-/*void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding) {
-	for (int i = 0; i < embedding.size(); ++i) {
-		QMap<float, RoadEdgeDesc> edges;
-
-		for (int j = 0; j < embedding[i].size(); ++j) {
-			Polyline2D polyline = GraphUtil::orderPolyLine(roads, embedding[i][j], i);
-			if ((polyline[0] - QVector2D(1817, 356)).length() < 2) {
-				int xxx = 0;
-			}
-
-
-
-			QVector2D vec = polyline[1] - polyline[0];
-			edges[-atan2f(vec.y(), vec.x())] = embedding[i][j];
-		}
-
-		std::vector<RoadEdgeDesc> edge_descs;
-		for (QMap<float, RoadEdgeDesc>::iterator it = edges.begin(); it != edges.end(); ++it) {
-			edge_descs.push_back(it.value());
-
-			RoadEdgePtr e = roads.graph[it.value()];
-			Polyline2D pl = e->polyline;
-		}
-
-		embedding[i] = edge_descs;
-	}
-}*/
-
 void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding) {
 	embedding.clear();
 
@@ -386,11 +356,7 @@ void VBOPmBlocks::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadE
 }
 
 /**
- * 全部のブロックに、ゾーンプランに基づいてゾーンタイプを割り当てる。
- * ゾーンタイプによって、各ブロックの歩道の幅も決まる。
- * なので、当然ながら、既存の区画は無効となる。
- * （現状、区画をクリアはしていない。クリアした方がよいか？）
- * 必要なら、この関数の後で、区画生成を実行してください。
+ * Generate side walks
  */
 void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& blocks) {
 	for (int i = 0; i < blocks.size(); ++i) {
@@ -399,28 +365,13 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 		BBox3D bbox;
 		blocks[i].sidewalkContour.getBBox3D(bbox.minPt, bbox.maxPt);
 
-		// ブロックが細すぎる場合は、使用不可ブロックとする
+		// If the block is too narrow, make it invalid.
 		if (blocks[i].sidewalkContour.isTooNarrow(8.0f, 18.0f) || blocks[i].sidewalkContour.isTooNarrow(1.0f, 3.0f)) {
 			blocks[i].valid = false;
 			continue;
 		}
 
-		// Hack:
-		// 円を公園にする
-		/*if (SQR(bbox.midPt().x() + 968) + SQR(bbox.midPt().y() - 210) < 1000) {
-			blocks[i].isPark = true;
-			continue;
-		}*/
-		if (SQR(bbox.midPt().x() - 920) + SQR(bbox.midPt().y() + 500) < 1000) {
-			blocks[i].isPark = true;
-			continue;
-		}
-		if (SQR(bbox.midPt().x() - 1907) + SQR(bbox.midPt().y() + 506) < 1000) {
-			blocks[i].isPark = true;
-			continue;
-		}
-
-		// 高さが40m以下、または、高さの差が20m以上なら、使用不可ブロックとする
+		// If the block is close or under waterlevel, or on a steep terain, make it invalid.
 		float min_z = std::numeric_limits<float>::max();
 		float max_z = 0.0f;
 		for (int pi = 0; pi < blocks[i].sidewalkContour.contour.size(); ++pi) {
@@ -442,16 +393,9 @@ void VBOPmBlocks::generateSideWalk(VBORenderManager* renderManager, BlockSet& bl
 			blocks[i].isPark = true;
 			continue;
 		}
-
-		// 面積が大きすぎる場合は公園にする
-		if (blocks[i].sidewalkContour.area() > 120000) {
-			blocks[i].isPark = true;
-			continue;
-		}
-
 	}
 
-	// 歩道の分を確保するため、ブロックを縮小する。
+	// Compute the block contour (the outer part becomes sidewalks)
 	for (int i = 0; i < blocks.size(); ++i) {
 		if (!blocks[i].valid) continue;
 		//if (blocks[i].isPark) continue;

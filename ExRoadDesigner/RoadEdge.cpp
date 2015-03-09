@@ -27,6 +27,7 @@ RoadEdge::RoadEdge(unsigned int type, unsigned int lanes, bool oneWay, bool link
 		color = QColor(255, 225, 104);
 		bgColor = QColor(229, 153, 21);
 		break;
+	case TYPE_BOULEVARD:
 	case TYPE_AVENUE:
 		//color = QColor(247, 247, 185);
 		//bgColor = QColor(203, 202, 149);
@@ -68,6 +69,7 @@ float RoadEdge::getWidth(float widthPerLane) {
 	switch (type) {
 	case TYPE_HIGHWAY:
 		return widthPerLane * 6.0f;// * lanes;
+	case TYPE_BOULEVARD:
 	case TYPE_AVENUE:
 		return widthPerLane * 4.0f;// * lanes;
 	case TYPE_STREET:

@@ -46,7 +46,6 @@ void CameraSequence::load(const QString &filename, float step) {
 		} else {
 			num = 200;
 		}
-		num = 100;
 
 		cameras.push_back(controlCameras[i]);
 		

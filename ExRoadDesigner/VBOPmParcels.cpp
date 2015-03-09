@@ -106,19 +106,8 @@ bool VBOPmParcels::subdivideParcel(Block &block, Parcel parcel, float areaMean, 
 	float kDistTol = 0.01f;
 
 	std::vector<Polygon3D> pgons;
-	/*
-	// CGAL版の分割（遅いが、優れている）
-	if (parcel.parcelContour.split(splitLine, pgons)) {
-		for (int i = 0; i < pgons.size(); ++i) {
-			Parcel parcel;
-			parcel.setContour(pgons[i]);
 
-			subdivideParcel(block, parcel, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
-		}
-	}
-	*/
-
-	// 簡易版の分割（しょぼいが、速い）
+	// Use the simple splitting because this is fast
 	if (parcel.parcelContour.splitMeWithPolyline(splitLine, pgon1.contour, pgon2.contour)) {
 		Parcel parcel1;
 		Parcel parcel2;
@@ -130,7 +119,7 @@ bool VBOPmParcels::subdivideParcel(Block &block, Parcel parcel, float areaMean, 
 		subdivideParcel(block, parcel1, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
 		subdivideParcel(block, parcel2, areaMean, areaMin, areaStd, splitIrregularity, outParcels);
 	} else {
-		// CGAL版の分割（遅いが、優れている）
+		// If the simple splitting fails, try CGAL version which is slow
 		if (parcel.parcelContour.split(splitLine, pgons)) {
 			for (int i = 0; i < pgons.size(); ++i) {
 				Parcel parcel;

@@ -8,7 +8,7 @@ std::vector<QVector3D> BlockMeshGenerator::sideWalkScale;
 std::vector<QString> BlockMeshGenerator::grassFileNames;
 
 /**
- * テクスチャ画像の読み込み
+ * Load texture
  */
 void BlockMeshGenerator::init() {
 	QString pathName="../data/textures/LC";
@@ -40,7 +40,7 @@ void BlockMeshGenerator::init() {
 void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockSet& blocks) {
 	if (!initialized) init();
 
-	// 3Dモデルを生成する
+	// generate 3d model
 	rendManager.removeStaticGeometry("3d_blocks");
 	rendManager.removeStaticGeometry("3d_parks");
 
@@ -50,7 +50,7 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 		if (!blocks[i].valid) continue;
 		//blocks[i].adaptToTerrain(&rendManager);
 
-		// 歩道の3Dモデルを生成
+		// side walks
 		{
 			std::vector<QVector3D> polygon;
 			for (int pi = 0; pi < blocks[i].sidewalkContour.contour.size(); ++pi) {
@@ -61,7 +61,7 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 			int randSidewalk=2;//qrand()%grassFileNames.size();
 			rendManager.addStaticGeometry2("3d_blocks", polygon, 0.0f, false, sideWalkFileNames[randSidewalk], GL_QUADS, 2|mode_AdaptTerrain, sideWalkScale[randSidewalk], QColor());
 
-			// 側面
+			// side of the side walks
 			std::vector<Vertex> vert;
 			for (int sN = 0;sN < blocks[i].sidewalkContour.contour.size(); sN++) {
 				int ind1 = sN;
@@ -85,13 +85,13 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 			rendManager.addStaticGeometry("3d_blocks", vert, "", GL_QUADS, 1|mode_Lighting|mode_AdaptTerrain);
 		}
 
-		// 公園の3Dモデルを生成
+		// parks
 		if (blocks[i].isPark) {
 			// PARK
 			int randPark=qrand()%grassFileNames.size();
 			rendManager.addStaticGeometry2("3d_parks", blocks[i].blockContour.contour, 0.0f, false, grassFileNames[randPark], GL_QUADS, 2|mode_AdaptTerrain, QVector3D(0.05f,0.05f,0.05f), QColor());
 
-			// 側面
+			// side
 			std::vector<Vertex> vert;
 			for (int sN = 0; sN < blocks[i].blockContour.contour.size(); sN++) {
 				int ind1 = sN;
@@ -119,7 +119,7 @@ void BlockMeshGenerator::generateBlockMesh(VBORenderManager& rendManager, BlockS
 }
 
 /**
- * Parcel情報から、その3Dモデルを生成する
+ * generate parcel mesh
  */
 void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, BlockSet& blocks) {
 	rendManager.removeStaticGeometry("3d_parcels");
@@ -136,11 +136,11 @@ void BlockMeshGenerator::generateParcelMesh(VBORenderManager& rendManager, Block
 
 			if (blocks[i].myParcels[*vi].parcelContour.isSelfIntersecting()) continue;
 
-			// 上面のモデル
+			// top surface
 			int randPark=1;//qrand()%grassFileNames.size();
 			rendManager.addStaticGeometry2("3d_parcels", blocks[i].myParcels[*vi].parcelContour.contour, deltaZ, false, grassFileNames[randPark], GL_QUADS, 2|mode_AdaptTerrain, QVector3D(0.05f,0.05f,0.05f), QColor());
 
-			// 側面のモデル
+			// side
 			for(int sN=0;sN<blocks[i].myParcels[*vi].parcelContour.contour.size();sN++){
 				int ind1 = sN;
 				int ind2 = (sN+1) % blocks[i].myParcels[*vi].parcelContour.contour.size();
@@ -178,14 +178,7 @@ void BlockMeshGenerator::generate2DParcelMesh(VBORenderManager& rendManager, Blo
 				parkC.push_back(parkC.front());
 				rendManager.addStaticGeometry2("3d_parks", parkC, deltaZ, false, "", GL_QUADS, 1, QVector3D(), parkColor);
 			}
-		}/* else {
-			Block::parcelGraphVertexIter vi, vend;
-			for (boost::tie(vi, vend) = boost::vertices(blocks[bN].myParcels); vi != vend; ++vi) {
-				if (blocks[bN].myParcels[*vi].isPark && blocks[bN].myParcels[*vi].parcelContour.contour.size() > 2) {
-					rendManager.addStaticGeometry2("3d_parks", blocks[bN].myParcels[*vi].parcelContour.contour, deltaZ, false, "", GL_QUADS, 1, QVector3D(), parkColor);
-				}
-			}
-		}*/
+		}
 	}
 
 	// Draw parcels as lines
