@@ -84,7 +84,8 @@ void PropertyWidget::setRoadEdge(RoadGraph &roads, RoadEdgeDesc edgeDesc, RoadEd
 	QString oneWay;
 	QString link;
 	QString roundabout;
-	QString groupId;
+	QString exId;
+	QString patchId;
 	QString generationType;
 
 	if (selectedEdge != NULL) {
@@ -114,7 +115,8 @@ void PropertyWidget::setRoadEdge(RoadGraph &roads, RoadEdgeDesc edgeDesc, RoadEd
 		link = selectedEdge->link ? "Yes" : "No";
 		roundabout = selectedEdge->roundabout ? "Yes" : "No";
 
-		groupId = selectedEdge->properties["group_id"].toString();
+		exId = selectedEdge->properties["ex_id"].toString();
+		patchId = QString::number(selectedEdge->patchId);
 		generationType = selectedEdge->properties["generation_type"].toString();
 	}
 
@@ -125,7 +127,8 @@ void PropertyWidget::setRoadEdge(RoadGraph &roads, RoadEdgeDesc edgeDesc, RoadEd
 	ui.lineEditEdgeOneWay->setText(oneWay);
 	ui.lineEditEdgeLink->setText(link);
 	ui.lineEditEdgeRoundabout->setText(roundabout);
-	ui.lineEditEdgeGroupId->setText(groupId);
+	ui.lineEditEdgeExampleId->setText(exId);
+	ui.lineEditEdgePatchId->setText(patchId);
 	ui.lineEditEdgeGenerationType->setText(generationType);
 }
 
@@ -152,7 +155,8 @@ void PropertyWidget::resetRoadEdge() {
 	ui.lineEditEdgeOneWay->setText("");
 	ui.lineEditEdgeLink->setText("");
 	ui.lineEditEdgeRoundabout->setText("");
-	ui.lineEditEdgeGroupId->setText("");
+	ui.lineEditEdgeExampleId->setText("");
+	ui.lineEditEdgePatchId->setText("");
 	ui.lineEditEdgeGenerationType->setText("");
 }
 

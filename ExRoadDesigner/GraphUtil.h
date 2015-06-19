@@ -144,6 +144,7 @@ public:
 	static float getTotalEdgeLength(RoadGraph &roads);
 	static void computeStatistics(RoadGraph &roads, float &avgEdgeLength, float &varEdgeLength, float &avgEdgeCurvature, float &varEdgeCurvature);
 	static void computeStatistics(RoadGraph &roads, const QVector2D &pt, float dist, float &avgEdgeLength, float &varEdgeLength, float &avgEdgeCurvature, float &varEdgeCurvature);
+	static float computeRateOfPatches(RoadGraph& roads);
 
 	static void buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding);
 

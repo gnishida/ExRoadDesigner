@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'PropertyWidget.ui'
 **
-** Created: Thu Mar 26 10:44:37 2015
+** Created: Wed Jun 17 13:40:48 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -41,13 +41,15 @@ public:
     QLabel *label_10;
     QLineEdit *lineEditEdgeRoundabout;
     QLabel *label_17;
-    QLineEdit *lineEditEdgeGroupId;
+    QLineEdit *lineEditEdgeExampleId;
     QLabel *label_18;
     QLineEdit *lineEditEdgeGenerationType;
     QLabel *label_4;
     QLineEdit *lineEditEdgeSource;
     QLineEdit *lineEditEdgeTarget;
     QLabel *label_5;
+    QLineEdit *lineEditEdgePatchId;
+    QLabel *label_22;
     QGroupBox *groupBox_5;
     QLabel *label_6;
     QLineEdit *lineEditVertexDesc;
@@ -87,7 +89,7 @@ public:
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         groupBox = new QGroupBox(dockWidgetContents);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setGeometry(QRect(10, 450, 171, 211));
+        groupBox->setGeometry(QRect(10, 450, 171, 231));
         label = new QLabel(groupBox);
         label->setObjectName(QString::fromUtf8("label"));
         label->setGeometry(QRect(10, 60, 31, 16));
@@ -120,16 +122,16 @@ public:
         lineEditEdgeRoundabout->setGeometry(QRect(80, 140, 81, 20));
         label_17 = new QLabel(groupBox);
         label_17->setObjectName(QString::fromUtf8("label_17"));
-        label_17->setGeometry(QRect(10, 160, 51, 16));
-        lineEditEdgeGroupId = new QLineEdit(groupBox);
-        lineEditEdgeGroupId->setObjectName(QString::fromUtf8("lineEditEdgeGroupId"));
-        lineEditEdgeGroupId->setGeometry(QRect(80, 160, 81, 20));
+        label_17->setGeometry(QRect(10, 160, 61, 16));
+        lineEditEdgeExampleId = new QLineEdit(groupBox);
+        lineEditEdgeExampleId->setObjectName(QString::fromUtf8("lineEditEdgeExampleId"));
+        lineEditEdgeExampleId->setGeometry(QRect(80, 160, 81, 20));
         label_18 = new QLabel(groupBox);
         label_18->setObjectName(QString::fromUtf8("label_18"));
-        label_18->setGeometry(QRect(10, 180, 51, 16));
+        label_18->setGeometry(QRect(10, 200, 51, 16));
         lineEditEdgeGenerationType = new QLineEdit(groupBox);
         lineEditEdgeGenerationType->setObjectName(QString::fromUtf8("lineEditEdgeGenerationType"));
-        lineEditEdgeGenerationType->setGeometry(QRect(80, 180, 81, 20));
+        lineEditEdgeGenerationType->setGeometry(QRect(80, 200, 81, 20));
         label_4 = new QLabel(groupBox);
         label_4->setObjectName(QString::fromUtf8("label_4"));
         label_4->setGeometry(QRect(10, 20, 31, 16));
@@ -142,6 +144,12 @@ public:
         label_5 = new QLabel(groupBox);
         label_5->setObjectName(QString::fromUtf8("label_5"));
         label_5->setGeometry(QRect(10, 40, 31, 16));
+        lineEditEdgePatchId = new QLineEdit(groupBox);
+        lineEditEdgePatchId->setObjectName(QString::fromUtf8("lineEditEdgePatchId"));
+        lineEditEdgePatchId->setGeometry(QRect(80, 180, 81, 20));
+        label_22 = new QLabel(groupBox);
+        label_22->setObjectName(QString::fromUtf8("label_22"));
+        label_22->setGeometry(QRect(10, 180, 51, 16));
         groupBox_5 = new QGroupBox(dockWidgetContents);
         groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
         groupBox_5->setGeometry(QRect(10, 10, 171, 431));
@@ -238,10 +246,11 @@ public:
         label_3->setText(QApplication::translate("PropertyWidget", "One Way", 0, QApplication::UnicodeUTF8));
         label_9->setText(QApplication::translate("PropertyWidget", "Link", 0, QApplication::UnicodeUTF8));
         label_10->setText(QApplication::translate("PropertyWidget", "Roundabout", 0, QApplication::UnicodeUTF8));
-        label_17->setText(QApplication::translate("PropertyWidget", "Group", 0, QApplication::UnicodeUTF8));
+        label_17->setText(QApplication::translate("PropertyWidget", "Example Id", 0, QApplication::UnicodeUTF8));
         label_18->setText(QApplication::translate("PropertyWidget", "Example?", 0, QApplication::UnicodeUTF8));
         label_4->setText(QApplication::translate("PropertyWidget", "Source", 0, QApplication::UnicodeUTF8));
         label_5->setText(QApplication::translate("PropertyWidget", "Target", 0, QApplication::UnicodeUTF8));
+        label_22->setText(QApplication::translate("PropertyWidget", "Patch Id", 0, QApplication::UnicodeUTF8));
         groupBox_5->setTitle(QApplication::translate("PropertyWidget", "Vertex", 0, QApplication::UnicodeUTF8));
         label_6->setText(QApplication::translate("PropertyWidget", "ID", 0, QApplication::UnicodeUTF8));
         label_7->setText(QApplication::translate("PropertyWidget", "Location", 0, QApplication::UnicodeUTF8));

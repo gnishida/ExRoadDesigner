@@ -26,7 +26,7 @@
       <x>10</x>
       <y>450</y>
       <width>171</width>
-      <height>211</height>
+      <height>231</height>
      </rect>
     </property>
     <property name="title">
@@ -152,15 +152,15 @@
       <rect>
        <x>10</x>
        <y>160</y>
-       <width>51</width>
+       <width>61</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Group</string>
+      <string>Example Id</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEditEdgeGroupId">
+    <widget class="QLineEdit" name="lineEditEdgeExampleId">
      <property name="geometry">
       <rect>
        <x>80</x>
@@ -174,7 +174,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>180</y>
+       <y>200</y>
        <width>51</width>
        <height>16</height>
       </rect>
@@ -187,7 +187,7 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>180</y>
+       <y>200</y>
        <width>81</width>
        <height>20</height>
       </rect>
@@ -237,6 +237,29 @@
      </property>
      <property name="text">
       <string>Target</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEditEdgePatchId">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>180</y>
+       <width>81</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_22">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>180</y>
+       <width>51</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Patch Id</string>
      </property>
     </widget>
    </widget>

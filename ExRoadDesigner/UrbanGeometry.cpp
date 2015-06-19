@@ -37,6 +37,7 @@ This file is part of QtUrban.
 #include "VBOPmParcels.h"
 #include "VBOPmBuildings.h"
 #include "VBOVegetation.h"
+#include <QElapsedTimer>
 
 UrbanGeometry::UrbanGeometry(MainWindow* mainWin) {
 	this->mainWin = mainWin;
@@ -65,6 +66,9 @@ void UrbanGeometry::generateRoadsEx(std::vector<ExFeature> &features) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
 
+	QElapsedTimer timer;
+    timer.start();
+
 	if (G::getBool("useLayer")) {
 		PatchRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
@@ -72,12 +76,20 @@ void UrbanGeometry::generateRoadsEx(std::vector<ExFeature> &features) {
 		PatchRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
 	}
+
+	std::cout << "Road generation took " << timer.elapsed() / 1000.0 << " seconds" << std::endl;
+	std::cout << "Total length of the road network: " << GraphUtil::getTotalEdgeLength(roads) << " m" << std::endl;
+	std::cout << "Rate of patches: " << GraphUtil::computeRateOfPatches(roads) << std::endl;
+
 	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateRoadsWarp(std::vector<ExFeature> &features) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
+
+	QElapsedTimer timer;
+    timer.start();
 
 	if (G::getBool("useLayer")) {
 		WarpRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
@@ -86,12 +98,20 @@ void UrbanGeometry::generateRoadsWarp(std::vector<ExFeature> &features) {
 		WarpRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
 	}
+
+	std::cout << "Road generation took " << timer.elapsed() / 1000.0 << " seconds" << std::endl;
+	std::cout << "Total length of the road network: " << GraphUtil::getTotalEdgeLength(roads) << " m" << std::endl;
+	std::cout << "Rate of patches: " << GraphUtil::computeRateOfPatches(roads) << std::endl;
+
 	update(mainWin->glWidget->vboRenderManager);
 }
 
 void UrbanGeometry::generateRoadsPM(std::vector<ExFeature> &features) {
 	if (areas.selectedIndex == -1) return;
 	if (areas.selectedArea()->hintLine.size() == 0) return;
+
+	QElapsedTimer timer;
+    timer.start();
 
 	if (G::getBool("useLayer")) {
 		PMRoadGenerator generator(mainWin, areas.selectedArea()->roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
@@ -100,6 +120,10 @@ void UrbanGeometry::generateRoadsPM(std::vector<ExFeature> &features) {
 		PMRoadGenerator generator(mainWin, roads, areas.selectedArea()->area, areas.selectedArea()->hintLine, &mainWin->glWidget->vboRenderManager, features);
 		generator.generateRoadNetwork();
 	}
+
+	std::cout << "Road generation took " << timer.elapsed() / 1000.0 << " seconds" << std::endl;
+	std::cout << "Total length of the road network: " << GraphUtil::getTotalEdgeLength(roads) << " m" << std::endl;
+
 	update(mainWin->glWidget->vboRenderManager);
 }
 
@@ -319,7 +343,8 @@ void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 	vboRenderManager.removeStaticGeometry("streetLamp");
 
 	if (G::getBool("shader2D")) {
-		RoadMeshGenerator::generate2DRoadMesh(vboRenderManager, roads);
+		//RoadMeshGenerator::generate2DRoadMesh(vboRenderManager, roads);
+		RoadMeshGenerator::generate2DRoadMeshWithColorCoded(vboRenderManager, roads);
 		BlockMeshGenerator::generate2DParcelMesh(vboRenderManager, blocks);
 	} else {
 		RoadMeshGenerator::generateRoadMesh(vboRenderManager, roads);
@@ -331,7 +356,8 @@ void UrbanGeometry::update(VBORenderManager& vboRenderManager) {
 
 	for (int i = 0; i < areas.size(); ++i) {
 		if (G::getBool("shader2D")) {
-			RoadMeshGenerator::generate2DRoadMesh(vboRenderManager, areas[i]->roads);
+			//RoadMeshGenerator::generate2DRoadMesh(vboRenderManager, areas[i]->roads);
+			RoadMeshGenerator::generate2DRoadMeshWithColorCoded(vboRenderManager, areas[i]->roads);
 		} else {
 			RoadMeshGenerator::generateRoadMesh(vboRenderManager, areas[i]->roads);
 		}

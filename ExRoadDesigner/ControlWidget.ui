@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>198</width>
-    <height>621</height>
+    <height>672</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -26,11 +26,11 @@
       <x>1</x>
       <y>0</y>
       <width>196</width>
-      <height>581</height>
+      <height>621</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="RoadGenerationTab">
      <attribute name="title">
@@ -224,7 +224,7 @@
         <x>10</x>
         <y>230</y>
         <width>171</width>
-        <height>311</height>
+        <height>351</height>
        </rect>
       </property>
       <property name="title">
@@ -234,7 +234,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>92</y>
+         <y>130</y>
          <width>61</width>
          <height>21</height>
         </rect>
@@ -247,7 +247,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>92</y>
+         <y>130</y>
          <width>51</width>
          <height>20</height>
         </rect>
@@ -257,7 +257,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>72</y>
+         <y>110</y>
          <width>51</width>
          <height>20</height>
         </rect>
@@ -267,7 +267,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>72</y>
+         <y>110</y>
          <width>61</width>
          <height>21</height>
         </rect>
@@ -280,7 +280,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>277</y>
+         <y>310</y>
          <width>51</width>
          <height>28</height>
         </rect>
@@ -293,7 +293,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>277</y>
+         <y>310</y>
          <width>51</width>
          <height>28</height>
         </rect>
@@ -312,10 +312,10 @@
         </rect>
        </property>
        <property name="text">
-        <string>Avenue patch dist</string>
+        <string>Avenue patch dist 1</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEditPatchDistance1">
+      <widget class="QLineEdit" name="lineEditAvenuePatchDistance1">
        <property name="geometry">
         <rect>
          <x>110</x>
@@ -325,11 +325,11 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEditPatchDistance2">
+      <widget class="QLineEdit" name="lineEditStreetPatchDistance1">
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>52</y>
+         <y>70</y>
          <width>51</width>
          <height>20</height>
         </rect>
@@ -339,20 +339,20 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>52</y>
+         <y>70</y>
          <width>91</width>
          <height>21</height>
         </rect>
        </property>
        <property name="text">
-        <string>Street patch dist</string>
+        <string>Street patch dist 1</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_5">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>113</y>
+         <y>151</y>
          <width>61</width>
          <height>21</height>
         </rect>
@@ -365,7 +365,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>113</y>
+         <y>151</y>
          <width>51</width>
          <height>20</height>
         </rect>
@@ -398,7 +398,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>131</y>
+         <y>169</y>
          <width>81</width>
          <height>21</height>
         </rect>
@@ -411,7 +411,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>133</y>
+         <y>171</y>
          <width>51</width>
          <height>20</height>
         </rect>
@@ -421,7 +421,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>247</y>
+         <y>280</y>
          <width>71</width>
          <height>28</height>
         </rect>
@@ -434,7 +434,7 @@
        <property name="geometry">
         <rect>
          <x>90</x>
-         <y>247</y>
+         <y>280</y>
          <width>71</width>
          <height>28</height>
         </rect>
@@ -447,7 +447,7 @@
        <property name="geometry">
         <rect>
          <x>60</x>
-         <y>277</y>
+         <y>310</y>
          <width>51</width>
          <height>28</height>
         </rect>
@@ -460,7 +460,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>200</y>
+         <y>237</y>
          <width>111</width>
          <height>17</height>
         </rect>
@@ -473,7 +473,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>218</y>
+         <y>255</y>
          <width>131</width>
          <height>17</height>
         </rect>
@@ -486,7 +486,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>151</y>
+         <y>189</y>
          <width>81</width>
          <height>21</height>
         </rect>
@@ -499,7 +499,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>153</y>
+         <y>191</y>
          <width>51</width>
          <height>20</height>
         </rect>
@@ -509,7 +509,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>170</y>
+         <y>208</y>
          <width>81</width>
          <height>21</height>
         </rect>
@@ -522,7 +522,53 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>173</y>
+         <y>211</y>
+         <width>51</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEditAvenuePatchDistance2">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>51</y>
+         <width>51</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_17">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>51</y>
+         <width>101</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Avenue patch dist 2</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_18">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>90</y>
+         <width>91</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Street patch dist 2</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEditStreetPatchDistance2">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
+         <y>90</y>
          <width>51</width>
          <height>20</height>
         </rect>
@@ -1250,8 +1296,8 @@
   <tabstop>checkBoxCropping</tabstop>
   <tabstop>checkBoxUseLayer</tabstop>
   <tabstop>lineEditHoughScale</tabstop>
-  <tabstop>lineEditPatchDistance1</tabstop>
-  <tabstop>lineEditPatchDistance2</tabstop>
+  <tabstop>lineEditAvenuePatchDistance1</tabstop>
+  <tabstop>lineEditStreetPatchDistance1</tabstop>
   <tabstop>lineEditInterpolateSigma1</tabstop>
   <tabstop>lineEditInterpolateSigma2</tabstop>
   <tabstop>lineEditRotationAngle</tabstop>

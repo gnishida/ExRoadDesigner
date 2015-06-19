@@ -72,9 +72,9 @@ public:
 
 	void init();
 
-	std::vector<RoadEdgeDescs> shapes(int roadType, float houghScale, float patchDistance, bool saveImage);
-	std::vector<Patch> patches(int roadType, float houghScale, float patchDistance, bool saveImage);
-	void detectAvenueShapes(float houghScale, float patchDistance, bool saveImage);
-	void detectStreetShapes(float houghScale, float patchDistance, bool saveImage);
+	std::vector<RoadEdgeDescs> shapes(int roadType, int ex_id, float houghScale, float patchDistance, bool saveImage);
+	//std::vector<Patch> patches(int roadType, int ex_id, float houghScale, float patchDistance, bool saveImage);
+	void detectAvenueShapes(int ex_id, float houghScale, float patchDistance, bool saveImage);
+	void detectStreetShapes(int ex_id, float houghScale, float patchDistance, bool saveImage);
 };
 

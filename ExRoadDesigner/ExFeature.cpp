@@ -330,14 +330,17 @@ void ExFeature::savePatchImages(int roadType, int ex_id, RoadGraph& roads, std::
 					int x2 = (patches[i].roads.graph[*ei]->polyline[pl+1].x() - bbox.minPt.x()) * scale;
 					int y2 = img.rows - (patches[i].roads.graph[*ei]->polyline[pl+1].y() - bbox.minPt.y()) * scale;
 
-					if (patches[i].roads.graph[*ei]->connector) {
+					/*if (patches[i].roads.graph[*ei]->connector) {
 						cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(255, 128, 128), width);
 					} else {
 						cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(255, 0, 0), width);
 					}
+					*/
+					cv::line(img, cv::Point(x1, y1), cv::Point(x2, y2), cv::Scalar(0, 0, 0), width);
 				}
 			}
 
+			/*
 			// 頂点の描画
 			{
 				RoadVertexIter vi, vend;
@@ -379,6 +382,7 @@ void ExFeature::savePatchImages(int roadType, int ex_id, RoadGraph& roads, std::
 					cv::putText(img, str.toUtf8().data(), cv::Point(x, y), cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 0.5, cv::Scalar(0, 128, 0), 1);
 				}
 			}
+			*/
 		}
 
 		char filename[255];
@@ -467,27 +471,27 @@ void ExFeature::init() {
 	}
 }
 
-std::vector<RoadEdgeDescs> ExFeature::shapes(int roadType, float houghScale, float patchDistance, bool saveImage) {
+std::vector<RoadEdgeDescs> ExFeature::shapes(int roadType, int ex_id, float houghScale, float patchDistance, bool saveImage) {
 	if (roadType == RoadEdge::TYPE_AVENUE) {
-		if (!avenueShapesDetected) detectAvenueShapes(houghScale, patchDistance, saveImage);
+		if (!avenueShapesDetected) detectAvenueShapes(ex_id, houghScale, patchDistance, saveImage);
 		return avenueShapes;
 	} else {
-		if (!streetShapesDetected) detectStreetShapes(houghScale, patchDistance, saveImage);
+		if (!streetShapesDetected) detectStreetShapes(ex_id, houghScale, patchDistance, saveImage);
 		return streetShapes;
 	}
 }
 
-std::vector<Patch> ExFeature::patches(int roadType, float houghScale, float patchDistance, bool saveImage) {
+/*std::vector<Patch> ExFeature::patches(int roadType, int ex_id, float houghScale, float patchDistance, bool saveImage) {
 	if (roadType == RoadEdge::TYPE_AVENUE) {
-		if (!avenueShapesDetected) detectAvenueShapes(houghScale, patchDistance, saveImage);
+		if (!avenueShapesDetected) detectAvenueShapes(ex_id, houghScale, patchDistance, saveImage);
 		return avenuePatches;
 	} else {
-		if (!streetShapesDetected) detectStreetShapes(houghScale, patchDistance, saveImage);
+		if (!streetShapesDetected) detectStreetShapes(ex_id, houghScale, patchDistance, saveImage);
 		return streetPatches;
 	}
-}
+}*/
 
-void ExFeature::detectAvenueShapes(float houghScale, float patchDistance, bool saveImage) {
+void ExFeature::detectAvenueShapes(int ex_id, float houghScale, float patchDistance, bool saveImage) {
 	if (avenueShapesDetected) return;
 	avenueShapesDetected = true;
 
@@ -496,11 +500,11 @@ void ExFeature::detectAvenueShapes(float houghScale, float patchDistance, bool s
 
 	// save patch images
 	if (saveImage) {
-		savePatchImages(RoadEdge::TYPE_AVENUE, 1, avenues, avenuePatches, 1.0f, true);
+		savePatchImages(RoadEdge::TYPE_AVENUE, ex_id, avenues, avenuePatches, 1.0f, true);
 	}
 }
 
-void ExFeature::detectStreetShapes(float houghScale, float patchDistance, bool saveImage) {
+void ExFeature::detectStreetShapes(int ex_id, float houghScale, float patchDistance, bool saveImage) {
 	if (streetShapesDetected) return;
 	streetShapesDetected = true;
 
@@ -509,6 +513,6 @@ void ExFeature::detectStreetShapes(float houghScale, float patchDistance, bool s
 
 	// save patch images
 	if (saveImage) {
-		savePatchImages(RoadEdge::TYPE_STREET, 1, streets, streetPatches, 1.0f, true);
+		savePatchImages(RoadEdge::TYPE_STREET, ex_id, streets, streetPatches, 1.0f, true);
 	}
 }

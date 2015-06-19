@@ -3783,6 +3783,24 @@ void GraphUtil::computeStatistics(RoadGraph &roads, const QVector2D &pt, float d
 	varEdgeCurvature = totalCurvature2 / (float)num - SQR(avgEdgeCurvature);
 }
 
+float GraphUtil::computeRateOfPatches(RoadGraph& roads) {
+	int patch_count = 0;
+	int pm_count = 0;
+
+	RoadEdgeIter ei, eend;
+	for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+		if (!roads.graph[*ei]->valid) continue;
+
+		if (roads.graph[*ei]->patchId >= 0) {
+			patch_count++;
+		} else {
+			pm_count++;
+		}
+	}
+
+	return (float)patch_count / (float)(patch_count + pm_count);
+}
+
 void GraphUtil::buildEmbedding(RoadGraph &roads, std::vector<std::vector<RoadEdgeDesc> > &embedding) {
 	RoadVertexIter vi, vend;
 	for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {

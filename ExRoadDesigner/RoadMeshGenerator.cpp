@@ -592,3 +592,361 @@ void RoadMeshGenerator::generate2DRoadMesh(VBORenderManager& renderManager, Road
 		}
 	}
 }
+
+void RoadMeshGenerator::generate2DRoadMeshWithColorCoded(VBORenderManager& renderManager, RoadGraph& roads) {
+	float deltaZ = 2.0f;
+
+	//////////////////////////////////////
+	// EDGES
+	{
+		RoadEdgeIter ei, eend;
+		for (boost::tie(ei, eend) = boost::edges(roads.graph); ei != eend; ++ei) {
+			if (!roads.graph[*ei]->valid) continue;
+
+			int num = roads.graph[*ei]->polyline.size();
+			if (num <= 1) continue;
+
+			float halfWidth = roads.graph[*ei]->getWidth()*0.5f;//it should not have /2.0f (but compensated below)
+			
+
+			std::vector<Vertex> vert(4*(num - 1));
+			std::vector<Vertex> vertBg(4*(num - 1));
+			
+			// Type
+			QColor color;// = graph[*ei]->color;
+			QColor colorO;
+			float heightOffset = 0.0f;
+			float heightOffsetO=0.0f;
+
+			switch (roads.graph[*ei]->type) {
+			case RoadEdge::TYPE_HIGHWAY:
+				heightOffset = 0.8f;
+				heightOffsetO = 0.3f;
+				color=QColor(0xfa,0x9e,0x25);
+				colorO=QColor(0x00, 0x00, 0x00);//QColor(0xdf,0x9c,0x13);
+				break;
+			case RoadEdge::TYPE_BOULEVARD:
+				heightOffset = 0.5f;
+				heightOffsetO = 0.2f;
+				color=QColor(0xff,0xe1,0x68);
+				colorO=QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
+				//halfWidth*=1.4f;
+				break;
+			case RoadEdge::TYPE_AVENUE:
+				heightOffset = 0.6f;
+				heightOffsetO = 0.1f;
+				//color=QColor(0xff,0xe1,0x68);
+				color = getColor(RoadEdge::TYPE_AVENUE, roads.graph[*ei]->properties["ex_id"].toInt(), roads.graph[*ei]->patchId);
+				colorO=QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
+				break;
+			case RoadEdge::TYPE_STREET:
+				heightOffset = 0.4f;
+				heightOffsetO = 0.1f;
+				//color=QColor(0xff,0xff,0xff);
+				color = getColor(RoadEdge::TYPE_STREET, roads.graph[*ei]->properties["ex_id"].toInt(), roads.graph[*ei]->patchId);
+				colorO=QColor(0x00, 0x00, 0x00);//QColor(0xd7,0xd1,0xc7);
+				break;
+			}
+
+			heightOffset+=0.45f;//to have park below
+			heightOffsetO+=0.45f;//to have park below
+
+			float halfWidthBg = halfWidth + G::global().getFloat("2DroadsStroke");//it should not depend on the type 3.5f
+
+			QVector2D p0, p1, p2, p3;
+			QVector2D p0Bg, p1Bg, p2Bg, p3Bg;
+			for (int i = 0; i < num - 1; ++i) {
+				QVector2D pt1 = roads.graph[*ei]->polyline[i];
+				QVector2D pt2 = roads.graph[*ei]->polyline[i + 1];
+
+				QVector2D perp = pt2 - pt1;
+				perp = QVector2D(-perp.y(), perp.x());
+				perp.normalize();
+
+				if (i == 0) {
+					p0 = pt1 + perp * halfWidth;
+					p1 = pt1 - perp * halfWidth;
+					p0Bg = pt1 + perp * halfWidthBg;
+					p1Bg = pt1 - perp * halfWidthBg;
+				}
+				p2 = pt2 - perp * halfWidth;
+				p3 = pt2 + perp * halfWidth;
+				p2Bg = pt2 - perp * halfWidthBg;
+				p3Bg = pt2 + perp * halfWidthBg;
+				QVector3D normal(0, 0, 1);// = Util::calculateNormal(p0, p1, p2);
+
+				if (i < num - 2) {
+					QVector2D pt3 = roads.graph[*ei]->polyline[i + 2];
+
+					Util::getIrregularBisector(pt1, pt2, pt3, halfWidth, halfWidth, p3);
+					Util::getIrregularBisector(pt1, pt2, pt3, -halfWidth, -halfWidth, p2);
+					Util::getIrregularBisector(pt1, pt2, pt3, halfWidthBg, halfWidthBg, p3Bg);
+					Util::getIrregularBisector(pt1, pt2, pt3, -halfWidthBg, -halfWidthBg, p2Bg);
+				}
+
+				vert[i*4+0]=Vertex(p0.x(),p0.y(),deltaZ+heightOffset,color,0,0,1.0f,0,0,0);// pos color normal texture
+				vert[i*4+1]=Vertex(p1.x(),p1.y(),deltaZ+heightOffset,color,0,0,1.0f,0,0,0);// pos color normal texture
+				vert[i*4+2]=Vertex(p2.x(),p2.y(),deltaZ+heightOffset,color,0,0,1.0f,0,0,0);// pos color normal texture
+				vert[i*4+3]=Vertex(p3.x(),p3.y(),deltaZ+heightOffset,color,0,0,1.0f,0,0,0);// pos color normal texture
+					
+				vertBg[i*4+0]=Vertex(p0Bg.x(),p0Bg.y(),deltaZ+heightOffsetO,colorO,0,0,1.0f,0,0,0);// pos color normal texture
+				vertBg[i*4+1]=Vertex(p1Bg.x(),p1Bg.y(),deltaZ+heightOffsetO,colorO,0,0,1.0f,0,0,0);// pos color normal texture
+				vertBg[i*4+2]=Vertex(p2Bg.x(),p2Bg.y(),deltaZ+heightOffsetO,colorO,0,0,1.0f,0,0,0);// pos color normal texture
+				vertBg[i*4+3]=Vertex(p3Bg.x(),p3Bg.y(),deltaZ+heightOffsetO,colorO,0,0,1.0f,0,0,0);// pos color normal texture
+					
+
+				p0 = p3;
+				p1 = p2;
+				p0Bg = p3Bg;
+				p1Bg = p2Bg;
+			}
+
+			renderManager.addStaticGeometry("3d_roads", vert, "", GL_QUADS, 1);//MODE=1 color
+			renderManager.addStaticGeometry("3d_roads", vertBg, "", GL_QUADS, 1);//MODE=1 color
+		}
+	}
+
+	/////////////////////////////////////////////////////
+	// INTERSECTIONS
+	{
+		RoadVertexIter vi, vend;
+		for (boost::tie(vi, vend) = boost::vertices(roads.graph); vi != vend; ++vi) {
+			if (!roads.graph[*vi]->valid) continue;
+			if (GraphUtil::getDegree(roads, *vi) == 0) continue;
+
+			// get the largest width of the outing edges
+			QColor color;// = graph[*ei]->color;
+			QColor colorO;
+			float heightOffset = 0.0f;
+			float heightOffsetO=0.0f;
+			int maxType=-1;
+			float halfWidth;
+
+			RoadOutEdgeIter oei, oeend;
+			for (boost::tie(oei, oeend) = boost::out_edges(*vi, roads.graph); oei != oeend; ++oei) {
+				if (!roads.graph[*oei]->valid) continue;
+				//printf("type %d\n",graph[*oei]->type);
+				if(maxType>roads.graph[*oei]->type)
+					continue;
+				maxType=roads.graph[*oei]->type;
+				halfWidth=roads.graph[*oei]->getWidth()*0.5f;//it should not have /2.0f (but compensated below)
+
+				switch (roads.graph[*oei]->type) {
+				case RoadEdge::TYPE_HIGHWAY:
+					heightOffset = 0.6f;
+					heightOffsetO = 0.3f;
+					color=QColor(0xfa,0x9e,0x25);
+					colorO=QColor(0x00, 0x00, 0x00);//QColor(0xdf,0x9c,0x13);
+					continue;
+				case RoadEdge::TYPE_BOULEVARD:
+					heightOffset = 0.5f;
+					heightOffsetO = 0.2f;
+					color=QColor(0xff,0xe1,0x68);
+					colorO=QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
+					continue;
+				case RoadEdge::TYPE_AVENUE:
+					heightOffset = 0.5f;
+					heightOffsetO = 0.2f;
+					//color=QColor(0xff,0xe1,0x68);
+					color = getColor(RoadEdge::TYPE_AVENUE, roads.graph[*vi]->properties["ex_id"].toInt(), roads.graph[*vi]->patchId);
+					colorO=QColor(0x00, 0x00, 0x00);//QColor(0xe5,0xbd,0x4d);
+					continue;
+				case RoadEdge::TYPE_STREET:
+					heightOffset = 0.4f;
+					heightOffsetO = 0.2f;
+					//color=QColor(0xff,0xff,0xff);
+					color = getColor(RoadEdge::TYPE_STREET, roads.graph[*vi]->properties["ex_id"].toInt(), roads.graph[*vi]->patchId);
+					colorO=QColor(0x00, 0x00, 0x00);//QColor(0xd7,0xd1,0xc7);
+					continue;
+				}
+			}
+
+			heightOffset+=0.45f;//to have park below
+			heightOffsetO+=0.45f;//to have park below
+
+			float max_r=halfWidth;
+			float max_rO=halfWidth + G::global().getFloat("2DroadsStroke");//it should not depend on the type 3.5f
+
+			std::vector<Vertex> vert(3*20);
+			std::vector<Vertex> vertBg(3*20);
+
+			for (int i = 0; i < 20; ++i) {
+				float angle1 = 2.0 * M_PI * i / 20.0f;
+				float angle2 = 2.0 * M_PI * (i + 1) / 20.0f;
+
+				vert[i*3+0]=Vertex(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);
+				vert[i*3+1]=Vertex(roads.graph[*vi]->pt.x() + max_r * cosf(angle1), roads.graph[*vi]->pt.y() + max_r * sinf(angle1), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);
+				vert[i*3+2]=Vertex(roads.graph[*vi]->pt.x() + max_r * cosf(angle2), roads.graph[*vi]->pt.y() + max_r * sinf(angle2), deltaZ + heightOffset, color, 0, 0, 1.0f, 0, 0, 0);
+
+				vertBg[i*3+0]=Vertex(roads.graph[*vi]->pt.x(), roads.graph[*vi]->pt.y(), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);
+				vertBg[i*3+1]=Vertex(roads.graph[*vi]->pt.x() + max_rO * cosf(angle1), roads.graph[*vi]->pt.y() + max_rO * sinf(angle1), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);
+				vertBg[i*3+2]=Vertex(roads.graph[*vi]->pt.x() + max_rO * cosf(angle2), roads.graph[*vi]->pt.y() + max_rO * sinf(angle2), deltaZ + heightOffsetO, colorO, 0, 0, 1.0f, 0, 0, 0);
+			}
+						
+			renderManager.addStaticGeometry("3d_roads_inter", vert, "", GL_TRIANGLES, 1);//MODE=1 color
+			renderManager.addStaticGeometry("3d_roads_inter", vertBg, "", GL_TRIANGLES, 1);//MODE=1 color
+		}
+	}
+}
+
+QColor RoadMeshGenerator::getColor(int roadType, int ex_id, int patchId) {
+	if (patchId == -1) {
+		return QColor(241, 27, 233);
+		//return QColor(255, 255, 255);
+	}
+
+	if (ex_id == 0) {
+		return QColor(241, 27, 27);		
+		/*switch (patchId % 15) {
+		case 0:
+			return QColor(255, 0, 0);
+		case 1:
+			return QColor(255, 128, 0);
+		case 2:
+			return QColor(255, 0, 128);
+		case 3:
+			return QColor(255, 128, 128);
+		case 4:
+			return QColor(255, 64, 0);
+		case 5:
+			return QColor(255, 0, 64);
+		case 6:
+			return QColor(255, 64, 64);
+		case 7: 
+			return QColor(192, 0, 0);
+		case 8:
+			return QColor(128, 0, 0);
+		case 9:
+			return QColor(192, 64, 0);
+		case 10:
+			return QColor(192, 0, 64);
+		case 11:
+			return QColor(192, 64, 64);
+		case 12:
+			return QColor(128, 32, 0);
+		case 13:
+			return QColor(128, 0, 32);
+		case 14:
+			return QColor(128, 32, 32);
+		default:
+			return QColor(0, 0, 0);
+		}*/
+	} else if (ex_id == 1) {
+		return QColor(63, 27, 241);
+		/*switch (patchId % 15) {
+		case 0:
+			return QColor(0, 0, 255);
+		case 1:
+			return QColor(0, 128, 255);
+		case 2:
+			return QColor(128, 0, 255);
+		case 3:
+			return QColor(128, 64, 255);
+		case 4:
+			return QColor(0, 64, 255);
+		case 5:
+			return QColor(64, 0, 255);
+		case 6:
+			return QColor(64, 64, 255);
+		case 7: 
+			return QColor(0, 0, 192);
+		case 8:
+			return QColor(0, 0, 128);
+		case 9:
+			return QColor(0, 64, 192);
+		case 10:
+			return QColor(64, 0, 192);
+		case 11:
+			return QColor(64, 64, 192);
+		case 12:
+			return QColor(0, 32, 128);
+		case 13:
+			return QColor(32, 0, 128);
+		case 14:
+			return QColor(32, 32, 128);
+		default:
+			return QColor(0, 0, 0);
+		}*/
+	} else {
+		printf("ERROR: roadType=%d, ex_id=%d, patchId=%d\n", roadType, ex_id, patchId);
+		return QColor(255, 255, 255);
+	}
+
+	/*
+	if (ex_id == 0) {
+
+	} else if (ex_id == 1) {
+		int b = (patchId % 12) * 35 + 80;
+		int r = 0;
+		int g = 0;
+		if (b > 255) {
+			r = b - 255;
+			g = b - 255;
+			b = 255;
+		}
+		return QColor(r, g, b);
+	} else {
+		printf("ERROR: roadType=%d, ex_id=%d, patchId=%d\n", roadType, ex_id, patchId);
+		return QColor(255, 255, 255);
+	}
+	*/
+
+	/*
+	if (patchId == -1) return QColor(0xff, 0xff, 0xff);
+	
+	switch (patchId % 25) {
+	case 0:
+		return QColor(255, 0, 0);
+	case 1:
+		return QColor(0, 255, 0);
+	case 2:
+		return QColor(0, 0, 255);
+	case 3:
+		return QColor(255, 255, 0);
+	case 4:
+		return QColor(0, 255, 255);
+	case 5:
+		return QColor(255, 0, 255);
+	case 6:
+		return QColor(128, 0, 0);
+	case 7: 
+		return QColor(0, 128, 0);
+	case 8:
+		return QColor(0, 0, 128);
+	case 9:
+		return QColor(128, 128, 0);
+	case 10:
+		return QColor(0, 128, 128);
+	case 11:
+		return QColor(128, 0, 128);
+	case 12:
+		return QColor(128, 128, 128);
+	case 13:
+		return QColor(64, 0, 0);
+	case 14:
+		return QColor(0, 64, 0);
+	case 15:
+		return QColor(0, 0, 64);
+	case 16:
+		return QColor(64, 64, 0);
+	case 17:
+		return QColor(0, 64, 64);
+	case 18:
+		return QColor(64, 0, 64);
+	case 19:
+		return QColor(255, 64, 0);
+	case 20:
+		return QColor(0, 255, 64);
+	case 21:
+		return QColor(64, 0, 255);
+	case 22:
+		return QColor(255, 128, 64);
+	case 23:
+		return QColor(64, 255, 128);
+	case 24:
+		return QColor(128, 64, 255);
+	default:
+		return QColor(0, 0, 0);
+	}
+	*/
+}

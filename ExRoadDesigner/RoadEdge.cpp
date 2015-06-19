@@ -8,6 +8,7 @@ RoadEdge::RoadEdge(unsigned int type, unsigned int lanes, bool oneWay, bool link
 	this->link = link;
 	this->roundabout = roundabout;
 
+	this->patchId = -1;
 	this->color = QColor(255, 255, 255);
 
 	// initialize other members

@@ -28,8 +28,10 @@ ControlWidget::ControlWidget(MainWindow* mainWin) : QDockWidget("Control Widget"
 	ui.checkBoxUseLayer->setChecked(false);
 	ui.lineEditMinBlockSize->setText("10000");
 	ui.lineEditHoughScale->setText("500.0");
-	ui.lineEditPatchDistance1->setText("80");
-	ui.lineEditPatchDistance2->setText("20");
+	ui.lineEditAvenuePatchDistance1->setText("80");
+	ui.lineEditAvenuePatchDistance2->setText("80");
+	ui.lineEditStreetPatchDistance1->setText("20");
+	ui.lineEditStreetPatchDistance2->setText("20");
 	ui.lineEditInterpolateSigma1->setText("0.2");
 	ui.lineEditInterpolateSigma2->setText("0.2");
 	ui.lineEditRotationAngle->setText("0.0");
@@ -114,8 +116,10 @@ void ControlWidget::generateRoadsEx() {
 	G::global()["useLayer"] = ui.checkBoxUseLayer->isChecked();
 
 	G::global()["houghScale"] = ui.lineEditHoughScale->text().toFloat();
-	G::global()["avenuePatchDistance"] = ui.lineEditPatchDistance1->text().toFloat();
-	G::global()["streetPatchDistance"] = ui.lineEditPatchDistance2->text().toFloat();
+	G::global()["avenuePatchDistance1"] = ui.lineEditAvenuePatchDistance1->text().toFloat();
+	G::global()["avenuePatchDistance2"] = ui.lineEditAvenuePatchDistance2->text().toFloat();
+	G::global()["streetPatchDistance1"] = ui.lineEditStreetPatchDistance1->text().toFloat();
+	G::global()["streetPatchDistance2"] = ui.lineEditStreetPatchDistance2->text().toFloat();
 	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
@@ -155,8 +159,10 @@ void ControlWidget::generateRoadsWarp() {
 	G::global()["useLayer"] = ui.checkBoxUseLayer->isChecked();
 
 	G::global()["houghScale"] = ui.lineEditHoughScale->text().toFloat();
-	G::global()["avenuePatchDistance"] = ui.lineEditPatchDistance1->text().toFloat();
-	G::global()["streetPatchDistance"] = ui.lineEditPatchDistance2->text().toFloat();
+	G::global()["avenuePatchDistance1"] = ui.lineEditAvenuePatchDistance1->text().toFloat();
+	G::global()["avenuePatchDistance2"] = ui.lineEditAvenuePatchDistance2->text().toFloat();
+	G::global()["streetPatchDistance1"] = ui.lineEditStreetPatchDistance1->text().toFloat();
+	G::global()["streetPatchDistance2"] = ui.lineEditStreetPatchDistance2->text().toFloat();
 	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
@@ -195,8 +201,10 @@ void ControlWidget::generateRoadsPM() {
 	G::global()["useLayer"] = ui.checkBoxUseLayer->isChecked();
 
 	G::global()["houghScale"] = ui.lineEditHoughScale->text().toFloat();
-	G::global()["avenuePatchDistance"] = ui.lineEditPatchDistance1->text().toFloat();
-	G::global()["streetPatchDistance"] = ui.lineEditPatchDistance2->text().toFloat();
+	G::global()["avenuePatchDistance1"] = ui.lineEditAvenuePatchDistance1->text().toFloat();
+	G::global()["avenuePatchDistance2"] = ui.lineEditAvenuePatchDistance2->text().toFloat();
+	G::global()["streetPatchDistance1"] = ui.lineEditStreetPatchDistance1->text().toFloat();
+	G::global()["streetPatchDistance2"] = ui.lineEditStreetPatchDistance2->text().toFloat();
 	G::global()["interpolationSigma1"] = ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["rotationAngle"] = ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;

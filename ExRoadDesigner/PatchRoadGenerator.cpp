@@ -63,7 +63,13 @@ void PatchRoadGenerator::generateRoadNetwork() {
 			shapes.resize(features.size());
 			patches.resize(features.size());
 			for (int i = 0; i < features.size(); ++i) {
-				shapes[i] = features[i].shapes(RoadEdge::TYPE_AVENUE, G::getFloat("houghScale"), G::getFloat("avenuePatchDistance"), G::getBool("savePatchImages"));
+				float patchDistance;
+				if (i == 0) {
+					patchDistance = G::getFloat("avenuePatchDistance1");
+				} else {
+					patchDistance = G::getFloat("avenuePatchDistance2");
+				}
+				shapes[i] = features[i].shapes(RoadEdge::TYPE_AVENUE, i + 1, G::getFloat("houghScale"), patchDistance, G::getBool("savePatchImages"));
 				patches[i] = RoadGeneratorHelper::convertToPatch(RoadEdge::TYPE_AVENUE, features[i].roads(RoadEdge::TYPE_AVENUE), features[i].roads(RoadEdge::TYPE_AVENUE), shapes[i]);
 			}
 		}
@@ -148,7 +154,13 @@ void PatchRoadGenerator::generateRoadNetwork() {
 			shapes.resize(features.size());
 			patches.resize(features.size());
 			for (int i = 0; i < features.size(); ++i) {
-				shapes[i] = features[i].shapes(RoadEdge::TYPE_STREET, G::getFloat("houghScale") * 0.2f, G::getFloat("streetPatchDistance"), G::getBool("savePatchImages"));
+				float patchDistance;
+				if (i == 0) {
+					patchDistance = G::getFloat("streetPatchDistance1");
+				} else {
+					patchDistance = G::getFloat("streetPatchDistance2");
+				}
+				shapes[i] = features[i].shapes(RoadEdge::TYPE_STREET, i + 1, G::getFloat("houghScale") * 0.2f, patchDistance, G::getBool("savePatchImages"));
 				patches[i] = RoadGeneratorHelper::convertToPatch(RoadEdge::TYPE_STREET, features[i].roads(RoadEdge::TYPE_STREET), features[i].roads(RoadEdge::TYPE_AVENUE), shapes[i]);
 			}
 		}
@@ -725,6 +737,8 @@ void PatchRoadGenerator::buildReplacementGraphByExample(int roadType, RoadGraph 
 			edge->polyline.translate(roads.graph[srcDesc]->pt);
 
 			RoadEdgeDesc e_desc = GraphUtil::addEdge(replacementGraph, conv[src], conv[tgt], edge);
+			replacementGraph.graph[e_desc]->patchId = patchId;
+			replacementGraph.graph[e_desc]->properties["ex_id"] = ex_id;
 		}
 	}
 
@@ -820,6 +834,8 @@ void PatchRoadGenerator::buildReplacementGraphByExample2(int roadType, RoadGraph
 			edge->polyline.translate(roads.graph[srcDesc]->pt);
 
 			RoadEdgeDesc e_desc = GraphUtil::addEdge(replacementGraph, conv[src], conv[tgt], edge);
+			replacementGraph.graph[e_desc]->patchId = patchId;
+			replacementGraph.graph[e_desc]->properties["ex_id"] = ex_id;
 		}
 	}
 

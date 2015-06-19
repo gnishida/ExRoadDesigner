@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ControlWidget.ui'
 **
-** Created: Thu Mar 26 10:44:37 2015
+** Created: Wed Jun 17 12:11:58 2015
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -55,8 +55,8 @@ public:
     QPushButton *pushButtonGeneratePM;
     QPushButton *pushButtonClear;
     QLabel *label_8;
-    QLineEdit *lineEditPatchDistance1;
-    QLineEdit *lineEditPatchDistance2;
+    QLineEdit *lineEditAvenuePatchDistance1;
+    QLineEdit *lineEditStreetPatchDistance1;
     QLabel *label_9;
     QLabel *label_5;
     QLineEdit *lineEditRotationAngle;
@@ -73,6 +73,10 @@ public:
     QLineEdit *lineEditSlopeTolerance;
     QLabel *label_16;
     QLineEdit *lineEditAcrossRiverTolerance;
+    QLineEdit *lineEditAvenuePatchDistance2;
+    QLabel *label_17;
+    QLabel *label_18;
+    QLineEdit *lineEditStreetPatchDistance2;
     QWidget *CleanUpTab;
     QGroupBox *groupBox_5;
     QPushButton *pushButtonMerge;
@@ -120,14 +124,14 @@ public:
     {
         if (ControlWidget->objectName().isEmpty())
             ControlWidget->setObjectName(QString::fromUtf8("ControlWidget"));
-        ControlWidget->resize(198, 621);
+        ControlWidget->resize(198, 672);
         ControlWidget->setMinimumSize(QSize(190, 240));
         ControlWidget->setStyleSheet(QString::fromUtf8("background-color: rgb(181, 181, 181);"));
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QString::fromUtf8("dockWidgetContents"));
         TabWidget = new QTabWidget(dockWidgetContents);
         TabWidget->setObjectName(QString::fromUtf8("TabWidget"));
-        TabWidget->setGeometry(QRect(1, 0, 196, 581));
+        TabWidget->setGeometry(QRect(1, 0, 196, 621));
         RoadGenerationTab = new QWidget();
         RoadGenerationTab->setObjectName(QString::fromUtf8("RoadGenerationTab"));
         groupBox = new QGroupBox(RoadGenerationTab);
@@ -178,43 +182,43 @@ public:
         lineEditRandomSeed->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         groupBox_8 = new QGroupBox(RoadGenerationTab);
         groupBox_8->setObjectName(QString::fromUtf8("groupBox_8"));
-        groupBox_8->setGeometry(QRect(10, 230, 171, 311));
+        groupBox_8->setGeometry(QRect(10, 230, 171, 351));
         label_2 = new QLabel(groupBox_8);
         label_2->setObjectName(QString::fromUtf8("label_2"));
-        label_2->setGeometry(QRect(10, 92, 61, 21));
+        label_2->setGeometry(QRect(10, 130, 61, 21));
         lineEditInterpolateSigma2 = new QLineEdit(groupBox_8);
         lineEditInterpolateSigma2->setObjectName(QString::fromUtf8("lineEditInterpolateSigma2"));
-        lineEditInterpolateSigma2->setGeometry(QRect(110, 92, 51, 20));
+        lineEditInterpolateSigma2->setGeometry(QRect(110, 130, 51, 20));
         lineEditInterpolateSigma1 = new QLineEdit(groupBox_8);
         lineEditInterpolateSigma1->setObjectName(QString::fromUtf8("lineEditInterpolateSigma1"));
-        lineEditInterpolateSigma1->setGeometry(QRect(110, 72, 51, 20));
+        lineEditInterpolateSigma1->setGeometry(QRect(110, 110, 51, 20));
         label_6 = new QLabel(groupBox_8);
         label_6->setObjectName(QString::fromUtf8("label_6"));
-        label_6->setGeometry(QRect(10, 72, 61, 21));
+        label_6->setGeometry(QRect(10, 110, 61, 21));
         pushButtonGeneratePM = new QPushButton(groupBox_8);
         pushButtonGeneratePM->setObjectName(QString::fromUtf8("pushButtonGeneratePM"));
-        pushButtonGeneratePM->setGeometry(QRect(10, 277, 51, 28));
+        pushButtonGeneratePM->setGeometry(QRect(10, 310, 51, 28));
         pushButtonClear = new QPushButton(groupBox_8);
         pushButtonClear->setObjectName(QString::fromUtf8("pushButtonClear"));
-        pushButtonClear->setGeometry(QRect(110, 277, 51, 28));
+        pushButtonClear->setGeometry(QRect(110, 310, 51, 28));
         label_8 = new QLabel(groupBox_8);
         label_8->setObjectName(QString::fromUtf8("label_8"));
         label_8->setGeometry(QRect(10, 32, 101, 21));
-        lineEditPatchDistance1 = new QLineEdit(groupBox_8);
-        lineEditPatchDistance1->setObjectName(QString::fromUtf8("lineEditPatchDistance1"));
-        lineEditPatchDistance1->setGeometry(QRect(110, 32, 51, 20));
-        lineEditPatchDistance2 = new QLineEdit(groupBox_8);
-        lineEditPatchDistance2->setObjectName(QString::fromUtf8("lineEditPatchDistance2"));
-        lineEditPatchDistance2->setGeometry(QRect(110, 52, 51, 20));
+        lineEditAvenuePatchDistance1 = new QLineEdit(groupBox_8);
+        lineEditAvenuePatchDistance1->setObjectName(QString::fromUtf8("lineEditAvenuePatchDistance1"));
+        lineEditAvenuePatchDistance1->setGeometry(QRect(110, 32, 51, 20));
+        lineEditStreetPatchDistance1 = new QLineEdit(groupBox_8);
+        lineEditStreetPatchDistance1->setObjectName(QString::fromUtf8("lineEditStreetPatchDistance1"));
+        lineEditStreetPatchDistance1->setGeometry(QRect(110, 70, 51, 20));
         label_9 = new QLabel(groupBox_8);
         label_9->setObjectName(QString::fromUtf8("label_9"));
-        label_9->setGeometry(QRect(10, 52, 91, 21));
+        label_9->setGeometry(QRect(10, 70, 91, 21));
         label_5 = new QLabel(groupBox_8);
         label_5->setObjectName(QString::fromUtf8("label_5"));
-        label_5->setGeometry(QRect(10, 113, 61, 21));
+        label_5->setGeometry(QRect(10, 151, 61, 21));
         lineEditRotationAngle = new QLineEdit(groupBox_8);
         lineEditRotationAngle->setObjectName(QString::fromUtf8("lineEditRotationAngle"));
-        lineEditRotationAngle->setGeometry(QRect(110, 113, 51, 20));
+        lineEditRotationAngle->setGeometry(QRect(110, 151, 51, 20));
         lineEditHoughScale = new QLineEdit(groupBox_8);
         lineEditHoughScale->setObjectName(QString::fromUtf8("lineEditHoughScale"));
         lineEditHoughScale->setGeometry(QRect(110, 12, 51, 20));
@@ -223,37 +227,49 @@ public:
         label_10->setGeometry(QRect(10, 12, 91, 21));
         label_12 = new QLabel(groupBox_8);
         label_12->setObjectName(QString::fromUtf8("label_12"));
-        label_12->setGeometry(QRect(10, 131, 81, 21));
+        label_12->setGeometry(QRect(10, 169, 81, 21));
         lineEditRoadAngleTolerance = new QLineEdit(groupBox_8);
         lineEditRoadAngleTolerance->setObjectName(QString::fromUtf8("lineEditRoadAngleTolerance"));
-        lineEditRoadAngleTolerance->setGeometry(QRect(110, 133, 51, 20));
+        lineEditRoadAngleTolerance->setGeometry(QRect(110, 171, 51, 20));
         pushButtonGenerateEx = new QPushButton(groupBox_8);
         pushButtonGenerateEx->setObjectName(QString::fromUtf8("pushButtonGenerateEx"));
-        pushButtonGenerateEx->setGeometry(QRect(10, 247, 71, 28));
+        pushButtonGenerateEx->setGeometry(QRect(10, 280, 71, 28));
         pushButtonGenerateWarp = new QPushButton(groupBox_8);
         pushButtonGenerateWarp->setObjectName(QString::fromUtf8("pushButtonGenerateWarp"));
-        pushButtonGenerateWarp->setGeometry(QRect(90, 247, 71, 28));
+        pushButtonGenerateWarp->setGeometry(QRect(90, 280, 71, 28));
         pushButtonGenerateAliaga = new QPushButton(groupBox_8);
         pushButtonGenerateAliaga->setObjectName(QString::fromUtf8("pushButtonGenerateAliaga"));
-        pushButtonGenerateAliaga->setGeometry(QRect(60, 277, 51, 28));
+        pushButtonGenerateAliaga->setGeometry(QRect(60, 310, 51, 28));
         checkBoxSaveRoadImages = new QCheckBox(groupBox_8);
         checkBoxSaveRoadImages->setObjectName(QString::fromUtf8("checkBoxSaveRoadImages"));
-        checkBoxSaveRoadImages->setGeometry(QRect(20, 200, 111, 17));
+        checkBoxSaveRoadImages->setGeometry(QRect(20, 237, 111, 17));
         checkBoxSavePatchImages = new QCheckBox(groupBox_8);
         checkBoxSavePatchImages->setObjectName(QString::fromUtf8("checkBoxSavePatchImages"));
-        checkBoxSavePatchImages->setGeometry(QRect(20, 218, 131, 17));
+        checkBoxSavePatchImages->setGeometry(QRect(20, 255, 131, 17));
         label_14 = new QLabel(groupBox_8);
         label_14->setObjectName(QString::fromUtf8("label_14"));
-        label_14->setGeometry(QRect(10, 151, 81, 21));
+        label_14->setGeometry(QRect(10, 189, 81, 21));
         lineEditSlopeTolerance = new QLineEdit(groupBox_8);
         lineEditSlopeTolerance->setObjectName(QString::fromUtf8("lineEditSlopeTolerance"));
-        lineEditSlopeTolerance->setGeometry(QRect(110, 153, 51, 20));
+        lineEditSlopeTolerance->setGeometry(QRect(110, 191, 51, 20));
         label_16 = new QLabel(groupBox_8);
         label_16->setObjectName(QString::fromUtf8("label_16"));
-        label_16->setGeometry(QRect(10, 170, 81, 21));
+        label_16->setGeometry(QRect(10, 208, 81, 21));
         lineEditAcrossRiverTolerance = new QLineEdit(groupBox_8);
         lineEditAcrossRiverTolerance->setObjectName(QString::fromUtf8("lineEditAcrossRiverTolerance"));
-        lineEditAcrossRiverTolerance->setGeometry(QRect(110, 173, 51, 20));
+        lineEditAcrossRiverTolerance->setGeometry(QRect(110, 211, 51, 20));
+        lineEditAvenuePatchDistance2 = new QLineEdit(groupBox_8);
+        lineEditAvenuePatchDistance2->setObjectName(QString::fromUtf8("lineEditAvenuePatchDistance2"));
+        lineEditAvenuePatchDistance2->setGeometry(QRect(110, 51, 51, 20));
+        label_17 = new QLabel(groupBox_8);
+        label_17->setObjectName(QString::fromUtf8("label_17"));
+        label_17->setGeometry(QRect(10, 51, 101, 21));
+        label_18 = new QLabel(groupBox_8);
+        label_18->setObjectName(QString::fromUtf8("label_18"));
+        label_18->setGeometry(QRect(10, 90, 91, 21));
+        lineEditStreetPatchDistance2 = new QLineEdit(groupBox_8);
+        lineEditStreetPatchDistance2->setObjectName(QString::fromUtf8("lineEditStreetPatchDistance2"));
+        lineEditStreetPatchDistance2->setGeometry(QRect(110, 90, 51, 20));
         TabWidget->addTab(RoadGenerationTab, QString());
         CleanUpTab = new QWidget();
         CleanUpTab->setObjectName(QString::fromUtf8("CleanUpTab"));
@@ -450,15 +466,15 @@ public:
         QWidget::setTabOrder(checkBoxLocalStreets, checkBoxCropping);
         QWidget::setTabOrder(checkBoxCropping, checkBoxUseLayer);
         QWidget::setTabOrder(checkBoxUseLayer, lineEditHoughScale);
-        QWidget::setTabOrder(lineEditHoughScale, lineEditPatchDistance1);
-        QWidget::setTabOrder(lineEditPatchDistance1, lineEditPatchDistance2);
-        QWidget::setTabOrder(lineEditPatchDistance2, lineEditInterpolateSigma1);
+        QWidget::setTabOrder(lineEditHoughScale, lineEditAvenuePatchDistance1);
+        QWidget::setTabOrder(lineEditAvenuePatchDistance1, lineEditStreetPatchDistance1);
+        QWidget::setTabOrder(lineEditStreetPatchDistance1, lineEditInterpolateSigma1);
         QWidget::setTabOrder(lineEditInterpolateSigma1, lineEditInterpolateSigma2);
         QWidget::setTabOrder(lineEditInterpolateSigma2, lineEditRotationAngle);
 
         retranslateUi(ControlWidget);
 
-        TabWidget->setCurrentIndex(2);
+        TabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(ControlWidget);
@@ -481,8 +497,8 @@ public:
         label_6->setText(QApplication::translate("ControlWidget", "sigma1 ^2", 0, QApplication::UnicodeUTF8));
         pushButtonGeneratePM->setText(QApplication::translate("ControlWidget", "PM", 0, QApplication::UnicodeUTF8));
         pushButtonClear->setText(QApplication::translate("ControlWidget", "Clear", 0, QApplication::UnicodeUTF8));
-        label_8->setText(QApplication::translate("ControlWidget", "Avenue patch dist", 0, QApplication::UnicodeUTF8));
-        label_9->setText(QApplication::translate("ControlWidget", "Street patch dist", 0, QApplication::UnicodeUTF8));
+        label_8->setText(QApplication::translate("ControlWidget", "Avenue patch dist 1", 0, QApplication::UnicodeUTF8));
+        label_9->setText(QApplication::translate("ControlWidget", "Street patch dist 1", 0, QApplication::UnicodeUTF8));
         label_5->setText(QApplication::translate("ControlWidget", "rotation", 0, QApplication::UnicodeUTF8));
         label_10->setText(QApplication::translate("ControlWidget", "Circle Hough scale", 0, QApplication::UnicodeUTF8));
         label_12->setText(QApplication::translate("ControlWidget", "angle tolerance", 0, QApplication::UnicodeUTF8));
@@ -493,6 +509,8 @@ public:
         checkBoxSavePatchImages->setText(QApplication::translate("ControlWidget", "save patch images", 0, QApplication::UnicodeUTF8));
         label_14->setText(QApplication::translate("ControlWidget", "slope tolerance", 0, QApplication::UnicodeUTF8));
         label_16->setText(QApplication::translate("ControlWidget", "across river", 0, QApplication::UnicodeUTF8));
+        label_17->setText(QApplication::translate("ControlWidget", "Avenue patch dist 2", 0, QApplication::UnicodeUTF8));
+        label_18->setText(QApplication::translate("ControlWidget", "Street patch dist 2", 0, QApplication::UnicodeUTF8));
         TabWidget->setTabText(TabWidget->indexOf(RoadGenerationTab), QApplication::translate("ControlWidget", "Road", 0, QApplication::UnicodeUTF8));
         groupBox_5->setTitle(QApplication::translate("ControlWidget", "Finalize", 0, QApplication::UnicodeUTF8));
         pushButtonMerge->setText(QApplication::translate("ControlWidget", "Merge", 0, QApplication::UnicodeUTF8));

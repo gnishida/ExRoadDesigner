@@ -390,8 +390,10 @@ void MainWindow::onRotationVideo() {
 	G::global()["useLayer"] = controlWidget->ui.checkBoxUseLayer->isChecked();
 
 	G::global()["houghScale"] = controlWidget->ui.lineEditHoughScale->text().toFloat();
-	G::global()["avenuePatchDistance"] = controlWidget->ui.lineEditPatchDistance1->text().toFloat();
-	G::global()["streetPatchDistance"] = controlWidget->ui.lineEditPatchDistance2->text().toFloat();
+	G::global()["avenuePatchDistance1"] = controlWidget->ui.lineEditAvenuePatchDistance1->text().toFloat();
+	G::global()["avenuePatchDistance2"] = controlWidget->ui.lineEditAvenuePatchDistance2->text().toFloat();
+	G::global()["streetPatchDistance1"] = controlWidget->ui.lineEditStreetPatchDistance1->text().toFloat();
+	G::global()["streetPatchDistance2"] = controlWidget->ui.lineEditStreetPatchDistance2->text().toFloat();
 	G::global()["interpolationSigma1"] = controlWidget->ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = controlWidget->ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["roadAngleTolerance"] = controlWidget->ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
@@ -472,8 +474,10 @@ void MainWindow::onInterpolationVideo() {
 	G::global()["useLayer"] = controlWidget->ui.checkBoxUseLayer->isChecked();
 
 	G::global()["houghScale"] = controlWidget->ui.lineEditHoughScale->text().toFloat();
-	G::global()["avenuePatchDistance"] = controlWidget->ui.lineEditPatchDistance1->text().toFloat();
-	G::global()["streetPatchDistance"] = controlWidget->ui.lineEditPatchDistance2->text().toFloat();
+	G::global()["avenuePatchDistance1"] = controlWidget->ui.lineEditAvenuePatchDistance1->text().toFloat();
+	G::global()["avenuePatchDistance2"] = controlWidget->ui.lineEditAvenuePatchDistance2->text().toFloat();
+	G::global()["streetPatchDistance1"] = controlWidget->ui.lineEditStreetPatchDistance1->text().toFloat();
+	G::global()["streetPatchDistance2"] = controlWidget->ui.lineEditStreetPatchDistance2->text().toFloat();
 	G::global()["rotationAngle"] = controlWidget->ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
 	G::global()["roadAngleTolerance"] = controlWidget->ui.lineEditRoadAngleTolerance->text().toFloat() / 180.0f * M_PI;
 
@@ -556,8 +560,10 @@ void MainWindow::onBlendingVideo() {
 	G::global()["useLayer"] = controlWidget->ui.checkBoxUseLayer->isChecked();
 
 	G::global()["houghScale"] = controlWidget->ui.lineEditHoughScale->text().toFloat();
-	G::global()["avenuePatchDistance"] = controlWidget->ui.lineEditPatchDistance1->text().toFloat();
-	G::global()["streetPatchDistance"] = controlWidget->ui.lineEditPatchDistance2->text().toFloat();
+	G::global()["avenuePatchDistance1"] = controlWidget->ui.lineEditAvenuePatchDistance1->text().toFloat();
+	G::global()["avenuePatchDistance2"] = controlWidget->ui.lineEditAvenuePatchDistance2->text().toFloat();
+	G::global()["streetPatchDistance1"] = controlWidget->ui.lineEditStreetPatchDistance1->text().toFloat();
+	G::global()["streetPatchDistance2"] = controlWidget->ui.lineEditStreetPatchDistance2->text().toFloat();
 	G::global()["interpolationSigma1"] = controlWidget->ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = controlWidget->ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["rotationAngle"] = controlWidget->ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
@@ -644,8 +650,10 @@ void MainWindow::onGrowingVideo() {
 	G::global()["useLayer"] = controlWidget->ui.checkBoxUseLayer->isChecked();
 
 	G::global()["houghScale"] = controlWidget->ui.lineEditHoughScale->text().toFloat();
-	G::global()["avenuePatchDistance"] = controlWidget->ui.lineEditPatchDistance1->text().toFloat();
-	G::global()["streetPatchDistance"] = controlWidget->ui.lineEditPatchDistance2->text().toFloat();
+	G::global()["avenuePatchDistance1"] = controlWidget->ui.lineEditAvenuePatchDistance1->text().toFloat();
+	G::global()["avenuePatchDistance2"] = controlWidget->ui.lineEditAvenuePatchDistance2->text().toFloat();
+	G::global()["streetPatchDistance1"] = controlWidget->ui.lineEditStreetPatchDistance1->text().toFloat();
+	G::global()["streetPatchDistance2"] = controlWidget->ui.lineEditStreetPatchDistance2->text().toFloat();
 	G::global()["interpolationSigma1"] = controlWidget->ui.lineEditInterpolateSigma1->text().toFloat();
 	G::global()["interpolationSigma2"] = controlWidget->ui.lineEditInterpolateSigma2->text().toFloat();
 	G::global()["rotationAngle"] = controlWidget->ui.lineEditRotationAngle->text().toFloat() / 180.0f * M_PI;
